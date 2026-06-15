@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" fill="none" role="img" aria-label="Cloud solutions and DevOps">
+  <defs>
+    <linearGradient id="clBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF8F3"/>
+      <stop offset="50%" stop-color="#F5F0FF"/>
+      <stop offset="100%" stop-color="#EFF6FF"/>
+    </linearGradient>
+    <linearGradient id="clNavy" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2A5F9E"/>
+      <stop offset="100%" stop-color="#1E3A5F"/>
+    </linearGradient>
+    <filter id="clSh" x="-8%" y="-8%" width="116%" height="116%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#2A5F9E" flood-opacity="0.1"/>
+    </filter>
+  </defs>
+
+  <rect width="400" height="300" rx="16" fill="url(#clBg)"/>
+  <ellipse cx="200" cy="120" rx="175" ry="95" fill="#14B8A6" opacity="0.07"/>
+
+  <g filter="url(#clSh)">
+    <path d="M138,168 Q118,168 118,148 Q118,130 136,128 Q138,108 158,106 Q166,88 186,90 Q194,76 212,78 Q232,76 242,94 Q262,92 270,112 Q288,114 288,136 Q288,156 270,158 Z" fill="#FFFFFF" stroke="#14B8A6" stroke-width="1.8"/>
+    <path d="M148,163 Q131,163 131,146 Q131,132 146,130 Q148,113 164,111 Q171,96 189,98 Q197,86 213,88 Q230,86 239,102 Q256,100 263,117 Q278,119 278,134 Q278,151 263,153 Z" fill="#14B8A6" opacity="0.08"/>
+
+    <path d="M173,146 L173,134 M168,138 L173,132 L178,138" stroke="#14B8A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M203,146 L203,134 M198,138 L203,132 L208,138" stroke="#4A90E2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M233,146 L233,134 M228,138 L233,132 L238,138" stroke="#8FB9F4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <line x1="163" y1="163" x2="143" y2="208" stroke="#14B8A6" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.4"/>
+  <line x1="208" y1="161" x2="208" y2="208" stroke="#4A90E2" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.4"/>
+  <line x1="253" y1="163" x2="273" y2="208" stroke="#C9C4F8" stroke-width="1.5" stroke-dasharray="4,3" opacity="0.4"/>
+
+  <g filter="url(#clSh)">
+    <rect x="98" y="208" width="82" height="52" rx="8" fill="#FFFFFF" stroke="#4A90E2"/>
+    <rect x="106" y="218" width="62" height="8" rx="3" fill="#F1F5F9"/>
+    <rect x="106" y="230" width="62" height="8" rx="3" fill="#F1F5F9"/>
+    <rect x="106" y="242" width="62" height="8" rx="3" fill="#F1F5F9"/>
+    <circle cx="152" cy="222" r="3" fill="#14B8A6"/>
+    <circle cx="152" cy="234" r="3" fill="#4A90E2"/>
+    <circle cx="152" cy="246" r="3" fill="#F97316"/>
+
+    <rect x="174" y="208" width="52" height="52" rx="8" fill="#FFFFFF" stroke="#8FB9F4"/>
+    <text x="200" y="238" text-anchor="middle" font-family="monospace" font-size="15" fill="#2A5F9E" opacity="0.75">DB</text>
+    <rect x="188" y="246" width="24" height="5" rx="2" fill="#8FB9F4" opacity="0.35"/>
+
+    <rect x="238" y="208" width="78" height="52" rx="8" fill="#FFFFFF" stroke="#C9C4F8"/>
+    <rect x="248" y="218" width="58" height="8" rx="3" fill="#F1F5F9"/>
+    <rect x="248" y="230" width="58" height="8" rx="3" fill="#F1F5F9"/>
+    <rect x="248" y="242" width="58" height="8" rx="3" fill="#F1F5F9"/>
+    <circle cx="288" cy="222" r="3" fill="#C9C4F8"/>
+    <circle cx="288" cy="234" r="3" fill="#C9C4F8" opacity="0.65"/>
+    <circle cx="288" cy="246" r="3" fill="#C9C4F8" opacity="0.4"/>
+  </g>
+
+  <g filter="url(#clSh)">
+    <rect x="292" y="48" width="92" height="58" rx="12" fill="#FFFFFF" stroke="#14B8A6"/>
+    <rect x="292" y="48" width="92" height="22" rx="12" fill="url(#clNavy)"/>
+    <rect x="292" y="62" width="92" height="8" fill="url(#clNavy)"/>
+    <text x="338" y="72" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="9" font-weight="600" fill="#FFFFFF">Uptime</text>
+    <text x="338" y="96" text-anchor="middle" font-family="Space Grotesk,Arial,sans-serif" font-size="20" font-weight="800" fill="#14B8A6">99.9%</text>
+  </g>
+
+  <circle cx="30" cy="78" r="3" fill="#14B8A6" opacity="0.45"/>
+  <circle cx="48" cy="278" r="2" fill="#8FB9F4" opacity="0.5"/>
+  <circle cx="372" cy="188" r="3" fill="#C9C4F8" opacity="0.5"/>
+</svg>

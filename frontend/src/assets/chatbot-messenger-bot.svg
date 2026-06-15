@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 340" role="img" aria-label="Chatbot messenger window">
+  <defs>
+    <linearGradient id="cmHeader" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7C3AED"/>
+      <stop offset="100%" stop-color="#DB2777"/>
+    </linearGradient>
+    <filter id="cmWinShadow" x="-15%" y="-15%" width="130%" height="140%">
+      <feDropShadow dx="0" dy="16" stdDeviation="20" flood-color="#7C3AED" flood-opacity="0.2"/>
+    </filter>
+    <style>
+      .cm-float { animation: cmFloat 4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+      @keyframes cmFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+      .cm-msg-in { animation: cmMsgIn 3s ease-in-out infinite; transform-box: fill-box; transform-origin: left center; }
+      .cm-msg-out { animation: cmMsgIn 3s ease-in-out infinite .8s; transform-box: fill-box; transform-origin: right center; }
+      @keyframes cmMsgIn { 0%,100%{opacity:.7;transform:scale(.98)} 50%{opacity:1;transform:scale(1)} }
+      .cm-dot { animation: cmDot 1.2s ease-in-out infinite; }
+      .cm-dot.d2 { animation-delay: .2s; }
+      .cm-dot.d3 { animation-delay: .4s; }
+      @keyframes cmDot { 0%,100%{opacity:.3} 50%{opacity:1} }
+      .cm-send { animation: cmSend 2.5s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+      @keyframes cmSend { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+    </style>
+  </defs>
+
+  <ellipse cx="150" cy="318" rx="76" ry="11" fill="#8B5CF6" opacity="0.12"/>
+
+  <!-- Floating channel icons -->
+  <g opacity="0.9">
+    <circle cx="42" cy="88" r="18" fill="white" stroke="#E2E8F0"/>
+    <rect x="34" y="82" width="16" height="12" rx="4" fill="none" stroke="#8B5CF6" stroke-width="1.5"/>
+    <circle cx="258" cy="72" r="18" fill="white" stroke="#E2E8F0"/>
+    <path d="M250 72h16M258 64v16" stroke="#22C55E" stroke-width="2" stroke-linecap="round"/>
+  </g>
+
+  <g class="cm-float" filter="url(#cmWinShadow)">
+  <!-- Chat window -->
+    <rect x="52" y="56" width="196" height="232" rx="20" fill="white" stroke="#E2E8F0" stroke-width="1.5"/>
+
+    <!-- Header -->
+    <rect x="52" y="56" width="196" height="48" rx="20" fill="url(#cmHeader)"/>
+    <rect x="52" y="80" width="196" height="24" fill="url(#cmHeader)"/>
+    <circle cx="78" cy="80" r="14" fill="white" opacity="0.95"/>
+    <rect x="70" y="74" width="16" height="12" rx="4" fill="none" stroke="#7C3AED" stroke-width="1.4"/>
+    <path d="M72 78h12M72 82h8" stroke="#7C3AED" stroke-width="1.2" stroke-linecap="round"/>
+    <text x="100" y="77" font-family="Space Grotesk,Arial,sans-serif" font-size="11" font-weight="700" fill="white">Support Bot</text>
+    <text x="100" y="92" font-family="Inter,Arial,sans-serif" font-size="8" fill="rgba(255,255,255,0.8)">Typically replies instantly</text>
+    <circle cx="228" cy="80" r="5" fill="#34D399"/>
+
+    <!-- Messages -->
+    <g class="cm-msg-in">
+      <rect x="68" y="118" width="96" height="34" rx="12" fill="#F1F5F9"/>
+      <text x="78" y="134" font-family="Inter,Arial,sans-serif" font-size="8" fill="#64748B">Track order #48291</text>
+      <text x="78" y="146" font-family="Inter,Arial,sans-serif" font-size="7" fill="#94A3B8">10:42 AM</text>
+    </g>
+    <g class="cm-msg-out">
+      <rect x="124" y="162" width="108" height="48" rx="12" fill="#F5F3FF" stroke="#DDD6FE"/>
+      <text x="134" y="178" font-family="Inter,Arial,sans-serif" font-size="8" fill="#5B21B6">Your package ships</text>
+      <text x="134" y="190" font-family="Inter,Arial,sans-serif" font-size="8" fill="#5B21B6">tomorrow by 5 PM.</text>
+      <text x="134" y="204" font-family="Inter,Arial,sans-serif" font-size="7" fill="#A78BFA">Bot - 10:42 AM</text>
+    </g>
+
+    <!-- Typing indicator -->
+    <rect x="68" y="220" width="52" height="26" rx="13" fill="#EDE9FE"/>
+    <circle class="cm-dot" cx="84" cy="233" r="3.5" fill="#8B5CF6"/>
+    <circle class="cm-dot d2" cx="96" cy="233" r="3.5" fill="#A855F7"/>
+    <circle class="cm-dot d3" cx="108" cy="233" r="3.5" fill="#EC4899"/>
+
+    <!-- Input bar -->
+    <rect x="64" y="258" width="148" height="22" rx="11" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <text x="76" y="272" font-family="Inter,Arial,sans-serif" font-size="8" fill="#94A3B8">Type a message...</text>
+    <g class="cm-send" transform="translate(222,269)">
+      <circle r="14" fill="url(#cmHeader)"/>
+      <path d="M-5 0 L5 0 M0 -5 L5 0 L0 5" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    </g>
+  </g>
+
+  <g opacity="0.95">
+    <rect x="18" y="22" width="100" height="34" rx="17" fill="white" stroke="#E2E8F0"/>
+    <circle cx="36" cy="39" r="5" fill="#34D399"/>
+    <text x="48" y="43" font-family="Inter,Arial,sans-serif" font-size="10" font-weight="700" fill="#059669">CHATTING</text>
+    <rect x="182" y="22" width="100" height="34" rx="17" fill="white" stroke="#E2E8F0"/>
+    <text x="232" y="43" text-anchor="middle" font-family="Space Grotesk,Arial,sans-serif" font-size="11" font-weight="800" fill="#7C3AED">Live chat</text>
+  </g>
+</svg>

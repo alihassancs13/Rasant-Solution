@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 340" role="img" aria-label="Orchestri platform capabilities">
+  <defs>
+    <linearGradient id="ocapBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF8F3"/>
+      <stop offset="100%" stop-color="#EFF6FF"/>
+    </linearGradient>
+  </defs>
+  <rect width="560" height="340" rx="16" fill="url(#ocapBg)" stroke="#CBD5E1"/>
+  <rect x="24" y="24" width="240" height="140" rx="12" fill="#FFFFFF" stroke="#6366F1" stroke-width="2"/>
+  <text x="44" y="52" font-family="Space Grotesk,Arial,sans-serif" font-size="13" font-weight="800" fill="#4338CA">Backend</text>
+  <text x="44" y="74" font-family="Inter,Arial,sans-serif" font-size="9" fill="#64748B">FastAPI | Orchestrator FSM</text>
+  <text x="44" y="92" font-family="Inter,Arial,sans-serif" font-size="9" fill="#64748B">Agents | Local DATA_DIR storage</text>
+  <text x="44" y="110" font-family="Inter,Arial,sans-serif" font-size="9" fill="#64748B">Subprocess test and deploy</text>
+  <text x="44" y="128" font-family="Inter,Arial,sans-serif" font-size="9" fill="#64748B">OpenAI / Azure OpenAI</text>
+  <rect x="296" y="24" width="240" height="140" rx="12" fill="#FFFFFF" stroke="#2A5F9E" stroke-width="2"/>
+  <text x="316" y="52" font-family="Space Grotesk,Arial,sans-serif" font-size="13" font-weight="800" fill="#1E3A5F">Frontend</text>
+  <text x="316" y="74" font-family="Inter,Arial,sans-serif" font-size="9" fill="#64748B">Vite + React + TypeScript</text>
+  <text x="316" y="92" font-family="Inter,Arial,sans-serif" font-size="9" fill="#64748B">SSE event stream + polling</text>
+  <text x="316" y="110" font-family="Inter,Arial,sans-serif" font-size="9" fill="#64748B">Run actions and approvals UI</text>
+  <text x="316" y="128" font-family="Inter,Arial,sans-serif" font-size="9" fill="#64748B">Local folder bridge picker</text>
+  <rect x="24" y="184" width="160" height="132" rx="12" fill="#FFFFFF" stroke="#14B8A6"/>
+  <text x="44" y="212" font-family="Inter,Arial,sans-serif" font-size="10" font-weight="700" fill="#0F766E">Desktop .exe</text>
+  <text x="44" y="232" font-family="Inter,Arial,sans-serif" font-size="8" fill="#64748B">Windows + macOS builds</text>
+  <text x="44" y="248" font-family="Inter,Arial,sans-serif" font-size="8" fill="#64748B">Localhost API + browser</text>
+  <rect x="200" y="184" width="160" height="132" rx="12" fill="#FFFFFF" stroke="#4A90E2"/>
+  <text x="220" y="212" font-family="Inter,Arial,sans-serif" font-size="10" font-weight="700" fill="#2A5F9E">Auth and VCS</text>
+  <text x="220" y="232" font-family="Inter,Arial,sans-serif" font-size="8" fill="#64748B">GitHub / Bitbucket OAuth</text>
+  <text x="220" y="248" font-family="Inter,Arial,sans-serif" font-size="8" fill="#64748B">Commit and push actions</text>
+  <rect x="376" y="184" width="160" height="132" rx="12" fill="#FFFFFF" stroke="#F59E0B"/>
+  <text x="396" y="212" font-family="Inter,Arial,sans-serif" font-size="10" font-weight="700" fill="#C2410C">Security</text>
+  <text x="396" y="232" font-family="Inter,Arial,sans-serif" font-size="8" fill="#64748B">ALLOWED_PROJECT_ROOTS</text>
+  <text x="396" y="248" font-family="Inter,Arial,sans-serif" font-size="8" fill="#64748B">Argv-only subprocess | timeouts</text>
+</svg>

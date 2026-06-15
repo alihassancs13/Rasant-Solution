@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 920 300" role="img" aria-label="Chatbot conversation flow">
+  <defs>
+    <linearGradient id="cfGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#8B5CF6"/>
+      <stop offset="50%" stop-color="#F59E0B"/>
+      <stop offset="100%" stop-color="#14B8A6"/>
+    </linearGradient>
+    <style>
+      .cf-flow { stroke-dasharray:7 5; animation: cfFlow 1s linear infinite; }
+      @keyframes cfFlow { to{stroke-dashoffset:-24} }
+      .cf-pulse { animation: cfPulse 2.2s ease-in-out infinite; transform-box:fill-box; transform-origin:center; }
+      @keyframes cfPulse { 0%,100%{opacity:1} 50%{opacity:.85} }
+    </style>
+  </defs>
+  <rect width="920" height="300" rx="16" fill="#F8FAFC" stroke="#E2E8F0"/>
+
+  <text x="460" y="32" text-anchor="middle" font-family="Space Grotesk,Arial,sans-serif" font-size="14" font-weight="700" fill="#1E3A5F">How your chatbot handles a conversation</text>
+
+  <g>
+    <rect x="24" y="56" width="150" height="200" rx="14" fill="white" stroke="#E2E8F0"/>
+    <text x="99" y="82" text-anchor="middle" font-size="11" font-weight="700" fill="#1E3A5F" font-family="Inter,Arial,sans-serif">Channels</text>
+    <rect x="40" y="96" width="118" height="32" rx="8" fill="#F5F3FF" stroke="#C4B5FD"/>
+    <text x="99" y="116" text-anchor="middle" font-size="9" fill="#6D28D9" font-family="Inter,Arial,sans-serif">Website widget</text>
+    <rect x="40" y="136" width="118" height="32" rx="8" fill="#ECFDF5" stroke="#34D399"/>
+    <text x="99" y="156" text-anchor="middle" font-size="9" fill="#047857" font-family="Inter,Arial,sans-serif">WhatsApp</text>
+    <rect x="40" y="176" width="118" height="32" rx="8" fill="#EFF6FF" stroke="#8FB9F4"/>
+    <text x="99" y="196" text-anchor="middle" font-size="9" fill="#2A5F9E" font-family="Inter,Arial,sans-serif">In-app chat</text>
+    <rect x="40" y="216" width="118" height="28" rx="8" fill="#FFF7ED" stroke="#FDBA74"/>
+    <text x="99" y="234" text-anchor="middle" font-size="9" fill="#C2410C" font-family="Inter,Arial,sans-serif">Social DMs</text>
+  </g>
+
+  <path class="cf-flow" d="M174 156 H218" stroke="url(#cfGrad)" stroke-width="2.5" fill="none"/>
+  <polygon points="218,151 228,156 218,161" fill="#7C3AED"/>
+
+  <g class="cf-pulse">
+    <rect x="232" y="88" width="168" height="136" rx="16" fill="white" stroke="#C4B5FD" stroke-width="2"/>
+    <rect x="248" y="108" width="136" height="36" rx="10" fill="#7C3AED"/>
+    <text x="316" y="131" text-anchor="middle" font-size="11" font-weight="700" fill="white" font-family="Inter,Arial,sans-serif">Chatbot Agent</text>
+    <text x="316" y="162" text-anchor="middle" font-size="9" fill="#64748B" font-family="Inter,Arial,sans-serif">NLP + intent routing</text>
+    <rect x="252" y="172" width="60" height="22" rx="6" fill="#F5F3FF"/>
+    <text x="282" y="186" text-anchor="middle" font-size="8" fill="#6D28D9" font-family="Inter,Arial,sans-serif">Understand</text>
+    <rect x="320" y="172" width="60" height="22" rx="6" fill="#FFFBEB"/>
+    <text x="350" y="186" text-anchor="middle" font-size="8" fill="#B45309" font-family="Inter,Arial,sans-serif">Retrieve</text>
+    <rect x="252" y="200" width="128" height="22" rx="6" fill="#ECFDF5"/>
+    <text x="316" y="214" text-anchor="middle" font-size="8" fill="#047857" font-family="Inter,Arial,sans-serif">Generate grounded reply</text>
+  </g>
+
+  <path class="cf-flow" d="M400 156 H444" stroke="url(#cfGrad)" stroke-width="2.5" fill="none"/>
+  <polygon points="444,151 454,156 444,161" fill="#F59E0B"/>
+
+  <g>
+    <rect x="458" y="56" width="150" height="200" rx="14" fill="white" stroke="#E2E8F0"/>
+    <text x="533" y="82" text-anchor="middle" font-size="11" font-weight="700" fill="#1E3A5F" font-family="Inter,Arial,sans-serif">Knowledge</text>
+    <rect x="474" y="96" width="118" height="32" rx="8" fill="#FFF7ED" stroke="#FDBA74"/>
+    <text x="533" y="116" text-anchor="middle" font-size="9" fill="#C2410C" font-family="Inter,Arial,sans-serif">Documents</text>
+    <rect x="474" y="136" width="118" height="32" rx="8" fill="#F5F3FF" stroke="#C4B5FD"/>
+    <text x="533" y="156" text-anchor="middle" font-size="9" fill="#6D28D9" font-family="Inter,Arial,sans-serif">FAQs and policies</text>
+    <rect x="474" y="176" width="118" height="32" rx="8" fill="#ECFDF5" stroke="#34D399"/>
+    <text x="533" y="196" text-anchor="middle" font-size="9" fill="#047857" font-family="Inter,Arial,sans-serif">Product catalog</text>
+    <rect x="474" y="216" width="118" height="28" rx="8" fill="#EFF6FF" stroke="#8FB9F4"/>
+    <text x="533" y="234" text-anchor="middle" font-size="9" fill="#2A5F9E" font-family="Inter,Arial,sans-serif">Embeddings index</text>
+  </g>
+
+  <path class="cf-flow" d="M608 156 H652" stroke="url(#cfGrad)" stroke-width="2.5" fill="none"/>
+  <polygon points="652,151 662,156 652,161" fill="#14B8A6"/>
+
+  <g>
+    <rect x="666" y="56" width="230" height="200" rx="14" fill="white" stroke="#E2E8F0"/>
+    <text x="781" y="82" text-anchor="middle" font-size="11" font-weight="700" fill="#1E3A5F" font-family="Inter,Arial,sans-serif">Outcomes</text>
+    <rect x="682" y="96" width="198" height="36" rx="8" fill="#ECFDF5" stroke="#34D399"/>
+    <text x="781" y="118" text-anchor="middle" font-size="9" fill="#047857" font-family="Inter,Arial,sans-serif">Instant answer in chat</text>
+    <rect x="682" y="140" width="198" height="36" rx="8" fill="#F5F3FF" stroke="#C4B5FD"/>
+    <text x="781" y="162" text-anchor="middle" font-size="9" fill="#6D28D9" font-family="Inter,Arial,sans-serif">Create ticket / CRM note</text>
+    <rect x="682" y="184" width="198" height="36" rx="8" fill="#FFF7ED" stroke="#FDBA74"/>
+    <text x="781" y="206" text-anchor="middle" font-size="9" fill="#C2410C" font-family="Inter,Arial,sans-serif">Live handoff to human agent</text>
+    <rect x="682" y="228" width="198" height="24" rx="8" fill="#EFF6FF" stroke="#8FB9F4"/>
+    <text x="781" y="243" text-anchor="middle" font-size="8" fill="#2A5F9E" font-family="Inter,Arial,sans-serif">Log tokens and analytics</text>
+  </g>
+</svg>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -28 280 348" role="img" aria-label="AI Agent bot">
+  <defs>
+    <linearGradient id="botBody" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2A5F9E"/>
+      <stop offset="100%" stop-color="#4A90E2"/>
+    </linearGradient>
+    <linearGradient id="botGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#FFD5B4"/>
+      <stop offset="50%" stop-color="#C9C4F8"/>
+      <stop offset="100%" stop-color="#8FB9F4"/>
+    </linearGradient>
+    <filter id="botShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#4A90E2" flood-opacity="0.25"/>
+    </filter>
+    <style>
+      .bot-float { animation: botFloat 4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+      @keyframes botFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+      .bot-eye { animation: botBlink 4s ease-in-out infinite; }
+      @keyframes botBlink { 0%,42%,46%,100%{transform:scaleY(1)} 44%{transform:scaleY(0.1)} }
+      .bot-ring { animation: botRing 6s linear infinite; transform-box: fill-box; transform-origin: center; }
+      @keyframes botRing { to{transform:rotate(360deg)} }
+      .bot-pulse { animation: botPulse 2s ease-in-out infinite; }
+      @keyframes botPulse { 0%,100%{opacity:.5} 50%{opacity:1} }
+      .bot-scan { animation: botScan 2.5s ease-in-out infinite; }
+      @keyframes botScan { 0%,100%{opacity:.3} 50%{opacity:.9} }
+    </style>
+  </defs>
+
+  <ellipse cx="140" cy="300" rx="72" ry="12" fill="#4A90E2" opacity="0.12" class="bot-pulse"/>
+
+  <g class="bot-float" filter="url(#botShadow)">
+    <circle class="bot-ring" cx="140" cy="130" r="108" fill="none" stroke="url(#botGlow)" stroke-width="2" stroke-dasharray="8 10" opacity="0.45"/>
+
+    <rect x="70" y="70" width="140" height="120" rx="28" fill="url(#botBody)"/>
+    <rect x="88" y="92" width="44" height="36" rx="10" fill="#0F2744" opacity="0.35"/>
+    <rect x="148" y="92" width="44" height="36" rx="10" fill="#0F2744" opacity="0.35"/>
+    <g class="bot-eye" transform="translate(110,110)">
+      <circle cx="0" cy="0" r="10" fill="#E0F2FE"/>
+      <circle cx="2" cy="0" r="5" fill="#1E3A5F"/>
+    </g>
+    <g class="bot-eye" transform="translate(170,110)">
+      <circle cx="0" cy="0" r="10" fill="#E0F2FE"/>
+      <circle cx="2" cy="0" r="5" fill="#1E3A5F"/>
+    </g>
+    <rect x="108" y="148" width="64" height="8" rx="4" fill="white" opacity="0.35"/>
+    <path d="M120 148 Q140 162 160 148" fill="none" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.7"/>
+
+    <rect x="98" y="190" width="84" height="72" rx="18" fill="url(#botBody)"/>
+    <circle cx="140" cy="226" r="16" fill="white" opacity="0.15"/>
+    <path d="M140 214 L140 238 M128 226 L152 226" stroke="white" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+
+    <rect x="44" y="198" width="24" height="52" rx="12" fill="#3A7BC8"/>
+    <rect x="212" y="198" width="24" height="52" rx="12" fill="#3A7BC8"/>
+
+    <rect x="108" y="262" width="28" height="36" rx="10" fill="#2A5F9E"/>
+    <rect x="144" y="262" width="28" height="36" rx="10" fill="#2A5F9E"/>
+
+    <rect x="118" y="44" width="44" height="20" rx="8" fill="#8FB9F4"/>
+    <circle cx="140" cy="36" r="8" fill="#FFD5B4" class="bot-scan"/>
+  </g>
+
+  <g opacity="0.9">
+    <rect x="24" y="24" width="88" height="32" rx="16" fill="white" stroke="#E2E8F0"/>
+    <circle cx="40" cy="40" r="5" fill="#34D399" class="bot-pulse"/>
+    <text x="52" y="44" font-family="Inter,Arial,sans-serif" font-size="10" font-weight="700" fill="#059669">ONLINE</text>
+    <rect x="168" y="24" width="88" height="32" rx="16" fill="white" stroke="#E2E8F0"/>
+    <text x="212" y="44" text-anchor="middle" font-family="Space Grotesk,Arial,sans-serif" font-size="11" font-weight="800" fill="#2A5F9E">130 calls</text>
+  </g>
+</svg>
