@@ -1,94 +1,167 @@
+<template>
+  <div class="relative w-full z-50">
+    <div 
+      v-if="isMobileMenuOpen" 
+      @click="toggleMobileMenu"
+      class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-300 z-40 md:hidden"
+    ></div>
+
+    <header class="fixed top-0 left-0 right-0 h-20 bg-white border-b border-slate-200/80 shadow-sm flex items-center justify-between px-6 md:px-12 z-50 transition-all duration-300">
+      <a href="#" class="flex items-center shrink-0 group" aria-label="Rasant Solutions home">
+        <img 
+          src="../assets/rasant-logo.svg" 
+          alt="Rasant Solutions Logo" 
+          class="h-[42px] w-auto transition-transform duration-200 group-hover:scale-[1.01]" 
+          decoding="async"
+        />
+      </a>
+
+      <div class="hidden md:flex items-center h-full relative">
+        <ul class="flex items-center gap-8 h-full m-0 p-0 list-none">
+          
+          <li 
+            class="relative h-full flex items-center group/nav"
+            @mouseenter="activeDropdown = 'services'"
+            @mouseleave="activeDropdown = null"
+          >
+            <a href="#services" class="flex items-center gap-1.5 font-medium text-[15px] text-slate-700 hover:text-blue-600 transition-colors duration-200 h-full cursor-pointer">
+              Services 
+              <i class="fa-solid fa-chevron-down text-[11px] transition-transform duration-200 group-hover/nav:rotate-180"></i>
+            </a>
+            
+            <div 
+              class="absolute top-[80px] left-1/2 -translate-x-1/2 w-[340px] bg-white border border-slate-100 rounded-2xl shadow-xl p-4 flex flex-col gap-1 transition-all duration-200 origin-top z-50"
+              :class="[activeDropdown === 'services' ? 'opacity-100 scale-100 pointer-events-auto visible' : 'opacity-0 scale-[0.97] pointer-events-none invisible']"
+            >
+              <div class="absolute top-0 inset-x-0 h-[3px] rounded-t-2xl bg-gradient-to-r from-orange-300 via-pink-400 to-blue-400"></div>
+
+              <a href="#services" class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 group/item transition-colors duration-200">
+                <div class="flex items-center gap-3.5">
+                  <div class="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center text-lg shadow-sm border border-purple-100/40">⚙️</div>
+                  <div>
+                    <h4 class="font-bold text-[14px] text-slate-800 m-0">Custom Software</h4>
+                    <p class="text-[12px] text-slate-500 font-normal m-0">Enterprise apps &amp; APIs</p>
+                  </div>
+                </div>
+                <span class="text-slate-400 font-medium translate-x-[-4px] opacity-0 group-hover/item:translate-x-0 group-hover/item:opacity-100 transition-all duration-200">→</span>
+              </a>
+
+              <a href="#services" class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 group/item transition-colors duration-200">
+                <div class="flex items-center gap-3.5">
+                  <div class="w-9 h-9 rounded-lg bg-indigo-50 flex items-center justify-center text-lg shadow-sm border border-indigo-100/40">📱</div>
+                  <div>
+                    <h4 class="font-bold text-[14px] text-slate-800 m-0">Web &amp; Mobile</h4>
+                    <p class="text-[12px] text-slate-500 font-normal m-0">React, Flutter &amp; Next.js</p>
+                  </div>
+                </div>
+                <span class="text-slate-400 font-medium translate-x-[-4px] opacity-0 group-hover/item:translate-x-0 group-hover/item:opacity-100 transition-all duration-200">→</span>
+              </a>
+
+              <a href="#services" class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 group/item transition-colors duration-200">
+                <div class="flex items-center gap-3.5">
+                  <div class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center text-lg shadow-sm border border-blue-100/40">☁️</div>
+                  <div>
+                    <h4 class="font-bold text-[14px] text-slate-800 m-0">Cloud &amp; DevOps</h4>
+                    <p class="text-[12px] text-slate-500 font-normal m-0">AWS &amp; Kubernetes</p>
+                  </div>
+                </div>
+                <span class="text-slate-400 font-medium translate-x-[-4px] opacity-0 group-hover/item:translate-x-0 group-hover/item:opacity-100 transition-all duration-200">→</span>
+              </a>
+            </div>
+          </li>
+
+          <li 
+            class="relative h-full flex items-center group/nav"
+            @mouseenter="activeDropdown = 'projects'"
+            @mouseleave="activeDropdown = null"
+          >
+            <a href="#products" class="flex items-center gap-1.5 font-medium text-[15px] text-slate-700 hover:text-blue-600 transition-colors duration-200 h-full cursor-pointer">
+              Projects 
+              <i class="fa-solid fa-chevron-down text-[11px] transition-transform duration-200 group-hover/nav:rotate-180"></i>
+            </a>
+
+            <div 
+              class="absolute top-[80px] left-1/2 -translate-x-1/2 w-[580px] bg-white border border-slate-100 rounded-2xl shadow-xl p-5 grid grid-cols-2 gap-3 transition-all duration-200 origin-top z-50"
+              :class="[activeDropdown === 'projects' ? 'opacity-100 scale-100 pointer-events-auto visible' : 'opacity-0 scale-[0.97] pointer-events-none invisible']"
+            >
+              <div class="absolute top-0 inset-x-0 h-[3px] rounded-t-2xl bg-gradient-to-r from-orange-300 via-pink-400 to-blue-400"></div>
+
+              <a href="http://localhost:5173/" class="block p-4 border border-slate-100 rounded-xl hover:border-blue-500/30 hover:bg-slate-50/50 transition-all duration-200">
+                <div class="inline-block text-[10px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2 py-0.5 rounded mb-1.5">Call Center</div>
+                <h4 class="font-bold text-[15px] text-slate-800 mb-0.5">Sentra AI</h4>
+                <p class="text-[12px] text-slate-500 font-normal">AI call center platform</p>
+              </a>
+
+              <a href="#" class="block p-4 border border-slate-100 rounded-xl hover:border-blue-500/30 hover:bg-slate-50/50 transition-all duration-200">
+                <div class="inline-block text-[10px] font-bold uppercase tracking-wider text-teal-600 bg-teal-50 px-2 py-0.5 rounded mb-1.5">Voice</div>
+                <h4 class="font-bold text-[15px] text-slate-800 mb-0.5">AI Agent</h4>
+                <p class="text-[12px] text-slate-500 font-normal">Talking voice agents</p>
+              </a>
+
+              <a href="#" class="block p-4 border border-slate-100 rounded-xl hover:border-blue-500/30 hover:bg-slate-50/50 transition-all duration-200">
+                <div class="inline-block text-[10px] font-bold uppercase tracking-wider text-purple-600 bg-purple-50 px-2 py-0.5 rounded mb-1.5">Chat</div>
+                <h4 class="font-bold text-[15px] text-slate-800 mb-0.5">Chatbot</h4>
+                <p class="text-[12px] text-slate-500 font-normal">Text and messaging bots</p>
+              </a>
+
+              <a href="#" class="block p-4 border border-slate-100 rounded-xl hover:border-blue-500/30 hover:bg-slate-50/50 transition-all duration-200">
+                <div class="inline-block text-[10px] font-bold uppercase tracking-wider text-orange-600 bg-orange-50 px-2 py-0.5 rounded mb-1.5">SDLC</div>
+                <h4 class="font-bold text-[15px] text-slate-800 mb-0.5">Orchestri</h4>
+                <p class="text-[12px] text-slate-500 font-normal">AI multi-agent dev workflow</p>
+              </a>
+            </div>
+          </li>
+
+          <li class="h-full flex items-center">
+            <a href="#" class="font-medium text-[15px] text-slate-700 hover:text-blue-600 transition-colors duration-200">Contact</a>
+          </li>
+        </ul>
+      </div>
+
+      <div class="hidden md:flex items-center gap-4">
+        <a href="#" class="px-5 py-2.5 border border-blue-600/80 text-[14px] font-semibold rounded-xl text-blue-600 hover:bg-blue-50 transition-all duration-200 shadow-sm">
+          Login
+        </a>
+        <a href="#" class=" bg-[#2A5F9E] hover:bg-[#1E4F87] relative overflow-hidden px-6 py-2.5    text-[14px] font-semibold text-white rounded-full transition-all duration-200 shadow-[0_0_25px_rgba(74,144,226,0.45)]  ">
+          Get Quote
+          <div class="absolute inset-0 w-1/2 h-full bg-white/10 transform -skew-x-12 -translate-x-full group-hover:animate-[shine_0.75s_ease-in-out]"></div>
+        </a>
+      </div>
+
+      <button 
+        @click="toggleMobileMenu" 
+        class="flex flex-col gap-1.5 md:hidden w-8 h-8 justify-center items-end group p-1 z-50 focus:outline-none"
+        aria-label="Toggle Navigation Control Drawer Menu"
+      >
+        <span class="h-0.5 bg-slate-800 rounded-full transition-all duration-300" :class="[isMobileMenuOpen ? 'w-6 rotate-45 translate-y-2' : 'w-6']"></span>
+        <span class="h-0.5 bg-slate-800 rounded-full transition-all duration-300" :class="[isMobileMenuOpen ? 'w-0 opacity-0' : 'w-4 group-hover:w-6']"></span>
+        <span class="h-0.5 bg-slate-800 rounded-full transition-all duration-300" :class="[isMobileMenuOpen ? 'w-6 -rotate-45 -translate-y-2' : 'w-5 group-hover:w-6']"></span>
+      </button>
+    </header>
+
+    <nav 
+      class="fixed top-0 right-0 bottom-0 w-[280px] bg-white border-l border-slate-100 shadow-2xl pt-24 px-6 flex flex-col gap-4 transform transition-transform duration-300 ease-out z-40 md:hidden"
+      :class="[isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full']"
+    >
+      <a href="#services" @click="isMobileMenuOpen = false" class="text-[16px] font-semibold text-slate-700 hover:text-blue-600 p-2 rounded-lg hover:bg-slate-50 transition-all">Services</a>
+      <a href="#products" @click="isMobileMenuOpen = false" class="text-[16px] font-semibold text-slate-700 hover:text-blue-600 p-2 rounded-lg hover:bg-slate-50 transition-all">Projects</a>
+      <a href="#" @click="isMobileMenuOpen = false" class="text-[16px] font-semibold text-slate-700 hover:text-blue-600 p-2 rounded-lg hover:bg-slate-50 transition-all">Contact</a>
+      <a href="#" @click="isMobileMenuOpen = false" class="text-[16px] font-semibold text-blue-600 bg-blue-50/60 p-2 rounded-lg transition-all">Login</a>
+      
+      <a href="#" @click="isMobileMenuOpen = false" class="mt-4 text-center px-5 py-3 bg-blue-600 text-[14px] font-bold text-white rounded-xl shadow-lg shadow-blue-100 transition-all">
+        Get a Free Quote
+      </a>
+    </nav>
+  </div>
+</template>
+
 <script setup>
 import { ref } from 'vue';
-import logo from "../assets/rasant-logo.svg";
 
-const isServicesOpen = ref(false);
-const isProjectsOpen = ref(false);
+const activeDropdown = ref(null);
+const isMobileMenuOpen = ref(false);
+
+const toggleMobileMenu = () => {
+  isMobileMenuOpen.value = !isMobileMenuOpen.value;
+};
 </script>
-
-<template>
-  <header style="display: flex; align-items: center; justify-content: space-between; height: 80px;" class="fixed top-0 left-0 right-0 bg-white border-b border-slate-100 px-6 md:px-12 z-50 font-sans shadow-sm">
-    
-    <div class="flex items-center shrink-0 cursor-pointer">
-      <img :src="logo" alt="Rasant Solutions" class="h-10 w-auto object-contain" width="212" height="42" />
-    </div>
-
-    <nav class="hidden md:block h-full">
-      <ul style="display: flex; flex-direction: row; align-items: center; gap: 32px;" class="h-full m-0 p-0 list-none">
-        
-        <li class="relative h-full flex items-center">
-          <div @click="isServicesOpen = !isServicesOpen; isProjectsOpen = false" class="flex items-center gap-1.5 px-1 h-full text-[15px] font-bold text-slate-800 hover:text-blue-600 transition-colors cursor-pointer select-none">
-            Services
-            <span class="text-[9px] text-slate-400 block">▼</span>
-          </div>
-          
-          <div v-if="isServicesOpen" class="absolute left-1/2 -translate-x-1/2 top-20 w-[380px] bg-white rounded-xl shadow-xl border border-slate-100 p-2 z-50">
-            <div class="flex items-start gap-3 p-2.5 rounded-lg hover:bg-slate-50 cursor-pointer">
-              <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-sm shrink-0">⚙️</div>
-              <div>
-                <h4 class="text-xs font-bold text-slate-900 m-0">Custom Software</h4>
-                <p class="text-[11px] text-slate-400 mt-0.5">Enterprise apps &amp; APIs</p>
-              </div>
-            </div>
-            <div class="flex items-start gap-3 p-2.5 rounded-lg hover:bg-slate-50 cursor-pointer">
-              <div class="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-sm shrink-0">📱</div>
-              <div>
-                <h4 class="text-xs font-bold text-slate-900 m-0">Web &amp; Mobile</h4>
-                <p class="text-[11px] text-slate-400 mt-0.5">React, Flutter &amp; Next.js</p>
-              </div>
-            </div>
-            <div class="flex items-start gap-3 p-2.5 rounded-lg hover:bg-slate-50 cursor-pointer">
-              <div class="w-8 h-8 rounded-lg bg-purple-50 flex items-center justify-center text-sm shrink-0">☁️</div>
-              <div>
-                <h4 class="text-xs font-bold text-slate-900 m-0">Cloud &amp; DevOps</h4>
-                <p class="text-[11px] text-slate-400 mt-0.5">AWS &amp; Kubernetes</p>
-              </div>
-            </div>
-          </div>
-        </li>
-
-        <li class="relative h-full flex items-center">
-          <div @click="isProjectsOpen = !isProjectsOpen; isServicesOpen = false" class="flex items-center gap-1.5 px-1 h-full text-[15px] font-bold text-slate-800 hover:text-blue-600 transition-colors cursor-pointer select-none">
-            Projects
-            <span class="text-[9px] text-slate-400 block">▼</span>
-          </div>
-          
-          <div v-if="isProjectsOpen" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px;" class="absolute left-1/2 -translate-x-1/2 top-20 w-[460px] bg-white rounded-xl shadow-xl border border-slate-100 p-3 z-50">
-            <div class="block p-2.5 border border-slate-50 rounded-lg hover:bg-slate-50 cursor-pointer">
-              <span class="text-[9px] font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded uppercase tracking-wider block w-fit mb-1">Call Center</span>
-              <h4 class="text-xs font-bold text-slate-900 m-0">Sentra AI</h4>
-            </div>
-            <div class="block p-2.5 border border-slate-50 rounded-lg hover:bg-slate-50 cursor-pointer">
-              <span class="text-[9px] font-bold text-purple-600 bg-purple-50 px-1.5 py-0.5 rounded uppercase tracking-wider block w-fit mb-1">Voice</span>
-              <h4 class="text-xs font-bold text-slate-900 m-0">AI Agent</h4>
-            </div>
-            <div class="block p-2.5 border border-slate-50 rounded-lg hover:bg-slate-50 cursor-pointer">
-              <span class="text-[9px] font-bold text-teal-600 bg-teal-50 px-1.5 py-0.5 rounded uppercase tracking-wider block w-fit mb-1">Chat</span>
-              <h4 class="text-xs font-bold text-slate-900 m-0">Chatbot</h4>
-            </div>
-            <div class="block p-2.5 border border-slate-50 rounded-lg hover:bg-slate-50 cursor-pointer">
-              <span class="text-[9px] font-bold text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded uppercase tracking-wider block w-fit mb-1">SDLC</span>
-              <h4 class="text-xs font-bold text-slate-900 m-0">Orchestri</h4>
-            </div>
-          </div>
-        </li>
-
-        <li class="h-full flex items-center">
-          <div class="px-1 h-full flex items-center text-[15px] font-bold text-slate-800 hover:text-blue-600 transition-colors cursor-pointer">
-            Contact
-          </div>
-        </li>
-      </ul>
-    </nav>
-
-    <div style="display: flex; flex-direction: row; align-items: center; gap: 12px;" class="hidden md:flex">
-      <div class="px-6 py-2 text-[14px] font-bold border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-full cursor-pointer transition-colors">
-        Login
-      </div>
-      <div class="px-6 py-2.5 text-[14px] font-bold bg-[#2250c5] text-white rounded-full hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/20 cursor-pointer">
-        Get Quote
-      </div>
-    </div>
-
-  </header>
-</template>

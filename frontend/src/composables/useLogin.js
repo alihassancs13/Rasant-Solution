@@ -1,41 +1,61 @@
-import { ref } from "vue";
+import { ref } from 'vue';
 
-export default function useLogin() {
-  const error = ref("");
-  const loading = ref(false);
+export function useLogin() {
+  const username = ref('');
+  const password = ref('');
+  const rememberMe = ref(true);
+  const isPasswordVisible = ref(false);
+  const errorMessage = ref('');
 
-  const login = async (username, password) => {
-    error.value = "";
-    loading.value = true;
+  // Local Page Redirection Dictionary Matrix
+  const DESTINATION_PAGES = {
+    admin: 'dashboard-admin.html',
+    employee: 'dashboard-employee.html',
+    client: 'dashboard-client.html'
+  };
 
-    try {
-      const pages = {
-        admin: "/dashboard-admin",
-        employee: "/dashboard-employee",
-        client: "/dashboard-client",
-      };
+  const togglePasswordVisibility = () => {
+    isPasswordVisible.value = !isPasswordVisible.value;
+  };
 
-      const key = username.toLowerCase();
+  const injectQuickCredentials = (userRole, userPass) => {
+    username.value = userRole;
+    password.value = userPass;
+    errorMessage.value = '';
+  };
 
-      if (
-        pages[key] &&
-        ((key === "admin" && password === "Admin@123") ||
-          (key === "employee" && password === "Employee@123") ||
-          (key === "client" && password === "Client@123"))
-      ) {
-        window.location.href = pages[key];
-        return;
-      }
+  const handleLoginSubmit = () => {
+    errorMessage.value = '';
+    
+    const normalizedUser = username.value.trim().toLowerCase();
+    const providedPass = password.value;
 
-      error.value = "Invalid username or password";
-    } finally {
-      loading.value = false;
+    if (!normalizedUser || !providedPass) {
+      errorMessage.value = 'Please fill in both fields.';
+      return;
+    }
+
+    // Static Demo Fallback Authentication Credentials Checking Verification Engine
+    if (DESTINATION_PAGES[normalizedUser] && (
+      (normalizedUser === 'admin' && providedPass === 'Admin@123') ||
+      (normalizedUser === 'employee' && providedPass === 'Employee@123') ||
+      (normalizedUser === 'client' && providedPass === 'Client@123')
+    )) {
+      // Success Callback Matrix Node Redirect Hook Execution
+      window.location.href = DESTINATION_PAGES[normalizedUser];
+    } else {
+      errorMessage.value = 'Invalid username or password. Please verify credentials.';
     }
   };
 
   return {
-    login,
-    error,
-    loading,
+    username,
+    password,
+    rememberMe,
+    isPasswordVisible,
+    errorMessage,
+    togglePasswordVisibility,
+    injectQuickCredentials,
+    handleLoginSubmit,
   };
 }
