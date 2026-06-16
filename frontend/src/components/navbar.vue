@@ -119,7 +119,7 @@
       </div>
 
       <div class="hidden md:flex items-center gap-4">
-        <a href="#" class="px-5 py-2.5 border border-blue-600/80 text-[14px] font-semibold rounded-xl text-blue-600 hover:bg-blue-50 transition-all duration-200 shadow-sm">
+        <a href="#" class="px-5 py-2.5 border border-blue-400/30 text-[14px] font-semibold rounded-full text-blue-900 hover:bg-blue-50 transition-all duration-200 shadow-sm">
           Login
         </a>
         <a href="#" class=" bg-[#2A5F9E] hover:bg-[#1E4F87] relative overflow-hidden px-6 py-2.5    text-[14px] font-semibold text-white rounded-full transition-all duration-200 shadow-[0_0_25px_rgba(74,144,226,0.45)]  ">
