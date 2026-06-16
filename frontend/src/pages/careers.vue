@@ -12,7 +12,7 @@
         </span>
         <h1 class="font-['Space_Grotesk'] text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#1e3a5f] tracking-tight leading-tight mb-6">
             Build the future<br />
-            <em class="not-italic text-transparent bg-clip-text bg-gradient-to-r from-[#F26522] to-[#E05314]">with us</em>
+            <em class="not-italic  bg-clip-text bg-gradient-to-r text-orange-700">with us</em>
             </h1>
         <p class="text-base sm:text-lg text-[#64748B] max-w-2xl mx-auto leading-relaxed">
           Join Rasant Solutions — innovation, growth, and meaningful work across AI products and custom software.

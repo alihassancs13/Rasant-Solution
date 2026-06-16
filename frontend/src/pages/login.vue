@@ -9,9 +9,6 @@
         <div class="absolute inset-x-[-5%] inset-y-[-10%] pointer-events-none bg-[radial-gradient(circle_at_18%_20%,rgba(255,213,180,0.35)_0%,transparent_42%),radial-gradient(circle_at_82%_18%,rgba(201,196,248,0.32)_0%,transparent_40%),radial-gradient(circle_at_50%_85%,rgba(143,185,244,0.18)_0%,transparent_45%)]" aria-hidden="true"></div>
         
         <div class="relative z-10 w-full max-w-135 flex flex-col justify-center h-full gap-4">
-          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-blue-600/8 border border-blue-600/15 rounded-full text-[11px] font-bold tracking-wider uppercase text-blue-900 w-fit">
-            <span class="w-1.5 h-1.5 rounded-full bg-blue-900 shadow-[0_0_0_3px_rgba(20,184,166,0.2)]"></span>
-          </div>
 
           <div class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-blue-600/8 border border-blue-600/15 rounded-full text-[11px] font-bold tracking-wider uppercase text-orange-800 w-fit">
             <span class="w-1.5 h-1.5 rounded-full bg-orange-700 shadow-[0_0_0_3px_rgba(20,184,166,0.2)]"></span>
@@ -173,11 +170,6 @@
               Client
             </button>
           </div>
-          
-          <p class="mt-2 text-[9px] text-slate-400 leading-relaxed text-center font-normal">
-            Demo passwords: <code class="font-mono text-[8px] bg-slate-100 text-slate-700 px-1 py-0.5 rounded">Admin@123</code> · <code class="font-mono text-[8px] bg-slate-100 text-slate-700 px-1 py-0.5 rounded">Employee@123</code>
-          </p>
-
           <div class="mt-4 space-y-1.5 text-center text-[11px]">
             <p class="text-slate-500 font-normal">
               Need an account? 

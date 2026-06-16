@@ -3,12 +3,23 @@
     <!-- adjust path to your existing reusable Navbar component -->
     <Navbar />
 
-    <section class="relative overflow-hidden bg-gradient-to-br from-indigo-50 via-white to-blue-50 px-6 py-20 text-center">
-      <div class="relative max-w-3xl mx-auto">
-        <span class="inline-block text-xs font-semibold uppercase tracking-wider text-indigo-600 mb-4">Contact</span>
-        <h1 class="text-4xl sm:text-5xl font-extrabold text-slate-900 leading-tight">
-          Let's start your<br /><em class="italic text-indigo-600">next project</em>
-        </h1>
+    <section class="relative overflow-hidden px-6 py-20 text-center bg-pink-50 mt-5">
+  <div class="absolute inset-0 opacity-70 mix-blend-multiply pointer-events-none bg-[radial-gradient(circle_at_top_right,rgba(244,63,94,0.09),transparent_45%),radial-gradient(circle_at_bottom_left,rgba(59,130,246,0.1),transparent_50%),radial-gradient(circle_at_top_left,rgba(219,39,119,0.06),transparent_40%),radial-gradient(circle_at_bottom_right,rgba(241,245,249,1),transparent_60%)]" aria-hidden="true"></div>
+
+  <div class="relative z-10 max-w-3xl mx-auto">
+    <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-['Space_Grotesk'] font-bold uppercase tracking-wider bg-slate-100 border border-slate-200 text-[#F26522] mb-4 select-none">
+      <span class="relative flex h-2 w-2">
+      <span class="animate-ping absolute inline-flex  h-full w-full rounded-full bg-[#10B981] opacity-75"></span>
+      <span class="relative inline-flex rounded-full h-2 w-2 bg-[#10B981]"></span>
+      </span>
+        Contact
+      </div>
+
+      <h1 class="font-['Space_Grotesk',sans-serif] text-4xl sm:text-5xl font-bold text-[#1e3a5f] leading-tight">
+        Let's start your<br />
+        <em class="italic text-orange-700">next project</em>
+      </h1>
+
         <p class="mt-4 text-slate-500 text-base sm:text-lg">
           Share your idea and our team will respond within 24 hours with a free consultation and project estimate.
         </p>
@@ -54,10 +65,10 @@
 
         <!-- right: contact form -->
         <div class="relative bg-white border border-slate-200 rounded-2xl shadow-lg p-7 sm:p-9 overflow-hidden">
-          <div class="absolute top-0 left-0 right-0 h-1 bg-indigo-600"></div>
+          <div class="absolute top-0 left-0 right-0 h-1 bg-orange-800"></div>
 
           <div class="mb-5">
-            <h2 class="text-xl font-extrabold text-slate-900 tracking-tight">Send a message</h2>
+            <h2 class="text-xl font-bold text-slate-900 tracking-tight">Send a message</h2>
             <p class="text-sm text-slate-500 mt-1">Tell us about your project — we'll reply within one business day.</p>
           </div>
 
@@ -107,9 +118,11 @@
             </div>
 
             <div>
-              <button type="submit" class="w-full rounded-xl bg-indigo-600 text-white font-semibold py-3.5 hover:bg-indigo-700 transition-colors">
-                Send Message
-              </button>
+              <button type="submit" class="w-full rounded-xl bg-orange-800 text-white font-semibold py-3.5 hover:bg-orange-900 transition-colors relative overflow-hidden group">
+              <div class="absolute inset-0 top-0 w-1/3 h-full bg-linear-to-r from-transparent via-white/20 to-transparent pointer-events-none animate-[shineLoop_0.98s_ease-in-out_infinite_alternate]"></div>
+              
+              <span class="relative z-10">Send Message</span>
+            </button>
             </div>
           </form>
         </div>
