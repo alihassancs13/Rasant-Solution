@@ -3,7 +3,7 @@
     <div class="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
       <div>
         <router-link to="/" aria-label="Rasant Solutions home" class="inline-flex">
-          <img src="../assets/rasant-logo.png" alt="" width="212" height="42" decoding="async" class="h-10 w-auto" />
+          <img src="../assets/images/rasant-logo.png" alt="" width="212" height="42" decoding="async" class="h-10 w-auto" />
         </router-link>
         <p class="mt-4 text-sm text-slate-500 leading-relaxed">
           We build intelligent digital products that help businesses grow, innovate, and deliver.
@@ -45,16 +45,16 @@
         </div>
         <div class="flex gap-3" aria-label="Social media">
           <router-link to="#" aria-label="LinkedIn" class="w-9 h-9 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 transition-colors">
-            <img src="../assets/social-linkedin.svg" alt="" width="20" height="20" decoding="async" />
+            <img src="../assets/icons/social-linkedin.svg" alt="" width="20" height="20" decoding="async" />
           </router-link>
           <router-link to="#" aria-label="X" class="w-9 h-9 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 transition-colors">
-            <img src="../assets/social-x.svg" alt="" width="20" height="20" decoding="async" />
+            <img src="../assets/icons/social-x.svg" alt="" width="20" height="20" decoding="async" />
           </router-link>
           <router-link to="#" aria-label="GitHub" class="w-9 h-9 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 transition-colors">
-            <img src="../assets/social-github.svg" alt="" width="20" height="20" decoding="async" />
+            <img src="../assets/icons/social-github.svg" alt="" width="20" height="20" decoding="async" />
           </router-link>
           <router-link to="#" aria-label="Instagram" class="w-9 h-9 flex items-center justify-center rounded-full bg-slate-100 hover:bg-slate-200 transition-colors">
-            <img src="../assets/social-instagram.svg" alt="" width="20" height="20" decoding="async" />
+            <img src="../assets/icons/social-instagram.svg" alt="" width="20" height="20" decoding="async" />
           </router-link>
         </div>
       </div>

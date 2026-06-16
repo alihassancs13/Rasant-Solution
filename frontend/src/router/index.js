@@ -24,8 +24,7 @@ const routes = [
     name: "ai-agent",
     component: () => import("../pages/ai-agent.vue"),
   },
-<<<<<<< HEAD
-=======
+
   {
       path: '/ai-agent',
       name: 'ai-agent',
@@ -37,7 +36,7 @@ const routes = [
     path: "/",
     redirect: "/contact",
   },
->>>>>>> e036492eafd27a15684bd0454bebae3d10f4f394
+
 ];
  
 const router = createRouter({
