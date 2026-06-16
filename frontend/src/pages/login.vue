@@ -173,7 +173,7 @@
           <div class="mt-4 space-y-1.5 text-center text-[11px]">
             <p class="text-slate-500 font-normal">
               Need an account? 
-              <a href="#" class="font-bold text-[#4f6f9a] no-underline hover:underline">Contact sales</a>
+              <a href="" class="font-bold text-[#4f6f9a] no-underline hover:underline">Contact sales</a>
             </p>
             <a href="#" class="inline-block font-medium text-slate-500 no-underline transition-colors duration-200 hover:text-blue-600">
               <i class="fa-solid fa-arrow-left mr-1 text-[10px]"></i> Back to website

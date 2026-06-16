@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 140" fill="none" aria-hidden="true">
+  <rect x="24" y="32" width="88" height="76" rx="12" fill="#fff" stroke="#E8C1D9" stroke-width="2"/>
+  <path d="M58 48h20M58 58h14M58 68h18" stroke="#2A5F9E" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M40 88h56" stroke="#8FB9F4" stroke-width="3" stroke-linecap="round"/>
+  <path d="M40 96h40" stroke="#FFD5B4" stroke-width="2" stroke-linecap="round"/>
+  <circle cx="130" cy="44" r="28" fill="url(#salUp)"/>
+  <path d="M130 56V32M118 44h24" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+  <rect x="108" y="84" width="64" height="36" rx="10" fill="url(#salCard)"/>
+  <path d="M120 100h40M120 108h28" stroke="#fff" stroke-width="2" stroke-linecap="round" opacity="0.9"/>
+  <defs>
+    <linearGradient id="salUp" x1="102" y1="16" x2="158" y2="72">
+      <stop stop-color="#14B8A6"/><stop offset="1" stop-color="#4A90E2"/>
+    </linearGradient>
+    <linearGradient id="salCard" x1="108" y1="84" x2="172" y2="120">
+      <stop stop-color="#2A5F9E"/><stop offset="1" stop-color="#6BA3E8"/>
+    </linearGradient>
+  </defs>
+</svg>

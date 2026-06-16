@@ -113,7 +113,7 @@
           </li>
 
           <li class="h-full flex items-center">
-            <a href="#" class="font-medium text-[15px] text-slate-700 hover:text-blue-600 transition-colors duration-200">Contact</a>
+            <a href="../pages/contactForm.vue" class="font-medium text-[15px] text-slate-700 hover:text-blue-600 transition-colors duration-200">Contact</a>
           </li>
         </ul>
       </div>
