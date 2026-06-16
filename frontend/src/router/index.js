@@ -1,7 +1,8 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Login from "../pages/Login.vue";
 import Contact from "../pages/contactForm.vue";
-import Careers from "../pages/contactForm.vue"
+import Careers from "../pages/careers.vue";
+import Orchestri from "../pages/sdlc-orchestri.vue";
 const routes = [
   {
     path: "/",
@@ -29,6 +30,11 @@ const routes = [
       component: () => import('../pages/ai-agent.vue')
     }
   ,
+  {
+    path: "/orchestri",
+    name: "Orchestri",
+    component: () => import("../pages/sdlc-orchestri.vue"), // Make sure your file name matches exactly
+  },
   {
     path: "/",
     redirect: "/contact",
