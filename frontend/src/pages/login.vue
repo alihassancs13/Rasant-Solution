@@ -9,8 +9,13 @@
         <div class="absolute inset-x-[-5%] inset-y-[-10%] pointer-events-none bg-[radial-gradient(circle_at_18%_20%,rgba(255,213,180,0.35)_0%,transparent_42%),radial-gradient(circle_at_82%_18%,rgba(201,196,248,0.32)_0%,transparent_40%),radial-gradient(circle_at_50%_85%,rgba(143,185,244,0.18)_0%,transparent_45%)]" aria-hidden="true"></div>
         
         <div class="relative z-10 w-full max-w-135 flex flex-col justify-center h-full gap-4">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-blue-600/8 border border-blue-600/15 rounded-full text-[11px] font-bold tracking-wider uppercase text-blue-900 w-fit">
+            <span class="w-1.5 h-1.5 rounded-full bg-blue-900 shadow-[0_0_0_3px_rgba(20,184,166,0.2)]"></span>
+          </div>
+
           <div class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-blue-600/8 border border-blue-600/15 rounded-full text-[11px] font-bold tracking-wider uppercase text-orange-800 w-fit">
             <span class="w-1.5 h-1.5 rounded-full bg-orange-700 shadow-[0_0_0_3px_rgba(20,184,166,0.2)]"></span>
+
             Secure portal
           </div>
 
@@ -24,11 +29,13 @@
             </p>
           </div>
 
-         <div class="w-full max-w-65 mx-auto" aria-hidden="true">
+          <div class="w-full max-w-65 mx-auto" aria-hidden="true">
             <img
               :src="loginVisual"
               alt="Platform access visualization"
-              width="270" height="102"
+              width="270"
+              height="102"
+              class="w-full h-auto max-h-[33vh] object-contain rounded-2xl shadow-md bg-pink-50 border border-slate-100"
             />
           </div>
 
