@@ -4,31 +4,31 @@
     
     <section class="grid grid-cols-1 lg:grid-cols-[3fr_2fr] h-full pt-20 overflow-hidden w-full">
       
-      <aside class="relative hidden lg:flex items-center justify-center p-8 xl:p-12 overflow-hidden bg-gradient-to-b from-[#fdf4ff] via-[#fff8f3] to-slate-50 border-r border-slate-200/60 h-full">
+      <aside class="relative hidden lg:flex items-center justify-center p-8 xl:p-12 overflow-hidden bg-linear-to-b from-[#fdf4ff] via-[#fff8f3] to-slate-50 border-r border-slate-200/60 h-full">
         
-        <div class="absolute -inset-x-[5%] -inset-y-[10%] pointer-events-none bg-[radial-gradient(circle_at_18%_20%,rgba(255,213,180,0.35)_0%,transparent_42%),radial-gradient(circle_at_82%_18%,rgba(201,196,248,0.32)_0%,transparent_40%),radial-gradient(circle_at_50%_85%,rgba(143,185,244,0.18)_0%,transparent_45%)]" aria-hidden="true"></div>
+        <div class="absolute inset-x-[-5%] inset-y-[-10%] pointer-events-none bg-[radial-gradient(circle_at_18%_20%,rgba(255,213,180,0.35)_0%,transparent_42%),radial-gradient(circle_at_82%_18%,rgba(201,196,248,0.32)_0%,transparent_40%),radial-gradient(circle_at_50%_85%,rgba(143,185,244,0.18)_0%,transparent_45%)]" aria-hidden="true"></div>
         
-        <div class="relative z-10 w-full max-w-[540px] flex flex-col justify-center h-full gap-4">
-          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-blue-600/[0.08] border border-blue-600/[0.15] rounded-full text-[11px] font-bold tracking-wider uppercase text-blue-900 w-fit">
-            <span class="w-1.5 h-1.5 rounded-full bg-blue-900 shadow-[0_0_0_3px_rgba(20,184,166,0.2)]"></span>
+        <div class="relative z-10 w-full max-w-135 flex flex-col justify-center h-full gap-4">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-blue-600/8 border border-blue-600/15 rounded-full text-[11px] font-bold tracking-wider uppercase text-orange-800 w-fit">
+            <span class="w-1.5 h-1.5 rounded-full bg-orange-700 shadow-[0_0_0_3px_rgba(20,184,166,0.2)]"></span>
             Secure portal
           </div>
 
           <div class="space-y-1.5">
             <h2 class="text-3xl xl:text-4xl font-bold text-[#1e3a5f] leading-tight">
               Sign in to your
-              <span class="text-[#2b6cb0]">workspace</span>
+              <span class="text-orange-700">workspace</span>
             </h2>
             <p class="text-[13px] xl:text-[14px] leading-relaxed text-slate-500 font-normal">
               One account for Sentra AI, Voice AI Agent, Chatbot dashboards, and client billing — role-based access for your team.
             </p>
           </div>
 
-          <div class="w-full max-w-[480px]" aria-hidden="true">
-            <img 
-              src="@/assets/login-visual.svg" 
-              alt="Platform access visualization" 
-              class="w-full h-auto max-h-[33vh] object-contain rounded-2xl shadow-md bg-pink-50 border border-slate-100"
+         <div class="w-full max-w-65 mx-auto" aria-hidden="true">
+            <img
+              :src="loginVisual"
+              alt="Platform access visualization"
+              width="270" height="102"
             />
           </div>
 
@@ -56,7 +56,7 @@
       </aside>
 
       <main class="flex items-center justify-center p-4 sm:p-6 bg-white w-full h-full overflow-y-auto lg:overflow-hidden">
-        <div class="w-full max-w-[380px] bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-xl shadow-slate-100/50">
+        <div class="w-full max-w-95 bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-xl shadow-slate-100/50">
           
           <div class="mb-4 text-center lg:text-left">
             <h2 class="font-display text-xl font-bold tracking-tight text-[#1e3a5f]">Welcome back</h2>
@@ -91,7 +91,7 @@
             <div class="flex flex-col gap-1">
               <div class="flex items-center justify-between gap-2">
                 <label for="password" class="block text-[11px] font-semibold text-slate-700">Password</label>
-                <a href="mailto:sales@rasantsolutions.com?subject=Forgot%20Password" class="text-[11px] font-semibold text-[#3e6394] no-underline whitespace-nowrap hover:text-indigo-700 hover:underline transition-colors duration-150">
+                <a href="mailto:sales@rasantsolutions.com?subject=Forgot%20Password" class="text-[11px] font-semibold text-orange-700 no-underline whitespace-nowrap hover:text-indigo-700 hover:underline transition-colors duration-150">
                   Forgot password?
                 </a>
               </div>
@@ -123,7 +123,7 @@
                 <input 
                   type="checkbox" 
                   v-model="rememberMe" 
-                  class="w-3.5 h-3.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 cursor-pointer accent-blue-600"
+                  class="w-3.5 h-3.5 rounded border-slate-300 text-orange-700 focus:ring-orange-600 cursor-pointer accent-orange-700"
                 />
                 <span>Remember me on this device</span>
               </label>
@@ -131,14 +131,14 @@
 
             <button 
             type="submit" 
-            class="relative overflow-hidden w-full flex items-center justify-center px-6 py-2.5 bg-[#2A5F9E] hover:bg-[#1E4F87] text-[13px] font-semibold text-white rounded-xl transition-all duration-200 shadow-[0_4px_14px_rgba(42,95,158,0.4)] hover:shadow-[0_6px_20px_rgba(42,95,158,0.6)] active:scale-[0.98] group"
+            class="relative overflow-hidden w-full flex items-center justify-center px-6 py-2.5 bg-orange-700 hover:bg-orange-900 text-[13px] font-semibold text-white rounded-xl transition-all duration-200 shadow-[0_4px_14px_rgba(42,95,158,0.4)] hover:shadow-[0_6px_20px_rgba(42,95,158,0.6)] active:scale-[0.98] group"
           >
             Sign In
             <div class="absolute inset-0 w-1/4 h-full bg-white/10 pointer-events-none animate-shine-loop"></div>
           </button>
           </form>
 
-          <div class="flex items-center gap-3 my-3.5 text-slate-400 text-[9px] font-bold uppercase tracking-wider before:content-[''] before:flex-1 before:h-[1px] before:bg-slate-200/80 after:content-[''] after:flex-1 after:h-[1px] after:bg-slate-200/80" aria-hidden="true">
+          <div class="flex items-center gap-3 my-3.5 text-slate-400 text-[9px] font-bold uppercase tracking-wider before:content-[''] before:flex-1 before:h-px before:bg-slate-200/80 after:content-[''] after:flex-1 after:h-px after:bg-slate-200/80" aria-hidden="true">
             <span>Or try a demo</span>
           </div>
 
@@ -174,7 +174,7 @@
           <div class="mt-4 space-y-1.5 text-center text-[11px]">
             <p class="text-slate-500 font-normal">
               Need an account? 
-              <a href="" class="font-bold text-[#4f6f9a] no-underline hover:underline">Contact sales</a>
+              <a href="" class="font-bold text-orange-700 no-underline hover:underline">Contact sales</a>
             </p>
             <a href="#" class="inline-block font-medium text-slate-500 no-underline transition-colors duration-200 hover:text-blue-600">
               <i class="fa-solid fa-arrow-left mr-1 text-[10px]"></i> Back to website
@@ -190,7 +190,7 @@
 <script setup>
 import Navbar from '../components/navbar.vue';
 import { useLogin } from '../composables/useLogin';
-
+import loginVisual from '../assets/svg/login-visual.svg'
 const {
   username,
   password,

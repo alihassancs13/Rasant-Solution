@@ -15,7 +15,7 @@
     <header class="fixed top-0 left-0 right-0 h-20 bg-white border-b border-slate-200/80 shadow-sm flex items-center justify-between px-6 md:px-12 z-50 transition-all duration-300">
       <a href="#" class="flex items-center shrink-0 group" aria-label="Rasant Solutions home">
         <img 
-          src="../assets/rasant-logo.svg" 
+          src="../assets/images/rasant-logo.png" 
           alt="Rasant Solutions Logo" 
           class="h-[42px] w-auto transition-transform duration-200 group-hover:scale-[1.01]" 
           decoding="async"
@@ -133,7 +133,7 @@
         </a>
         <button 
           type="button"
-          class="bg-[#2A5F9E] hover:bg-[#1E4F87] relative overflow-hidden px-6 py-2.5 text-[14px] font-semibold text-white rounded-full transition-all duration-200 shadow-[0_0_25px_rgba(74,144,226,0.45)] active:scale-[0.98] cursor-pointer flex items-center justify-center"
+          class="bg-orange-700 hover:bg-orange-900 relative overflow-hidden px-6 py-2.5 text-[14px] font-semibold text-white rounded-full transition-all duration-200 shadow-[0_0_25px_rgba(74,144,226,0.45)] active:scale-[0.98] cursor-pointer flex items-center justify-center"
         >
           Get Quote
           <div class="absolute inset-0 w-1/4 h-full bg-white/10 pointer-events-none animate-shine-loop"></div>
