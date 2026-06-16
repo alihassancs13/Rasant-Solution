@@ -1,9 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Login from "../pages/Login.vue";
 import Contact from "../pages/contactForm.vue";
-import contact from "../pages/contactForm.vue"
- 
- 
+import Careers from "../pages/contactForm.vue"
 const routes = [
   {
     path: "/",
@@ -24,7 +22,6 @@ const routes = [
     name: "ai-agent",
     component: () => import("../pages/ai-agent.vue"),
   },
-
   {
       path: '/ai-agent',
       name: 'ai-agent',
@@ -36,12 +33,14 @@ const routes = [
     path: "/",
     redirect: "/contact",
   },
-
+  {
+    path: "/careers",
+    name: "Careers",
+    component: () => import("../pages/careers.vue"), // Added your new Careers page here
+  },
 ];
- 
 const router = createRouter({
   history: createWebHistory(),
   routes,
 });
- 
 export default router;
