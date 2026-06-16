@@ -13,14 +13,14 @@
       ></div>
 
     <header class="fixed top-0 left-0 right-0 h-20 bg-white border-b border-slate-200/80 shadow-sm flex items-center justify-between px-6 md:px-12 z-50 transition-all duration-300">
-      <a href="#" class="flex items-center shrink-0 group" aria-label="Rasant Solutions home">
+      <router-link to="/" class="flex items-center shrink-0 group" aria-label="Rasant Solutions home">
         <img 
           src="../assets/rasant-logo.svg" 
           alt="Rasant Solutions Logo" 
-          class="h-[42px] w-auto transition-transform duration-200 group-hover:scale-[1.01]" 
+          class="h-10.5 w-auto transition-transform duration-200 group-hover:scale-[1.01]" 
           decoding="async"
         />
-      </a>
+      </router-link>
 
       <div class="hidden md:flex items-center h-full relative">
         <ul class="flex items-center gap-8 h-full m-0 p-0 list-none">
@@ -30,18 +30,18 @@
             @mouseenter="activeDropdown = 'services'"
             @mouseleave="activeDropdown = null"
           >
-            <a href="#services" class="flex items-center gap-1.5 font-medium text-[15px] text-slate-700 hover:text-blue-600 transition-colors duration-200 h-full cursor-pointer">
+            <button type="button" class="flex items-center gap-1.5 font-medium text-[15px] text-slate-700 hover:text-blue-600 transition-colors duration-200 h-full cursor-pointer bg-transparent border-0">
               Services 
               <i class="fa-solid fa-chevron-down text-[11px] transition-transform duration-200 group-hover/nav:rotate-180"></i>
-            </a>
+            </button>
             
             <div 
-              class="absolute top-[80px] left-1/2 -translate-x-1/2 w-[340px] bg-white border border-slate-100 rounded-2xl shadow-xl p-4 flex flex-col gap-1 transition-all duration-200 origin-top z-50"
+              class="absolute top-20 left-1/2 -translate-x-1/2 w-85 bg-white border border-slate-100 rounded-2xl shadow-xl p-4 flex flex-col gap-1 transition-all duration-200 origin-top z-50"
               :class="[activeDropdown === 'services' ? 'opacity-100 scale-100 pointer-events-auto visible' : 'opacity-0 scale-[0.97] pointer-events-none invisible']"
             >
-              <div class="absolute top-0 inset-x-0 h-[3px] rounded-t-2xl bg-gradient-to-r from-orange-300 via-pink-400 to-blue-400"></div>
+              <div class="absolute top-0 inset-x-0 h-0.75 rounded-t-2xl bg-linear-to-r from-orange-300 via-pink-400 to-blue-400"></div>
 
-              <a href="#services" class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 group/item transition-colors duration-200">
+              <router-link to="/#services" class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 group/item transition-colors duration-200">
                 <div class="flex items-center gap-3.5">
                   <div class="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center text-lg shadow-sm border border-purple-100/40">⚙️</div>
                   <div>
@@ -49,10 +49,10 @@
                     <p class="text-[12px] text-slate-500 font-normal m-0">Enterprise apps &amp; APIs</p>
                   </div>
                 </div>
-                <span class="text-slate-400 font-medium translate-x-[-4px] opacity-0 group-hover/item:translate-x-0 group-hover/item:opacity-100 transition-all duration-200">→</span>
-              </a>
+                <span class="text-slate-400 font-medium -translate-x-1 opacity-0 group-hover/item:translate-x-0 group-hover/item:opacity-100 transition-all duration-200">→</span>
+              </router-link>
 
-              <a href="#services" class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 group/item transition-colors duration-200">
+              <router-link to="/#services" class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 group/item transition-colors duration-200">
                 <div class="flex items-center gap-3.5">
                   <div class="w-9 h-9 rounded-lg bg-indigo-50 flex items-center justify-center text-lg shadow-sm border border-indigo-100/40">📱</div>
                   <div>
@@ -60,10 +60,10 @@
                     <p class="text-[12px] text-slate-500 font-normal m-0">React, Flutter &amp; Next.js</p>
                   </div>
                 </div>
-                <span class="text-slate-400 font-medium translate-x-[-4px] opacity-0 group-hover/item:translate-x-0 group-hover/item:opacity-100 transition-all duration-200">→</span>
-              </a>
+                <span class="text-slate-400 font-medium -translate-x-1 opacity-0 group-hover/item:translate-x-0 group-hover/item:opacity-100 transition-all duration-200">→</span>
+              </router-link>
 
-              <a href="#services" class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 group/item transition-colors duration-200">
+              <router-link to="/#services" class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 group/item transition-colors duration-200">
                 <div class="flex items-center gap-3.5">
                   <div class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center text-lg shadow-sm border border-blue-100/40">☁️</div>
                   <div>
@@ -71,8 +71,8 @@
                     <p class="text-[12px] text-slate-500 font-normal m-0">AWS &amp; Kubernetes</p>
                   </div>
                 </div>
-                <span class="text-slate-400 font-medium translate-x-[-4px] opacity-0 group-hover/item:translate-x-0 group-hover/item:opacity-100 transition-all duration-200">→</span>
-              </a>
+                <span class="text-slate-400 font-medium -translate-x-1 opacity-0 group-hover/item:translate-x-0 group-hover/item:opacity-100 transition-all duration-200">→</span>
+              </router-link>
             </div>
           </li>
 
@@ -81,22 +81,22 @@
             @mouseenter="activeDropdown = 'projects'"
             @mouseleave="activeDropdown = null"
           >
-            <a href="#products" class="flex items-center gap-1.5 font-medium text-[15px] text-slate-700 hover:text-blue-600 transition-colors duration-200 h-full cursor-pointer">
+            <button type="button" class="flex items-center gap-1.5 font-medium text-[15px] text-slate-700 hover:text-blue-600 transition-colors duration-200 h-full cursor-pointer bg-transparent border-0">
               Projects 
               <i class="fa-solid fa-chevron-down text-[11px] transition-transform duration-200 group-hover/nav:rotate-180"></i>
-            </a>
+            </button>
 
             <div 
-              class="absolute top-[80px] left-1/2 -translate-x-1/2 w-[460px] bg-white border border-slate-100 rounded-2xl shadow-xl p-5 grid grid-cols-2 gap-3 transition-all duration-200 origin-top z-50"
+              class="absolute top-20 left-1/2 -translate-x-1/2 w-115 bg-white border border-slate-100 rounded-2xl shadow-xl p-5 grid grid-cols-2 gap-3 transition-all duration-200 origin-top z-50"
               :class="[activeDropdown === 'projects' ? 'opacity-100 scale-100 pointer-events-auto visible' : 'opacity-0 scale-[0.97] pointer-events-none invisible']"
             >
-              <div class="absolute top-0 inset-x-0 h-[3px] rounded-t-2xl bg-gradient-to-r from-orange-300 via-pink-400 to-blue-400"></div>
+              <div class="absolute top-0 inset-x-0 h-0.75 rounded-t-2xl bg-linear-to-r from-orange-300 via-pink-400 to-blue-400"></div>
 
-              <a href="http://localhost:5173/" class="block p-4 border border-slate-100 rounded-xl hover:border-blue-500/30 hover:bg-slate-50/50 transition-all duration-200">
+              <div @click="window.open('http://localhost:5173/', '_blank')" class="block p-4 border border-slate-100 rounded-xl hover:border-blue-500/30 hover:bg-slate-50/50 transition-all duration-200 cursor-pointer">
                 <div class="inline-block text-[10px] font-bold uppercase tracking-wider text-blue-600 bg-blue-50 px-2 py-0.5 rounded mb-1.5">Call Center</div>
                 <h4 class="font-bold text-[15px] text-slate-800 mb-0.5">Sentra AI</h4>
                 <p class="text-[12px] text-slate-500 font-normal">AI call center platform</p>
-              </a>
+              </div>
 
               <router-link 
               to="/ai-agent" 
@@ -107,30 +107,30 @@
               <p class="text-[12px] text-slate-500 font-normal">Talking voice agents</p>
             </router-link>
 
-              <a href="#" class="block p-4 border border-slate-100 rounded-xl hover:border-blue-500/30 hover:bg-slate-50/50 transition-all duration-200">
+              <router-link to="/chatbot" class="block p-4 border border-slate-100 rounded-xl hover:border-blue-500/30 hover:bg-slate-50/50 transition-all duration-200">
                 <div class="inline-block text-[10px] font-bold uppercase tracking-wider text-purple-600 bg-purple-50 px-2 py-0.5 rounded mb-1.5">Chat</div>
                 <h4 class="font-bold text-[15px] text-slate-800 mb-0.5">Chatbot</h4>
                 <p class="text-[12px] text-slate-500 font-normal">Text and messaging bots</p>
-              </a>
+              </router-link>
 
-              <a href="#" class="block p-4 border border-slate-100 rounded-xl hover:border-blue-500/30 hover:bg-slate-50/50 transition-all duration-200">
+              <router-link to="/orchestri" class="block p-4 border border-slate-100 rounded-xl hover:border-blue-500/30 hover:bg-slate-50/50 transition-all duration-200">
                 <div class="inline-block text-[10px] font-bold uppercase tracking-wider text-orange-600 bg-orange-50 px-2 py-0.5 rounded mb-1.5">SDLC</div>
                 <h4 class="font-bold text-[15px] text-slate-800 mb-0.5">Orchestri</h4>
                 <p class="text-[12px] text-slate-500 font-normal">AI multi-agent dev workflow</p>
-              </a>
+              </router-link>
             </div>
           </li>
 
           <li class="h-full flex items-center">
-            <a href="../pages/contactForm.vue" class="font-medium text-[15px] text-slate-700 hover:text-blue-600 transition-colors duration-200">Contact</a>
+            <router-link to="/contact" class="font-medium text-[15px] text-slate-700 hover:text-blue-600 transition-colors duration-200">Contact</router-link>
           </li>
         </ul>
       </div>
 
       <div class="hidden md:flex items-center gap-4">
-        <a href="#" class="px-5 py-2.5 border border-blue-400/30 text-[14px] font-semibold rounded-full text-blue-900 hover:bg-blue-50 transition-all duration-200 shadow-sm">
+        <router-link to="/login" class="px-5 py-2.5 border border-blue-400/30 text-[14px] font-semibold rounded-full text-blue-900 hover:bg-blue-50 transition-all duration-200 shadow-sm">
           Login
-        </a>
+        </router-link>
         <button 
           type="button"
           class="bg-[#2A5F9E] hover:bg-[#1E4F87] relative overflow-hidden px-6 py-2.5 text-[14px] font-semibold text-white rounded-full transition-all duration-200 shadow-[0_0_25px_rgba(74,144,226,0.45)] active:scale-[0.98] cursor-pointer flex items-center justify-center"
@@ -152,24 +152,24 @@
     </header>
 
     <nav 
-      class="fixed top-0 right-0 bottom-0 w-[280px] bg-white border-l border-slate-100 shadow-2xl pt-24 px-6 flex flex-col gap-4 transform transition-transform duration-300 ease-out z-40 md:hidden"
+      class="fixed top-0 right-0 bottom-0 w-70 bg-white border-l border-slate-100 shadow-2xl pt-24 px-6 flex flex-col gap-4 transform transition-transform duration-300 ease-out z-40 md:hidden"
       :class="[isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full']"
     >
-      <a href="#services" @click="isMobileMenuOpen = false" class="text-[16px] font-semibold text-slate-700 hover:text-blue-600 p-2 rounded-lg hover:bg-slate-50 transition-all">Services</a>
-      <a href="#products" @click="isMobileMenuOpen = false" class="text-[16px] font-semibold text-slate-700 hover:text-blue-600 p-2 rounded-lg hover:bg-slate-50 transition-all">Projects</a>
-      <a href="#" @click="isMobileMenuOpen = false" class="text-[16px] font-semibold text-slate-700 hover:text-blue-600 p-2 rounded-lg hover:bg-slate-50 transition-all">Contact</a>
-      
-      <button 
-        type="button"
+      <router-link to="/#services" @click="isMobileMenuOpen = false" class="text-[16px] font-semibold text-slate-700 hover:text-blue-600 p-2 rounded-lg hover:bg-slate-50 transition-all">Services</router-link>
+      <router-link to="/#products" @click="isMobileMenuOpen = false" class="text-[16px] font-semibold text-slate-700 hover:text-blue-600 p-2 rounded-lg hover:bg-slate-50 transition-all">Projects</router-link>
+      <router-link to="/contact" @click="isMobileMenuOpen = false" class="text-[16px] font-semibold text-slate-700 hover:text-blue-600 p-2 rounded-lg hover:bg-slate-50 transition-all">Contact</router-link>
+
+      <router-link 
+        to="/login"
         @click="isMobileMenuOpen = false" 
-        class="text-[16px] font-semibold text-blue-900 bg-blue-50/60 p-2 rounded-lg transition-all cursor-pointer text-left w-full sm:w-auto"
+        class="block text-[16px] font-semibold text-blue-900 bg-blue-50/60 p-2 rounded-lg transition-all cursor-pointer text-left w-full sm:w-auto"
       >
         Login
-      </button>
+      </router-link>
       
-      <a href="#" @click="isMobileMenuOpen = false" class="mt-4 text-center px-5 py-3 bg-blue-600 text-[14px] font-bold text-white rounded-xl shadow-lg shadow-blue-100 transition-all">
+      <router-link to="/contact" @click="isMobileMenuOpen = false" class="mt-4 text-center px-5 py-3 bg-blue-600 text-[14px] font-bold text-white rounded-xl shadow-lg shadow-blue-100 transition-all">
         Get a Free Quote
-      </a>
+      </router-link>
     </nav>
   </div>
 </template>

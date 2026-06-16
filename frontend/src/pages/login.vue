@@ -4,12 +4,12 @@
     
     <section class="grid grid-cols-1 lg:grid-cols-[3fr_2fr] h-full pt-20 overflow-hidden w-full">
       
-      <aside class="relative hidden lg:flex items-center justify-center p-8 xl:p-12 overflow-hidden bg-gradient-to-b from-[#fdf4ff] via-[#fff8f3] to-slate-50 border-r border-slate-200/60 h-full">
+      <aside class="relative hidden lg:flex items-center justify-center p-8 xl:p-12 overflow-hidden bg-linear-to-b from-[#fdf4ff] via-[#fff8f3] to-slate-50 border-r border-slate-200/60 h-full">
         
-        <div class="absolute -inset-x-[5%] -inset-y-[10%] pointer-events-none bg-[radial-gradient(circle_at_18%_20%,rgba(255,213,180,0.35)_0%,transparent_42%),radial-gradient(circle_at_82%_18%,rgba(201,196,248,0.32)_0%,transparent_40%),radial-gradient(circle_at_50%_85%,rgba(143,185,244,0.18)_0%,transparent_45%)]" aria-hidden="true"></div>
+        <div class="absolute inset-x-[-5%] inset-y-[-10%] pointer-events-none bg-[radial-gradient(circle_at_18%_20%,rgba(255,213,180,0.35)_0%,transparent_42%),radial-gradient(circle_at_82%_18%,rgba(201,196,248,0.32)_0%,transparent_40%),radial-gradient(circle_at_50%_85%,rgba(143,185,244,0.18)_0%,transparent_45%)]" aria-hidden="true"></div>
         
-        <div class="relative z-10 w-full max-w-[540px] flex flex-col justify-center h-full gap-4">
-          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-blue-600/[0.08] border border-blue-600/[0.15] rounded-full text-[11px] font-bold tracking-wider uppercase text-blue-900 w-fit">
+        <div class="relative z-10 w-full max-w-135 flex flex-col justify-center h-full gap-4">
+          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-blue-600/8 border border-blue-600/15 rounded-full text-[11px] font-bold tracking-wider uppercase text-blue-900 w-fit">
             <span class="w-1.5 h-1.5 rounded-full bg-blue-900 shadow-[0_0_0_3px_rgba(20,184,166,0.2)]"></span>
             Secure portal
           </div>
@@ -24,9 +24,9 @@
             </p>
           </div>
 
-          <div class="w-full max-w-[480px]" aria-hidden="true">
+          <div class="w-full max-w-120" aria-hidden="true">
             <img 
-              src="@/assets/login-visual.svg" 
+              src="../svg/login-visual.svg" 
               alt="Platform access visualization" 
               class="w-full h-auto max-h-[33vh] object-contain rounded-2xl shadow-md bg-pink-50 border border-slate-100"
             />
@@ -56,7 +56,7 @@
       </aside>
 
       <main class="flex items-center justify-center p-4 sm:p-6 bg-white w-full h-full overflow-y-auto lg:overflow-hidden">
-        <div class="w-full max-w-[380px] bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-xl shadow-slate-100/50">
+        <div class="w-full max-w-95 bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-xl shadow-slate-100/50">
           
           <div class="mb-4 text-center lg:text-left">
             <h2 class="font-display text-xl font-bold tracking-tight text-[#1e3a5f]">Welcome back</h2>
@@ -138,7 +138,7 @@
           </button>
           </form>
 
-          <div class="flex items-center gap-3 my-3.5 text-slate-400 text-[9px] font-bold uppercase tracking-wider before:content-[''] before:flex-1 before:h-[1px] before:bg-slate-200/80 after:content-[''] after:flex-1 after:h-[1px] after:bg-slate-200/80" aria-hidden="true">
+          <div class="flex items-center gap-3 my-3.5 text-slate-400 text-[9px] font-bold uppercase tracking-wider before:content-[''] before:flex-1 before:h-px before:bg-slate-200/80 after:content-[''] after:flex-1 after:h-px after:bg-slate-200/80" aria-hidden="true">
             <span>Or try a demo</span>
           </div>
 
