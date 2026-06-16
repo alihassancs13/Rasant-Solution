@@ -6,6 +6,12 @@
       class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-300 z-40 md:hidden"
     ></div>
 
+    <!-- Global Desktop Dropdown Backdrop Mask (Darkened to 25% black opacity) -->
+      <div 
+        v-if="activeDropdown" 
+        class="fixed inset-0 bg-slate-900/55 backdrop-blur-[5px] transition-all duration-300 pointer-events-none hidden md:block z-30"
+      ></div>
+
     <header class="fixed top-0 left-0 right-0 h-20 bg-white border-b border-slate-200/80 shadow-sm flex items-center justify-between px-6 md:px-12 z-50 transition-all duration-300">
       <a href="#" class="flex items-center shrink-0 group" aria-label="Rasant Solutions home">
         <img 
@@ -81,7 +87,7 @@
             </a>
 
             <div 
-              class="absolute top-[80px] left-1/2 -translate-x-1/2 w-[580px] bg-white border border-slate-100 rounded-2xl shadow-xl p-5 grid grid-cols-2 gap-3 transition-all duration-200 origin-top z-50"
+              class="absolute top-[80px] left-1/2 -translate-x-1/2 w-[460px] bg-white border border-slate-100 rounded-2xl shadow-xl p-5 grid grid-cols-2 gap-3 transition-all duration-200 origin-top z-50"
               :class="[activeDropdown === 'projects' ? 'opacity-100 scale-100 pointer-events-auto visible' : 'opacity-0 scale-[0.97] pointer-events-none invisible']"
             >
               <div class="absolute top-0 inset-x-0 h-[3px] rounded-t-2xl bg-gradient-to-r from-orange-300 via-pink-400 to-blue-400"></div>
@@ -92,11 +98,14 @@
                 <p class="text-[12px] text-slate-500 font-normal">AI call center platform</p>
               </a>
 
-              <a href="#" class="block p-4 border border-slate-100 rounded-xl hover:border-blue-500/30 hover:bg-slate-50/50 transition-all duration-200">
-                <div class="inline-block text-[10px] font-bold uppercase tracking-wider text-teal-600 bg-teal-50 px-2 py-0.5 rounded mb-1.5">Voice</div>
-                <h4 class="font-bold text-[15px] text-slate-800 mb-0.5">AI Agent</h4>
-                <p class="text-[12px] text-slate-500 font-normal">Talking voice agents</p>
-              </a>
+              <router-link 
+              to="/ai-agent" 
+              class="block p-4 border border-slate-100 rounded-xl hover:border-blue-500/30 hover:bg-slate-50/50 transition-all duration-200"
+            >
+              <div class="inline-block text-[10px] font-bold uppercase tracking-wider text-teal-600 bg-teal-50 px-2 py-0.5 rounded mb-1.5">Voice</div>
+              <h4 class="font-bold text-[15px] text-slate-800 mb-0.5">AI Agent</h4>
+              <p class="text-[12px] text-slate-500 font-normal">Talking voice agents</p>
+            </router-link>
 
               <a href="#" class="block p-4 border border-slate-100 rounded-xl hover:border-blue-500/30 hover:bg-slate-50/50 transition-all duration-200">
                 <div class="inline-block text-[10px] font-bold uppercase tracking-wider text-purple-600 bg-purple-50 px-2 py-0.5 rounded mb-1.5">Chat</div>
@@ -122,10 +131,13 @@
         <a href="#" class="px-5 py-2.5 border border-blue-400/30 text-[14px] font-semibold rounded-full text-blue-900 hover:bg-blue-50 transition-all duration-200 shadow-sm">
           Login
         </a>
-        <a href="#" class=" bg-[#2A5F9E] hover:bg-[#1E4F87] relative overflow-hidden px-6 py-2.5    text-[14px] font-semibold text-white rounded-full transition-all duration-200 shadow-[0_0_25px_rgba(74,144,226,0.45)]  ">
+        <button 
+          type="button"
+          class="bg-[#2A5F9E] hover:bg-[#1E4F87] relative overflow-hidden px-6 py-2.5 text-[14px] font-semibold text-white rounded-full transition-all duration-200 shadow-[0_0_25px_rgba(74,144,226,0.45)] active:scale-[0.98] cursor-pointer flex items-center justify-center"
+        >
           Get Quote
-          <div class="absolute inset-0 w-1/2 h-full bg-white/10 transform -skew-x-12 -translate-x-full group-hover:animate-[shine_0.75s_ease-in-out]"></div>
-        </a>
+          <div class="absolute inset-0 w-1/4 h-full bg-white/10 pointer-events-none animate-shine-loop"></div>
+        </button>
       </div>
 
       <button 
@@ -146,7 +158,14 @@
       <a href="#services" @click="isMobileMenuOpen = false" class="text-[16px] font-semibold text-slate-700 hover:text-blue-600 p-2 rounded-lg hover:bg-slate-50 transition-all">Services</a>
       <a href="#products" @click="isMobileMenuOpen = false" class="text-[16px] font-semibold text-slate-700 hover:text-blue-600 p-2 rounded-lg hover:bg-slate-50 transition-all">Projects</a>
       <a href="#" @click="isMobileMenuOpen = false" class="text-[16px] font-semibold text-slate-700 hover:text-blue-600 p-2 rounded-lg hover:bg-slate-50 transition-all">Contact</a>
-      <a href="#" @click="isMobileMenuOpen = false" class="text-[16px] font-semibold text-blue-600 bg-blue-50/60 p-2 rounded-lg transition-all">Login</a>
+      
+      <button 
+        type="button"
+        @click="isMobileMenuOpen = false" 
+        class="text-[16px] font-semibold text-blue-900 bg-blue-50/60 p-2 rounded-lg transition-all cursor-pointer text-left w-full sm:w-auto"
+      >
+        Login
+      </button>
       
       <a href="#" @click="isMobileMenuOpen = false" class="mt-4 text-center px-5 py-3 bg-blue-600 text-[14px] font-bold text-white rounded-xl shadow-lg shadow-blue-100 transition-all">
         Get a Free Quote

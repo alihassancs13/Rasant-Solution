@@ -11,6 +11,12 @@ const routes = [
     path: "/",
     redirect: "/login",
   },
+  {
+      path: '/ai-agent',
+      name: 'ai-agent',
+      
+      component: () => import('../pages/ai-agent.vue') 
+    }
 ];
 
 const router = createRouter({

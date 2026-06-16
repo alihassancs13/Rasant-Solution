@@ -130,11 +130,12 @@
             </div>
 
             <button 
-              type="submit" 
-              class="relative overflow-hidden w-full flex items-center justify-center px-6 py-2 bg-[#2A5F9E] hover:bg-blue-700 text-[13px] font-semibold text-white rounded-xl transition-all duration-200 shadow-md shadow-blue-100 group"
-            >
-              Sign In
-            </button>
+            type="submit" 
+            class="relative overflow-hidden w-full flex items-center justify-center px-6 py-2.5 bg-[#2A5F9E] hover:bg-[#1E4F87] text-[13px] font-semibold text-white rounded-xl transition-all duration-200 shadow-[0_4px_14px_rgba(42,95,158,0.4)] hover:shadow-[0_6px_20px_rgba(42,95,158,0.6)] active:scale-[0.98] group"
+          >
+            Sign In
+            <div class="absolute inset-0 w-1/4 h-full bg-white/10 pointer-events-none animate-shine-loop"></div>
+          </button>
           </form>
 
           <div class="flex items-center gap-3 my-3.5 text-slate-400 text-[9px] font-bold uppercase tracking-wider before:content-[''] before:flex-1 before:h-[1px] before:bg-slate-200/80 after:content-[''] after:flex-1 after:h-[1px] after:bg-slate-200/80" aria-hidden="true">

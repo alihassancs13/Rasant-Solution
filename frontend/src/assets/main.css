@@ -4,6 +4,9 @@
   --animate-mesh-shift: meshShift 10s ease-in-out infinite alternate;
   --animate-shine: shine 0.75s ease-in-out;
   --animate-shake: shake 0.35s ease-in-out;
+  
+  /* Sped up to 0.9 seconds for a snappy, high-end reflection look */
+  --animate-shine-loop: shineLoop 0.9s ease-in-out infinite alternate;
 
   @keyframes meshShift {
     0% { transform: translate(0, 0) scale(1); opacity: 0.9; }
@@ -16,5 +19,10 @@
     0%, 100% { transform: translateX(0); }
     25% { transform: translateX(-5px); }
     75% { transform: translateX(5px); }
+  }
+  
+  @keyframes shineLoop {
+    0% { transform: translateX(-250%) skewX(-12deg); }
+    100% { transform: translateX(400%) skewX(-12deg); }
   }
 }
