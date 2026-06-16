@@ -10,7 +10,7 @@
       <header class="fixed top-0 left-0 right-0 z-40 transition-all duration-300 px-6 py-4 bg-white/90 backdrop-blur-md border-b border-slate-200/80 shadow-sm">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
           <a href="home.html" class="flex-shrink-0" aria-label="Rasant Solutions home">
-            <img src="@/assets/rasant-logo.svg" alt="Rasant Solutions" class="h-10 w-auto" width="212" height="42" decoding="async"/>
+            <img src="../assets/svg/rasant-logo.svg" alt="Rasant Solutions" class="h-10 w-auto" width="212" height="42" decoding="async"/>
           </a>
 
           <nav class="hidden md:flex items-center gap-8 relative">
@@ -161,7 +161,7 @@
             <div class="absolute inset-[8%] rounded-full bg-[radial-gradient(circle,rgba(45,212,191,0.2)_0%,transparent_70%)] animate-[aaBotGlow_3s_ease-in-out_infinite]"></div>
             <div class="absolute inset-[-14px] rounded-full border-2 border-dashed border-[rgba(45,212,191,0.35)] animate-[aaBotRingSpin_22s_linear_infinite]"></div>
             <div class="absolute inset-[-22px] rounded-full border-2 border-dashed border-[rgba(139,92,246,0.2)] animate-[aaBotRingSpin_30s_linear_infinite_reverse]"></div>
-            <object :data="require('../assets/ai-agent-bot.svg')" type="image/svg+xml" title="Voice AI Agent" class="w-full block relative z-20 filter drop-shadow-[0_16px_36px_rgba(42,95,158,0.2)]">Voice AI Agent robot</object>
+            <object :data="botSvg" type="image/svg+xml" />
           </div>
         </div>
 
@@ -192,7 +192,9 @@
           <div class="relative w-full max-w-[560px] mx-auto animate-[aaVisualFloat_6s_ease-in-out_infinite]">
             <div class="absolute inset-[8%_4%] rounded-full bg-[radial-gradient(circle,rgba(20,184,166,0.18)_0%,rgba(74,144,226,0.08)_45%,transparent_72%)] filter blur-[8px] animate-[aaShowcaseGlow_4s_ease-in-out_infinite] pointer-events-none"></div>
             <div class="relative z-10 rounded-[16px] overflow-hidden border border-slate-200/80 shadow-[0_22px_56px_rgba(15,23,42,0.1)] bg-white transition-all duration-350 min-h-[320px] hover:shadow-[0_28px_64px_rgba(15,76,129,0.14)] hover:-translate-y-1 hover:scale-[1.01]">
-              <object :data="require('../assets/ai-agent-voice-flow.svg')" type="image/svg+xml" title="Voice AI agent call flow" class="w-full min-h-[280px] block">Voice agent flow diagram</object>
+              <object :data="voiceFlow" type="image/svg+xml" title="Voice AI agent call flow" class="w-full min-h-[280px] block">
+                Voice agent flow diagram
+              </object>
             </div>
           </div>
         </div>
@@ -218,7 +220,9 @@
                 <div class="bg-[#fafbfc] border border-slate-200/60 rounded-[14px] p-[10px_10px_8px] animate-[aaTileFloat_5s_ease-in-out_infinite] transition-all hover:border-teal-400/40 hover:shadow-md">
                   <span class="block text-[9px] font-extrabold tracking-wider uppercase text-slate-500 mb-2 pl-0.5">Scheduled queue</span>
                   <div class="overflow-hidden rounded-[10px] bg-white border border-slate-100 h-[170px] md:h-[108px]">
-                    <object :data="require('../assets/ai-agent-scheduled-calls.svg')" type="image/svg+xml" title="Scheduled calls overview" class="w-full block -mt-1.5">Scheduled calls overview</object>
+                    <object :data="scheduledCalls" type="image/svg+xml" title="Scheduled calls overview" class="w-full block -mt-1.5">
+                      Scheduled calls overview
+                    </object>
                   </div>
                 </div>
 
@@ -226,10 +230,12 @@
                   <span class="block text-[9px] font-extrabold tracking-wider uppercase text-slate-500 mb-2 pl-0.5">Activity and usage</span>
                   <div class="grid grid-cols-1 sm:grid-cols-[0.42fr_0.58fr] gap-2">
                     <div class="overflow-hidden rounded-[10px] bg-white border border-slate-100 h-[150px] md:h-[108px]">
-                      <object :data="require('../assets/ai-agent-analytics.svg')" type="image/svg+xml" title="Analytics summary" class="w-full block">Analytics summary</object>
+                      <object :data="analytics" type="image/svg+xml" title="Analytics summary" class="w-full block">
+                        Analytics summary
+                      </object>
                     </div>
                     <div class="overflow-hidden rounded-[10px] bg-white border border-slate-100 h-[150px] md:h-[108px] flex items-center justify-center bg-[#fafbfc]">
-                      <img src="@/assets/agent_graphs.png" alt="Activity trend charts" class="w-[118%] h-auto block scale-[0.88] origin-center" width="1100" height="420"/>
+                      <img src="../assets/images/agent_graphs.png" alt="Activity trend charts" class="w-[118%] h-auto block scale-[0.88] origin-center" width="1100" height="420"/>
                     </div>
                   </div>
                 </div>
@@ -278,7 +284,9 @@
                 <div class="absolute inset-5 rounded-full bg-[radial-gradient(circle,rgba(45,212,191,0.22)_0%,transparent_68%)] animate-[aaVoiceGlow_3.5s_ease-in-out_infinite]"></div>
                 <div class="absolute inset-[-8%] rounded-full border-2 border-dashed border-slate-400/30 animate-[aaBotRingSpin_24s_linear_infinite]"></div>
                 <div class="absolute inset-[-18%] rounded-full border-2 border-dashed border-sky-400/20 animate-[aaBotRingSpin_30s_linear_infinite_reverse]"></div>
-                <object :data="require('../assets/ai-agent-phone-bot.svg')" type="image/svg+xml" title="Voice AI agent on a call" class="w-full block relative z-20 filter drop-shadow-[0_22px_48px_rgba(42,95,158,0.2)] animate-[aaBotObjBob_5s_ease-in-out_infinite]">Voice AI agent with phone</object>
+                <object :data="phoneBot" type="image/svg+xml" title="Voice AI agent on a call" class="w-full block relative z-20 filter drop-shadow-[0_22px_48px_rgba(42,95,158,0.2)] animate-[aaBotObjBob_5s_ease-in-out_infinite]">
+                  Voice AI agent with phone
+                </object>
               </div>
             </div>
           </div>
@@ -333,7 +341,10 @@
             <div class="absolute inset-[8%_4%] rounded-full bg-[radial-gradient(circle,rgba(74,144,226,0.22)_0%,rgba(20,184,166,0.1)_50%,transparent_72%)] filter blur-[8px] animate-[aaShowcaseGlow_4s_ease-in-out_infinite] pointer-events-none"></div>
             <div class="absolute inset-[-6px] rounded-[22px] border-2 border-dashed border-teal-500/35 animate-[aaBotRingSpin_26s_linear_infinite] pointer-events-none"></div>
             <div class="relative z-10 rounded-[16px] overflow-hidden border border-slate-200/80 shadow-[0_22px_56px_rgba(15,23,42,0.1)] bg-white transition-all duration-350 min-h-[300px] md:min-h-[340px] hover:shadow-[0_28px_64px_rgba(15,76,129,0.14)] hover:-translate-y-1 hover:scale-[1.01]">
-              <object :data="require('../assets/ai-agent-capabilities.svg')" type="image/svg+xml" title="Voice AI capabilities and telephony integrations" class="w-full min-h-[320px] block">Voice agent capabilities diagram</object>
+              <object :data="voiceFlow" type="image/svg+xml" title="Voice AI agent call flow"
+              class="w-full min-h-[280px] block">
+              Voice agent flow diagram
+            </object>
             </div>
           </div>
         </div>
@@ -390,6 +401,12 @@
 </template>
 
 <script>
+import botSvg from '../assets/svg/admin-careers-hero.svg';
+import voiceFlow from '../assets/svg/ai-agent-voice-flow.svg'
+import scheduledCalls from '../assets/svg/ai-agent-scheduled-calls.svg'
+import analytics from '../assets/svg/ai-agent-analytics.svg'
+import phoneBot from '../assets/svg/ai-agent-phone-bot.svg'
+import capabilities from '../assets/svg/ai-agent-capabilities.svg'
 export default {
   name: 'AiAgentComponent',
   data() {
