@@ -2,11 +2,17 @@ import { createRouter, createWebHistory } from "vue-router";
 import Login from "../pages/Login.vue";
 import Contact from "../pages/contactForm.vue";
 import Careers from "../pages/careers.vue";
-import Orchestri from "../pages/sdlc-orchestri.vue";
+import Home from "../pages/home.vue";
+
 const routes = [
   {
     path: "/",
-    redirect: "/login",
+    redirect: "/home",
+  },
+  {
+    path: "/home",
+    name: "Home",
+    component: Home,
   },
   {
     path: "/login",
@@ -24,29 +30,20 @@ const routes = [
     component: () => import("../pages/ai-agent.vue"),
   },
   {
-      path: '/ai-agent',
-      name: 'ai-agent',
-     
-      component: () => import('../pages/ai-agent.vue')
-    }
-  ,
-  {
     path: "/orchestri",
     name: "Orchestri",
-    component: () => import("../pages/sdlc-orchestri.vue"), // Make sure your file name matches exactly
-  },
-  {
-    path: "/",
-    redirect: "/contact",
+    component: () => import("../pages/sdlc-orchestri.vue"),
   },
   {
     path: "/careers",
     name: "Careers",
-    component: () => import("../pages/careers.vue"), // Added your new Careers page here
+    component: () => import("../pages/careers.vue"),
   },
 ];
+
 const router = createRouter({
   history: createWebHistory(),
   routes,
 });
+
 export default router;
