@@ -7,7 +7,7 @@
   <div class="absolute inset-0 opacity-70 mix-blend-multiply pointer-events-none bg-[radial-gradient(circle_at_top_right,rgba(244,63,94,0.09),transparent_45%),radial-gradient(circle_at_bottom_left,rgba(59,130,246,0.1),transparent_50%),radial-gradient(circle_at_top_left,rgba(219,39,119,0.06),transparent_40%),radial-gradient(circle_at_bottom_right,rgba(241,245,249,1),transparent_60%)]" aria-hidden="true"></div>
 
   <div class="relative z-10 max-w-3xl mx-auto">
-    <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-['Space_Grotesk'] font-bold uppercase tracking-wider bg-slate-100 border border-slate-200 text-[#F26522] mb-4 select-none">
+    <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-['Space_Grotesk'] font-bold uppercase tracking-wider bg-slate-100 border border-slate-200 text-orange-800 mb-4 select-none">
       <span class="relative flex h-2 w-2">
       <span class="animate-ping absolute inline-flex  h-full w-full rounded-full bg-[#10B981] opacity-75"></span>
       <span class="relative inline-flex rounded-full h-2 w-2 bg-[#10B981]"></span>

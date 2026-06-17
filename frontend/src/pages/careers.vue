@@ -2,24 +2,29 @@
   <div class="min-h-screen bg-white font-['Inter'] text-[#1E293B] antialiased selection:bg-[#4A90E2]/20">
     <Navbar />
 
-    <section class="relative overflow-hidden bg-gradient-to-b from-[#F8FAFC] via-[#F1F5F9] to-white py-20 lg:py-28">
-      <div class="absolute inset-0 opacity-40 mix-blend-multiply pointer-events-none bg-[radial-gradient(circle_at_top_right,rgba(74,144,226,0.15),transparent_50%),radial-gradient(circle_at_bottom_left,rgba(242,101,34,0.1),transparent_50%)]" aria-hidden="true"></div>
-      
-      <div class="relative max-w-4xl mx-auto px-6 text-center">
-        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold tracking-wider uppercase bg-[#F26522]/10 text-[#8e3c17] border border-[#F26522]/20 mb-6">
-          <span class="w-1.5 h-1.5 rounded-full bg-[#10B981] animate-pulse"></span>
-          Careers
-        </span>
-        <h1 class="font-['Space_Grotesk'] text-4xl sm:text-5xl lg:text-6xl font-extrabold text-[#1e3a5f] tracking-tight leading-tight mb-6">
-            Build the future<br />
-            <em class="not-italic  bg-clip-text bg-gradient-to-r text-orange-700">with us</em>
-            </h1>
-        <p class="text-base sm:text-lg text-[#64748B] max-w-2xl mx-auto leading-relaxed">
-          Join Rasant Solutions — innovation, growth, and meaningful work across AI products and custom software.
-        </p>
-      </div>
-    </section>
+    <section class="relative overflow-hidden py-20 lg:py-24 bg-gradient-to-r from-[#FFF5EE] via-[#FFF1F2] to-[#F3F4F6]">
+  <!-- Smooth background mesh gradient blending peach, pink, and light purple tones -->
+  <div class="absolute inset-0 opacity-60 pointer-events-none bg-[radial-gradient(circle_at_top_left,rgba(255,237,213,0.5),transparent_45%),radial-gradient(circle_at_top_right,rgba(243,232,255,0.6),transparent_50%)]" aria-hidden="true"></div>
+  
+  <div class="relative max-w-4xl mx-auto px-6 text-center z-10">
+    <!-- Careers Badge -->
+    <span class="inline-flex items-center gap-2 px-3 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase bg-slate-400/10 text-orange-700 border border-slate-300/30 mb-5">
+      <span class="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse"></span>
+      Careers
+    </span>
 
+    <!-- Main Headline (Brought up slightly to 3xl / 4xl) -->
+    <h1 class="font-['Space_Grotesk'] text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#0F2942] tracking-tight leading-[1.2] mb-5">
+      Build the future<br />
+      <em class="not-italic text-[#C2410C]">with us</em>
+    </h1>
+
+    <!-- Subtitle Text (Brought up to a clean text-sm / text-base balance) -->
+    <p class="text-sm sm:text-base text-slate-500 max-w-2xl mx-auto leading-relaxed font-normal">
+      Join Rasant Solutions — innovation, growth, and meaningful work across AI products and custom software.
+    </p>
+  </div>
+</section>
     <main class="max-w-5xl mx-auto px-6 pb-24">
       
       <div v-if="hasOpenings" id="careersJobsSection" class="space-y-12">
