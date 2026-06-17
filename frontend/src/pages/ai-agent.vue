@@ -63,8 +63,8 @@
         <div class="absolute right-[2%] top-1/2 -translate-y-1/2 w-[min(480px,52%)] h-[min(400px,72%)] rounded-full pointer-events-none z-0 blur-[52px] bg-[radial-gradient(circle,rgba(20,184,166,0.2)_0%,rgba(74,144,226,0.1)_42%,transparent_72%)]" aria-hidden="true"></div>
 
         <div class="relative z-20">
-          <span class="absolute font-['Space_Grotesk'] text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] text-slate-900/[0.065] -top-12 left-0 pointer-events-none select-none" aria-hidden="true">01</span>
-          <span class="inline-block uppercase tracking-wider text-[11px] font-bold text-teal-600 bg-teal-50 px-3 py-1 rounded-full mb-2 mt-8 relative z-10">Call Flow</span>
+          <span class="block font-['Space_Grotesk'] text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] text-slate-900/[0.065] pointer-events-none select-none" aria-hidden="true">01</span>
+          <span class="inline-block uppercase tracking-wider text-[11px] font-bold text-teal-600 bg-teal-50 px-3 py-1 rounded-full mb-2 relative z-10">Call Flow</span>
           <h2 class="font-['Space_Grotesk'] text-[clamp(24px,3vw,36px)] font-extrabold tracking-[-0.8px] leading-[1.15] text-slate-900 my-2 relative z-10">From ring to resolution on the phone</h2>
           <p class="text-[15px] text-slate-500 leading-relaxed max-w-115">Route every call through speech recognition, intent handling, and smart transfer — so callers get answers on the line without waiting in silence.</p>
         </div>
@@ -114,10 +114,11 @@
         </div>
 
         <div class="relative z-20">
-          <span class="absolute font-['Space_Grotesk'] text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] text-slate-900/[0.065] -top-12 left-0 pointer-events-none select-none" aria-hidden="true">02</span>
-          <span class="inline-block uppercase tracking-wider text-[11px] font-bold text-teal-600 bg-teal-50 px-3 py-1 rounded-full mb-2 mt-8 relative z-10">Live Dashboards</span>
+          <span class="block font-['Space_Grotesk'] text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] text-slate-900/[0.065] pointer-events-none select-none" aria-hidden="true">02</span>
+          <span class="inline-block uppercase tracking-wider text-[11px] font-bold text-teal-600 bg-teal-50 px-3 py-1 rounded-full mb-2 relative z-10">Live Dashboards</span>
           <h2 class="font-['Space_Grotesk'] text-[clamp(24px,3vw,36px)] font-extrabold tracking-[-0.8px] leading-[1.15] text-slate-900 my-2 relative z-10">Monitor every call in real time</h2>
           <p class="text-[15px] text-slate-500 leading-relaxed max-w-115">See queues, live volume, and agent activity in one glance — from scheduled callbacks to activity trends.</p>
+
 
           <div class="flex flex-wrap items-center gap-2.5 mt-4.5">
             <div class="inline-flex items-center gap-1.75 px-3.5 py-1.5 rounded-full bg-teal-500/10 border border-teal-500/35 text-[10px] font-extrabold tracking-widest text-teal-800 animate-[aaLivePulse_2.2s_ease-in-out_infinite]" aria-label="Live data">
@@ -142,8 +143,8 @@
           <div class="absolute right-[2%] top-1/2 -translate-y-1/2 w-[min(480px,52%)] h-[min(400px,72%)] rounded-full pointer-events-none z-0 blur-[52px] bg-[radial-gradient(circle,rgba(20,184,166,0.2)_0%,rgba(74,144,226,0.1)_42%,transparent_72%)]" aria-hidden="true"></div>
 
           <div class="relative z-20">
-            <span class="absolute font-['Space_Grotesk'] text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] text-slate-900/[0.065] -top-12 left-0 pointer-events-none select-none" aria-hidden="true">03</span>
-            <span class="inline-block uppercase tracking-wider text-[11px] font-bold text-teal-600 bg-teal-50 px-3 py-1 rounded-full mb-2 mt-8 relative z-10">Voice Workflows</span>
+            <span class="block font-['Space_Grotesk'] text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] text-slate-900/[0.065] pointer-events-none select-none" aria-hidden="true">03</span>
+            <span class="inline-block uppercase tracking-wider text-[11px] font-bold text-teal-600 bg-teal-50 px-3 py-1 rounded-full mb-2 relative z-10">Voice Workflows</span>
             <h2 class="font-['Space_Grotesk'] text-[clamp(24px,3vw,36px)] font-extrabold tracking-[-0.8px] leading-[1.15] text-slate-900 my-2 relative z-10">
               Built for real calls. <em class="not-italic bg-gradient-to-r from-teal-500 to-indigo-600 bg-clip-text text-transparent">Operator-grade control.</em>
             </h2>
@@ -204,10 +205,11 @@
         </div>
 
         <div class="relative z-20">
-          <span class="absolute font-['Space_Grotesk'] text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] text-slate-900/[0.065] -top-12 left-0 pointer-events-none select-none" aria-hidden="true">04</span>
-          <span class="inline-block uppercase tracking-wider text-[11px] font-bold text-teal-600 bg-teal-50 px-3 py-1 rounded-full mb-2 mt-8 relative z-10">Capabilities</span>
+          <span class="block font-['Space_Grotesk'] text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] text-slate-900/[0.065] pointer-events-none select-none" aria-hidden="true">04</span>
+          <span class="inline-block uppercase tracking-wider text-[11px] font-bold text-teal-600 bg-teal-50 px-3 py-1 rounded-full mb-2 relative z-10">Capabilities</span>
           <h2 class="font-['Space_Grotesk'] text-[clamp(24px,3vw,36px)] font-extrabold tracking-[-0.8px] leading-[1.15] text-slate-900 my-2 relative z-10">Everything a voice agent needs</h2>
           <p class="text-[15px] text-slate-500 leading-relaxed max-w-115">Recordings, warm transfer, and telephony integrations — the full toolkit for production voice deployments.</p>
+
 
           <ul class="mt-4.5 flex flex-col gap-2.5 list-none p-0">
             <li v-for="(feat, i) in capabilityFeatures" :key="i"
