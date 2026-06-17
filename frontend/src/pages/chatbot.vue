@@ -56,9 +56,9 @@
     <section class="py-20 lg:py-28 bg-white relative overflow-hidden">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          
+
           <div class="lg:col-span-5 space-y-4">
-            <div class="text-7xl font-extrabold text-slate-100 font-space-grotesk tracking-tighter leading-none select-none">01</div>
+            <div class="font-['Space_Grotesk'] text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] text-slate-900/[0.065] pointer-events-none select-none">01</div>
             <span class="inline-block text-xs font-bold uppercase tracking-wider text-indigo-600">Conversation Flow</span>
             <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 font-space-grotesk">From message to resolution in chat</h2>
             <p class="text-slate-600 leading-relaxed">
@@ -102,12 +102,13 @@
           </div>
 
           <div class="lg:col-span-5 space-y-5 lg:order-2">
-            <div class="text-7xl font-extrabold text-slate-200/70 font-space-grotesk tracking-tighter leading-none select-none">02</div>
+            <div class="font-['Space_Grotesk'] text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] text-slate-900/[0.065] pointer-events-none select-none">02</div>
             <span class="inline-block text-xs font-bold uppercase tracking-wider text-indigo-600">Live Analytics</span>
             <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 font-space-grotesk">Track tokens, requests, and usage</h2>
             <p class="text-slate-600 leading-relaxed">
               See embeddings, AI responses, and activity trends in one dashboard - from daily token burn to document coverage.
             </p>
+
             
             <div class="flex flex-wrap items-center gap-3 pt-2">
               <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-bold tracking-wider">
@@ -131,7 +132,7 @@
         
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-16">
           <div class="lg:col-span-6 space-y-4">
-            <div class="text-7xl font-extrabold text-slate-100 font-space-grotesk tracking-tighter leading-none select-none">03</div>
+            <div class="font-['Space_Grotesk'] text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] text-slate-900/[0.065] pointer-events-none select-none">03</div>
             <span class="inline-block text-xs font-bold uppercase tracking-wider text-indigo-600">Chat Workflows</span>
             <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 font-space-grotesk">
               Built for real conversations. <br/>
@@ -212,12 +213,13 @@
           </div>
 
           <div class="lg:col-span-6 space-y-6">
-            <div class="text-7xl font-extrabold text-slate-200/80 font-space-grotesk tracking-tighter leading-none select-none">04</div>
+            <div class="font-['Space_Grotesk'] text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] text-slate-900/[0.065] pointer-events-none select-none">04</div>
             <span class="inline-block text-xs font-bold uppercase tracking-wider text-indigo-600">Capabilities</span>
             <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 font-space-grotesk">Everything a chatbot agent needs</h2>
             <p class="text-slate-600 leading-relaxed mb-6">
               Intent routing, human handoff, and CRM integrations - the full toolkit for production chat deployments.
             </p>
+
 
             <ul class="space-y-6">
               <li class="flex items-start gap-4">
