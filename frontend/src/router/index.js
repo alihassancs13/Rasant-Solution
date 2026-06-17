@@ -3,6 +3,7 @@ import Login from "../pages/Login.vue";
 import Contact from "../pages/contactForm.vue";
 import Careers from "../pages/careers.vue";
 import Home from "../pages/home.vue";
+import Chatbot from "../pages/chatbot.vue";
 
 const routes = [
   {
@@ -38,6 +39,11 @@ const routes = [
     path: "/careers",
     name: "Careers",
     component: () => import("../pages/careers.vue"),
+  },
+  {
+    path: "/chatbot",
+    name: "Chatbot",
+    component: () => import("../pages/chatbot.vue"), 
   },
 ];
 

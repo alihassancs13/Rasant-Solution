@@ -65,10 +65,10 @@
           
           <div class="lg:col-span-7 order-last lg:order-first">
             <div class="bg-white rounded-2xl shadow-xl border border-slate-200/60 p-2 overflow-hidden max-w-2xl mx-auto">
-              <img src="..//assets/images/orchestri-pipeline-progress.png" alt="Orchestri Product UI Management Console" class="w-full h-auto rounded-xl object-cover" />
+              <img src="../assets/images/orchestri-pipeline-progress.png" alt="Orchestri Product UI Management Console" class="w-full h-auto rounded-xl object-cover" />
             </div>
             <div class="oc-dash-img-wrap oc-dash-img-workflow">
-            <img src="..//assets/images/orchestri-workflow-ui.png" alt="Orchestri workflow console with Specification, Plan, Implementation, Testing, and Commit" width="900" height="1100" loading="lazy" decoding="async"/>
+            <img src="../assets/images/orchestri-workflow-ui.png" alt="Orchestri workflow console with Specification, Plan, Implementation, Testing, and Commit" width="900" height="1100" loading="lazy" decoding="async"/>
           </div>
           </div>
 
