@@ -3,7 +3,7 @@ import App from './App.vue'
 import router from './router/index.js'
 import './assets/main.css'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import '../icon.js' 
+import './fontAwesomeIcons/icon.js' 
 
 const app = createApp(App)
 app.component('font-awesome-icon', FontAwesomeIcon)
