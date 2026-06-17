@@ -12,7 +12,7 @@
           </span>
         </div>
 
-        <h1 class="text-5xl md:text-6xl font-extrabold tracking-tight text-slate-900 leading-[1.1]">
+        <h1 class="text-5xl md:text-6xl font-bold tracking-tight text-[#1e3a5f] leading-[1.1]">
           We craft <br />
           <Transition name="fade" mode="out-in">
             <span
@@ -30,7 +30,7 @@
         </p>
 
         <div class="flex flex-wrap gap-4 pt-4">
-          <button class="inline-flex items-center justify-center bg-[#E03C08] hover:bg-[#c63406] text-white font-semibold px-7 py-4 rounded-xl shadow-lg shadow-orange-600/20 transition-all duration-200 group transform hover:-translate-y-0.5">
+          <button class="inline-flex items-center justify-center bg-orange-700 hover:bg-orange-800 text-white font-semibold px-7 py-4 rounded-xl shadow-lg shadow-orange-600/20 transition-all duration-200 group transform hover:-translate-y-0.5">
             <span>Start Your Project</span>
             <svg class="w-5 h-5 ml-2 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
