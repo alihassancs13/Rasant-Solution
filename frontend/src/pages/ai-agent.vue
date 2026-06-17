@@ -2,16 +2,13 @@
   <div data-page="ai-agent" class="bg-[#f8fafc] min-h-screen font-sans text-[#1e293b]">
     <Navbar />
 
-    <!-- Hero -->
     <section class="relative pt-17 pb-0 overflow-hidden bg-[linear-gradient(180deg,#fdf4ff_0%,#fff8f3_38%,#f8fafc_100%)]" id="top">
       <div class="absolute inset-[-10%_-5%] pointer-events-none bg-[radial-gradient(circle_at_18%_20%,rgba(255,213,180,0.35)_0%,transparent_42%),radial-gradient(circle_at_82%_18%,rgba(201,196,248,0.32)_0%,transparent_40%),radial-gradient(circle_at_50%_80%,rgba(45,212,191,0.12)_0%,transparent_45%)] animate-[aaMeshShift_10s_ease-in-out_infinite_alternate]"></div>
 
-      <!-- Orbs -->
       <div class="absolute rounded-full blur-[70px] pointer-events-none w-80 h-80 bg-[rgba(255,213,180,0.45)] -top-5 -left-20 animate-[aaOrbDrift_14s_ease-in-out_infinite]"></div>
       <div class="absolute rounded-full blur-[70px] pointer-events-none w-70 h-70 bg-[rgba(143,185,244,0.35)] top-15 -right-15 animate-[aaOrbDrift_14s_ease-in-out_infinite] [animation-delay:-6s]"></div>
       <div class="absolute rounded-full blur-[70px] pointer-events-none w-50 h-50 bg-[rgba(45,212,191,0.22)] bottom-[10%] left-[55%] animate-[aaOrbDrift_14s_ease-in-out_infinite] [animation-delay:-3s]"></div>
 
-      <!-- Side grid panels -->
       <div class="absolute left-0 right-0 top-13 bottom-0 z-10 pointer-events-none overflow-hidden hidden sm:block" aria-hidden="true">
         <div v-for="side in ['left', 'right']" :key="side"
           :class="[
@@ -29,36 +26,38 @@
         </div>
       </div>
 
-      <div class="relative max-w-240 mx-auto px-3 z-30">
-        <!-- Bot image -->
-        <div class="relative z-30 flex justify-center px-[4%] py-1 mx-auto">
-          <div class="relative w-[min(260px,68vw)] animate-[aaBotEnter_0.9s_cubic-bezier(0.22,1,0.36,1)_both]">
-            <div class="absolute inset-[8%] rounded-full bg-[radial-gradient(circle,rgba(45,212,191,0.2)_0%,transparent_70%)] animate-[aaBotGlow_3s_ease-in-out_infinite]"></div>
-            <div class="absolute -inset-3.5 rounded-full border-2 border-dashed border-[rgba(45,212,191,0.35)] animate-[aaBotRingSpin_22s_linear_infinite]"></div>
-            <div class="absolute -inset-5.5 rounded-full border-2 border-dashed border-[rgba(139,92,246,0.2)] animate-[aaBotRingSpin_30s_linear_infinite_reverse]"></div>
-            <object :data="aiBot" type="image/svg+xml" title="Voice AI Agent"
-              class="w-full block relative z-20 drop-shadow-[0_16px_36px_rgba(42,95,158,0.2)]">
-              Voice AI Agent robot
-            </object>
-          </div>
-        </div>
-
-        <!-- Hero text -->
-        <div class="relative z-30 text-center max-w-150 mx-auto px-[4%] pt-1 pb-5.5">
-          <span class="inline-block uppercase tracking-wider text-[11px] font-bold text-teal-600 bg-teal-50 px-3 py-1 rounded-full mb-3">Voice AI Agent</span>
-          <h1 class="font-['Space_Grotesk'] text-[clamp(24px,3.5vw,36px)] font-extrabold tracking-[-1px] leading-[1.15] mb-2.5 text-slate-900">
+      <div class="relative max-w-260 mx-auto px-6 z-30 grid grid-cols-1 md:grid-cols-2 gap-8 items-center pt-8 pb-12">
+        
+        <div class="relative z-30 text-left max-w-140 mx-auto md:mx-0">
+          <span class="inline-block uppercase tracking-wider text-[11px] font-bold text-teal-600 bg-teal-50 px-3 py-1 rounded-full mb-4">Voice AI Agent</span>
+          <h1 class="font-['Space_Grotesk'] text-[clamp(28px,4vw,44px)] font-extrabold tracking-[-1px] leading-[1.15] mb-4 text-slate-900">
             Talking agents with <em class="not-italic bg-gradient-to-r from-teal-500 to-indigo-600 bg-clip-text text-transparent">clear, natural voice</em>
           </h1>
-          <p class="text-[15px] text-slate-500 leading-relaxed mb-4">Phone-first AI that handles customer service calls, internal dialing, outbound campaigns, and scheduled callbacks — with live queue visibility and call analytics built in.</p>
-          <div class="flex justify-center gap-3 flex-wrap">
+          <p class="text-[15px] text-slate-500 leading-relaxed mb-6">Phone-first AI that handles customer service calls, internal dialing, outbound campaigns, and scheduled callbacks — with live queue visibility and call analytics built in.</p>
+          <div class="flex justify-start gap-3 flex-wrap">
             <a href="contact.html?project=ai-agent" class="px-6 py-3 bg-gradient-to-r from-teal-500 to-indigo-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all text-sm">Book a Voice Demo</a>
             <a href="pricing.html?project=ai-agent" class="px-6 py-3 border border-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition-colors text-sm">View Pricing</a>
           </div>
         </div>
+
+        <div class="relative z-30 flex justify-center py-1 mx-auto md:mr-0 md:ml-auto">
+          <div class="relative w-[min(280px,72vw)] animate-[aaBotEnter_0.9s_cubic-bezier(0.22,1,0.36,1)_both]">
+            <div class="absolute inset-[8%] rounded-full bg-[radial-gradient(circle,rgba(45,212,191,0.2)_0%,transparent_70%)] animate-[aaBotGlow_3s_ease-in-out_infinite]"></div>
+            <div class="absolute -inset-3.5 rounded-full border-2 border-dashed border-[rgba(45,212,191,0.35)] animate-[aaBotRingSpin_22s_linear_infinite]"></div>
+            <div class="absolute -inset-5.5 rounded-full border-2 border-dashed border-[rgba(139,92,246,0.2)] animate-[aaBotRingSpin_30s_linear_infinite_reverse]"></div>
+            
+            <img 
+              src="../assets/svg/ai-agent-bot.svg" 
+              alt="Chatbot agent" 
+              class="w-full block relative z-20 drop-shadow-[0_16px_36px_rgba(42,95,158,0.2)]" 
+              title="Chatbot Agent"
+            />
+          </div>
+        </div>
+
       </div>
     </section>
 
-    <!-- Section 01: Call Flow -->
     <section class="relative py-18 px-[5%] overflow-hidden" id="flow">
       <div class="relative max-w-285 mx-auto grid grid-cols-1 md:grid-cols-[0.88fr_1.12fr] gap-[clamp(28px,5vw,56px)] items-center">
         <div class="absolute right-[2%] top-1/2 -translate-y-1/2 w-[min(480px,52%)] h-[min(400px,72%)] rounded-full pointer-events-none z-0 blur-[52px] bg-[radial-gradient(circle,rgba(20,184,166,0.2)_0%,rgba(74,144,226,0.1)_42%,transparent_72%)]" aria-hidden="true"></div>
@@ -71,17 +70,15 @@
         </div>
 
         <div class="relative z-10 flex items-center justify-center">
-          <SvgCard :src="voiceFlow" title="Voice AI agent call flow" minHeight="min-h-70" />
+          <img src="../assets/svg/ai-agent-voice-flow.svg" title="Voice AI agent call flow" minHeight="min-h-70" />
         </div>
       </div>
     </section>
 
-    <!-- Section 02: Live Dashboard -->
     <section class="relative py-18 px-[5%] overflow-hidden bg-slate-50" id="dashboard">
       <div class="relative max-w-285 mx-auto grid grid-cols-1 md:grid-cols-[1.12fr_0.88fr] gap-[clamp(28px,5vw,56px)] items-center">
         <div class="absolute left-[2%] top-1/2 -translate-y-1/2 w-[min(480px,52%)] h-[min(400px,72%)] rounded-full pointer-events-none z-0 blur-[52px] bg-[radial-gradient(circle,rgba(74,144,226,0.2)_0%,rgba(20,184,166,0.1)_42%,transparent_72%)]" aria-hidden="true"></div>
 
-        <!-- Dashboard cockpit -->
         <div class="relative z-10 flex items-center justify-center order-last md:order-first">
           <div class="relative w-full max-w-140 mx-auto">
             <div class="absolute inset-[8%_4%] rounded-full bg-[radial-gradient(circle,rgba(20,184,166,0.18)_0%,rgba(74,144,226,0.08)_45%,transparent_72%)] blur-sm animate-[aaShowcaseGlow_4s_ease-in-out_infinite] pointer-events-none"></div>
@@ -93,22 +90,18 @@
               class="relative z-10 w-full mx-auto p-4.5 rounded-[18px] bg-white/92 border border-slate-200/80 shadow-[0_20px_52px_rgba(15,23,42,0.09)] transition-all duration-350 ease-out animate-[aaVisualFloat_7s_ease-in-out_infinite]"
             >
               <div class="relative z-10 grid grid-cols-1 gap-2.5">
-                <!-- Scheduled queue tile -->
                 <div class="bg-[#fafbfc] border border-slate-200/60 rounded-[14px] p-[10px_10px_8px] animate-[aaTileFloat_5s_ease-in-out_infinite] transition-all hover:border-teal-400/40 hover:shadow-md">
                   <span class="block text-[9px] font-extrabold tracking-wider uppercase text-slate-500 mb-2 pl-0.5">Scheduled queue</span>
                   <div class="overflow-hidden rounded-[10px] bg-white border border-slate-100 h-[170px] md:h-[108px]">
-                    <object :data="scheduledCallsSvg" type="image/svg+xml" title="Scheduled calls overview" class="w-full block -mt-1.5">
-                      Scheduled calls overview
-                    </object>
+                    <img src="../assets/svg/ai-agent-scheduled-calls.svg" alt="Scheduled calls overview" class="w-full block -mt-1.5" />
                   </div>
                 </div>
 
-                <!-- Activity tile -->
                 <div class="bg-[#fafbfc] border border-slate-200/60 rounded-[14px] p-[10px_10px_8px] animate-[aaTileFloat_5s_ease-in-out_infinite] [animation-delay:0.8s] transition-all hover:border-teal-400/40 hover:shadow-md">
                   <span class="block text-[9px] font-extrabold tracking-wider uppercase text-slate-500 mb-2 pl-0.5">Activity and usage</span>
                   <div class="grid grid-cols-1 sm:grid-cols-[0.42fr_0.58fr] gap-2">
                     <div class="overflow-hidden rounded-[10px] bg-white border border-slate-100 h-[150px] md:h-[108px]">
-                      <object :data="analytics" type="image/svg+xml" title="Analytics summary" class="w-full block">Analytics summary</object>
+                      <img src="../assets/svg/ai-agent-analytics.svg" alt="Analytics summary" class="w-full block" />
                     </div>
                     <div class="overflow-hidden rounded-[10px] bg-[#fafbfc] border border-slate-100 h-[150px] md:h-[108px] flex items-center justify-center">
                       <img src="../assets/images/agent_graphs.png" alt="Activity trend charts" class="w-[118%] h-auto block scale-[0.88] origin-center" width="1100" height="420" />
@@ -143,7 +136,6 @@
       </div>
     </section>
 
-    <!-- Section 03: Voice Workflows -->
     <section class="relative py-18 px-[5%] overflow-hidden" id="workflows">
       <div class="max-w-280 mx-auto">
         <div class="relative max-w-285 mx-auto grid grid-cols-1 md:grid-cols-[0.88fr_1.12fr] gap-[clamp(28px,5vw,56px)] items-center mb-7">
@@ -163,15 +155,15 @@
               <div class="absolute inset-5 rounded-full bg-[radial-gradient(circle,rgba(45,212,191,0.22)_0%,transparent_68%)] animate-[aaVoiceGlow_3.5s_ease-in-out_infinite]"></div>
               <div class="absolute inset-[-8%] rounded-full border-2 border-dashed border-slate-400/30 animate-[aaBotRingSpin_24s_linear_infinite]"></div>
               <div class="absolute inset-[-18%] rounded-full border-2 border-dashed border-sky-400/20 animate-[aaBotRingSpin_30s_linear_infinite_reverse]"></div>
-              <object :data="phoneBot" type="image/svg+xml" title="Voice AI agent on a call"
-                class="w-full block relative z-20 drop-shadow-[0_22px_48px_rgba(42,95,158,0.2)] animate-[aaBotObjBob_5s_ease-in-out_infinite]">
-                Voice AI agent with phone
-              </object>
+              <img 
+                src="../assets/svg/ai-agent-phone-bot.svg" 
+                alt="Voice AI agent on a call"
+                class="w-full block relative z-20 drop-shadow-[0_22px_48px_rgba(42,95,158,0.2)] animate-[aaBotObjBob_5s_ease-in-out_infinite]"
+              />
             </div>
           </div>
         </div>
 
-        <!-- Workflow cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <article v-for="(card, i) in workflowCards" :key="i"
             :class="[
@@ -190,7 +182,6 @@
             <span :class="`relative z-10 inline-block text-[9px] font-extrabold tracking-wider uppercase mb-2`" :style="{ color: card.hex }">{{ card.tag }}</span>
             <h3 class="relative z-10 font-['Space_Grotesk'] text-sm font-bold mb-1.5">{{ card.title }}</h3>
             <p class="relative z-10 text-[12.5px] text-slate-500 leading-normal">{{ card.desc }}</p>
-            <!-- accent bar -->
             <div class="absolute left-0 top-0 bottom-0 w-1 rounded-[16px_0_0_16px]" :style="{ background: card.hex }"></div>
             <div class="absolute inset-0 pointer-events-none rounded-[14px]" :style="{ background: `linear-gradient(135deg, ${card.hex}14 0%, transparent 55%)` }"></div>
           </article>
@@ -198,7 +189,6 @@
       </div>
     </section>
 
-    <!-- Section 04: Capabilities -->
     <section class="relative py-18 px-[5%] overflow-hidden bg-slate-50">
       <div class="relative max-w-285 mx-auto grid grid-cols-1 md:grid-cols-[1.12fr_0.88fr] gap-[clamp(28px,5vw,56px)] items-center">
         <div class="absolute left-[2%] top-1/2 -translate-y-1/2 w-[min(480px,52%)] h-[min(400px,72%)] rounded-full pointer-events-none z-0 blur-[52px] bg-[radial-gradient(circle,rgba(74,144,226,0.2)_0%,rgba(20,184,166,0.1)_42%,transparent_72%)]" aria-hidden="true"></div>
@@ -208,9 +198,7 @@
             <div class="absolute inset-[8%_4%] rounded-full bg-[radial-gradient(circle,rgba(74,144,226,0.22)_0%,rgba(20,184,166,0.1)_50%,transparent_72%)] blur-sm animate-[aaShowcaseGlow_4s_ease-in-out_infinite] pointer-events-none"></div>
             <div class="absolute -inset-1.5 rounded-[22px] border-2 border-dashed border-teal-500/35 animate-[aaBotRingSpin_26s_linear_infinite] pointer-events-none"></div>
             <div class="relative z-10 rounded-2xl overflow-hidden border border-slate-200/80 shadow-[0_22px_56px_rgba(15,23,42,0.1)] bg-white transition-all duration-350 min-h-75 md:min-h-85 hover:shadow-[0_28px_64px_rgba(15,76,129,0.14)] hover:-translate-y-1 hover:scale-[1.01]">
-              <object :data="capabilities" type="image/svg+xml" title="Voice AI capabilities and telephony integrations" class="w-full min-h-80 block">
-                Voice agent capabilities diagram
-              </object>
+              <img src="../assets/svg/ai-agent-capabilities.svg" alt="Voice AI capabilities and telephony integrations" class="w-full min-h-80 block" />
             </div>
           </div>
         </div>
@@ -240,16 +228,15 @@
       </div>
     </section>
 
-    <!-- CTA -->
     <section class="p-6 md:p-12 max-w-7xl mx-auto">
-      <div class="bg-linear-to-br from-slate-900 to-slate-800 text-white p-8 md:p-12 rounded-3xl flex flex-col lg:flex-row lg:items-center justify-between gap-8 shadow-xl">
+      <div class="bg-orange-800 text-white p-8 md:p-12 rounded-3xl flex flex-col lg:flex-row lg:items-center justify-between gap-8 shadow-xl">
         <div class="max-w-2xl">
           <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight font-['Space_Grotesk'] mb-2">Ready to deploy a voice agent?</h2>
-          <p class="text-slate-400 text-sm md:text-base leading-relaxed">Book a demo and hear how your calls can sound — customer service, internal lines, and outbound included.</p>
+          <p class="text-white text-sm md:text-base leading-relaxed">Book a demo and hear how your calls can sound — customer service, internal lines, and outbound included.</p>
         </div>
         <div class="flex gap-3 flex-wrap items-center">
-          <a href="contact.html?project=ai-agent" class="px-6 py-3.5 bg-gradient-to-r from-teal-400 to-emerald-500 text-slate-950 font-bold rounded-xl shadow-md transition-transform hover:scale-[1.02] text-sm">Contact Sales</a>
-          <a href="pricing.html?project=ai-agent" class="px-6 py-3.5 border border-white/20 text-white font-semibold rounded-xl hover:bg-white/5 transition-colors text-sm">View Pricing</a>
+          <a href="contact.html?project=ai-agent" class="px-6 py-3.5 bg-white from-teal-400 to-emerald-500 text-orange-600 font-bold rounded-xl shadow-md transition-transform hover:scale-[1.02] text-sm">Contact Sales</a>
+          <a href="pricing.html?project=ai-agent" class="px-6 py-3.5 border border-white/80 text-white font-semibold rounded-xl hover:bg-white/5 transition-colors text-sm">View Pricing</a>
         </div>
       </div>
     </section>
@@ -259,12 +246,6 @@
 </template>
 
 <script>
-import voiceFlow from '../assets/svg/ai-agent-voice-flow.svg'
-import scheduledCallsSvg from '../assets/svg/ai-agent-scheduled-calls.svg'
-import analytics from '../assets/svg/ai-agent-analytics.svg'
-import phoneBot from '../assets/svg/ai-agent-phone-bot.svg'
-import aiBot from '../assets/svg/ai-agent-bot.svg'
-import capabilities from '../assets/svg/ai-agent-capabilities.svg'
 import Footer from '../components/footer.vue'
 import Navbar from '../components/navbar.vue'
 
@@ -293,7 +274,6 @@ export default {
 
   data() {
     return {
-      voiceFlow, scheduledCallsSvg, analytics, phoneBot, aiBot, capabilities,
       parallaxStyle: { transform: 'perspective(900px) rotateX(0deg) rotateY(0deg)' },
       gridCells: CELL_CONFIGS,
 
@@ -304,11 +284,11 @@ export default {
       ],
 
       workflowCards: [
-        { tag: 'Use case', title: 'Customer service',    desc: 'Inbound support, FAQs, and warm handoff with full transcripts.',          hex: '#14B8A6', delay: '0s'   },
-        { tag: 'Use case', title: 'Internal dialing',    desc: 'Extensions, department transfers, and staff announcements.',               hex: '#8B5CF6', delay: '0.6s' },
-        { tag: 'Use case', title: 'Outbound campaigns',  desc: 'Reminders, follow-ups, and sales outreach on a live queue.',              hex: '#F59E0B', delay: '1.2s' },
+        { tag: 'Use case', title: 'Customer service',    desc: 'Inbound support, FAQs, and warm handoff with full transcripts.',    hex: '#14B8A6', delay: '0s'   },
+        { tag: 'Use case', title: 'Internal dialing',    desc: 'Extensions, department transfers, and staff announcements.',                hex: '#8B5CF6', delay: '0.6s' },
+        { tag: 'Use case', title: 'Outbound campaigns',  desc: 'Reminders, follow-ups, and sales outreach on a live queue.',               hex: '#F59E0B', delay: '1.2s' },
         { tag: 'Control',  title: 'Natural, clear speech', desc: 'Human-like TTS and accurate STT — no robotic pacing.',                 hex: '#2A5F9E', delay: '0.3s' },
-        { tag: 'Control',  title: 'Live call queue',     desc: 'Scheduled, active, and completed calls refresh automatically.',           hex: '#059669', delay: '0.9s' },
+        { tag: 'Control',  title: 'Live call queue',     desc: 'Scheduled, active, and completed calls refresh automatically.',            hex: '#059669', delay: '0.9s' },
         { tag: 'Control',  title: 'Routing and analytics', desc: 'Resolve on the line, transfer when needed, track volume trends.',      hex: '#0F766E', delay: '1.5s' },
       ],
 
@@ -387,17 +367,5 @@ export default {
 @keyframes aaCardFloat {
   0%, 100% { transform: translateY(0); }
   50%       { transform: translateY(-8px); }
-}
-@keyframes aaBotObjBob {
-  0%, 100% { transform: translateY(0); }
-  50%       { transform: translateY(-8px); }
-}
-@keyframes aaFeatIn {
-  from { opacity: 0; transform: translateX(-12px); }
-  to   { opacity: 1; transform: none; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  * { animation: none !important; transform: none !important; transition: none !important; }
 }
 </style>
