@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Rasant Solutions">
+  <defs>
+    <linearGradient id="rsMark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#4A90E2"/>
+      <stop offset="55%" stop-color="#2A5F9E"/>
+      <stop offset="100%" stop-color="#1E3A5F"/>
+    </linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="8" fill="url(#rsMark)"/>
+  <path d="M9 9 L9 23 M9 9 L19 9 Q23 9 23 13.5 Q23 18 19 18 L9 18 M15.5 18 L23 23"
+        fill="none" stroke="#FFFFFF" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M24 7 L27 7 L22.5 13" fill="none" stroke="#9FD8FF" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+</svg>

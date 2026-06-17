@@ -35,7 +35,7 @@
           </h1>
           <p class="text-[15px] text-slate-500 leading-relaxed mb-6">Phone-first AI that handles customer service calls, internal dialing, outbound campaigns, and scheduled callbacks — with live queue visibility and call analytics built in.</p>
           <div class="flex justify-start gap-3 flex-wrap">
-            <a href="contact.html?project=ai-agent" class="px-6 py-3 bg-gradient-to-r from-teal-500 to-indigo-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all text-sm">Book a Voice Demo</a>
+            <a href="contact.html?project=ai-agent" class="px-6 py-3 bg-orange-800 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all text-sm ">Book a Voice Demo</a>
             <a href="pricing.html?project=ai-agent" class="px-6 py-3 border border-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition-colors text-sm">View Pricing</a>
           </div>
         </div>
@@ -45,11 +45,11 @@
             <div class="absolute inset-[8%] rounded-full bg-[radial-gradient(circle,rgba(45,212,191,0.2)_0%,transparent_70%)] animate-[aaBotGlow_3s_ease-in-out_infinite]"></div>
             <div class="absolute -inset-3.5 rounded-full border-2 border-dashed border-[rgba(45,212,191,0.35)] animate-[aaBotRingSpin_22s_linear_infinite]"></div>
             <div class="absolute -inset-5.5 rounded-full border-2 border-dashed border-[rgba(139,92,246,0.2)] animate-[aaBotRingSpin_30s_linear_infinite_reverse]"></div>
-            
-            <img 
-              src="../assets/svg/ai-agent-bot.svg" 
-              alt="Chatbot agent" 
-              class="w-full block relative z-20 drop-shadow-[0_16px_36px_rgba(42,95,158,0.2)]" 
+
+            <img
+              src="../assets/svg/ai-agent-bot.svg"
+              alt="Chatbot agent"
+              class="w-full block relative z-20 drop-shadow-[0_16px_36px_rgba(42,95,158,0.2)]"
               title="Chatbot Agent"
             />
           </div>

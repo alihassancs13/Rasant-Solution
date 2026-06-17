@@ -179,7 +179,7 @@
     <text x="446" y="244" text-anchor="middle" font-size="10" fill="#64748B">Route by skill, language, and priority</text>
 
     <rect x="262" y="252" width="368" height="28" rx="8" fill="#F8FAFC" stroke="#E2E8F0"/>
-    <text x="446" y="270" text-anchor="middle" font-size="10" font-weight="600" fill="#475569">AI voice answer, self-service, or live agent — recording starts automatically</text>
+    <text x="446" y="264" text-anchor="middle" font-size="9.5" font-weight="600" fill="#475569"><tspan x="446" dy="0">AI voice answer, self-service,</tspan><tspan x="446" dy="12">or live agent</tspan></text>
   </g>
 
   <!-- COL 3: HUB -->
@@ -226,7 +226,7 @@
     <text x="1014" y="174" font-size="9.5" fill="#64748B">Handles FAQs, order status</text>
 
     <rect x="866" y="208" width="248" height="28" rx="8" fill="#F8FAFC" stroke="#E2E8F0"/>
-    <text x="990" y="226" text-anchor="middle" font-size="10" fill="#64748B">Resolves on its own, or warm-hands off with full transcript</text>
+    <text x="990" y="221" text-anchor="middle" font-size="9.5" fill="#64748B"><tspan x="990" dy="0">Resolves on its own, or</tspan><tspan x="990" dy="12">warm-hands off with full transcript</tspan></text>
 
     <rect x="900" y="248" width="180" height="24" rx="12" fill="#FEF3C7"/>
     <text x="990" y="264" text-anchor="middle" font-size="9.5" font-weight="700" fill="#92400E">Handoff to live agent ↗</text>
@@ -285,7 +285,7 @@
     </g>
     <text x="354" y="425" font-size="9" fill="#64748B">"I need a person please"</text>
 
-    <text x="446" y="468" text-anchor="middle" font-size="10" fill="#64748B">RAG-grounded answers — seamless handoff to live agent with full chat history</text>
+    <text x="446" y="462" text-anchor="middle" font-size="9.5" fill="#64748B"><tspan x="446" dy="0">RAG-grounded answers</tspan><tspan x="446" dy="12">Seamless handoff with full chat history</tspan></text>
   </g>
 
   <!-- ROW 2: LIVE AGENTS -->
@@ -342,7 +342,7 @@
     <rect x="1042" y="580" width="110" height="26" rx="7" fill="#FFFFFF" stroke="#14B8A6" stroke-width="1.5"/>
     <text x="1097" y="598" text-anchor="middle" font-size="9.5" font-weight="700" fill="#0F766E">CRM update</text>
 
-    <text x="768" y="618" text-anchor="middle" font-size="10" fill="#64748B">Script prompts, disposition codes, callback scheduling, supervisor monitoring</text>
+    <text x="768" y="610" text-anchor="middle" font-size="9.5" fill="#64748B"><tspan x="768" dy="0">Script prompts • disposition codes</tspan><tspan x="768" dy="12">Callbacks • supervisor monitoring</tspan></text>
   </g>
 
   <!-- ROW 4: MODULES -->
@@ -393,4 +393,37 @@
   <g class="sp-process-group" data-procs="outbound,webchat,whatsapp,email"><path class="sp-flow" d="M982 292 L982 312" fill="none" stroke="#4A90E2" stroke-width="1.5"/></g>
   <g class="sp-process-group" data-procs="outbound"><path class="sp-flow" d="M748 496 L748 520" fill="none" stroke="#F97316" stroke-width="1.5"/></g>
   </g>
+
+<script><![CDATA[
+(function(){
+const groups=[...document.querySelectorAll('.sp-process-group')];
+const buttons=[...document.querySelectorAll('.sp-channel-btn')];
+function setActive(proc){
+ groups.forEach(g=>{
+   const p=(g.getAttribute('data-procs')||'').split(',');
+   const show=!proc || p.includes(proc);
+   g.style.opacity=show?'1':'0.08';
+ });
+ buttons.forEach(b=>{
+   const active=b.getAttribute('data-process')===proc;
+   b.style.opacity=active||!proc?'1':'0.6';
+ });
+}
+buttons.forEach(b=>{
+ b.style.cursor='pointer';
+ b.addEventListener('click',()=>setActive(b.getAttribute('data-process')));
+});
+document.addEventListener('keydown',e=>{
+ if(e.key==='Escape') setActive(null);
+});
+const reset=document.createElementNS('http://www.w3.org/2000/svg','text');
+reset.setAttribute('x','40');
+reset.setAttribute('y','420');
+reset.setAttribute('font-size','11');
+reset.setAttribute('fill','#2563EB');
+reset.style.cursor='pointer';
+document.documentElement.appendChild(reset);
+reset.addEventListener('click',()=>setActive(null));
+})();
+]]></script>
 </svg>
