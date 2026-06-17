@@ -41,9 +41,9 @@
     <section class="py-24 bg-white border-y border-slate-100" id="flow">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
-          
+
           <div class="lg:col-span-5 space-y-6 relative">
-            <div class="absolute -top-12 left-0 text-8xl font-black text-slate-100/80 pointer-events-none select-none font-display">01</div>
+            <span class="block font-['Space_Grotesk'] text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] text-slate-900/[0.065] pointer-events-none select-none" aria-hidden="true">01</span>
             <span class="inline-block text-xs font-bold uppercase tracking-widest text-indigo-600">SDLC Flow</span>
             <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Gated workflow from spec to deploy</h2>
             <p class="text-base leading-relaxed text-slate-600">
@@ -73,12 +73,13 @@
           </div>
 
           <div class="lg:col-span-5 space-y-6 relative">
-            <div class="absolute -top-12 left-0 text-8xl font-black text-slate-200/60 pointer-events-none select-none font-display">02</div>
+            <span class="block font-['Space_Grotesk'] text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] text-slate-900/[0.065] pointer-events-none select-none" aria-hidden="true">02</span>
             <span class="inline-block text-xs font-bold uppercase tracking-widest text-indigo-600">Product UI</span>
             <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Pipeline progress and workflow console</h2>
             <p class="text-base leading-relaxed text-slate-600">
               Track every stage from Setup to Deploy on the pipeline bar, then work through Specification, Plan, Implementation, Testing, and Commit in the sidebar workflow — with revision feedback and commit-and-push built in.
             </p>
+
             
             <div class="pt-2 space-y-4">
               <div class="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold tracking-wide text-emerald-700 ring-1 ring-inset ring-emerald-600/20">
@@ -99,10 +100,10 @@
 
     <section class="py-24 bg-white" id="workflows">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
-        
+
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
           <div class="lg:col-span-6 space-y-4 relative">
-            <div class="absolute -top-12 left-0 text-8xl font-black text-slate-100 pointer-events-none select-none font-display">03</div>
+            <span class="block font-['Space_Grotesk'] text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] text-slate-900/[0.065] pointer-events-none select-none" aria-hidden="true">03</span>
             <span class="inline-block text-xs font-bold uppercase tracking-widest text-indigo-600">Multi-Agent SDLC</span>
             <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
               Specialized agents. <span class="text-indigo-600 italic">One orchestrator.</span>
@@ -167,12 +168,13 @@
           </div>
 
           <div class="lg:col-span-6 space-y-6 relative">
-            <div class="absolute -top-12 left-0 text-8xl font-black text-slate-200/60 pointer-events-none select-none font-display">04</div>
+            <span class="block font-['Space_Grotesk'] text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] text-slate-900/[0.065] pointer-events-none select-none" aria-hidden="true">04</span>
             <span class="inline-block text-xs font-bold uppercase tracking-widest text-indigo-600">Platform</span>
             <h2 class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">Monorepo, desktop, and cloud-ready</h2>
             <p class="text-base leading-relaxed text-slate-600">
               FastAPI backend with local DATA_DIR storage, React UI with SSE, Windows .exe and macOS .app builds, plus local folder bridge for hosted UI + local disk.
             </p>
+
 
             <ul class="space-y-4 pt-2">
               <li class="flex items-start gap-4">
