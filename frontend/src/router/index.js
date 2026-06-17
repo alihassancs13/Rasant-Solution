@@ -4,6 +4,7 @@ import Contact from "../pages/contactForm.vue";
 import Careers from "../pages/careers.vue";
 import Home from "../pages/home.vue";
 import Chatbot from "../pages/chatbot.vue";
+import sentraAI from "../pages/sentraAI.vue";
 
 const routes = [
   {
@@ -45,7 +46,13 @@ const routes = [
     name: "Chatbot",
     component: () => import("../pages/chatbot.vue"), 
   },
+  {
+    path: "/sentra",
+    name: "sentraAI",
+    component: () => import("../pages/sentraAI.vue"),
+  },
 ];
+
 
 const router = createRouter({
   history: createWebHistory(),
