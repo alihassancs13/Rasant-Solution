@@ -42,7 +42,11 @@
             >
               <div class="absolute top-0 inset-x-0 h-0.75 rounded-t-2xl bg-linear-to-r from-orange-300 via-pink-400 to-blue-400"></div>
 
-              <router-link to="/#services" class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 group/item transition-colors duration-200">
+              <router-link
+                  to="/#services"
+                  @click="navigateToServices"
+                  class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 group/item transition-colors duration-200"
+              >
                 <div class="flex items-center gap-3.5">
                   <div class="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center text-lg shadow-sm border border-purple-100/40">⚙️</div>
                   <div>
@@ -53,7 +57,11 @@
                 <span class="text-slate-400 font-medium -translate-x-1 opacity-0 group-hover/item:translate-x-0 group-hover/item:opacity-100 transition-all duration-200">→</span>
               </router-link>
 
-              <router-link to="/#services" class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 group/item transition-colors duration-200">
+              <router-link
+                  to="/#services"
+                  @click="navigateToServices"
+                  class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 group/item transition-colors duration-200"
+              >
                 <div class="flex items-center gap-3.5">
                   <div class="w-9 h-9 rounded-lg bg-indigo-50 flex items-center justify-center text-lg shadow-sm border border-indigo-100/40">📱</div>
                   <div>
@@ -64,7 +72,11 @@
                 <span class="text-slate-400 font-medium -translate-x-1 opacity-0 group-hover/item:translate-x-0 group-hover/item:opacity-100 transition-all duration-200">→</span>
               </router-link>
 
-              <router-link to="/#services" class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 group/item transition-colors duration-200">
+              <router-link
+                  to="/#services"
+                  @click="navigateToServices"
+                  class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 group/item transition-colors duration-200"
+              >
                 <div class="flex items-center gap-3.5">
                   <div class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center text-lg shadow-sm border border-blue-100/40">☁️</div>
                   <div>
@@ -77,6 +89,7 @@
             </div>
           </li>
 
+          <!-- Other dropdowns remain the same -->
           <li
               class="relative h-full flex items-center group/nav"
               @mouseenter="activeDropdown = 'projects'"
@@ -165,7 +178,7 @@
         class="fixed top-0 right-0 bottom-0 w-70 bg-white border-l border-slate-100 shadow-2xl pt-24 px-6 flex flex-col gap-4 transform transition-transform duration-300 ease-out z-40 md:hidden"
         :class="[isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full']"
     >
-      <router-link to="/#services" @click="closeMobileMenu" class="text-[16px] font-semibold text-slate-700 hover:text-blue-600 p-2 rounded-lg hover:bg-slate-50 transition-all">Services</router-link>
+      <router-link to="/#services" @click="navigateToServices" class="text-[16px] font-semibold text-slate-700 hover:text-blue-600 p-2 rounded-lg hover:bg-slate-50 transition-all">Services</router-link>
       <router-link to="/#products" @click="closeMobileMenu" class="text-[16px] font-semibold text-slate-700 hover:text-blue-600 p-2 rounded-lg hover:bg-slate-50 transition-all">Projects</router-link>
       <router-link to="/contact" @click="closeMobileMenu" class="text-[16px] font-semibold text-slate-700 hover:text-blue-600 p-2 rounded-lg hover:bg-slate-50 transition-all">Contact</router-link>
 
@@ -186,7 +199,9 @@
 
 <script setup>
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
 
+const router = useRouter();
 const activeDropdown = ref(null);
 const isMobileMenuOpen = ref(false);
 
@@ -196,6 +211,23 @@ const toggleMobileMenu = () => {
 
 const closeMobileMenu = () => {
   isMobileMenuOpen.value = false;
+};
+
+// Navigation method for services
+const navigateToServices = (event) => {
+  event?.preventDefault();
+  closeMobileMenu();
+
+  // If we're on the home page, scroll to services
+  if (router.currentRoute.value.path === '/') {
+    const servicesSection = document.getElementById('services');
+    if (servicesSection) {
+      servicesSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  } else {
+    // Navigate to home page with hash
+    router.push('/#services');
+  }
 };
 </script>
 
