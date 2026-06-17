@@ -242,7 +242,7 @@
 
     <div class="relative z-10 text-center max-w-[720px] mx-auto mb-11">
       <span class="text-xs font-bold tracking-widest text-blue-600 uppercase">Our Products</span>
-      <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mt-3 leading-tight">
+      <h2 class="text-3xl md:text-4xl font-extrabold text-blue-900 mt-3 leading-tight">
         Sentra AI at the core.<br />
         Powerful modules around it.
       </h2>
@@ -520,7 +520,7 @@
           class="bg-white border border-slate-200 rounded-[20px] p-8 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:-rotate-[0.5deg] hover:border-blue-500/25 hover:shadow-xl"
         >
           <div class="flex gap-1 mb-[18px]">
-            <font-awesome-icon v-for="n in 5" :key="n" :icon="['fas', 'star']" class="text-amber-500 text-sm" />
+            <font-awesome-icon v-for="n in 5" :key="n" :icon="['fas', 'star']" class="text-blue-900 text-sm" />
           </div>
           <p class="text-[15px] text-slate-600 leading-[1.75] italic mb-6">
             "{{ testimonial.quote }}"
@@ -574,7 +574,6 @@
           </span>
         </div>
       </div>
-
       <div class="flex flex-wrap gap-3 shrink-0">
         <RouterLink
           to="/pricing"
