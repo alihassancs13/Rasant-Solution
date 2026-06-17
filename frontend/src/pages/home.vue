@@ -417,11 +417,11 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-7">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-7 ">
         <div
             v-for="(service, i) in services"
             :key="service.title"
-            class="group bg-white rounded-2xl border border-slate-100 shadow-xl shadow-slate-200/50 p-7 transition-all duration-700 ease-out hover:-translate-y-1.5 hover:shadow-2xl hover:shadow-slate-300/40"
+            class="group bg-white rounded-2xl border border-slate-100 shadow-xl shadow-slate-200/50 p-7 transition-all duration-700 ease-out hover:-translate-y-1.5 hover:shadow-[inset_0_0_15px_rgba(14,165,233,0.3)] "
             :class="visible.services ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-14 scale-95'"
             :style="{ transitionDelay: visible.services ? `${i * 150}ms` : '0ms', animationDelay: `${i * 0.4}s` }"
         >
@@ -430,8 +430,8 @@
               :alt="service.title"
               class="w-full h-36 object-contain mb-5 transition-transform duration-500 ease-out group-hover:scale-110 animate-float"
           />
-          <div :class="['w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform duration-300 ease-out group-hover:scale-110 group-hover:rotate-6', service.iconBg]">
-            <font-awesome-icon :icon="service.icon" :class="['text-lg', service.iconColor]" />
+          <div :class="['w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform duration-300 ease-out  ', service.iconBg]">
+            <font-awesome-icon :icon="service.icon" :class="['text-3xl', service.iconColor]" />
           </div>
           <h3 class="text-lg font-bold text-slate-900 mb-2.5">{{ service.title }}</h3>
           <p class="text-sm text-slate-500 leading-relaxed mb-5">{{ service.description }}</p>
@@ -853,21 +853,30 @@ const services = [
   {
     title: 'Custom Software Development',
     description: 'Tailor-made applications engineered to your exact workflows. Scalable, secure, and built to last — not off-the-shelf compromises.',
-    illustration: serviceSoftwareSvg, icon: ['fas', 'code'], iconBg: 'bg-blue-500/10', iconColor: 'text-blue-600',
+    illustration: serviceSoftwareSvg,
+    icon: 'fa-solid fa-code',
+    iconBg: 'bg-blue-500/10',
+    iconColor: 'text-blue-950',
     link: '/services/custom-software',
     tags: [{ label: 'Enterprise Apps', class: 'bg-blue-50 text-blue-600' }, { label: 'AI Integration', class: 'bg-amber-50 text-amber-600' }, { label: 'APIs', class: 'bg-teal-50 text-teal-600' }],
   },
   {
     title: 'Web & Mobile Applications',
     description: 'Beautiful, high-performance web and mobile apps using React, Flutter, and Next.js. Pixel-perfect UI that users love to interact with.',
-    illustration: serviceWebMobileSvg, icon: ['fas', 'mobile-screen-button'], iconBg: 'bg-sky-400/10', iconColor: 'text-sky-500',
+    illustration: serviceWebMobileSvg,
+    icon: 'fa-solid fa-mobile-screen-button',
+    iconBg: 'bg-sky-400/10',
+    iconColor: 'text-blue-950',
     link: '/services/web-mobile',
     tags: [{ label: 'React / Next.js', class: 'bg-blue-50 text-blue-600' }, { label: 'Flutter', class: 'bg-purple-50 text-purple-600' }, { label: 'PWA', class: 'bg-teal-50 text-teal-600' }],
   },
   {
     title: 'Cloud Solutions & DevOps',
     description: 'Architect, migrate and manage cloud infrastructure that scales with your growth. CI/CD pipelines, container orchestration, 99.9% uptime guaranteed.',
-    illustration: serviceCloudSvg, icon: ['fas', 'cloud'], iconBg: 'bg-teal-500/10', iconColor: 'text-teal-600',
+    illustration: serviceCloudSvg,
+    icon: 'fa-solid fa-cloud',
+    iconBg: 'bg-teal-500/10',
+    iconColor: 'text-blue-950',
     link: '/services/cloud-devops',
     tags: [{ label: 'AWS / GCP', class: 'bg-teal-50 text-teal-600' }, { label: 'Kubernetes', class: 'bg-blue-50 text-blue-600' }, { label: 'CI/CD', class: 'bg-amber-50 text-amber-600' }],
   },
