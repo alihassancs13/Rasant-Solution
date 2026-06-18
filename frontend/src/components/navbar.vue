@@ -42,54 +42,52 @@
             >
               <div class="absolute top-0 inset-x-0 h-0.75 rounded-t-2xl bg-linear-to-r from-orange-300 via-pink-400 to-blue-400"></div>
 
-              <router-link
-                  to="/#services"
-                  @click="navigateToServices"
-                  class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 group/item transition-colors duration-200"
+              <!-- 👇 UPDATED: navigateToServicesSection with section ID -->
+              <button
+                  @click="navigateToServicesSection('services')"
+                  class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 group/item transition-colors duration-200 w-full text-left"
               >
-                <div class="flex items-center gap-3.5">
-                  <div class="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center text-lg shadow-sm border border-purple-100/40">⚙️</div>
+                <div class="flex items-center cursor-pointer gap-3.5">
+                  <div class="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center text-lg shadow-sm border border-purple-100/40"><font-awesome-icon :icon="['fas', 'gear']" /></div>
                   <div>
-                    <h4 class="font-bold text-[14px] text-slate-800 m-0">Custom Software</h4>
+                    <h4 class="font-bold text-[14px] text-slate-800  m-0">Custom Software</h4>
                     <p class="text-[12px] text-slate-500 font-normal m-0">Enterprise apps &amp; APIs</p>
                   </div>
                 </div>
                 <span class="text-slate-400 font-medium -translate-x-1 opacity-0 group-hover/item:translate-x-0 group-hover/item:opacity-100 transition-all duration-200">→</span>
-              </router-link>
+              </button>
 
-              <router-link
-                  to="/#services"
-                  @click="navigateToServices"
-                  class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 group/item transition-colors duration-200"
+              <button
+                  @click="navigateToServicesSection('services')"
+                  class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 group/item transition-colors duration-200 w-full text-left"
               >
                 <div class="flex items-center gap-3.5">
-                  <div class="w-9 h-9 rounded-lg bg-indigo-50 flex items-center justify-center text-lg shadow-sm border border-indigo-100/40">📱</div>
+                  <div class="w-9 h-9 rounded-lg bg-indigo-50 flex items-center justify-center text-lg shadow-sm border border-indigo-100/40"><font-awesome-icon :icon="['fas', 'mobile-screen']" /></div>
                   <div>
                     <h4 class="font-bold text-[14px] text-slate-800 m-0">Web &amp; Mobile</h4>
                     <p class="text-[12px] text-slate-500 font-normal m-0">React, Flutter &amp; Next.js</p>
                   </div>
                 </div>
-                <span class="text-slate-400 font-medium -translate-x-1 opacity-0 group-hover/item:translate-x-0 group-hover/item:opacity-100 transition-all duration-200">→</span>
-              </router-link>
+                <span class="text-slate-400 font-medium -translate-x-1 opacity-0 group-hover/item:translate-x-0 group-hover/item:opacity-100 transition-all duration-200"><font-awesome-icon :icon="['fas', 'arrow-right']" /></span>
+              </button>
 
-              <router-link
-                  to="/#services"
-                  @click="navigateToServices"
-                  class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 group/item transition-colors duration-200"
+              <button
+                  @click="navigateToServicesSection('services')"
+                  class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 group/item transition-colors duration-200 w-full text-left"
               >
                 <div class="flex items-center gap-3.5">
-                  <div class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center text-lg shadow-sm border border-blue-100/40">☁️</div>
+                  <div class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center text-lg shadow-sm border border-blue-100/40"><font-awesome-icon :icon="['fas', 'cloud']" />️</div>
                   <div>
                     <h4 class="font-bold text-[14px] text-slate-800 m-0">Cloud &amp; DevOps</h4>
                     <p class="text-[12px] text-slate-500 font-normal m-0">AWS &amp; Kubernetes</p>
                   </div>
                 </div>
                 <span class="text-slate-400 font-medium -translate-x-1 opacity-0 group-hover/item:translate-x-0 group-hover/item:opacity-100 transition-all duration-200">→</span>
-              </router-link>
+              </button>
             </div>
           </li>
 
-          <!-- Other dropdowns remain the same -->
+          <!-- Projects Dropdown -->
           <li
               class="relative h-full flex items-center group/nav"
               @mouseenter="activeDropdown = 'projects'"
@@ -108,6 +106,7 @@
 
               <router-link
                   to="/sentra"
+                  @click="closeMobileMenu"
                   class="block p-4 border border-slate-100 rounded-xl hover:border-blue-500/30 hover:bg-slate-50/50 transition-all duration-200"
               >
                 <div class="inline-block text-[10px] font-bold uppercase tracking-wider text-teal-600 bg-teal-50 px-2 py-0.5 rounded mb-1.5">Voice</div>
@@ -117,6 +116,7 @@
 
               <router-link
                   to="/ai-agent"
+                  @click="closeMobileMenu"
                   class="block p-4 border border-slate-100 rounded-xl hover:border-blue-500/30 hover:bg-slate-50/50 transition-all duration-200"
               >
                 <div class="inline-block text-[10px] font-bold uppercase tracking-wider text-teal-600 bg-teal-50 px-2 py-0.5 rounded mb-1.5">Voice</div>
@@ -124,13 +124,13 @@
                 <p class="text-[12px] text-slate-500 font-normal">Talking voice agents</p>
               </router-link>
 
-              <router-link to="/chatbot" class="block p-4 border border-slate-100 rounded-xl hover:border-blue-500/30 hover:bg-slate-50/50 transition-all duration-200">
+              <router-link to="/chatbot" @click="closeMobileMenu" class="block p-4 border border-slate-100 rounded-xl hover:border-blue-500/30 hover:bg-slate-50/50 transition-all duration-200">
                 <div class="inline-block text-[10px] font-bold uppercase tracking-wider text-purple-600 bg-purple-50 px-2 py-0.5 rounded mb-1.5">Chat</div>
                 <h4 class="font-bold text-[15px] text-slate-800 mb-0.5">Chatbot</h4>
                 <p class="text-[12px] text-slate-500 font-normal">Text and messaging bots</p>
               </router-link>
 
-              <router-link to="/orchestri" class="block p-4 border border-slate-100 rounded-xl hover:border-blue-500/30 hover:bg-slate-50/50 transition-all duration-200">
+              <router-link to="/orchestri" @click="closeMobileMenu" class="block p-4 border border-slate-100 rounded-xl hover:border-blue-500/30 hover:bg-slate-50/50 transition-all duration-200">
                 <div class="inline-block text-[10px] font-bold uppercase tracking-wider text-orange-600 bg-orange-50 px-2 py-0.5 rounded mb-1.5">SDLC</div>
                 <h4 class="font-bold text-[15px] text-slate-800 mb-0.5">Orchestri</h4>
                 <p class="text-[12px] text-slate-500 font-normal">AI multi-agent dev workflow</p>
@@ -139,21 +139,22 @@
           </li>
 
           <li class="h-full flex items-center">
-            <router-link to="/careers" class="font-medium text-[15px] text-slate-700 hover:text-blue-600 transition-colors duration-200">Careers</router-link>
+            <router-link to="/careers" @click="closeMobileMenu" class="font-medium text-[15px] text-slate-700 hover:text-blue-600 transition-colors duration-200">Careers</router-link>
           </li>
 
           <li class="h-full flex items-center">
-            <router-link to="/contact" class="font-medium text-[15px] text-slate-700 hover:text-blue-600 transition-colors duration-200">Contact</router-link>
+            <router-link to="/contact" @click="closeMobileMenu" class="font-medium text-[15px] text-slate-700 hover:text-blue-600 transition-colors duration-200">Contact</router-link>
           </li>
         </ul>
       </div>
 
       <div class="hidden md:flex items-center gap-4">
-        <router-link to="/login" class="px-5 py-2.5 border border-blue-400/30 text-[14px] font-semibold rounded-full text-blue-900 hover:bg-blue-50 transition-all duration-200 shadow-sm">
+        <router-link to="/login" @click="closeMobileMenu" class="px-5 py-2.5 border border-blue-400/30 text-[14px] font-semibold rounded-full text-blue-900 hover:bg-blue-50 transition-all duration-200 shadow-sm">
           Login
         </router-link>
         <router-link
             to="/contact"
+            @click="closeMobileMenu"
             class="bg-orange-700 hover:bg-orange-900 relative overflow-hidden px-6 py-2.5 text-[14px] font-semibold text-white rounded-full transition-all duration-200 shadow-[0_0_25px_rgba(74,144,226,0.45)] active:scale-[0.98] cursor-pointer flex items-center justify-center"
         >
           Get Quote
@@ -178,7 +179,7 @@
         class="fixed top-0 right-0 bottom-0 w-70 bg-white border-l border-slate-100 shadow-2xl pt-24 px-6 flex flex-col gap-4 transform transition-transform duration-300 ease-out z-40 md:hidden"
         :class="[isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full']"
     >
-      <router-link to="/#services" @click="navigateToServices" class="text-[16px] font-semibold text-slate-700 hover:text-blue-600 p-2 rounded-lg hover:bg-slate-50 transition-all">Services</router-link>
+      <button @click="navigateToServicesSection('services')" class="text-[16px] font-semibold text-slate-700 hover:text-blue-600 p-2 rounded-lg hover:bg-slate-50 transition-all text-left">Services</button>
       <router-link to="/#products" @click="closeMobileMenu" class="text-[16px] font-semibold text-slate-700 hover:text-blue-600 p-2 rounded-lg hover:bg-slate-50 transition-all">Projects</router-link>
       <router-link to="/contact" @click="closeMobileMenu" class="text-[16px] font-semibold text-slate-700 hover:text-blue-600 p-2 rounded-lg hover:bg-slate-50 transition-all">Contact</router-link>
 
@@ -213,21 +214,37 @@ const closeMobileMenu = () => {
   isMobileMenuOpen.value = false;
 };
 
-// Navigation method for services
-const navigateToServices = (event) => {
-  event?.preventDefault();
+// ✅ Updated: Services section navigation with proper scrolling
+const navigateToServicesSection = (sectionId = 'services') => {
   closeMobileMenu();
+  activeDropdown.value = null;
 
-  // If we're on the home page, scroll to services
-  if (router.currentRoute.value.path === '/') {
-    const servicesSection = document.getElementById('services');
-    if (servicesSection) {
-      servicesSection.scrollIntoView({ behavior: 'smooth' });
+  const currentPath = router.currentRoute.value.path;
+
+  if (currentPath === '/' || currentPath === '/home') {
+    // Already on home page, just scroll to section
+    const section = document.getElementById(sectionId);
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   } else {
-    // Navigate to home page with hash
-    router.push('/#services');
+    // Navigate to home page with hash, then scroll after navigation
+    router.push('/').then(() => {
+      // Wait for DOM to update
+      setTimeout(() => {
+        const section = document.getElementById(sectionId);
+        if (section) {
+          section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 300);
+    });
   }
+};
+
+// ✅ Navigation method for services (deprecated - use navigateToServicesSection)
+const navigateToServices = (event) => {
+  event?.preventDefault();
+  navigateToServicesSection('services');
 };
 </script>
 
