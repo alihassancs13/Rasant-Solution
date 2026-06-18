@@ -37,14 +37,20 @@
       <!-- Main content -->
       <div class="relative max-w-[1040px] mx-auto px-6 z-30 grid grid-cols-1 md:grid-cols-2 gap-8 items-center pt-8 pb-12">
         <!-- Left text content -->
-        <div class="relative z-30 text-left max-w-[560px] mx-auto md:mx-0">
+        <div class="relative z-30 text-left max-w-[560px] mx-auto md:mx-0 mt-15">
           <span class="inline-block uppercase tracking-wider text-[11px] font-bold text-teal-600 bg-teal-50 px-3 py-1 rounded-full mb-4">Voice AI Agent</span>
           <h1 class="font-['Space_Grotesk'] text-[clamp(28px,4vw,44px)] font-extrabold tracking-[-1px] leading-[1.15] mb-4 text-slate-900">
             Talking agents with <em class="not-italic bg-gradient-to-r from-teal-500 to-indigo-600 bg-clip-text text-transparent">clear, natural voice</em>
           </h1>
           <p class="text-[15px] text-slate-500 leading-relaxed mb-6">Phone-first AI that handles customer service calls, internal dialing, outbound campaigns, and scheduled callbacks — with live queue visibility and call analytics built in.</p>
           <div class="flex justify-start gap-3 flex-wrap">
-            <a href="contact.html?project=ai-agent" class="px-6 py-3 bg-orange-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all text-sm">Book a Voice Demo</a>
+            <button
+                type="submit"
+                class="relative overflow-hidden cursor-pointer w-50 flex items-center justify-center px-6 py-3.5 bg-orange-700 hover:bg-orange-900 text-base font-semibold text-white rounded-xl transition-all duration-200 shadow-[0_4px_14px_rgba(42,95,158,0.4)] hover:shadow-[0_6px_20px_rgba(42,95,158,0.6)] active:scale-[0.98] group"
+            >
+              Book a Voice Demo
+              <div class="absolute inset-0 w-1/4 h-full bg-white/10 pointer-events-none animate-shine-loop"></div>
+            </button>
             <a href="pricing.html?project=ai-agent" class="px-6 py-3 border border-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition-colors text-sm">View Pricing</a>
           </div>
         </div>
@@ -55,7 +61,22 @@
             <div class="absolute inset-[8%] rounded-full bg-[radial-gradient(circle,rgba(45,212,191,0.2)_0%,transparent_70%)] animate-[botGlow_3s_ease-in-out_infinite]"></div>
             <div class="absolute -inset-3.5 rounded-full border-2 border-dashed border-[rgba(45,212,191,0.35)] animate-[botRingSpin_22s_linear_infinite]"></div>
             <div class="absolute -inset-5.5 rounded-full border-2 border-dashed border-[rgba(139,92,246,0.2)] animate-[botRingSpin_30s_linear_infinite_reverse]"></div>
-            <img src="../assets/svg/ai-agent-bot.svg" alt="Chatbot agent" class="w-full block relative z-20 drop-shadow-[0_16px_36px_rgba(42,95,158,0.2)]" title="Chatbot Agent" />
+            <div class="relative w-full z-20 aspect-square max-w-sm mx-auto">
+
+              <svg class="absolute inset-0 w-full h-full z-10 pointer-events-none" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="200" cy="200" r="160"
+                        stroke="#93c5fd" stroke-width="2" stroke-dasharray="8 6" opacity="0.6"
+                        class="animate-[spin_20s_linear_infinite]" style="transform-origin: 200px 200px; animation-direction: reverse;" />
+
+                <circle cx="200" cy="200" r="130"
+                        stroke="#60a5fa" stroke-width="2" stroke-dasharray="6 4" opacity="0.8"
+                        class="animate-[spin_12s_linear_infinite]" style="transform-origin: 200px 200px;" />
+              </svg>
+
+              <img src="../assets/svg/ai-agent-bot.svg" alt="Chatbot agent" class="w-full h-full object-contain drop-shadow-[0_16px_36px_rgba(42,95,158,0.2)]" title="Chatbot Agent" />
+
+              <img src="../assets/images/ai-agent-face.png" alt="Bot face" class="absolute top-[22%] left-1/2 -translate-x-1/2 w-[55%] object-contain z-30" title="Bot Face" />
+            </div>
           </div>
         </div>
       </div>
@@ -73,7 +94,16 @@
         </div>
 
         <div class="relative z-10 flex items-center justify-center">
-          <img src="../assets/svg/ai-agent-voice-flow.svg" title="Voice AI agent call flow" minHeight="min-h-70" />
+          <div class="relative w-full max-w-full">
+            <img src="../assets/svg/ai-agent-voice-flow.svg" title="Voice AI agent call flow" class="w-full min-h-[280px] block" />
+
+            <img
+                src="../assets/images/ai-agent-face.png"
+                alt="Bot face"
+                class="absolute top-[42%] left-[34.5%] -translate-x-1/2 -translate-y-1/2 w-[7%] min-w-[45px] max-w-[65px] h-auto z-10"
+                title="Bot Face"
+            />
+          </div>
         </div>
       </div>
     </section>
@@ -159,10 +189,18 @@
               <div class="absolute inset-5 rounded-full bg-[radial-gradient(circle,rgba(45,212,191,0.22)_0%,transparent_68%)] animate-[aaVoiceGlow_3.5s_ease-in-out_infinite]"></div>
               <div class="absolute inset-[-8%] rounded-full border-2 border-dashed border-slate-400/30 animate-[aaBotRingSpin_24s_linear_infinite]"></div>
               <div class="absolute inset-[-18%] rounded-full border-2 border-dashed border-sky-400/20 animate-[aaBotRingSpin_30s_linear_infinite_reverse]"></div>
-              <img 
-                src="../assets/svg/ai-agent-phone-bot.svg" 
-                alt="Voice AI agent on a call"
-                class="w-full block relative z-20 drop-shadow-[0_22px_48px_rgba(42,95,158,0.2)] animate-[aaBotObjBob_5s_ease-in-out_infinite]"
+
+              <img
+                  src="../assets/svg/ai-agent-phone-bot.svg"
+                  alt="Voice AI agent on a call"
+                  class="w-full block relative z-10 drop-shadow-[0_22px_48px_rgba(42,95,158,0.2)]"
+              />
+
+              <img
+                  src="../assets/images/ai-agent-face.png"
+                  alt="Bot face"
+                  class="absolute top-1/2 left-[46%] -translate-x-1/2 -translate-y-1/2 w-[50%] h-auto z-20 animate-[aaBotObjBob_5s_ease-in-out_infinite]"
+                  title="Bot Face"
               />
             </div>
           </div>
@@ -201,8 +239,11 @@
           <div class="relative w-full max-w-140 mx-auto animate-[aaVisualFloat_6s_ease-in-out_infinite]">
             <div class="absolute inset-[8%_4%] rounded-full bg-[radial-gradient(circle,rgba(74,144,226,0.22)_0%,rgba(20,184,166,0.1)_50%,transparent_72%)] blur-sm animate-[aaShowcaseGlow_4s_ease-in-out_infinite] pointer-events-none"></div>
             <div class="absolute -inset-1.5 rounded-[22px] border-2 border-dashed border-teal-500/35 animate-[aaBotRingSpin_26s_linear_infinite] pointer-events-none"></div>
+
             <div class="relative z-10 rounded-2xl overflow-hidden border border-slate-200/80 shadow-[0_22px_56px_rgba(15,23,42,0.1)] bg-white transition-all duration-350 min-h-75 md:min-h-85 hover:shadow-[0_28px_64px_rgba(15,76,129,0.14)] hover:-translate-y-1 hover:scale-[1.01]">
               <img src="../assets/svg/ai-agent-capabilities.svg" alt="Voice AI capabilities and telephony integrations" class="w-full min-h-80 block" />
+
+              <img src="../assets/images/ai-agent-face.png" alt="Bot Face" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[18%] object-contain z-20" title="Bot Face" />
             </div>
           </div>
         </div>
@@ -232,9 +273,76 @@
         </div>
       </div>
     </section>
+    <!-- In your template -->
+    <!-- Pricing Section -->
+    <!-- Pricing Section -->
+    <!-- Pricing Section -->
+    <section class="relative py-18 px-[5%] overflow-hidden bg-slate-50" id="pricing">
+      <div class="max-w-285 mx-auto text-center mb-12">
+        <span class="inline-block uppercase tracking-wider text-[11px] font-bold text-teal-600 bg-teal-50 px-3 py-1 rounded-full mb-4">Pricing</span>
+        <h2 class="font-['Space_Grotesk'] text-[clamp(28px,3.5vw,42px)] font-extrabold tracking-[-1px] leading-[1.15] text-slate-900 mb-4">
+          Voice agent plans that scale <br>with your calls
+        </h2>
+        <p class="text-[15px] text-slate-500 leading-relaxed max-w-2xl mx-auto">
+          From inbound support lines to outbound campaigns — every plan includes recordings, warm transfer, and usage analytics.
+        </p>
 
+        <!-- Billing Toggle -->
+        <div class="flex items-center justify-center gap-4 mt-8">
+          <span class="text-sm font-medium" :class="billingType === 'monthly' ? 'text-slate-900' : 'text-slate-400'">Monthly</span>
+          <button
+              @click="toggleBilling"
+              class="relative w-14 h-8 rounded-full transition-colors duration-300 focus:outline-none"
+              :class="billingType === 'yearly' ? 'bg-orange-600' : 'bg-slate-300'"
+          >
+        <span
+            class="absolute top-1 left-1 w-6 h-6 bg-white rounded-full shadow-md transition-transform duration-300"
+            :class="billingType === 'yearly' ? 'translate-x-6' : 'translate-x-0'"
+        ></span>
+          </button>
+          <span class="text-sm font-medium" :class="billingType === 'yearly' ? 'text-slate-900' : 'text-slate-400'">
+        Yearly
+        <span class="ml-2 inline-block bg-green-100 text-green-700 text-xs font-bold px-2 py-0.5 rounded-full">Save 15%</span>
+      </span>
+        </div>
+        <p v-if="billingType === 'yearly'" class="text-sm text-slate-500 mt-3">
+          Billed yearly — save 15%
+        </p>
+      </div>
+
+      <div class="max-w-285 mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+        <div v-for="(plan, index) in getPricingPlans()" :key="index"
+             class="bg-white rounded-2xl border shadow-lg p-8 hover:shadow-xl transition-shadow duration-300 relative"
+             :class="plan.featured ? 'border-2 border-orange-600 md:scale-105' : 'border-slate-200/80'">
+          <div v-if="plan.featured" class="absolute -top-3 left-1/2 -translate-x-1/2 z-10">
+            <span class="inline-block bg-orange-700 text-white text-xs font-bold uppercase tracking-wider px-4 py-1 rounded-full">Most Popular</span>
+          </div>
+          <div class="mb-6" :class="plan.featured ? 'mt-2' : ''">
+        <span class="inline-block text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-3"
+              :class="plan.badgeClass">{{ plan.name }}</span>
+            <div class="flex items-baseline gap-1">
+              <span class="text-4xl font-extrabold text-slate-900">{{ plan.price }}</span>
+              <span v-if="plan.period" class="text-sm text-slate-500">{{ plan.period }}</span>
+            </div>
+            <p class="text-sm text-slate-500 mt-2">{{ plan.description }}</p>
+          </div>
+          <ul class="space-y-3 mb-8">
+            <li v-for="(feature, fIndex) in plan.features" :key="fIndex"
+                class="flex items-start gap-3 text-sm"
+                :class="feature.included ? 'text-slate-700' : 'text-slate-500 opacity-60'">
+              <i :class="feature.included ? 'fas fa-check ' + plan.checkColor + ' mt-1' : 'fas fa-minus mt-1'"></i>
+              <span>{{ feature.text }}</span>
+            </li>
+          </ul>
+          <a :href="plan.ctaLink" class="block w-full text-center px-6 py-3 font-semibold rounded-xl transition-colors text-sm"
+             :class="plan.ctaClass">
+            {{ plan.ctaText }}
+          </a>
+        </div>
+      </div>
+    </section>
     <section class="p-6 md:p-12 max-w-7xl mx-auto">
-      <div class="bg-orange-600 text-white p-8 md:p-12 rounded-3xl flex flex-col lg:flex-row lg:items-center justify-between gap-8 shadow-xl">
+      <div class="bg-orange-700 text-white p-8 md:p-12 rounded-3xl flex flex-col lg:flex-row lg:items-center justify-between gap-8 shadow-xl">
         <div class="max-w-2xl">
           <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight font-['Space_Grotesk'] mb-2">Ready to deploy a voice agent?</h2>
           <p class="text-white text-sm md:text-base leading-relaxed">Book a demo and hear how your calls can sound — customer service, internal lines, and outbound included.</p>
@@ -280,6 +388,7 @@ export default {
   data() {
     return {
       parallaxStyle: { transform: 'perspective(900px) rotateX(0deg) rotateY(0deg)' },
+      billingType: 'monthly',
       gridCells: CELL_CONFIGS,
 
       liveStats: [
@@ -299,24 +408,83 @@ export default {
 
       capabilityFeatures: [
         {
-
           icon: 'fas fa-microphone',
           title: 'Recordings and logs',
           desc: 'Every call captured for review, training, and compliance.'
         },
         {
-
-          icon: 'fas fa-phone-alt',
+          icon: 'fas fa-graduation-cap',
           title: 'Warm transfer',
           desc: 'Pass context to a human agent when the caller needs a person.'
         },
         {
-
           icon: 'fas fa-plug',
           title: 'CRM and telephony hooks',
           desc: 'Connect to your phone system, CRM, and ticketing tools via API.'
         },
       ],
+
+      pricingPlans: [
+        {
+          name: 'Starter',
+          badgeClass: 'text-teal-600 bg-teal-50',
+          price: '₨45,000',
+          period: '/ mo',
+          description: 'Inbound voice agents for customer lines and IVR replacement.',
+          featured: false,
+          checkColor: 'text-teal-500',
+          features: [
+            { text: '2 voice agents', included: true },
+            { text: '200 voice minutes / mo', included: true },
+            { text: 'Basic workflows', included: true },
+            { text: 'Call recordings', included: true },
+            { text: 'Usage analytics', included: true },
+          ],
+          ctaText: 'Get Started',
+          ctaClass: 'bg-orange-700 border border-slate-300 text-white hover:bg-orange-800',
+          ctaLink: '/contact'
+        },
+        {
+          name: 'Business',
+          badgeClass: 'text-orange-600 bg-orange-50',
+          price: '₨125,000',
+          period: '/ mo',
+          description: 'For growing teams and businesses',
+          featured: true,
+          checkColor: 'text-orange-500',
+          features: [
+            { text: '10 voice agents', included: true },
+            { text: '1,000 voice minutes / mo', included: true },
+            { text: 'Advanced workflows', included: true },
+            { text: 'Call recordings & logs', included: true },
+            { text: 'Priority support', included: true },
+            { text: 'Warm transfer', included: true },
+          ],
+          ctaText: 'Get Started',
+          ctaClass: 'bg-orange-700 text-white hover:bg-orange-800 shadow-md hover:shadow-lg',
+          ctaLink: '/contact'
+        },
+        {
+          name: 'Enterprise',
+          badgeClass: 'text-violet-600 bg-violet-50',
+          price: 'Custom',
+          period: '',
+          description: 'For large-scale voice operations',
+          featured: false,
+          checkColor: 'text-violet-500',
+          features: [
+            { text: 'Unlimited voice agents', included: true },
+            { text: 'Custom voice minutes', included: true },
+            { text: 'Custom workflows', included: true },
+            { text: 'Dedicated account manager', included: true },
+            { text: 'Advanced analytics & insights', included: true },
+            { text: '24/7 phone support', included: true },
+          ],
+          ctaText: 'Contact Sales',
+          ctaClass: 'border border-slate-300 text-slate-700 hover:bg-slate-50',
+          ctaLink: '/contact'
+        }
+      ]
     }
   },
 
@@ -326,6 +494,30 @@ export default {
       const rx = -((event.clientY - box.top  - box.height / 2) / (box.height / 2)) * 8
       const ry =  ((event.clientX - box.left - box.width  / 2) / (box.width  / 2)) * 8
       this.parallaxStyle.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg)`
+    },
+    toggleBilling() {
+      this.billingType = this.billingType === 'monthly' ? 'yearly' : 'monthly'
+    },
+    getPricingPlans() {
+      const monthlyPrices = {
+        'Starter': '₨45,000',
+        'Business': '₨125,000',
+        'Enterprise': 'Custom'
+      }
+      const yearlyPrices = {
+        'Starter': '₨38,250',
+        'Business': '₨106,250',
+        'Enterprise': 'Custom'
+      }
+
+      const prices = this.billingType === 'monthly' ? monthlyPrices : yearlyPrices
+      const period = this.billingType === 'monthly' ? '/ month' : '/ year'
+
+      return this.pricingPlans.map(plan => ({
+        ...plan,
+        price: prices[plan.name] || plan.price,
+        period: plan.name === 'Enterprise' ? '' : period
+      }))
     },
     resetParallax() {
       this.parallaxStyle.transform = 'perspective(900px) rotateX(0deg) rotateY(0deg)'
@@ -387,5 +579,17 @@ export default {
 @keyframes aaCardFloat {
   0%, 100% { transform: translateY(0); }
   50%       { transform: translateY(-8px); }
+}
+@keyframes aaBotObjBob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%) skewX(-12deg);
+  }
+  100% {
+    transform: translateX(100%) skewX(-12deg);
+  }
 }
 </style>
