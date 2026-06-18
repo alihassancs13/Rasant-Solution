@@ -50,7 +50,7 @@
                 class="relative overflow-hidden cursor-pointer w-50 flex items-center justify-center px-6 py-3.5 bg-orange-700 hover:bg-orange-900 text-base font-semibold text-white rounded-xl transition-all duration-200 shadow-[0_4px_14px_rgba(42,95,158,0.4)] hover:shadow-[0_6px_20px_rgba(42,95,158,0.6)] active:scale-[0.98] group"
             >
               Book a Voice Demo
-              <div class="absolute inset-0 w-1/4 h-full bg-white/10 pointer-events-none animate-shine-loop"></div>
+              <div class="absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 pointer-events-none animate-shine-fast-loop"></div>
             </button>
             <button
                 @click="scrollToPricing"
@@ -68,21 +68,8 @@
             <div class="absolute inset-[8%] rounded-full bg-[radial-gradient(circle,rgba(45,212,191,0.2)_0%,transparent_70%)] animate-[botGlow_3s_ease-in-out_infinite]"></div>
             <div class="absolute -inset-3.5 rounded-full border-2 border-dashed border-[rgba(45,212,191,0.35)] animate-[botRingSpin_22s_linear_infinite]"></div>
             <div class="absolute -inset-5.5 rounded-full border-2 border-dashed border-[rgba(139,92,246,0.2)] animate-[botRingSpin_30s_linear_infinite_reverse]"></div>
-            <div class="relative w-full z-20 aspect-square max-w-sm mx-auto">
-
-              <svg class="absolute inset-0 w-full h-full z-10 pointer-events-none" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="200" cy="200" r="160"
-                        stroke="#93c5fd" stroke-width="2" stroke-dasharray="8 6" opacity="0.6"
-                        class="animate-[spin_20s_linear_infinite]" style="transform-origin: 200px 200px; animation-direction: reverse;" />
-
-                <circle cx="200" cy="200" r="130"
-                        stroke="#60a5fa" stroke-width="2" stroke-dasharray="6 4" opacity="0.8"
-                        class="animate-[spin_12s_linear_infinite]" style="transform-origin: 200px 200px;" />
-              </svg>
-
-              <img src="../assets/svg/ai-agent-bot.svg" alt="Chatbot agent" class="w-full h-full object-contain drop-shadow-[0_16px_36px_rgba(42,95,158,0.2)]" title="Chatbot Agent" />
-
-
+            <div class="relative w-full z-20 aspect-square max-w-sm mx-auto flex items-center justify-center overflow-visible">
+              <img src="../assets/svg/ai-agent-bot.svg" alt="Chatbot agent" class="w-full h-75 object-contain drop-shadow-[0_16px_36px_rgba(42,95,158,0.2)] relative z-10" title="Chatbot Agent" />
             </div>
           </div>
         </div>
@@ -100,7 +87,7 @@
           <p class="text-[15px] text-slate-500 leading-relaxed max-w-115">Route every call through speech recognition, intent handling, and smart transfer — so callers get answers on the line without waiting in silence.</p>
         </div>
 
-        <div class="relative z-10 flex items-center justify-center">
+        <div class="relative z-10 flex items-center justify-center bg-white rounded-2xl shadow-2xl shadow-blue-900/20">
           <div class="relative w-full max-w-full">
             <img src="../assets/svg/ai-agent-voice-flow.svg" title="Voice AI agent call flow" class="w-full min-h-[280px] block" />
 
@@ -192,10 +179,13 @@
           </div>
 
           <div class="relative z-10 flex items-center justify-center">
-            <div class="relative w-[min(280px,80%)] md:w-[min(320px,88%)] mx-auto animate-[aaVisualFloat_6s_ease-in-out_infinite]">
-              <div class="absolute inset-5 rounded-full bg-[radial-gradient(circle,rgba(45,212,191,0.22)_0%,transparent_68%)] animate-[aaVoiceGlow_3.5s_ease-in-out_infinite]"></div>
-              <div class="absolute inset-[-8%] rounded-full border-2 border-dashed border-slate-400/30 animate-[aaBotRingSpin_24s_linear_infinite]"></div>
-              <div class="absolute inset-[-18%] rounded-full border-2 border-dashed border-sky-400/20 animate-[aaBotRingSpin_30s_linear_infinite_reverse]"></div>
+            <div class="relative w-[min(250px,60%)] md:w-[min(280px,70%)] mx-auto animate-[visualFloat_6s_ease-in-out_infinite]">
+
+              <div class="absolute inset-5 rounded-full bg-[radial-gradient(circle,rgba(45,212,191,0.22)_0%,transparent_68%)]"></div>
+
+              <div class="absolute inset-[-8%] rounded-full border-2 border-dashed border-slate-400/30 animate-[spin_24s_linear_infinite]"></div>
+
+              <div class="absolute inset-[-18%] rounded-full border-2 border-dashed border-sky-400/20 animate-[spin_30s_linear_infinite_reverse]"></div>
 
               <img
                   src="../assets/svg/ai-agent-phone-bot.svg"
@@ -206,7 +196,7 @@
               <img
                   src="../assets/images/ai-agent-face.png"
                   alt="Bot face"
-                  class="absolute top-1/2 left-[46%] -translate-x-1/2 -translate-y-1/2 w-[50%] h-auto z-20 animate-[aaBotObjBob_5s_ease-in-out_infinite]"
+                  class="absolute top-1/2 left-[46%] -translate-x-1/2 -translate-y-1/2 w-[50%] h-auto z-20 animate-[botBob_5s_ease-in-out_infinite]"
                   title="Bot Face"
               />
             </div>
@@ -244,8 +234,10 @@
 
         <div class="relative z-10 flex items-center justify-center order-last md:order-first">
           <div class="relative w-full max-w-140 mx-auto animate-[aaVisualFloat_6s_ease-in-out_infinite]">
+
             <div class="absolute inset-[8%_4%] rounded-full bg-[radial-gradient(circle,rgba(74,144,226,0.22)_0%,rgba(20,184,166,0.1)_50%,transparent_72%)] blur-sm animate-[aaShowcaseGlow_4s_ease-in-out_infinite] pointer-events-none"></div>
-            <div class="absolute -inset-1.5 rounded-[22px] border-2 border-dashed border-teal-500/35 animate-[aaBotRingSpin_26s_linear_infinite] pointer-events-none"></div>
+
+            <div class="absolute -inset-1.5 rounded-[22px] border-2 border-dashed border-teal-500/35 animate-[spin_26s_linear_infinite] pointer-events-none"></div>
 
             <div class="relative z-10 rounded-2xl overflow-hidden border border-slate-200/80 shadow-[0_22px_56px_rgba(15,23,42,0.1)] bg-white transition-all duration-350 min-h-75 md:min-h-85 hover:shadow-[0_28px_64px_rgba(15,76,129,0.14)] hover:-translate-y-1 hover:scale-[1.01]">
               <img src="../assets/svg/ai-agent-capabilities.svg" alt="Voice AI capabilities and telephony integrations" class="w-full min-h-80 block" />
@@ -264,7 +256,7 @@
           <ul class="mt-4.5 flex flex-col gap-2.5 list-none p-0">
             <li v-for="(feat, i) in capabilityFeatures" :key="i"
                 class="flex gap-4 items-start p-[14px_16px] bg-white border border-slate-200/50 rounded-xl shadow-sm animate-[aaFeatIn_0.6s_ease_both]"
-                :style="i > 0 ? { animationDelay: `${i * 0.07}s` } : {}"><span class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm bg-teal-50 text-teal-700">
+                :style="i > 0 ? { animationDelay: `${i * 0.07}s` } : {}"><span class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm bg-slate-100 ">
   <i :class="feat.icon"></i>
 </span>
               <div>
@@ -429,7 +421,8 @@ export default {
         {
           icon: 'fas fa-microphone',
           title: 'Recordings and logs',
-          desc: 'Every call captured for review, training, and compliance.'
+          desc: 'Every call captured for review, training, and compliance.',
+          iconColor:'text-slate-900'
         },
         {
           icon: 'fas fa-graduation-cap',
@@ -562,6 +555,16 @@ export default {
 </script>
 
 <style scoped>
+@keyframes visualFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes botBob {
+  /* Keeps the horizontal centering while translating vertically */
+  0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+  50% { transform: translate(-50%, -50%) translateY(-5px); }
+}
 @keyframes aaMeshShift {
   0%   { transform: translate(0, 0) scale(1); opacity: 0.9; }
   100% { transform: translate(1.5%, -1%) scale(1.04); opacity: 1; }
@@ -626,5 +629,31 @@ export default {
   100% {
     transform: translateX(100%) skewX(-12deg);
   }
+}
+@keyframes shineFastLoop {
+  0% {
+    transform: translateX(-150%) skewX(-12deg);
+  }
+  /* Fast journey from Left to Right */
+  40% {
+    transform: translateX(250%) skewX(-12deg);
+  }
+  /* Tiny pause at the right edge before returning */
+  50% {
+    transform: translateX(250%) skewX(-12deg);
+  }
+  /* Fast journey back from Right to Left */
+  90% {
+    transform: translateX(-150%) skewX(-12deg);
+  }
+  /* Pause at the left edge before restarting the whole loop */
+  100% {
+    transform: translateX(-150%) skewX(-12deg);
+  }
+}
+
+.animate-shine-fast-loop {
+  /* Adjust 3s to make the total cycle (including pauses) longer or shorter */
+  animation: shineFastLoop 2s ease-in-out infinite;
 }
 </style>
