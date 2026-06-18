@@ -256,7 +256,7 @@
           <ul class="mt-4.5 flex flex-col gap-2.5 list-none p-0">
             <li v-for="(feat, i) in capabilityFeatures" :key="i"
                 class="flex gap-4 items-start p-[14px_16px] bg-white border border-slate-200/50 rounded-xl shadow-sm animate-[aaFeatIn_0.6s_ease_both]"
-                :style="i > 0 ? { animationDelay: `${i * 0.07}s` } : {}"><span class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm bg-slate-100 ">
+                :style="i > 0 ? { animationDelay: `${i * 0.07}s` } : {}"><span class="shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm bg-slate-100 ">
   <i :class="feat.icon"></i>
 </span>
               <div>
