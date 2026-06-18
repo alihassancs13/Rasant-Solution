@@ -8,7 +8,7 @@
         
         <div class="absolute inset-x-[-5%] inset-y-[-10%] pointer-events-none bg-[radial-gradient(circle_at_18%_20%,rgba(255,213,180,0.35)_0%,transparent_42%),radial-gradient(circle_at_82%_18%,rgba(201,196,248,0.32)_0%,transparent_40%),radial-gradient(circle_at_50%_85%,rgba(143,185,244,0.18)_0%,transparent_45%)]" aria-hidden="true"></div>
         
-        <div class="relative z-10 w-full max-w-135 flex flex-col justify-center h-full gap-4">
+        <div class="relative z-10 w-full max-w-135 flex flex-col justify-center h-full gap-4 mt-4">
 
           <div class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-blue-600/8 border border-blue-600/15 rounded-full text-[11px] font-bold tracking-wider uppercase text-orange-800 w-fit">
             <span class="w-1.5 h-1.5 rounded-full bg-orange-700 shadow-[0_0_0_3px_rgba(20,184,166,0.2)]"></span>
@@ -42,8 +42,8 @@
                 <i class="fa-solid fa-shield-halved text-xs"></i>
               </span>
               <div>
-                <strong class="block text-[12px] font-bold text-slate-800 mb-0.5">Role-based access</strong>
-                <span class="text-[11px] text-slate-500 leading-tight block">Admin, employee, and client portals</span>
+                <strong class="block text-[15px] font-bold text-slate-800 mb-0.5">Role-based access</strong>
+                <span class="text-[13px] text-slate-500 leading-tight block">Admin, employee, and client portals</span>
               </div>
             </li>
             <li class="flex items-start gap-3 p-2.5 bg-fuchsia-50/80 border border-slate-200/50 rounded-xl shadow-sm backdrop-blur-sm">
@@ -51,103 +51,104 @@
                 <i class="fa-solid fa-bolt text-xs"></i>
               </span>
               <div>
-                <strong class="block text-[12px] font-bold text-slate-800 mb-0.5">All products, one login</strong>
-                <span class="text-[11px] text-slate-500 leading-tight block">Sentra, Voice AI, Chatbot &amp; analytics</span>
+                <strong class="block text-[15px] font-bold text-slate-800 mb-0.5">All products, one login</strong>
+                <span class="text-[13px] text-slate-500 leading-tight block">Sentra, Voice AI, Chatbot &amp; analytics</span>
               </div>
             </li>
           </ul>
         </div>
       </aside>
 
-      <main class="flex items-center justify-center p-4 sm:p-6 bg-white w-full h-full overflow-y-auto lg:overflow-hidden">
-        <div class="w-full max-w-95 bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-xl shadow-slate-100/50">
+      <main class="flex items-center justify-center  sm:p-6 bg-white w-full h-full overflow-y-auto lg:overflow-hidden">
+        <div class="w-full max-w-[480px] bg-white border border-slate-200/80 rounded-2xl  sm:p-8 shadow-xl shadow-slate-100/50">
 
-          <div class="mb-4 text-center lg:text-left">
-            <h2 class="font-display text-xl font-bold tracking-tight text-[#1e3a5f]">Welcome back</h2>
-            <p class="text-[12px] text-slate-500 font-normal mt-0.5">Sign in with your username and password.</p>
+          <div class="mb-6 text-center lg:text-left">
+            <h2 class="font-display text-3xl sm:text-2xl font-bold tracking-tight text-[#1e3a5f]">Welcome back</h2>
+            <p class="text-base sm:text-lg text-slate-500 font-normal mt-1.5">Sign in with your username and password.</p>
           </div>
 
           <div
-            v-if="errorMessage"
-            class="mb-3 p-2.5 bg-red-50 border border-red-200 rounded-lg text-red-700 text-[11px] font-medium"
+              v-if="errorMessage"
+              class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm font-medium"
           >
             {{ errorMessage }}
           </div>
 
-          <form @submit.prevent="handleLoginSubmit" novalidate class="flex flex-col gap-3">
+          <form @submit.prevent="handleLoginSubmit" novalidate class="flex flex-col gap-5">
 
-            <div class="flex flex-col gap-1">
-              <label for="username" class="block text-[11px] font-semibold text-slate-700">Username</label>
+            <div class="flex flex-col gap-2">
+              <label for="username" class="block text-base font-semibold text-slate-700">Username</label>
               <div class="relative flex items-center w-full">
-                <i class="fa-regular fa-user absolute left-3.5 text-slate-400 pointer-events-none text-[13px]"></i>
+                <i class="fa-regular fa-user absolute left-4 text-slate-400 pointer-events-none text-base"></i>
                 <input
-                  type="text"
-                  id="username"
-                  v-model="username"
-                  placeholder="admin, employee, or client"
-                  required
-                  autocomplete="username"
-                  class="w-full pl-10 pr-4 py-2 border border-slate-200 rounded-xl font-sans text-[13px] text-slate-800 bg-slate-50/50 outline-none transition-all duration-200 focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-50"
+                    type="text"
+                    id="username"
+                    v-model="username"
+                    placeholder="admin, employee, or client"
+                    required
+                    autocomplete="username"
+                    class="w-full pl-11 pr-4 py-3 border border-slate-200 rounded-xl font-sans text-base text-slate-800 bg-slate-50/50 outline-none transition-all duration-200 focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-50"
                 />
               </div>
             </div>
 
-            <div class="flex flex-col gap-1">
+            <div class="flex flex-col gap-2">
               <div class="flex items-center justify-between gap-2">
-                <label for="password" class="block text-[11px] font-semibold text-slate-700">Password</label>
-                <a href="mailto:sales@rasantsolutions.com?subject=Forgot%20Password" class="text-[11px] font-semibold text-orange-700 no-underline whitespace-nowrap hover:text-indigo-700 hover:underline transition-colors duration-150">
+                <label for="password" class="block text-base font-semibold text-slate-700">Password</label>
+                <a href="mailto:sales@rasantsolutions.com?subject=Forgot%20Password" class="text-base font-semibold text-orange-700 no-underline whitespace-nowrap hover:text-indigo-700 hover:underline transition-colors duration-150">
                   Forgot password?
                 </a>
               </div>
               <div class="relative flex items-center w-full">
-                <i class="fa-solid fa-lock absolute left-3.5 text-slate-400 pointer-events-none text-[13px]"></i>
+                <i class="fa-solid fa-lock absolute left-4 text-slate-400 pointer-events-none text-base"></i>
                 <input
-                  :type="isPasswordVisible ? 'text' : 'password'"
-                  id="password"
-                  v-model="password"
-                  placeholder="Enter your password"
-                  required
-                  autocomplete="current-password"
-                  class="w-full pl-10 pr-10 py-2 border border-slate-200 rounded-xl font-sans text-[13px] text-slate-800 bg-slate-50/50 outline-none transition-all duration-200 focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-50"
+                    :type="isPasswordVisible ? 'text' : 'password'"
+                    id="password"
+                    v-model="password"
+                    placeholder="Enter your password"
+                    required
+                    autocomplete="current-password"
+                    class="w-full pl-11 pr-11 py-3 border border-slate-200 rounded-xl font-sans text-base text-slate-800 bg-slate-50/50 outline-none transition-all duration-200 focus:border-blue-600 focus:bg-white focus:ring-4 focus:ring-blue-50"
                 />
 
                 <button
-                  type="button"
-                  @click="togglePasswordVisibility"
-                  class="absolute right-1.5 w-7 h-7 border-none bg-transparent rounded-lg cursor-pointer text-slate-400 flex items-center justify-center transition-all duration-200 hover:text-blue-600 hover:bg-slate-100"
-                  :aria-label="isPasswordVisible ? 'Hide password' : 'Show password'"
+                    type="button"
+                    @click="togglePasswordVisibility"
+                    class="absolute right-2 w-8 h-8 border-none bg-transparent rounded-lg cursor-pointer text-slate-400 flex items-center justify-center transition-all duration-200 hover:text-blue-600 hover:bg-slate-100"
+                    :aria-label="isPasswordVisible ? 'Hide password' : 'Show password'"
                 >
-                  <i :class="['fa-regular', isPasswordVisible ? 'fa-eye-slash' : 'fa-eye', 'text-[13px]']"></i>
+                  <i :class="['fa-regular', isPasswordVisible ? 'fa-eye-slash' : 'fa-eye', 'text-base']"></i>
                 </button>
               </div>
             </div>
 
             <div class="flex items-center my-0.5">
-              <label class="inline-flex items-center gap-2 text-[11px] text-slate-500 font-normal cursor-pointer select-none">
+              <label class="inline-flex items-center gap-3 text-base text-slate-500 font-normal cursor-pointer select-none">
                 <input
-                  type="checkbox"
-                  v-model="rememberMe"
-                  class="w-3.5 h-3.5 rounded border-slate-300 text-orange-700 focus:ring-orange-600 cursor-pointer accent-orange-700"
+                    type="checkbox"
+                    v-model="rememberMe"
+                    class="w-4.5 h-4.5 rounded border-slate-300 text-orange-700 focus:ring-orange-600 cursor-pointer accent-orange-700"
                 />
                 <span>Remember me on this device</span>
               </label>
             </div>
 
             <button
-            type="submit"
-            class="relative overflow-hidden w-full flex items-center justify-center px-6 py-2.5 bg-orange-700 hover:bg-orange-900 text-[13px] font-semibold text-white rounded-xl transition-all duration-200 shadow-[0_4px_14px_rgba(42,95,158,0.4)] hover:shadow-[0_6px_20px_rgba(42,95,158,0.6)] active:scale-[0.98] group"
-          >
-            Sign In
-            <div class="absolute inset-0 w-1/4 h-full bg-white/10 pointer-events-none animate-shine-loop"></div>
-          </button>
+                type="submit"
+                class="relative overflow-hidden w-full flex items-center justify-center px-6 py-3.5 bg-orange-700 hover:bg-orange-900 text-base font-semibold text-white rounded-xl transition-all duration-200 shadow-[0_4px_14px_rgba(42,95,158,0.4)] hover:shadow-[0_6px_20px_rgba(42,95,158,0.6)] active:scale-[0.98] group"
+            >
+              Sign In
+              <div class="absolute inset-0 w-1/4 h-full bg-white/10 pointer-events-none animate-shine-loop"></div>
+            </button>
           </form>
-          <div class="mt-4 space-y-1.5 text-center text-[11px]">
-            <p class="text-slate-500 font-normal">
+
+          <div class="mt-6 space-y-3 text-center">
+            <p class="text-base text-slate-500 font-normal">
               Need an account?
               <a href="" class="font-bold text-orange-700 no-underline hover:underline">Contact sales</a>
             </p>
-            <a href="#" class="inline-block font-medium text-slate-500 no-underline transition-colors duration-200 hover:text-blue-600">
-              <i class="fa-solid fa-arrow-left mr-1 text-[10px]"></i> Back to website
+            <a href="#" class="inline-block font-medium text-base text-slate-500 no-underline transition-colors duration-200 hover:text-blue-600">
+              <i class="fa-solid fa-arrow-left mr-2 text-sm"></i> Back to website
             </a>
           </div>
 
