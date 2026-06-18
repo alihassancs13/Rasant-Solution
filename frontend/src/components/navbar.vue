@@ -14,7 +14,7 @@
     ></div>
 
     <header class="fixed top-0 left-0 right-0 h-20 bg-white border-b border-slate-200/80 shadow-sm flex items-center justify-between px-6 md:px-12 z-50 transition-all duration-300">
-      <router-link to="/" class="flex items-center shrink-0 group" aria-label="Rasant Solutions home">
+      <router-link to="/home" class="flex items-center shrink-0 group" aria-label="Rasant Solutions home">
         <img
             src="../assets/images/rasant-logo.png"
             alt="Rasant Solutions Logo"

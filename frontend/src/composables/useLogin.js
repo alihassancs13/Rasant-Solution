@@ -18,15 +18,10 @@ export function useLogin() {
     isPasswordVisible.value = !isPasswordVisible.value;
   };
 
-  const injectQuickCredentials = (userRole, userPass) => {
-    username.value = userRole;
-    password.value = userPass;
-    errorMessage.value = '';
-  };
 
   const handleLoginSubmit = () => {
     errorMessage.value = '';
-    
+
     const normalizedUser = username.value.trim().toLowerCase();
     const providedPass = password.value;
 
@@ -55,7 +50,6 @@ export function useLogin() {
     isPasswordVisible,
     errorMessage,
     togglePasswordVisibility,
-    injectQuickCredentials,
     handleLoginSubmit,
   };
 }
