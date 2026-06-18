@@ -1,6 +1,6 @@
 <template>
   <Navbar />
-  <section class="relative min-h-screen bg-gradient-to-br from-slate-50 via-indigo-50/30 to-purple-50/40 px-6 py-12 md:px-12 lg:px-24 flex items-center overflow-hidden font-sans">
+  <section class="relative min-h-screen bg-gradient-to-br from-white via-[#FFF8F3] to-[#F5F0FF] px-6 py-12 md:px-12 lg:px-24 flex items-center overflow-hidden font-sans">
 
     <div class="max-w-7xl pt-14 mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
 
@@ -9,19 +9,19 @@
           class="lg:col-span-5 flex flex-col space-y-6 text-left transition-all duration-1000 ease-out"
           :class="heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-16'"
       >
-        <div class="inline-flex items-center self-start bg-white/80 backdrop-blur-sm border border-slate-200/60 rounded-full px-4 py-1.5 shadow-sm">
-          <span class="w-2 h-2 rounded-full bg-purple-400 mr-2.5 animate-pulse"></span>
-          <span class="text-xs font-semibold tracking-wider text-slate-500 uppercase">
+        <div class="inline-flex items-center self-start bg-white/80 backdrop-blur-sm border border-[#E2E8F0]/60 rounded-full px-4 py-1.5 shadow-sm">
+          <span class="w-2 h-2 rounded-full bg-[#4A90E2] mr-2.5 animate-pulse"></span>
+          <span class="text-xs font-semibold tracking-wider text-[#64748B] uppercase">
             Trusted by 150+ businesses worldwide
           </span>
         </div>
 
-        <h1 class="text-5xl md:text-6xl font-bold tracking-tight text-[#1e3a5f] leading-[1.1]">
+        <h1 class="text-5xl md:text-6xl font-bold tracking-tight text-[#1E3A5F] leading-[1.1]">
           We craft <br />
           <Transition name="fade" mode="out-in">
             <span
                 :key="currentWordIndex"
-                class="inline-block bg-gradient-to-r from-orange-500 via-pink-500 to-purple-600 bg-clip-text text-transparent"
+                class="inline-block bg-gradient-to-r from-[#C96E3A] via-[#B0457A] via-[#6B52B8] to-[#3B73C4] bg-clip-text text-transparent"
             >
               {{ words[currentWordIndex] }}
             </span>
@@ -29,20 +29,20 @@
           software that ships fast.
         </h1>
 
-        <p class="text-lg text-slate-500 font-medium max-w-xl leading-relaxed">
+        <p class="text-lg text-[#475569] font-medium max-w-xl leading-relaxed">
           Rasant Solutions engineers bold digital products — from cloud-native platforms to AI-powered apps — built to launch fast and scale without limits.
         </p>
 
         <div class="flex flex-wrap gap-4 pt-4">
-          <button class="inline-flex items-center justify-center bg-orange-700 hover:bg-orange-800 text-white font-semibold px-7 py-4 rounded-xl shadow-lg shadow-orange-600/20 transition-all duration-200 group transform hover:-translate-y-0.5">
+          <button class="inline-flex items-center justify-center bg-[#C2410C] hover:bg-[#9A3412] text-white font-semibold px-7 py-4 rounded-xl shadow-lg shadow-[#C2410C]/20 transition-all duration-200 group transform hover:-translate-y-0.5 cursor-pointer">
             <span>Start Your Project</span>
             <svg class="w-5 h-5 ml-2 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
             </svg>
           </button>
 
-          <button class="inline-flex items-center justify-center bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold px-7 py-4 rounded-xl shadow-sm transition-all duration-200 transform hover:-translate-y-0.5">
-            <svg class="w-5 h-5 mr-2 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <button class="inline-flex items-center justify-center cursor-pointer bg-white border border-[#E2E8F0] hover:bg-[#F8FAFC] text-[#1E3A5F] font-semibold px-7 py-4 rounded-xl shadow-sm transition-all duration-200 transform hover:-translate-y-0.5">
+            <svg class="w-5 h-5 mr-2 text-[#64748B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
@@ -57,71 +57,71 @@
           :class="heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-16'"
       >
 
-        <div class="md:col-span-2 bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 flex flex-col h-44 max-w-md overflow-hidden">
-          <div class="flex items-center justify-between px-4 py-2 border-b border-slate-100 bg-slate-50/50">
+        <div class="md:col-span-2 bg-white rounded-2xl shadow-xl shadow-[#4A90E2]/10 border border-[#E2E8F0] flex flex-col h-44 max-w-md overflow-hidden">
+          <div class="flex items-center justify-between px-4 py-2 border-b border-[#E2E8F0] bg-[#F1F5F9]/50">
             <div class="flex space-x-1.5">
-              <span class="w-2.5 h-2.5 rounded-full bg-red-400"></span>
-              <span class="w-2.5 h-2.5 rounded-full bg-yellow-400"></span>
-              <span class="w-2.5 h-2.5 rounded-full bg-green-400"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-[#EF4444]"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-[#F59E0B]"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-[#22C55E]"></span>
             </div>
-            <span class="text-[11px] text-slate-400 font-mono">rasant — build.ts</span>
+            <span class="text-[11px] text-[#64748B] font-mono">rasant — build.ts</span>
             <div class="w-10"></div>
           </div>
-          <div class="p-3.5 font-mono text-[11px] leading-relaxed text-slate-600 flex-1 flex flex-col justify-between">
+          <div class="p-3.5 font-mono text-[11px] leading-relaxed text-[#475569] flex-1 flex flex-col justify-between">
             <div>
-              <p><span class="text-purple-600 font-semibold">const</span> app = <span class="text-purple-600">await</span> <span class="text-blue-600">rasant.build</span>({</p>
-              <p class="pl-4">stack: [<span class="text-emerald-600">"React"</span>, <span class="text-emerald-600">"Node"</span>, <span class="text-emerald-600">"AWS"</span>],</p>
-              <p class="pl-4">deploy: <span class="text-emerald-600">"production"</span></p>
+              <p><span class="text-[#6B52B8] font-semibold">const</span> app = <span class="text-[#6B52B8]">await</span> <span class="text-[#4A90E2]">rasant.build</span>({</p>
+              <p class="pl-4">stack: [<span class="text-[#14B8A6]">"React"</span>, <span class="text-[#14B8A6]">"Node"</span>, <span class="text-[#14B8A6]">"AWS"</span>],</p>
+              <p class="pl-4">deploy: <span class="text-[#14B8A6]">"production"</span></p>
               <p>});<br><span class="blinking-cursor"></span></p>
             </div>
-            <div class="pt-2.5 border-t border-slate-100 flex items-center text-[10px] text-slate-500 font-semibold">
-              <span class="text-emerald-500 mr-1.5">✓</span> Deployed &nbsp;•&nbsp; 0 downtime &nbsp;•&nbsp; 99% uptime
+            <div class="pt-2.5 border-t border-[#E2E8F0] flex items-center text-[10px] text-[#64748B] font-semibold">
+              <span class="text-[#22C55E] mr-1.5">✓</span> Deployed &nbsp;•&nbsp; 0 downtime &nbsp;•&nbsp; 99% uptime
             </div>
           </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 p-6 flex flex-col items-center justify-center text-center h-44 md:h-auto md:row-span-2 self-stretch">
-          <div class="w-14 h-14 rounded-full bg-emerald-50 flex items-center justify-center border-4 border-emerald-100/50 mb-3">
-            <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="bg-white rounded-2xl shadow-xl shadow-[#4A90E2]/10 border border-[#E2E8F0] p-6 flex flex-col items-center justify-center text-center h-44 md:h-auto md:row-span-2 self-stretch">
+          <div class="w-14 h-14 rounded-full bg-[#14B8A6]/10 flex items-center justify-center border-4 border-[#14B8A6]/20 mb-3">
+            <svg class="w-6 h-6 text-[#14B8A6]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
             </svg>
           </div>
-          <h3 class="font-bold text-slate-800 text-sm">Deployed</h3>
-          <p class="text-[11px] text-slate-400 mt-0.5">Production • 0 downtime</p>
+          <h3 class="font-bold text-[#1E3A5F] text-sm">Deployed</h3>
+          <p class="text-[11px] text-[#64748B] mt-0.5">Production • 0 downtime</p>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 p-5 flex flex-col justify-between h-36">
+        <div class="bg-white rounded-2xl shadow-xl shadow-[#4A90E2]/10 border border-[#E2E8F0] p-5 flex flex-col justify-between h-36">
           <div>
-            <div class="text-3xl font-extrabold text-blue-600 tracking-tight">{{ uptimeCounter }}%</div>
-            <div class="text-[10px] font-bold text-slate-400 tracking-wider uppercase mt-1">Uptime SLA</div>
+            <div class="text-3xl font-extrabold text-[#4A90E2] tracking-tight">{{ uptimeCounter }}%</div>
+            <div class="text-[10px] font-bold text-[#64748B] tracking-wider uppercase mt-1">Uptime SLA</div>
           </div>
-          <div class="w-full h-1.5 rounded-full bg-slate-100 overflow-hidden">
+          <div class="w-full h-1.5 rounded-full bg-[#F1F5F9] overflow-hidden">
             <div
-                class="h-full bg-gradient-to-r from-orange-500 via-pink-500 to-blue-500 transition-all duration-[2000ms] ease-out"
+                class="h-full bg-gradient-to-r from-[#C96E3A] via-[#B0457A] to-[#4A90E2] transition-all duration-[2000ms] ease-out"
                 :style="{ width: uptimeCounter + '%' }"
             ></div>
           </div>
         </div>
 
-        <div class="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 p-5 flex flex-col justify-between h-36">
-          <span class="text-[10px] font-bold text-slate-400 tracking-wider uppercase">Tech Stack</span>
+        <div class="bg-white rounded-2xl shadow-xl shadow-[#4A90E2]/10 border border-[#E2E8F0] p-5 flex flex-col justify-between h-36">
+          <span class="text-[10px] font-bold text-[#64748B] tracking-wider uppercase">Tech Stack</span>
           <div class="grid grid-cols-2 gap-1.5">
-            <span v-for="tech in techStack" :key="tech" class="text-[11px] font-semibold bg-slate-50 border border-slate-100 rounded-lg py-1.5 px-1 text-center text-slate-600">
+            <span v-for="tech in techStack" :key="tech" class="text-[11px] font-semibold bg-[#F8FAFC] border border-[#E2E8F0] rounded-lg py-1.5 px-1 text-center text-[#475569]">
               {{ tech }}
             </span>
           </div>
         </div>
 
-        <div class="md:col-span-3 bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 p-4 flex items-center justify-between space-x-6">
+        <div class="md:col-span-3 bg-white rounded-2xl shadow-xl shadow-[#4A90E2]/10 border border-[#E2E8F0] p-4 flex items-center justify-between space-x-6">
           <div class="flex-1 h-10 flex items-end relative overflow-hidden">
-            <svg class="w-full h-full text-blue-500/10" viewBox="0 0 300 50" preserveAspectRatio="none">
+            <svg class="w-full h-full text-[#4A90E2]/10" viewBox="0 0 300 50" preserveAspectRatio="none">
               <path d="M0 45 C 50 43, 80 30, 120 32 C 160 34, 200 15, 250 18 L 300 5 L 300 50 L 0 50 Z" fill="currentColor"/>
-              <path d="M0 45 C 50 43, 80 30, 120 32 C 160 34, 200 15, 250 18 L 300 5" fill="none" stroke="#3b82f6" stroke-width="2.5"/>
+              <path d="M0 45 C 50 43, 80 30, 120 32 C 160 34, 200 15, 250 18 L 300 5" fill="none" stroke="#4A90E2" stroke-width="2.5"/>
             </svg>
           </div>
           <div class="text-right shrink-0">
-            <div class="text-2xl font-extrabold text-purple-600">3x</div>
-            <div class="text-[11px] font-medium text-slate-400 mt-0.5">Faster delivery</div>
+            <div class="text-2xl font-extrabold text-[#6B52B8]">3x</div>
+            <div class="text-[11px] font-medium text-[#64748B] mt-0.5">Faster delivery</div>
           </div>
         </div>
 
@@ -132,7 +132,7 @@
   <!-- Stats Section -->
   <section
       ref="statsRef"
-      class="relative px-6 py-12 md:px-12 lg:px-24 bg-gradient-to-br from-slate-50 via-indigo-50/30 to-purple-50/40"
+      class="relative px-6 py-12 md:px-12 lg:px-24 bg-gradient-to-br from-white via-[#FFF8F3] to-[#F5F0FF]"
   >
     <div class="max-w-7xl mx-auto">
       <div
@@ -140,13 +140,13 @@
           :class="visible.stats ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'"
       >
         <div class="flex -space-x-3">
-          <div class="w-9 h-9 rounded-full bg-gradient-to-br from-orange-300 to-pink-300 border-2 border-white flex items-center justify-center text-[11px] font-bold text-white">AK</div>
-          <div class="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-300 to-purple-300 border-2 border-white flex items-center justify-center text-[11px] font-bold text-white">SR</div>
-          <div class="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-cyan-400 border-2 border-white flex items-center justify-center text-[11px] font-bold text-white">MJ</div>
-          <div class="w-9 h-9 rounded-full bg-orange-500 border-2 border-white flex items-center justify-center text-[11px] font-bold text-white">+</div>
+          <div class="w-9 h-9 rounded-full bg-gradient-to-br from-[#FFD5B4] to-[#E8C1D9] border-2 border-white flex items-center justify-center text-[11px] font-bold text-white">AK</div>
+          <div class="w-9 h-9 rounded-full bg-gradient-to-br from-[#C9C4F8] to-[#8FB9F4] border-2 border-white flex items-center justify-center text-[11px] font-bold text-white">SR</div>
+          <div class="w-9 h-9 rounded-full bg-gradient-to-br from-[#4A90E2] to-[#8FB9F4] border-2 border-white flex items-center justify-center text-[11px] font-bold text-white">MJ</div>
+          <div class="w-9 h-9 rounded-full bg-[#EA580C] border-2 border-white flex items-center justify-center text-[11px] font-bold text-white">+</div>
         </div>
-        <p class="text-sm text-slate-600">
-          <span class="font-bold text-slate-800">50+ clients</span> shipped products with us this year
+        <p class="text-sm text-[#475569]">
+          <span class="font-bold text-[#1E3A5F]">50+ clients</span> shipped products with us this year
         </p>
       </div>
 
@@ -154,7 +154,7 @@
         <div
             v-for="(stat, i) in stats"
             :key="stat.label"
-            class="bg-white rounded-2xl shadow-xl shadow-slate-200/50 border border-slate-100 p-5 flex items-center gap-4 transition-all duration-700 ease-out"
+            class="bg-white rounded-2xl shadow-xl shadow-[#4A90E2]/10 border border-[#E2E8F0] p-5 flex items-center gap-4 transition-all duration-700 ease-out"
             :class="visible.stats ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'"
             :style="{ transitionDelay: visible.stats ? `${i * 100}ms` : '0ms' }"
         >
@@ -162,8 +162,8 @@
             <font-awesome-icon :icon="stat.icon" :class="['text-lg', stat.iconColor]" />
           </div>
           <div>
-            <div class="text-2xl font-extrabold text-blue-600">{{ stat.value }}</div>
-            <div class="text-sm text-slate-500">{{ stat.label }}</div>
+            <div class="text-2xl font-extrabold text-[#4A90E2]">{{ stat.value }}</div>
+            <div class="text-sm text-[#475569]">{{ stat.label }}</div>
           </div>
         </div>
       </div>
@@ -173,11 +173,11 @@
   <!-- Trusted Technologies -->
   <section
       ref="techRef"
-      class="bg-slate-50 border-t border-slate-100 px-30 py-10 overflow-hidden"
+      class="bg-[#F8FAFC] border-t border-[#E2E8F0] px-30 py-10 overflow-hidden"
   >
     <div class="max-w-7xl mx-auto px-6 md:px-12 lg:px-24">
       <p
-          class="text-center text-xs font-bold tracking-widest text-slate-400 uppercase mb-6 transition-all duration-700 ease-out"
+          class="text-center text-xs font-bold tracking-widest text-[#64748B] uppercase mb-6 transition-all duration-700 ease-out"
           :class="visible.tech ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
       >
         Trusted Technologies We Build With
@@ -188,17 +188,17 @@
         class="relative transition-all duration-700 ease-out delay-200"
         :class="visible.tech ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'"
     >
-      <div class="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-slate-50 to-transparent z-10"></div>
-      <div class="pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-slate-50 to-transparent z-10"></div>
+      <div class="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-[#F8FAFC] to-transparent z-10"></div>
+      <div class="pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-[#F8FAFC] to-transparent z-10"></div>
       <div class="overflow-hidden">
         <div class="flex gap-6 w-max animate-marquee">
           <div
               v-for="(tech, i) in [...techList, ...techList]"
               :key="tech.name + '-' + i"
-              class="inline-flex items-center gap-2 bg-white border border-slate-200 rounded-full px-5 py-2.5 shadow-sm whitespace-nowrap shrink-0"
+              class="inline-flex items-center gap-2 bg-white border border-[#E2E8F0] rounded-full px-5 py-2.5 shadow-sm whitespace-nowrap shrink-0"
           >
             <font-awesome-icon :icon="tech.icon" :class="['text-sm', tech.color]" />
-            <span class="text-sm font-semibold text-slate-700">{{ tech.name }}</span>
+            <span class="text-sm font-semibold text-[#1E3A5F]">{{ tech.name }}</span>
           </div>
         </div>
       </div>
@@ -218,14 +218,14 @@
         class="relative z-10 text-center max-w-[720px] mx-auto mb-8 transition-all duration-700 ease-out"
         :class="visible.platform ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'"
     >
-      <span class="text-xs font-bold tracking-widest text-blue-600 uppercase">Sentra AI Platform</span>
-      <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mt-3 leading-tight">
+      <span class="text-xs font-bold tracking-widest text-[#4A90E2] uppercase">Sentra AI Platform</span>
+      <h2 class="text-3xl md:text-4xl font-extrabold text-[#1E3A5F] mt-3 leading-tight">
         Omni-Channel Access to<br />
-        <span class="bg-[linear-gradient(90deg,#C96E3A,#B0457A,#6B52B8,#3B73C4,#1D5AA8)] bg-clip-text text-transparent">
+        <span class="bg-gradient-to-r from-[#C96E3A] via-[#B0457A] via-[#6B52B8] to-[#3B73C4] bg-clip-text text-transparent">
           Service Supervision
         </span>
       </h2>
-      <p class="text-slate-500 mt-4 leading-relaxed">
+      <p class="text-[#475569] mt-4 leading-relaxed">
         Inbound and outbound voice, AI bots, live agents, chatbots, and supervisor analytics — one platform for modern call centers and customer teams.
       </p>
     </div>
@@ -253,10 +253,10 @@
         class="relative z-10 flex flex-wrap justify-center gap-4 mt-9 transition-all duration-700 ease-out delay-300"
         :class="visible.platform ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
     >
-      <RouterLink to="/sentra" class="inline-flex items-center justify-center bg-[#E03C08] hover:bg-[#c63406] text-white font-semibold px-6 py-3.5 rounded-xl shadow-lg shadow-orange-600/20 transition-all duration-200 transform hover:-translate-y-0.5">
+      <RouterLink to="/sentra" class="inline-flex items-center justify-center bg-[#C2410C] hover:bg-[#9A3412] text-white font-semibold px-6 py-3.5 rounded-xl shadow-lg shadow-[#C2410C]/20 transition-all duration-200 transform hover:-translate-y-0.5">
         Explore Sentra Platform
       </RouterLink>
-      <RouterLink to="/login" class="inline-flex items-center justify-center bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold px-6 py-3.5 rounded-xl shadow-sm transition-all duration-200 transform hover:-translate-y-0.5">
+      <RouterLink to="/login" class="inline-flex items-center justify-center bg-white border border-[#E2E8F0] hover:bg-[#F8FAFC] text-[#1E3A5F] font-semibold px-6 py-3.5 rounded-xl shadow-sm transition-all duration-200 transform hover:-translate-y-0.5">
         Open Sentra Portal
       </RouterLink>
     </div>
@@ -266,7 +266,7 @@
   <section
       id="products"
       ref="productsRef"
-      class="relative overflow-hidden px-[5%] py-24 bg-gradient-to-b from-white to-slate-50"
+      class="relative overflow-hidden px-[5%] py-24 bg-gradient-to-b from-white to-[#F8FAFC]"
   >
     <div class="pointer-events-none absolute top-[10%] -right-[8%] w-[520px] h-[520px] rounded-full bg-[radial-gradient(circle,rgba(74,144,226,0.08)_0%,transparent_70%)]"></div>
 
@@ -274,12 +274,12 @@
         class="relative z-10 text-center max-w-[720px] mx-auto mb-11 transition-all duration-700 ease-out"
         :class="visible.products ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'"
     >
-      <span class="text-xs font-bold tracking-widest text-blue-600 uppercase">Our Products</span>
-      <h2 class="text-3xl md:text-4xl font-extrabold text-blue-900 mt-3 leading-tight">
+      <span class="text-xs font-bold tracking-widest text-[#4A90E2] uppercase">Our Products</span>
+      <h2 class="text-3xl md:text-4xl font-extrabold text-[#1E3A5F] mt-3 leading-tight">
         Sentra AI at the core.<br />
         Powerful modules around it.
       </h2>
-      <p class="text-slate-500 mt-4 leading-relaxed">
+      <p class="text-[#475569] mt-4 leading-relaxed">
         Sentra AI is our flagship call-center platform. AI Agent, Chatbot, and Orchestri integrate into your systems — or deploy standalone.
       </p>
     </div>
@@ -294,12 +294,12 @@
             type="button"
             aria-label="Previous product"
             @click="prev"
-            class="group hidden lg:flex w-11 h-11 rounded-full border border-slate-200 bg-white text-slate-700 items-center justify-center shrink-0 transition-all duration-200 hover:bg-[#E03C08] hover:border-[#E03C08] hover:text-white hover:scale-105 hover:shadow-lg hover:shadow-orange-600/25"
+            class="group hidden lg:flex w-11 h-11 rounded-full border border-[#E2E8F0] bg-white text-[#1E3A5F] items-center justify-center shrink-0 transition-all duration-200 hover:bg-[#C2410C] hover:border-[#C2410C] hover:text-white hover:scale-105 hover:shadow-lg hover:shadow-[#C2410C]/25"
         >
           <font-awesome-icon :icon="['fas', 'chevron-left']" class="text-sm transition-transform duration-200 group-hover:-translate-x-0.5" />
         </button>
 
-        <div class="relative rounded-[28px] border border-blue-500/[0.18] bg-white/90 shadow-[0_24px_64px_rgba(15,23,42,0.08)] overflow-hidden lg:min-h-[380px]">
+        <div class="relative rounded-[28px] border border-[#4A90E2]/20 bg-white/90 shadow-[0_24px_64px_rgba(15,23,42,0.08)] overflow-hidden lg:min-h-[380px]">
           <article
               v-for="(product, index) in products"
               :key="product.title"
@@ -314,15 +314,15 @@
                 <span :class="['inline-block text-[10px] font-bold uppercase tracking-wide px-3 py-1.5 rounded-full mb-3.5', product.tagClass]">
                   {{ product.tag }}
                 </span>
-                <h3 class="text-2xl lg:text-[32px] font-extrabold tracking-tight text-slate-900 mb-3">
+                <h3 class="text-2xl lg:text-[32px] font-extrabold tracking-tight text-[#1E3A5F] mb-3">
                   {{ product.title }}
                 </h3>
-                <p class="text-[15px] text-slate-500 leading-relaxed mb-5 max-w-[420px]">
+                <p class="text-[15px] text-[#475569] leading-relaxed mb-5 max-w-[420px]">
                   {{ product.description }}
                 </p>
                 <RouterLink
                     :to="product.ctaLink"
-                    class="group inline-flex items-center justify-center gap-2 bg-[#E03C08] hover:bg-[#c63406] text-white font-semibold text-sm px-6 py-3 rounded-xl shadow-lg shadow-orange-600/20 transition-all duration-200 transform hover:-translate-y-0.5"
+                    class="group inline-flex items-center justify-center gap-2 bg-[#C2410C] hover:bg-[#9A3412] text-white font-semibold text-sm px-6 py-3 rounded-xl shadow-lg shadow-[#C2410C]/20 transition-all duration-200 transform hover:-translate-y-0.5"
                 >
                   {{ product.ctaText }}
                   <font-awesome-icon :icon="['fas', 'arrow-right']" class="text-xs transition-transform duration-200 group-hover:translate-x-1" />
@@ -348,7 +348,7 @@
             type="button"
             aria-label="Next product"
             @click="next"
-            class="group hidden lg:flex w-11 h-11 rounded-full border border-slate-200 bg-white text-slate-700 items-center justify-center shrink-0 transition-all duration-200 hover:bg-[#E03C08] hover:border-[#E03C08] hover:text-white hover:scale-105 hover:shadow-lg hover:shadow-orange-600/25"
+            class="group hidden lg:flex w-11 h-11 rounded-full border border-[#E2E8F0] bg-white text-[#1E3A5F] items-center justify-center shrink-0 transition-all duration-200 hover:bg-[#C2410C] hover:border-[#C2410C] hover:text-white hover:scale-105 hover:shadow-lg hover:shadow-[#C2410C]/25"
         >
           <font-awesome-icon :icon="['fas', 'chevron-right']" class="text-sm transition-transform duration-200 group-hover:translate-x-0.5" />
         </button>
@@ -366,21 +366,21 @@
             :class="[
             'relative px-5 py-2.5 rounded-full border text-sm font-semibold transition-all duration-300',
             index === activeIndex
-              ? 'bg-[#E03C08] border-[#E03C08] text-white shadow-lg shadow-orange-600/25 scale-105'
-              : 'border-slate-200 bg-white text-slate-500 hover:border-orange-400/40 hover:text-slate-700'
+              ? 'bg-[#C2410C] border-[#C2410C] text-white shadow-lg shadow-[#C2410C]/25 scale-105'
+              : 'border-[#E2E8F0] bg-white text-[#475569] hover:border-[#C2410C]/40 hover:text-[#1E3A5F]'
           ]"
         >
           {{ product.title }}
           <span
               v-if="index === activeIndex"
-              class="absolute -inset-1 rounded-full border-2 border-[#E03C08] animate-[ringPulse_2.5s_ease-out_infinite] pointer-events-none"
+              class="absolute -inset-1 rounded-full border-2 border-[#C2410C] animate-[ringPulse_2.5s_ease-out_infinite] pointer-events-none"
           ></span>
         </button>
       </div>
 
-      <div class="h-[3px] bg-blue-500/10 rounded-full mt-4 overflow-hidden">
+      <div class="h-[3px] bg-[#4A90E2]/10 rounded-full mt-4 overflow-hidden">
         <span
-            :class="['block h-full rounded-full bg-gradient-to-r from-teal-500 to-blue-500 transition-[width] duration-[6000ms] ease-linear', progressActive ? 'w-full' : 'w-0']"
+            :class="['block h-full rounded-full bg-gradient-to-r from-[#14B8A6] to-[#4A90E2] transition-[width] duration-[6000ms] ease-linear', progressActive ? 'w-full' : 'w-0']"
         ></span>
       </div>
     </div>
@@ -399,18 +399,18 @@
           :class="visible.services ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-12'"
       >
         <div>
-          <span class="text-xs font-bold tracking-widest text-blue-600 uppercase">What We Do</span>
-          <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mt-3 leading-tight">
+          <span class="text-xs font-bold tracking-widest text-[#4A90E2] uppercase">What We Do</span>
+          <h2 class="text-3xl md:text-4xl font-extrabold text-[#1E3A5F] mt-3 leading-tight">
             Services Built for<br />Modern Businesses
           </h2>
         </div>
         <div class="md:max-w-sm">
-          <p class="text-slate-500 leading-relaxed">
+          <p class="text-[#475569] leading-relaxed">
             From idea to deployment — we handle every layer of your digital product.
           </p>
           <RouterLink
               to="/services"
-              class="inline-flex items-center gap-2 mt-4 bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold px-5 py-3 rounded-xl shadow-sm transition-all duration-200"
+              class="inline-flex items-center gap-2 mt-4 bg-white border border-[#E2E8F0] hover:bg-[#F8FAFC] text-[#1E3A5F] font-semibold px-5 py-3 rounded-xl shadow-sm transition-all duration-200"
           >
             All Services
           </RouterLink>
@@ -421,7 +421,7 @@
         <div
             v-for="(service, i) in services"
             :key="service.title"
-            class="group bg-white rounded-2xl border border-slate-100 shadow-xl shadow-slate-200/50 p-7 transition-all duration-700 ease-out hover:-translate-y-1.5 hover:shadow-[inset_0_0_15px_rgba(14,165,233,0.3)] "
+            class="group bg-white rounded-2xl border border-[#E2E8F0] shadow-xl shadow-[#4A90E2]/10 p-7 transition-all duration-700 ease-out hover:-translate-y-1.5 hover:shadow-[inset_0_0_15px_rgba(74,144,226,0.3)]"
             :class="visible.services ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-14 scale-95'"
             :style="{ transitionDelay: visible.services ? `${i * 150}ms` : '0ms', animationDelay: `${i * 0.4}s` }"
         >
@@ -430,11 +430,11 @@
               :alt="service.title"
               class="w-full h-36 object-contain mb-5 transition-transform duration-500 ease-out group-hover:scale-110 animate-float"
           />
-          <div :class="['w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform duration-300 ease-out  ', service.iconBg]">
+          <div :class="['w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform duration-300 ease-out', service.iconBg]">
             <font-awesome-icon :icon="service.icon" :class="['text-3xl', service.iconColor]" />
           </div>
-          <h3 class="text-lg font-bold text-slate-900 mb-2.5">{{ service.title }}</h3>
-          <p class="text-sm text-slate-500 leading-relaxed mb-5">{{ service.description }}</p>
+          <h3 class="text-lg font-bold text-[#1E3A5F] mb-2.5">{{ service.title }}</h3>
+          <p class="text-sm text-[#475569] leading-relaxed mb-5">{{ service.description }}</p>
           <div class="flex flex-wrap gap-2 mb-6">
         <span
             v-for="tag in service.tags"
@@ -446,7 +446,7 @@
           </div>
           <RouterLink
               :to="service.link"
-              class="inline-flex items-center gap-2 text-sm font-bold text-blue-600 group-hover:gap-3 transition-all duration-200"
+              class="inline-flex items-center gap-2 text-sm font-bold text-[#4A90E2] group-hover:gap-3 transition-all duration-200"
           >
             Explore Service
             <font-awesome-icon :icon="['fas', 'arrow-right']" class="text-xs transition-transform duration-200 group-hover:translate-x-1" />
@@ -461,7 +461,7 @@
   <section
       id="process"
       ref="processSection"
-      class="px-[5%] py-24 bg-slate-50 border-t border-b border-slate-200"
+      class="px-[5%] py-24 bg-[#F8FAFC] border-t border-b border-[#E2E8F0]"
   >
     <div class="max-w-6xl mx-auto">
 
@@ -469,11 +469,11 @@
           class="text-center max-w-2xl mx-auto mb-[72px] transition-all duration-700 ease-out"
           :class="visible.process ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'"
       >
-        <span class="text-xs font-bold tracking-widest text-blue-600 uppercase">Our Process</span>
-        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mt-3 leading-tight">
+        <span class="text-xs font-bold tracking-widest text-[#4A90E2] uppercase">Our Process</span>
+        <h2 class="text-3xl md:text-4xl font-extrabold text-[#1E3A5F] mt-3 leading-tight">
           How We Bring Ideas to Life
         </h2>
-        <p class="text-slate-500 mt-4 leading-relaxed">
+        <p class="text-[#475569] mt-4 leading-relaxed">
           A battle-tested process that eliminates uncertainty and delivers results on time, every time.
         </p>
       </div>
@@ -481,7 +481,7 @@
       <div class="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-12 lg:gap-y-0">
 
         <div
-            class="hidden lg:block absolute top-9 h-0.5 bg-gradient-to-r from-teal-500 to-blue-500 opacity-45 origin-left transition-transform duration-[1200ms] ease-out"
+            class="hidden lg:block absolute top-9 h-0.5 bg-gradient-to-r from-[#14B8A6] to-[#4A90E2] opacity-45 origin-left transition-transform duration-[1200ms] ease-out"
             :style="{ left: 'calc(12.5% + 18px)', right: 'calc(12.5% + 18px)', transform: lineVisible ? 'scaleX(1)' : 'scaleX(0)' }"
         ></div>
 
@@ -496,8 +496,8 @@
             {{ step.number }}
             <span :class="['absolute -inset-1.5 rounded-full border-2 animate-[ringPulse_2.5s_ease-out_infinite]', step.ringClass]"></span>
           </div>
-          <h4 class="text-base font-bold text-slate-900 mb-2.5">{{ step.title }}</h4>
-          <p class="text-[13px] text-slate-500 leading-relaxed">{{ step.description }}</p>
+          <h4 class="text-base font-bold text-[#1E3A5F] mb-2.5">{{ step.title }}</h4>
+          <p class="text-[13px] text-[#475569] leading-relaxed">{{ step.description }}</p>
         </div>
 
       </div>
@@ -516,18 +516,18 @@
           class="relative transition-all duration-700 ease-out"
           :class="visible.about ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-16'"
       >
-        <div class="w-full rounded-[20px] overflow-hidden bg-slate-50 border border-slate-200 shadow-lg">
+        <div class="w-full rounded-[20px] overflow-hidden bg-[#F8FAFC] border border-[#E2E8F0] shadow-lg">
           <img :src="aboutIllustration" alt="About Rasant Solutions" class="w-full block" />
         </div>
-        <div class="absolute -bottom-5 -left-7 max-w-[200px] bg-white rounded-2xl px-5 py-4 shadow-xl border border-slate-200">
-          <div class="text-[10px] uppercase tracking-wide text-slate-400 mb-1">Avg. Delivery</div>
-          <div class="text-[22px] font-extrabold text-blue-500">3 Weeks</div>
-          <div class="text-[11px] text-slate-500 mt-0.5">From design to launch</div>
+        <div class="absolute -bottom-5 -left-7 max-w-[200px] bg-white rounded-2xl px-5 py-4 shadow-xl border border-[#E2E8F0]">
+          <div class="text-[10px] uppercase tracking-wide text-[#64748B] mb-1">Avg. Delivery</div>
+          <div class="text-[22px] font-extrabold text-[#4A90E2]">3 Weeks</div>
+          <div class="text-[11px] text-[#64748B] mt-0.5">From design to launch</div>
         </div>
-        <div class="absolute -top-5 -right-5 max-w-[200px] bg-white rounded-2xl px-5 py-4 shadow-xl border border-slate-200">
-          <div class="text-[10px] uppercase tracking-wide text-slate-400 mb-1">Client Retention</div>
-          <div class="text-[22px] font-extrabold text-emerald-400">94%</div>
-          <div class="text-[11px] text-slate-500 mt-0.5">Return for new projects</div>
+        <div class="absolute -top-5 -right-5 max-w-[200px] bg-white rounded-2xl px-5 py-4 shadow-xl border border-[#E2E8F0]">
+          <div class="text-[10px] uppercase tracking-wide text-[#64748B] mb-1">Client Retention</div>
+          <div class="text-[22px] font-extrabold text-[#14B8A6]">94%</div>
+          <div class="text-[11px] text-[#64748B] mt-0.5">Return for new projects</div>
         </div>
       </div>
 
@@ -535,11 +535,11 @@
           class="transition-all duration-700 ease-out delay-200"
           :class="visible.about ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-16'"
       >
-        <span class="text-xs font-bold tracking-widest text-blue-600 uppercase">Why Rasant</span>
-        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mt-3 leading-tight">
+        <span class="text-xs font-bold tracking-widest text-[#4A90E2] uppercase">Why Rasant</span>
+        <h2 class="text-3xl md:text-4xl font-extrabold text-[#1E3A5F] mt-3 leading-tight">
           Built to Deliver.<br />Designed to Last.
         </h2>
-        <p class="text-slate-500 mt-4 leading-relaxed">
+        <p class="text-[#475569] mt-4 leading-relaxed">
           We're not just another dev shop. We embed ourselves in your business and build software that solves real problems — not just specs on paper.
         </p>
 
@@ -547,14 +547,14 @@
           <li
               v-for="(feature, i) in aboutFeatures"
               :key="feature.title"
-              class="group flex items-start gap-4 bg-white border border-slate-200 rounded-2xl px-5 py-[18px] shadow-sm transition-all duration-700 ease-out hover:bg-blue-500/[0.04] hover:border-blue-500/25 hover:translate-x-1.5 hover:shadow-md"
+              class="group flex items-start gap-4 bg-white border border-[#E2E8F0] rounded-2xl px-5 py-[18px] shadow-sm transition-all duration-700 ease-out hover:bg-[#4A90E2]/5 hover:border-[#4A90E2]/25 hover:translate-x-1.5 hover:shadow-md"
               :class="visible.about ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'"
               :style="{ transitionDelay: visible.about ? `${300 + i * 100}ms` : '0ms' }"
           >
             <span :class="['w-2.5 h-2.5 rounded-full mt-1.5 shrink-0 animate-pulse', feature.dotColor, feature.delayClass]"></span>
             <div>
-              <h4 class="text-sm font-semibold text-slate-900 mb-1">{{ feature.title }}</h4>
-              <p class="text-[13px] text-slate-500 leading-relaxed">{{ feature.description }}</p>
+              <h4 class="text-sm font-semibold text-[#1E3A5F] mb-1">{{ feature.title }}</h4>
+              <p class="text-[13px] text-[#475569] leading-relaxed">{{ feature.description }}</p>
             </div>
           </li>
         </ul>
@@ -575,11 +575,11 @@
           class="text-center max-w-2xl mx-auto mb-[60px] transition-all duration-700 ease-out"
           :class="visible.testimonials ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'"
       >
-        <span class="text-xs font-bold tracking-widest text-blue-600 uppercase">Our Projects</span>
-        <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mt-3 leading-tight">
+        <span class="text-xs font-bold tracking-widest text-[#4A90E2] uppercase">Our Projects</span>
+        <h2 class="text-3xl md:text-4xl font-extrabold text-[#1E3A5F] mt-3 leading-tight">
           Work That Speaks<br />For Itself
         </h2>
-        <p class="text-slate-500 mt-4 leading-relaxed">
+        <p class="text-[#475569] mt-4 leading-relaxed">
           150+ projects delivered across 20+ industries. Real results from real clients.
         </p>
       </div>
@@ -588,7 +588,7 @@
         <div
             v-for="(testimonial, i) in testimonials"
             :key="testimonial.name"
-            class="bg-white border border-slate-200 rounded-[20px] p-8 shadow-sm transition-all duration-700 ease-out hover:-translate-y-1.5 hover:-rotate-[0.5deg] hover:border-blue-500/25 hover:shadow-xl"
+            class="bg-white border border-[#E2E8F0] rounded-[20px] p-8 shadow-sm transition-all duration-700 ease-out hover:-translate-y-1.5 hover:-rotate-[0.5deg] hover:border-[#4A90E2]/25 hover:shadow-xl"
             :class="[
             visible.testimonials ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-14',
             i % 2 === 0 ? '' : 'md:translate-y-4'
@@ -596,9 +596,9 @@
             :style="{ transitionDelay: visible.testimonials ? `${i * 150}ms` : '0ms' }"
         >
           <div class="flex gap-1 mb-[18px]">
-            <font-awesome-icon v-for="n in 5" :key="n" :icon="['fas', 'star']" class="text-blue-900 text-sm" />
+            <font-awesome-icon v-for="n in 5" :key="n" :icon="['fas', 'star']" class="text-[#1E3A5F] text-sm" />
           </div>
-          <p class="text-[15px] text-slate-600 leading-[1.75] italic mb-6">
+          <p class="text-[15px] text-[#475569] leading-[1.75] italic mb-6">
             "{{ testimonial.quote }}"
           </p>
           <div class="flex items-center gap-3">
@@ -606,13 +606,13 @@
               {{ testimonial.initials }}
             </div>
             <div>
-              <div class="text-sm font-semibold text-slate-900">{{ testimonial.name }}</div>
-              <div class="text-xs text-slate-500 mt-0.5">{{ testimonial.role }}</div>
+              <div class="text-sm font-semibold text-[#1E3A5F]">{{ testimonial.name }}</div>
+              <div class="text-xs text-[#64748B] mt-0.5">{{ testimonial.role }}</div>
             </div>
           </div>
           <RouterLink
               :to="testimonial.link"
-              class="inline-flex items-center gap-1.5 mt-5 text-[13px] font-bold text-teal-600 hover:gap-2.5 hover:text-teal-700 transition-all duration-200"
+              class="inline-flex items-center gap-1.5 mt-5 text-[13px] font-bold text-[#14B8A6] hover:gap-2.5 hover:text-[#0D9488] transition-all duration-200"
           >
             {{ testimonial.linkText }}
             <font-awesome-icon :icon="['fas', 'arrow-right']" class="text-[10px]" />
@@ -626,7 +626,7 @@
   <!-- Pricing CTA -->
   <section
       ref="pricingRef"
-      class="relative mx-[5%] mb-20 overflow-hidden rounded-[22px] border border-slate-300 border-l-[5px] border-l-[#2A5F9E] bg-white px-7 sm:px-12 py-9 sm:py-11 shadow-[0_4px_6px_rgba(30,58,95,0.04),0_24px_64px_rgba(42,95,158,0.12)] transition-all duration-700 ease-out hover:-translate-y-0.5 hover:shadow-[0_8px_12px_rgba(30,58,95,0.06),0_32px_72px_rgba(42,95,158,0.16)]"
+      class="relative mx-[5%] mb-20 overflow-hidden rounded-[22px] border border-[#CBD5E1] border-l-[5px] border-l-[#2A5F9E] bg-white px-7 sm:px-12 py-9 sm:py-11 shadow-[0_4px_6px_rgba(30,58,95,0.04),0_24px_64px_rgba(42,95,158,0.12)] transition-all duration-700 ease-out hover:-translate-y-0.5 hover:shadow-[0_8px_12px_rgba(30,58,95,0.06),0_32px_72px_rgba(42,95,158,0.16)]"
       :class="visible.pricing ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'"
   >
     <div class="pointer-events-none absolute -top-[40%] -right-[8%] w-80 h-80 rounded-full bg-[radial-gradient(circle,rgba(143,185,244,0.18)_0%,transparent_68%)]"></div>
@@ -634,14 +634,14 @@
 
     <div class="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-9">
       <div>
-        <span class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[1.3px] text-[#2A5F9E] bg-[#2A5F9E]/[0.08] border border-[#2A5F9E]/[0.15] px-3.5 py-1.5 rounded-full mb-3.5">
-          <span class="w-[7px] h-[7px] rounded-full bg-teal-500 shadow-[0_0_0_3px_rgba(20,184,166,0.2)]"></span>
+        <span class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[1.3px] text-[#2A5F9E] bg-[#2A5F9E]/10 border border-[#2A5F9E]/20 px-3.5 py-1.5 rounded-full mb-3.5">
+          <span class="w-[7px] h-[7px] rounded-full bg-[#14B8A6] shadow-[0_0_0_3px_rgba(20,184,166,0.2)]"></span>
           Pricing
         </span>
         <h3 class="text-2xl sm:text-[32px] font-extrabold tracking-tight text-[#1E3A5F] leading-tight mb-2.5">
           Transparent pricing for every product
         </h3>
-        <p class="text-[15px] text-slate-500 max-w-[500px] leading-relaxed mb-4.5">
+        <p class="text-[15px] text-[#475569] max-w-[500px] leading-relaxed mb-4.5">
           Compare plans side by side — no hidden fees. All prices shown in PKR.
         </p>
         <div class="flex flex-wrap gap-2">
@@ -655,10 +655,10 @@
         </div>
       </div>
       <div class="flex flex-wrap gap-3 shrink-0">
-        <RouterLink to="/pricing" class="inline-flex items-center justify-center bg-[#E03C08] hover:bg-[#c63406] text-white font-semibold px-7 py-3.5 rounded-xl shadow-lg shadow-orange-600/20 transition-all duration-200 transform hover:-translate-y-0.5">
+        <RouterLink to="/pricing" class="inline-flex items-center justify-center bg-[#C2410C] hover:bg-[#9A3412] text-white font-semibold px-7 py-3.5 rounded-xl shadow-lg shadow-[#C2410C]/20 transition-all duration-200 transform hover:-translate-y-0.5">
           Explore Pricing
         </RouterLink>
-        <RouterLink to="/contact" class="inline-flex items-center justify-center bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold px-7 py-3.5 rounded-xl shadow-sm transition-all duration-200 transform hover:-translate-y-0.5">
+        <RouterLink to="/contact" class="inline-flex items-center justify-center bg-white border border-[#E2E8F0] hover:bg-[#F8FAFC] text-[#1E3A5F] font-semibold px-7 py-3.5 rounded-xl shadow-sm transition-all duration-200 transform hover:-translate-y-0.5">
           Talk to Sales
         </RouterLink>
       </div>
@@ -693,7 +693,7 @@ const testimonialsRef= ref(null)
 const pricingRef     = ref(null)
 
 const visible = ref({
-  hero:         true,   // hero is visible on load
+  hero:         true,
   stats:        false,
   tech:         false,
   platform:     false,
@@ -748,10 +748,8 @@ const heroLoaded = ref(false)
 const uptimeCounter = ref(0)
 
 onMounted(() => {
-  // slight delay so transition is visible
   setTimeout(() => {
     heroLoaded.value = true
-    // start counter after hero appears
     setTimeout(() => {
       const target = 99
       const duration = 1800
@@ -801,47 +799,47 @@ onUnmounted(() => {
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 const stats = [
-  { value: '150+', label: 'Projects Delivered', icon: ['fas', 'rocket'],    bg: 'bg-blue-50',   iconColor: 'text-blue-500'   },
-  { value: '50+',  label: 'Happy Clients',       icon: ['fas', 'handshake'], bg: 'bg-amber-50',  iconColor: 'text-amber-500'  },
-  { value: '5+',   label: 'Years Experience',    icon: ['fas', 'bolt'],      bg: 'bg-orange-50', iconColor: 'text-orange-500' },
-  { value: '99%',  label: 'Client Satisfaction', icon: ['fas', 'star'],      bg: 'bg-purple-50', iconColor: 'text-purple-500' },
+  { value: '150+', label: 'Projects Delivered', icon: ['fas', 'rocket'],    bg: 'bg-[#4A90E2]/10',   iconColor: 'text-[#4A90E2]'   },
+  { value: '50+',  label: 'Happy Clients',       icon: ['fas', 'handshake'], bg: 'bg-[#F59E0B]/10',  iconColor: 'text-[#F59E0B]'  },
+  { value: '5+',   label: 'Years Experience',    icon: ['fas', 'bolt'],      bg: 'bg-[#EA580C]/10', iconColor: 'text-[#EA580C]' },
+  { value: '99%',  label: 'Client Satisfaction', icon: ['fas', 'star'],      bg: 'bg-[#6B52B8]/10', iconColor: 'text-[#6B52B8]' },
 ]
 
 const techList = [
-  { name: 'Flutter',      icon: ['fas', 'mobile-screen'], color: 'text-sky-500'     },
-  { name: 'Next.js',      icon: ['fas', 'server'],         color: 'text-slate-800'  },
-  { name: 'React',        icon: ['fab', 'react'],          color: 'text-cyan-500'   },
-  { name: 'Node.js',      icon: ['fab', 'node-js'],        color: 'text-emerald-600'},
-  { name: 'Python',       icon: ['fab', 'python'],         color: 'text-blue-500'   },
-  { name: 'AWS',          icon: ['fab', 'aws'],            color: 'text-orange-500' },
-  { name: 'Docker',       icon: ['fab', 'docker'],         color: 'text-blue-600'   },
-  { name: 'Google Cloud', icon: ['fab', 'google'],         color: 'text-red-500'    },
+  { name: 'Flutter',      icon: ['fas', 'mobile-screen'], color: 'text-[#0EA5E9]'     },
+  { name: 'Next.js',      icon: ['fas', 'server'],         color: 'text-[#1E3A5F]'  },
+  { name: 'React',        icon: ['fab', 'react'],          color: 'text-[#61DAFB]'   },
+  { name: 'Node.js',      icon: ['fab', 'node-js'],        color: 'text-[#339933]'},
+  { name: 'Python',       icon: ['fab', 'python'],         color: 'text-[#3776AB]'   },
+  { name: 'AWS',          icon: ['fab', 'aws'],            color: 'text-[#FF9900]' },
+  { name: 'Docker',       icon: ['fab', 'docker'],         color: 'text-[#2496ED]'   },
+  { name: 'Google Cloud', icon: ['fab', 'google'],         color: 'text-[#4285F4]'    },
 ]
 
 const products = [
   {
-    tag: 'Main Product', tagClass: 'bg-blue-50 text-blue-600',
+    tag: 'Main Product', tagClass: 'bg-[#4A90E2]/10 text-[#4A90E2]',
     title: 'Sentra AI',
     description: 'Omni-channel call center with AI routing, agent workbench, and real-time supervision. The platform everything else plugs into.',
     ctaText: 'Explore platform', ctaLink: '/sentra', svg: sentraBotSvg,
     glow: 'bg-[radial-gradient(circle,rgba(74,144,226,0.16)_0%,rgba(20,184,166,0.08)_45%,transparent_72%)]',
   },
   {
-    tag: 'Voice', tagClass: 'bg-teal-50 text-teal-600',
+    tag: 'Voice', tagClass: 'bg-[#14B8A6]/10 text-[#14B8A6]',
     title: 'AI Agent',
     description: 'Talking voice agents for customer service, internal dialing, and outbound campaigns — with natural speech and live call dashboards.',
     ctaText: 'View Voice AI Agent', ctaLink: '/ai-agent', svg: aiAgentSvg,
     glow: 'bg-[radial-gradient(circle,rgba(20,184,166,0.18)_0%,rgba(74,144,226,0.08)_50%,transparent_72%)]',
   },
   {
-    tag: 'Chat', tagClass: 'bg-teal-50 text-teal-600',
+    tag: 'Chat', tagClass: 'bg-[#14B8A6]/10 text-[#14B8A6]',
     title: 'Chatbot Agent',
     description: 'Conversational AI for web, WhatsApp, and in-app chat — grounded in your documents with token analytics and live handoff.',
     ctaText: 'View Chatbot Agent', ctaLink: '/chatbot', svg: chatbotSvg,
     glow: 'bg-[radial-gradient(circle,rgba(139,92,246,0.18)_0%,rgba(236,72,153,0.08)_50%,transparent_72%)]',
   },
   {
-    tag: 'SDLC', tagClass: 'bg-teal-50 text-teal-600',
+    tag: 'SDLC', tagClass: 'bg-[#14B8A6]/10 text-[#14B8A6]',
     title: 'Orchestri',
     description: 'AI-driven multi-agent SDLC — gated spec, plan, implement, test, and deploy workflow on your local project folder.',
     ctaText: 'View Orchestri', ctaLink: '/orchestri', svg: orchestriSvg,
@@ -854,59 +852,59 @@ const services = [
     title: 'Custom Software Development',
     description: 'Tailor-made applications engineered to your exact workflows. Scalable, secure, and built to last — not off-the-shelf compromises.',
     illustration: serviceSoftwareSvg,
-    icon: 'fa-solid fa-code',
-    iconBg: 'bg-blue-500/10',
-    iconColor: 'text-blue-950',
+    icon: ['fas', 'code'],
+    iconBg: 'bg-[#4A90E2]/10',
+    iconColor: 'text-[#1E3A5F]',
     link: '/services/custom-software',
-    tags: [{ label: 'Enterprise Apps', class: 'bg-blue-50 text-blue-600' }, { label: 'AI Integration', class: 'bg-amber-50 text-amber-600' }, { label: 'APIs', class: 'bg-teal-50 text-teal-600' }],
+    tags: [{ label: 'Enterprise Apps', class: 'bg-[#4A90E2]/10 text-[#4A90E2]' }, { label: 'AI Integration', class: 'bg-[#F59E0B]/10 text-[#B45309]' }, { label: 'APIs', class: 'bg-[#14B8A6]/10 text-[#0D9488]' }],
   },
   {
     title: 'Web & Mobile Applications',
     description: 'Beautiful, high-performance web and mobile apps using React, Flutter, and Next.js. Pixel-perfect UI that users love to interact with.',
     illustration: serviceWebMobileSvg,
-    icon: 'fa-solid fa-mobile-screen-button',
-    iconBg: 'bg-sky-400/10',
-    iconColor: 'text-blue-950',
+    icon: ['fas', 'mobile-screen-button'],
+    iconBg: 'bg-[#0EA5E9]/10',
+    iconColor: 'text-[#1E3A5F]',
     link: '/services/web-mobile',
-    tags: [{ label: 'React / Next.js', class: 'bg-blue-50 text-blue-600' }, { label: 'Flutter', class: 'bg-purple-50 text-purple-600' }, { label: 'PWA', class: 'bg-teal-50 text-teal-600' }],
+    tags: [{ label: 'React / Next.js', class: 'bg-[#4A90E2]/10 text-[#4A90E2]' }, { label: 'Flutter', class: 'bg-[#6B52B8]/10 text-[#6B52B8]' }, { label: 'PWA', class: 'bg-[#14B8A6]/10 text-[#0D9488]' }],
   },
   {
     title: 'Cloud Solutions & DevOps',
     description: 'Architect, migrate and manage cloud infrastructure that scales with your growth. CI/CD pipelines, container orchestration, 99.9% uptime guaranteed.',
     illustration: serviceCloudSvg,
-    icon: 'fa-solid fa-cloud',
-    iconBg: 'bg-teal-500/10',
-    iconColor: 'text-blue-950',
+    icon: ['fas', 'cloud'],
+    iconBg: 'bg-[#14B8A6]/10',
+    iconColor: 'text-[#1E3A5F]',
     link: '/services/cloud-devops',
-    tags: [{ label: 'AWS / GCP', class: 'bg-teal-50 text-teal-600' }, { label: 'Kubernetes', class: 'bg-blue-50 text-blue-600' }, { label: 'CI/CD', class: 'bg-amber-50 text-amber-600' }],
+    tags: [{ label: 'AWS / GCP', class: 'bg-[#14B8A6]/10 text-[#0D9488]' }, { label: 'Kubernetes', class: 'bg-[#4A90E2]/10 text-[#4A90E2]' }, { label: 'CI/CD', class: 'bg-[#F59E0B]/10 text-[#B45309]' }],
   },
 ]
 
 const steps = [
-  { number: '01', title: 'Discovery',      description: 'We deep-dive into your business goals, user needs, and technical requirements to map the full scope.',                      circleClass: 'bg-blue-500/[0.12] border-blue-500 text-blue-500', ringClass: 'border-blue-500' },
-  { number: '02', title: 'Design',         description: 'UI/UX wireframes and prototypes that are validated with real users before a single line of code is written.',               circleClass: 'bg-sky-400/10 border-sky-400 text-sky-400',        ringClass: 'border-sky-400'  },
-  { number: '03', title: 'Build',          description: 'Agile sprints with continuous delivery. You see progress every two weeks — no black-box development.',                      circleClass: 'bg-teal-500/10 border-teal-500 text-teal-500',     ringClass: 'border-teal-500' },
-  { number: '04', title: 'Launch & Scale', description: 'Rigorous QA, zero-downtime deployment, and ongoing support to keep your product growing.',                                  circleClass: 'bg-amber-500/10 border-amber-500 text-amber-500',  ringClass: 'border-amber-500'},
+  { number: '01', title: 'Discovery',      description: 'We deep-dive into your business goals, user needs, and technical requirements to map the full scope.',                      circleClass: 'bg-[#4A90E2]/10 border-[#4A90E2] text-[#4A90E2]', ringClass: 'border-[#4A90E2]' },
+  { number: '02', title: 'Design',         description: 'UI/UX wireframes and prototypes that are validated with real users before a single line of code is written.',               circleClass: 'bg-[#0EA5E9]/10 border-[#0EA5E9] text-[#0EA5E9]',        ringClass: 'border-[#0EA5E9]'  },
+  { number: '03', title: 'Build',          description: 'Agile sprints with continuous delivery. You see progress every two weeks — no black-box development.',                      circleClass: 'bg-[#14B8A6]/10 border-[#14B8A6] text-[#14B8A6]',     ringClass: 'border-[#14B8A6]' },
+  { number: '04', title: 'Launch & Scale', description: 'Rigorous QA, zero-downtime deployment, and ongoing support to keep your product growing.',                                  circleClass: 'bg-[#F59E0B]/10 border-[#F59E0B] text-[#F59E0B]',  ringClass: 'border-[#F59E0B]'},
 ]
 
 const aboutFeatures = [
-  { title: 'Expert Engineering Team',     description: 'Senior full-stack engineers with deep domain expertise across fintech, logistics, healthcare, and e-commerce.',           dotColor: 'bg-blue-500',   delayClass: '' },
-  { title: 'Transparent Communication',   description: "Weekly demos, real-time project tracking, and a dedicated project manager. You're never in the dark.",                    dotColor: 'bg-sky-400',    delayClass: '[animation-delay:-0.6s]' },
-  { title: 'Scalable Architecture',       description: 'We build for tomorrow, not just today. Clean, documented code that grows with your business without rewrites.',           dotColor: 'bg-teal-500',   delayClass: '[animation-delay:-1.2s]' },
-  { title: 'Post-Launch Support',         description: 'We stay with you after go-live. Maintenance, performance tuning, and feature additions on demand.',                       dotColor: 'bg-amber-500',  delayClass: '[animation-delay:-1.8s]' },
+  { title: 'Expert Engineering Team',     description: 'Senior full-stack engineers with deep domain expertise across fintech, logistics, healthcare, and e-commerce.',           dotColor: 'bg-[#4A90E2]',   delayClass: '' },
+  { title: 'Transparent Communication',   description: "Weekly demos, real-time project tracking, and a dedicated project manager. You're never in the dark.",                    dotColor: 'bg-[#0EA5E9]',    delayClass: '[animation-delay:-0.6s]' },
+  { title: 'Scalable Architecture',       description: 'We build for tomorrow, not just today. Clean, documented code that grows with your business without rewrites.',           dotColor: 'bg-[#14B8A6]',   delayClass: '[animation-delay:-1.2s]' },
+  { title: 'Post-Launch Support',         description: 'We stay with you after go-live. Maintenance, performance tuning, and feature additions on demand.',                       dotColor: 'bg-[#F59E0B]',  delayClass: '[animation-delay:-1.8s]' },
 ]
 
 const testimonials = [
-  { name: 'Ahmed Khan',      role: 'Operations Head, Sentra AI Client',  initials: 'AK', avatarBg: 'bg-[linear-gradient(135deg,#4A90E2,#8FB9F4)]',    quote: 'Sentra AI transformed our call center — wait times dropped 60% and our agents handle twice the volume. The IVR and AI routing just works.',            link: '/pricing?project=sentra', linkText: 'View Sentra AI pricing' },
-  { name: 'Sara Rashid',     role: 'CEO, FinTech Startup',               initials: 'SR', avatarBg: 'bg-[linear-gradient(135deg,#3A7BC8,#8FB9F4)]',    quote: 'Our AI agents now handle invoice processing and customer follow-ups autonomously. Rasant built a system that saves us 20+ hours every week.',        link: '/ai-agent',               linkText: 'Explore AI Agent'       },
-  { name: 'Michael Jensen',  role: 'Support Director, E-Commerce Brand', initials: 'MJ', avatarBg: 'bg-[linear-gradient(135deg,#F59E0B,#EF4444)]',    quote: 'The chatbot handles 80% of our support tickets on WhatsApp and web. Live handoff to agents is seamless — our CSAT scores went up immediately.',    link: '/chatbot',                linkText: 'Explore Chatbot Agent'  },
+  { name: 'Ahmed Khan',      role: 'Operations Head, Sentra AI Client',  initials: 'AK', avatarBg: 'bg-gradient-to-br from-[#4A90E2] to-[#8FB9F4]',    quote: 'Sentra AI transformed our call center — wait times dropped 60% and our agents handle twice the volume. The IVR and AI routing just works.',            link: '/pricing?project=sentra', linkText: 'View Sentra AI pricing' },
+  { name: 'Sara Rashid',     role: 'CEO, FinTech Startup',               initials: 'SR', avatarBg: 'bg-gradient-to-br from-[#3A7BC8] to-[#8FB9F4]',    quote: 'Our AI agents now handle invoice processing and customer follow-ups autonomously. Rasant built a system that saves us 20+ hours every week.',        link: '/ai-agent',               linkText: 'Explore AI Agent'       },
+  { name: 'Michael Jensen',  role: 'Support Director, E-Commerce Brand', initials: 'MJ', avatarBg: 'bg-gradient-to-br from-[#F59E0B] to-[#EF4444]',    quote: 'The chatbot handles 80% of our support tickets on WhatsApp and web. Live handoff to agents is seamless — our CSAT scores went up immediately.',    link: '/chatbot',                linkText: 'Explore Chatbot Agent'  },
 ]
 
 const ctaPills = [
-  { label: 'Sentra AI',  class: 'border-blue-200 bg-blue-50'     },
-  { label: 'AI Agent',   class: 'border-teal-300 bg-teal-50'     },
-  { label: 'Chatbot',    class: 'border-purple-300 bg-purple-50' },
-  { label: 'Orchestri',  class: 'border-orange-300 bg-orange-50' },
+  { label: 'Sentra AI',  class: 'border-[#93C5FD] bg-[#EFF6FF]'     },
+  { label: 'AI Agent',   class: 'border-[#5EEAD4] bg-[#F0FDFA]'     },
+  { label: 'Chatbot',    class: 'border-[#C4B5FD] bg-[#F5F3FF]' },
+  { label: 'Orchestri',  class: 'border-[#FDBA74] bg-[#FFF7ED]' },
 ]
 
 // ─── Carousel logic ───────────────────────────────────────────────────────────
@@ -967,14 +965,14 @@ onUnmounted(() => { observer?.disconnect() })
   display: inline-block;
   width: 2px;
   height: 14px;
-  background-color: #4f46e5;
+  background-color: #4A90E2;
   margin-left: 4px;
   animation: blink 1s step-end infinite;
   vertical-align: middle;
 }
 @keyframes blink {
   from, to { background-color: transparent }
-  50%       { background-color: #4f46e5 }
+  50%       { background-color: #4A90E2 }
 }
 .fade-enter-active, .fade-leave-active { transition: opacity 0.35s ease, transform 0.35s ease; }
 .fade-enter-from  { opacity: 0; transform: translateY(10px);  }
@@ -989,14 +987,6 @@ onUnmounted(() => { observer?.disconnect() })
   0%   { transform: scale(1);    opacity: 0.5; }
   100% { transform: scale(1.35); opacity: 0;   }
 }
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50%      { transform: translateY(-6px); }
-}
-.animate-float {
-  animation: float 3.5s ease-in-out infinite;
-}
-
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50%      { transform: translateY(-6px); }
