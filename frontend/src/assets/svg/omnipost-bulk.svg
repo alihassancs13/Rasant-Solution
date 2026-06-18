@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 280" role="img" aria-label="OmniPost bulk CSV upload">
+  <rect width="400" height="280" rx="14" fill="#FAFAFE"/>
+  <rect x="40" y="32" width="320" height="216" rx="12" fill="white" stroke="#E2E8F0"/>
+  <rect x="40" y="32" width="320" height="44" rx="12" fill="#ECFDF5"/>
+  <circle cx="60" cy="54" r="10" fill="#10B981"/>
+  <path d="M56,54l3,3 6-6" fill="none" stroke="white" stroke-width="2" stroke-linecap="round"/>
+  <text x="80" y="58" font-family="Inter,Arial,sans-serif" font-size="12" font-weight="700" fill="#065F46">Bulk Create Posts</text>
+  <rect x="56" y="92" width="288" height="88" rx="8" fill="#F8FAFC" stroke="#CBD5E1" stroke-dasharray="6 4"/>
+  <text x="200" y="128" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="11" fill="#64748B">Click to upload CSV</text>
+  <text x="200" y="146" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="9" fill="#94A3B8">Accepts only .csv files</text>
+  <text x="56" y="200" font-family="Inter,Arial,sans-serif" font-size="10" font-weight="700" fill="#312E81">Campaign (optional)</text>
+  <rect x="56" y="208" width="200" height="28" rx="6" fill="white" stroke="#E2E8F0"/>
+  <text x="68" y="226" font-family="Inter,Arial,sans-serif" font-size="9" fill="#94A3B8">Select campaign(s)</text>
+  <rect x="268" y="216" width="76" height="32" rx="8" fill="#7C3AED"/>
+  <text x="306" y="236" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="10" font-weight="700" fill="white">Upload</text>
+</svg>

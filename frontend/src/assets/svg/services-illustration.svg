@@ -1,0 +1,81 @@
+<svg viewBox="0 0 500 380" xmlns="http://www.w3.org/2000/svg" fill="none">
+  <defs>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <!-- Background -->
+  <rect width="500" height="380" rx="20" fill="#0F172A"/>
+  <ellipse cx="250" cy="190" rx="200" ry="160" fill="#1E3A5F" opacity="0.4"/>
+
+  <!-- Central hub -->
+  <circle cx="250" cy="190" r="55" fill="#1E293B" stroke="#2563EB" stroke-width="2"/>
+  <circle cx="250" cy="190" r="42" fill="#0F172A" stroke="#38BDF8" stroke-width="1" opacity="0.5"/>
+  <text x="250" y="185" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="10" font-weight="700" fill="#38BDF8">RASANT</text>
+  <text x="250" y="200" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="8" fill="#64748B">SOLUTIONS</text>
+
+  <!-- Orbit rings -->
+  <circle cx="250" cy="190" r="95" stroke="#2563EB" stroke-width="1" stroke-dasharray="3,8" opacity="0.4"/>
+  <circle cx="250" cy="190" r="145" stroke="#38BDF8" stroke-width="1" stroke-dasharray="2,12" opacity="0.25"/>
+
+  <!-- Service nodes -->
+  <!-- Web Dev - top -->
+  <circle cx="250" cy="92" r="30" fill="#1E293B" stroke="#2563EB" stroke-width="1.5" filter="url(#glow)"/>
+  <rect x="237" y="79" width="26" height="20" rx="4" fill="none" stroke="#38BDF8" stroke-width="1.5"/>
+  <path d="M241,89 L246,94 L241,99" stroke="#38BDF8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M253,89 L248,94 L253,99" stroke="#38BDF8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="250" y="113" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="8" fill="#94A3B8">Web Dev</text>
+
+  <!-- Mobile - right -->
+  <circle cx="345" cy="190" r="30" fill="#1E293B" stroke="#A78BFA" stroke-width="1.5"/>
+  <rect x="333" y="177" width="16" height="26" rx="3" fill="none" stroke="#A78BFA" stroke-width="1.5"/>
+  <circle cx="341" cy="199" r="2" fill="#A78BFA"/>
+  <text x="345" y="232" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="8" fill="#94A3B8">Mobile</text>
+
+  <!-- Cloud - bottom -->
+  <circle cx="250" cy="288" r="30" fill="#1E293B" stroke="#34D399" stroke-width="1.5"/>
+  <path d="M235,295 Q235,288 242,288 Q243,283 248,283 Q256,280 258,286 Q264,285 264,291 Q264,296 258,296 Z" stroke="#34D399" stroke-width="1.5" fill="none"/>
+  <text x="250" y="328" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="8" fill="#94A3B8">Cloud</text>
+
+  <!-- AI - left -->
+  <circle cx="155" cy="190" r="30" fill="#1E293B" stroke="#F59E0B" stroke-width="1.5"/>
+  <circle cx="155" cy="183" r="6" fill="none" stroke="#F59E0B" stroke-width="1.5"/>
+  <path d="M145,197 Q155,203 165,197" stroke="#F59E0B" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+  <text x="155" y="232" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="8" fill="#94A3B8">AI/ML</text>
+
+  <!-- Top-right node -->
+  <circle cx="316" cy="113" r="22" fill="#1E293B" stroke="#38BDF8" stroke-width="1" opacity="0.8"/>
+  <path d="M307,108 L325,108 M307,113 L320,113 M307,118 L316,118" stroke="#38BDF8" stroke-width="1.5" stroke-linecap="round"/>
+  <text x="316" y="146" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="7.5" fill="#64748B">API</text>
+
+  <!-- Bottom-right node -->
+  <circle cx="316" cy="267" r="22" fill="#1E293B" stroke="#A78BFA" stroke-width="1" opacity="0.8"/>
+  <rect x="308" y="257" width="16" height="20" rx="2" fill="none" stroke="#A78BFA" stroke-width="1.5"/>
+  <path d="M311,265 L321,265 M311,270 L318,270" stroke="#A78BFA" stroke-width="1.2" stroke-linecap="round"/>
+  <text x="316" y="300" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="7.5" fill="#64748B">Devops</text>
+
+  <!-- Bottom-left node -->
+  <circle cx="184" cy="267" r="22" fill="#1E293B" stroke="#34D399" stroke-width="1" opacity="0.8"/>
+  <path d="M176,267 L192,267 M176,260 L184,260 L192,267 L184,274 L176,267" stroke="#34D399" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="184" y="300" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="7.5" fill="#64748B">Security</text>
+
+  <!-- Top-left node -->
+  <circle cx="184" cy="113" r="22" fill="#1E293B" stroke="#F59E0B" stroke-width="1" opacity="0.8"/>
+  <rect x="176" y="105" width="16" height="16" rx="3" fill="none" stroke="#F59E0B" stroke-width="1.5"/>
+  <path d="M178,121 L192,121" stroke="#F59E0B" stroke-width="1.5" stroke-linecap="round"/>
+  <text x="184" y="146" text-anchor="middle" font-family="-apple-system,sans-serif" font-size="7.5" fill="#64748B">UI/UX</text>
+
+  <!-- Connection lines -->
+  <line x1="250" y1="148" x2="250" y2="122" stroke="#2563EB" stroke-width="1" stroke-dasharray="3,3" opacity="0.5"/>
+  <line x1="300" y1="190" x2="315" y2="190" stroke="#A78BFA" stroke-width="1" stroke-dasharray="3,3" opacity="0.5"/>
+  <line x1="250" y1="232" x2="250" y2="258" stroke="#34D399" stroke-width="1" stroke-dasharray="3,3" opacity="0.5"/>
+  <line x1="200" y1="190" x2="185" y2="190" stroke="#F59E0B" stroke-width="1" stroke-dasharray="3,3" opacity="0.5"/>
+
+  <!-- Floating particles -->
+  <circle cx="80" cy="60" r="3" fill="#2563EB" opacity="0.5"/>
+  <circle cx="430" cy="80" r="2" fill="#38BDF8" opacity="0.6"/>
+  <circle cx="60" cy="300" r="2.5" fill="#34D399" opacity="0.5"/>
+  <circle cx="450" cy="320" r="3" fill="#F59E0B" opacity="0.4"/>
+  <circle cx="420" cy="40" r="2" fill="#A78BFA" opacity="0.6"/>
+</svg>

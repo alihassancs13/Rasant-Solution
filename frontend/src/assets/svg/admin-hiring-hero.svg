@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 170 130" fill="none" aria-hidden="true">
+  <rect x="24" y="28" width="90" height="76" rx="12" fill="#fff" stroke="#8FB9F4" stroke-width="2"/>
+  <rect x="40" y="44" width="58" height="6" rx="3" fill="#2A5F9E"/>
+  <rect x="40" y="58" width="44" height="5" rx="2" fill="#C9C4F8"/>
+  <rect x="40" y="70" width="52" height="5" rx="2" fill="#FFD5B4"/>
+  <rect x="40" y="86" width="36" height="10" rx="5" fill="url(#hirBtn)"/>
+  <circle cx="124" cy="52" r="30" fill="url(#hirPlus)"/>
+  <path d="M124 40v24M112 52h24" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+  <path d="M118 88h44l-8 16h-28l-8-16z" fill="#E8C1D9" stroke="#C9C4F8" stroke-width="1.5"/>
+  <defs>
+    <linearGradient id="hirBtn" x1="40" y1="86" x2="76" y2="96">
+      <stop stop-color="#2A5F9E"/><stop offset="1" stop-color="#4A90E2"/>
+    </linearGradient>
+    <linearGradient id="hirPlus" x1="94" y1="22" x2="154" y2="82">
+      <stop stop-color="#14B8A6"/><stop offset="1" stop-color="#4A90E2"/>
+    </linearGradient>
+  </defs>
+</svg>

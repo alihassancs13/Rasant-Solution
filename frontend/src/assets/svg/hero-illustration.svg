@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 480" fill="none" role="img" aria-label="Rasant Solutions engineering and delivery">
+  <defs>
+    <linearGradient id="hiBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF8F3"/>
+      <stop offset="40%" stop-color="#F5F0FF"/>
+      <stop offset="100%" stop-color="#EFF6FF"/>
+    </linearGradient>
+    <linearGradient id="hiNavy" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#2A5F9E"/>
+      <stop offset="100%" stop-color="#1E3A5F"/>
+    </linearGradient>
+    <linearGradient id="hiHub" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD5B4"/>
+      <stop offset="45%" stop-color="#C9C4F8"/>
+      <stop offset="100%" stop-color="#4A90E2"/>
+    </linearGradient>
+    <filter id="hiSh" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="6" stdDeviation="12" flood-color="#2A5F9E" flood-opacity="0.12"/>
+    </filter>
+    <filter id="hiShSm" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#2A5F9E" flood-opacity="0.1"/>
+    </filter>
+    <style>
+      .hi-float { animation: hiFloat 4s ease-in-out infinite; }
+      .hi-float.f2 { animation-delay: -1.3s; }
+      .hi-float.f3 { animation-delay: -2.6s; }
+      @keyframes hiFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
+      .hi-pulse { animation: hiPulse 2.5s ease-in-out infinite; transform-box:fill-box; transform-origin:center; }
+      @keyframes hiPulse { 0%,100%{opacity:.85} 50%{opacity:1} }
+      .hi-bar { transform-origin:bottom; animation: hiBar 2s ease-in-out infinite alternate; }
+      .hi-bar.b2 { animation-delay:-.5s; }
+      .hi-bar.b3 { animation-delay:-1s; }
+      @keyframes hiBar { from{transform:scaleY(.6)} to{transform:scaleY(1)} }
+      .hi-ring { animation: hiRing 18s linear infinite; transform-box:fill-box; transform-origin:center; }
+      @keyframes hiRing { to { transform:rotate(360deg); } }
+    </style>
+  </defs>
+
+  <rect width="600" height="480" rx="20" fill="url(#hiBg)"/>
+  <ellipse cx="300" cy="240" rx="260" ry="200" fill="#4A90E2" opacity="0.05"/>
+  <ellipse cx="420" cy="170" rx="140" ry="110" fill="#C9C4F8" opacity="0.12"/>
+  <ellipse cx="150" cy="310" rx="100" ry="85" fill="#FFD5B4" opacity="0.15"/>
+
+  <g filter="url(#hiSh)">
+    <rect x="56" y="52" width="408" height="308" rx="16" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <rect x="56" y="52" width="408" height="36" rx="16" fill="url(#hiNavy)"/>
+    <rect x="56" y="74" width="408" height="14" fill="url(#hiNavy)"/>
+    <circle cx="84" cy="70" r="5.5" fill="#FFD5B4"/>
+    <circle cx="104" cy="70" r="5.5" fill="#C9C4F8"/>
+    <circle cx="124" cy="70" r="5.5" fill="#8FB9F4"/>
+    <rect x="156" y="60" width="200" height="20" rx="10" fill="rgba(255,255,255,0.15)"/>
+    <text x="256" y="74" text-anchor="middle" font-family="monospace" font-size="9" fill="rgba(255,255,255,0.85)">rasantsolutions.com</text>
+
+    <rect x="56" y="88" width="34" height="272" fill="#F8FAFC"/>
+    <text x="73" y="112" text-anchor="middle" font-family="monospace" font-size="9" fill="#94A3B8">1</text>
+    <text x="73" y="130" text-anchor="middle" font-family="monospace" font-size="9" fill="#94A3B8">2</text>
+    <text x="73" y="148" text-anchor="middle" font-family="monospace" font-size="9" fill="#94A3B8">3</text>
+    <text x="73" y="166" text-anchor="middle" font-family="monospace" font-size="9" fill="#94A3B8">4</text>
+    <text x="73" y="184" text-anchor="middle" font-family="monospace" font-size="9" fill="#94A3B8">5</text>
+    <text x="73" y="202" text-anchor="middle" font-family="monospace" font-size="9" fill="#94A3B8">6</text>
+    <text x="73" y="220" text-anchor="middle" font-family="monospace" font-size="9" fill="#94A3B8">7</text>
+    <text x="73" y="238" text-anchor="middle" font-family="monospace" font-size="9" fill="#94A3B8">8</text>
+    <text x="73" y="256" text-anchor="middle" font-family="monospace" font-size="9" fill="#94A3B8">9</text>
+    <text x="73" y="274" text-anchor="middle" font-family="monospace" font-size="9" fill="#94A3B8">10</text>
+    <text x="73" y="292" text-anchor="middle" font-family="monospace" font-size="9" fill="#94A3B8">11</text>
+    <text x="73" y="310" text-anchor="middle" font-family="monospace" font-size="9" fill="#94A3B8">12</text>
+    <text x="73" y="328" text-anchor="middle" font-family="monospace" font-size="9" fill="#94A3B8">13</text>
+
+    <rect x="96" y="100" width="356" height="16" rx="2" fill="#4A90E2" opacity="0.1"/>
+    <text x="104" y="112" font-family="monospace" font-size="10" fill="#8B5CF6">const</text>
+    <text x="144" y="112" font-family="monospace" font-size="10" fill="#2A5F9E">solution</text>
+    <text x="202" y="112" font-family="monospace" font-size="10" fill="#1E3A5F"> = </text>
+    <text x="220" y="112" font-family="monospace" font-size="10" fill="#14B8A6">new</text>
+    <text x="244" y="112" font-family="monospace" font-size="10" fill="#F97316">RasantApp</text>
+    <text x="314" y="112" font-family="monospace" font-size="10" fill="#1E3A5F">()</text>
+
+    <text x="112" y="130" font-family="monospace" font-size="10" fill="#64748B">// Build. Innovate. Deliver.</text>
+
+    <text x="112" y="148" font-family="monospace" font-size="10" fill="#8B5CF6">async</text>
+    <text x="152" y="148" font-family="monospace" font-size="10" fill="#2A5F9E">function</text>
+    <text x="208" y="148" font-family="monospace" font-size="10" fill="#F97316"> buildFuture</text>
+    <text x="300" y="148" font-family="monospace" font-size="10" fill="#1E3A5F">() {</text>
+
+    <text x="120" y="166" font-family="monospace" font-size="10" fill="#8B5CF6">  await</text>
+    <text x="162" y="166" font-family="monospace" font-size="10" fill="#14B8A6"> solution</text>
+    <text x="220" y="166" font-family="monospace" font-size="10" fill="#1E3A5F">.</text>
+    <text x="226" y="166" font-family="monospace" font-size="10" fill="#4A90E2">deploy</text>
+    <text x="272" y="166" font-family="monospace" font-size="10" fill="#1E3A5F">(cloud)</text>
+
+    <text x="120" y="184" font-family="monospace" font-size="10" fill="#8B5CF6">  return</text>
+    <text x="168" y="184" font-family="monospace" font-size="10" fill="#14B8A6"> { success: true }</text>
+    <text x="104" y="202" font-family="monospace" font-size="10" fill="#1E3A5F">}</text>
+
+    <rect x="112" y="216" width="340" height="124" rx="8" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <text x="126" y="236" font-family="Inter,Arial,sans-serif" font-size="10" font-weight="600" fill="#1E3A5F">Performance Analytics</text>
+
+    <rect class="hi-bar" x="126" y="298" width="20" height="30" rx="3" fill="#4A90E2" opacity="0.65"/>
+    <rect class="hi-bar b2" x="154" y="278" width="20" height="50" rx="3" fill="#4A90E2" opacity="0.75"/>
+    <rect class="hi-bar b3" x="182" y="263" width="20" height="65" rx="3" fill="#8FB9F4" opacity="0.8"/>
+    <rect class="hi-bar" x="210" y="253" width="20" height="75" rx="3" fill="#8FB9F4"/>
+    <rect class="hi-bar b2" x="238" y="268" width="20" height="60" rx="3" fill="#4A90E2" opacity="0.75"/>
+    <rect class="hi-bar b3" x="266" y="246" width="20" height="82" rx="3" fill="#14B8A6"/>
+    <rect class="hi-bar" x="294" y="256" width="20" height="72" rx="3" fill="#14B8A6" opacity="0.85"/>
+    <rect class="hi-bar b2" x="322" y="241" width="20" height="87" rx="3" fill="#F97316"/>
+    <rect class="hi-bar b3" x="350" y="248" width="20" height="80" rx="3" fill="#F97316" opacity="0.85"/>
+    <polyline points="136,303 164,280 192,266 220,256 248,270 276,248 304,258 332,243 360,250" stroke="#4A90E2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.55"/>
+    <circle cx="276" cy="248" r="4" fill="#14B8A6"/>
+    <circle cx="332" cy="243" r="4" fill="#F97316"/>
+  </g>
+
+  <g class="hi-float" filter="url(#hiShSm)">
+    <rect x="388" y="72" width="172" height="100" rx="12" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <rect x="400" y="84" width="32" height="32" rx="8" fill="#EFF6FF"/>
+    <path d="M410,100 L416,94 L422,100" stroke="#4A90E2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M416,94 L416,106" stroke="#4A90E2" stroke-width="2" stroke-linecap="round"/>
+    <text x="400" y="134" font-family="Inter,Arial,sans-serif" font-size="9" fill="#64748B">Deployments</text>
+    <text x="400" y="152" font-family="Space Grotesk,Arial,sans-serif" font-size="18" font-weight="700" fill="#1E3A5F">2,847</text>
+    <rect x="400" y="158" width="52" height="10" rx="5" fill="#ECFDF5"/>
+    <text x="426" y="166" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="8" font-weight="600" fill="#059669">+ 12.5%</text>
+  </g>
+
+  <g class="hi-float f2" filter="url(#hiShSm)">
+    <rect x="24" y="292" width="152" height="90" rx="12" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <rect x="36" y="304" width="28" height="28" rx="7" fill="#FFF7ED"/>
+    <path d="M50,312 L50,322 M44,318 L56,318" stroke="#F97316" stroke-width="2" stroke-linecap="round"/>
+    <text x="36" y="350" font-family="Inter,Arial,sans-serif" font-size="9" fill="#64748B">Projects Done</text>
+    <text x="36" y="368" font-family="Space Grotesk,Arial,sans-serif" font-size="17" font-weight="700" fill="#1E3A5F">150+</text>
+  </g>
+
+  <g class="hi-float f3" filter="url(#hiShSm)">
+    <rect x="378" y="302" width="184" height="112" rx="12" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="394" y="324" font-family="Space Grotesk,Arial,sans-serif" font-size="10" font-weight="700" fill="#1E3A5F">System Status</text>
+    <circle class="hi-pulse" cx="394" cy="344" r="4" fill="#22C55E"/>
+    <text x="404" y="348" font-family="Inter,Arial,sans-serif" font-size="9" fill="#475569">All systems operational</text>
+    <circle cx="394" cy="362" r="4" fill="#4A90E2"/>
+    <text x="404" y="366" font-family="Inter,Arial,sans-serif" font-size="9" fill="#475569">API response: 42ms</text>
+    <circle cx="394" cy="380" r="4" fill="#F97316"/>
+    <text x="404" y="384" font-family="Inter,Arial,sans-serif" font-size="9" fill="#475569">99.9% uptime</text>
+    <rect x="394" y="392" width="152" height="6" rx="3" fill="#E2E8F0"/>
+    <rect x="394" y="392" width="138" height="6" rx="3" fill="url(#hiHub)"/>
+  </g>
+
+  <ellipse class="hi-ring" cx="488" cy="412" rx="78" ry="28" stroke="#4A90E2" stroke-width="1" stroke-dasharray="4,4" fill="none" opacity="0.35"/>
+  <ellipse cx="488" cy="412" rx="108" ry="40" stroke="#8FB9F4" stroke-width="1" stroke-dasharray="6,6" fill="none" opacity="0.22"/>
+  <circle cx="538" cy="388" r="5" fill="#8FB9F4" opacity="0.65"/>
+  <circle cx="448" cy="440" r="4" fill="#C9C4F8" opacity="0.65"/>
+  <circle cx="568" cy="432" r="4.5" fill="#14B8A6" opacity="0.55"/>
+</svg>

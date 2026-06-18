@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 200" role="img" aria-label="OmniPost idea to publish workflow">
+  <defs>
+    <linearGradient id="fGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7C3AED"/>
+      <stop offset="100%" stop-color="#EC4899"/>
+    </linearGradient>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#A78BFA"/>
+    </marker>
+  </defs>
+  <rect width="640" height="200" rx="16" fill="#FAFAFE"/>
+  <g>
+    <circle cx="100" cy="88" r="36" fill="url(#fGrad)"/>
+    <text x="100" y="84" text-anchor="middle" font-family="Space Grotesk,Arial,sans-serif" font-size="18" font-weight="800" fill="white">1</text>
+    <text x="100" y="102" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="8" font-weight="700" fill="white">GENERATE</text>
+    <text x="100" y="148" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="10" font-weight="600" fill="#312E81">Generate or bulk-import</text>
+    <text x="100" y="162" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="10" fill="#64748B">post ideas</text>
+  </g>
+  <line x1="148" y1="88" x2="212" y2="88" stroke="#C4B5FD" stroke-width="2" marker-end="url(#arrow)"/>
+  <g>
+    <circle cx="260" cy="88" r="36" fill="white" stroke="#7C3AED" stroke-width="2.5"/>
+    <text x="260" y="84" text-anchor="middle" font-family="Space Grotesk,Arial,sans-serif" font-size="18" font-weight="800" fill="#7C3AED">2</text>
+    <text x="260" y="102" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="8" font-weight="700" fill="#7C3AED">APPROVE</text>
+    <text x="260" y="148" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="10" font-weight="600" fill="#312E81">Submit for team</text>
+    <text x="260" y="162" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="10" fill="#64748B">approval</text>
+  </g>
+  <line x1="308" y1="88" x2="372" y2="88" stroke="#C4B5FD" stroke-width="2" marker-end="url(#arrow)"/>
+  <g>
+    <circle cx="420" cy="88" r="36" fill="white" stroke="#EC4899" stroke-width="2.5"/>
+    <text x="420" y="84" text-anchor="middle" font-family="Space Grotesk,Arial,sans-serif" font-size="18" font-weight="800" fill="#DB2777">3</text>
+    <text x="420" y="102" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="8" font-weight="700" fill="#DB2777">PUBLISH</text>
+    <text x="420" y="148" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="10" font-weight="600" fill="#312E81">Schedule or publish</text>
+    <text x="420" y="162" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="10" fill="#64748B">to social platforms</text>
+  </g>
+  <g transform="translate(500,52)">
+    <rect width="120" height="72" rx="10" fill="white" stroke="#E2E8F0"/>
+    <circle cx="24" cy="24" r="10" fill="#1877F2"/><text x="24" y="28" text-anchor="middle" font-size="10" font-weight="800" fill="white">f</text>
+    <circle cx="60" cy="24" r="10" fill="#1DA1F2"/><text x="60" y="28" text-anchor="middle" font-size="8" font-weight="800" fill="white">X</text>
+    <circle cx="96" cy="24" r="10" fill="#0A66C2"/><text x="96" y="28" text-anchor="middle" font-size="7" font-weight="800" fill="white">in</text>
+    <rect x="14" y="40" width="92" height="6" rx="3" fill="#EDE9FE"/>
+    <rect x="14" y="52" width="72" height="6" rx="3" fill="#EDE9FE"/>
+  </g>
+</svg>
