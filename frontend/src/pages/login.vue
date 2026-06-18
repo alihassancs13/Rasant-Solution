@@ -1,23 +1,22 @@
 <template>
   <div class="h-screen w-screen overflow-hidden bg-slate-50 flex flex-col font-sans select-none antialiased">
     <Navbar />
-    
+
     <section class="grid grid-cols-1 lg:grid-cols-[3fr_2fr] h-full pt-20 overflow-hidden w-full">
-      
+
       <aside class="relative hidden lg:flex items-center justify-center p-8 xl:p-12 overflow-hidden bg-linear-to-b from-[#fdf4ff] via-[#fff8f3] to-slate-50 border-r border-slate-200/60 h-full">
-        
+
         <div class="absolute inset-x-[-5%] inset-y-[-10%] pointer-events-none bg-[radial-gradient(circle_at_18%_20%,rgba(255,213,180,0.35)_0%,transparent_42%),radial-gradient(circle_at_82%_18%,rgba(201,196,248,0.32)_0%,transparent_40%),radial-gradient(circle_at_50%_85%,rgba(143,185,244,0.18)_0%,transparent_45%)]" aria-hidden="true"></div>
-        
+
         <div class="relative z-10 w-full max-w-135 flex flex-col justify-center h-full gap-4 mt-4">
 
           <div class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-blue-600/8 border border-blue-600/15 rounded-full text-[11px] font-bold tracking-wider uppercase text-orange-800 w-fit">
-            <span class="w-1.5 h-1.5 rounded-full bg-orange-700 shadow-[0_0_0_3px_rgba(20,184,166,0.2)]"></span>
-
+            <span class="w-1.5 h-1.5 rounded-full bg-[#14B8A6] shadow-[0_0_0_3px_rgba(20,184,166,0.2)]"></span>
             Secure portal
           </div>
 
           <div class="space-y-1.5">
-            <h2 class="text-3xl xl:text-4xl font-bold text-[#1e3a5f] leading-tight">
+            <h2 class="font-['Space_Grotesk'] text-3xl xl:text-4xl font-bold text-[#1e3a5f] leading-tight">
               Sign in to your
               <span class="text-orange-700">workspace</span>
             </h2>
@@ -28,27 +27,27 @@
 
           <div class="w-full max-w-65 mx-auto" aria-hidden="true">
             <img
-              :src="loginVisual"
-              alt="Platform access visualization"
-              width="270"
-              height="102"
-              class="w-full h-auto max-h-[33vh] object-contain rounded-2xl shadow-md bg-pink-50 border border-slate-100"
+                :src="loginVisual"
+                alt="Platform access visualization"
+                width="270"
+                height="102"
+                class="w-full h-auto max-h-[33vh] object-contain rounded-2xl shadow-md bg-pink-50 border border-slate-100"
             />
           </div>
 
           <ul class="flex flex-col gap-2.5 m-0 p-0 list-none">
             <li class="flex items-start gap-3 p-2.5 bg-white/90 border border-slate-200/50 rounded-xl shadow-sm backdrop-blur-sm">
               <span class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600 shrink-0" aria-hidden="true">
-                <i class="fa-solid fa-shield-halved text-xs"></i>
+                <font-awesome-icon icon="ffa-solid fa-lock" class="absolute left-4 text-slate-400 pointer-events-none text-base" />
               </span>
               <div>
                 <strong class="block text-[15px] font-bold text-slate-800 mb-0.5">Role-based access</strong>
                 <span class="text-[13px] text-slate-500 leading-tight block">Admin, employee, and client portals</span>
               </div>
             </li>
-            <li class="flex items-start gap-3 p-2.5 bg-fuchsia-50/80 border border-slate-200/50 rounded-xl shadow-sm backdrop-blur-sm">
-              <span class="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-amber-500 shrink-0" aria-hidden="true">
-                <i class="fa-solid fa-bolt text-xs"></i>
+            <li class="flex items-start gap-3 p-2.5 bg-white/90 border border-slate-200/50 rounded-xl shadow-sm backdrop-blur-sm">
+              <span class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600 shrink-0" aria-hidden="true">
+                <font-awesome-icon icon="fa-solid fa-rocket" class="absolute left-4 text-slate-400 pointer-events-none text-base" />
               </span>
               <div>
                 <strong class="block text-[15px] font-bold text-slate-800 mb-0.5">All products, one login</strong>
@@ -59,12 +58,12 @@
         </div>
       </aside>
 
-      <main class="flex items-center justify-center  sm:p-6 bg-white w-full h-full overflow-y-auto lg:overflow-hidden">
-        <div class="w-full max-w-[480px] bg-white border border-slate-200/80 rounded-2xl  sm:p-8 shadow-xl shadow-slate-100/50">
+      <main class="flex items-center justify-center sm:p-6 bg-white w-full h-full overflow-y-auto lg:overflow-hidden rounded-lg">
+        <div class="w-full max-w-120 bg-white border border-slate-200/80 rounded-2xl sm:p-8 shadow-xl shadow-slate-100/50">
 
           <div class="mb-6 text-center lg:text-left">
-            <h2 class="font-display text-3xl sm:text-2xl font-bold tracking-tight text-[#1e3a5f]">Welcome back</h2>
-            <p class="text-base sm:text-lg text-slate-500 font-normal mt-1.5">Sign in with your username and password.</p>
+            <h2 class="font-['Space_Grotesk'] font-display text-3xl sm:text-2xl font-bold tracking-tight text-[#1e3a5f]">Welcome back</h2>
+            <p class="text-base sm:text-sm text-slate-500 font-normal mt-1.5">Sign in with your username and password.</p>
           </div>
 
           <div
@@ -79,7 +78,7 @@
             <div class="flex flex-col gap-2">
               <label for="username" class="block text-base font-semibold text-slate-700">Username</label>
               <div class="relative flex items-center w-full">
-                <i class="fa-regular fa-user absolute left-4 text-slate-400 pointer-events-none text-base"></i>
+                <font-awesome-icon icon="fa-solid fa-user" class="absolute left-4 text-slate-400 pointer-events-none text-base" />
                 <input
                     type="text"
                     id="username"
@@ -100,7 +99,7 @@
                 </a>
               </div>
               <div class="relative flex items-center w-full">
-                <i class="fa-solid fa-lock absolute left-4 text-slate-400 pointer-events-none text-base"></i>
+                <font-awesome-icon icon="fa-solid fa-lock" class="absolute left-4 text-slate-400 pointer-events-none text-base" />
                 <input
                     :type="isPasswordVisible ? 'text' : 'password'"
                     id="password"
@@ -117,7 +116,7 @@
                     class="absolute right-2 w-8 h-8 border-none bg-transparent rounded-lg cursor-pointer text-slate-400 flex items-center justify-center transition-all duration-200 hover:text-blue-600 hover:bg-slate-100"
                     :aria-label="isPasswordVisible ? 'Hide password' : 'Show password'"
                 >
-                  <i :class="['fa-regular', isPasswordVisible ? 'fa-eye-slash' : 'fa-eye', 'text-base']"></i>
+                  <font-awesome-icon :icon="isPasswordVisible ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'" class="text-base" />
                 </button>
               </div>
             </div>
@@ -135,7 +134,7 @@
 
             <button
                 type="submit"
-                class="relative overflow-hidden w-full flex items-center justify-center px-6 py-3.5 bg-orange-700 hover:bg-orange-900 text-base font-semibold text-white rounded-xl transition-all duration-200 shadow-[0_4px_14px_rgba(42,95,158,0.4)] hover:shadow-[0_6px_20px_rgba(42,95,158,0.6)] active:scale-[0.98] group"
+                class="relative overflow-hidden cursor-pointer w-full flex items-center justify-center px-6 py-3.5 bg-orange-700 hover:bg-orange-900 text-base font-semibold text-white rounded-xl transition-all duration-200 shadow-[0_4px_14px_rgba(42,95,158,0.4)] hover:shadow-[0_6px_20px_rgba(42,95,158,0.6)] active:scale-[0.98] group"
             >
               Sign In
               <div class="absolute inset-0 w-1/4 h-full bg-white/10 pointer-events-none animate-shine-loop"></div>
@@ -148,7 +147,8 @@
               <a href="" class="font-bold text-orange-700 no-underline hover:underline">Contact sales</a>
             </p>
             <a href="#" class="inline-block font-medium text-base text-slate-500 no-underline transition-colors duration-200 hover:text-blue-600">
-              <i class="fa-solid fa-arrow-left mr-2 text-sm"></i> Back to website
+              <font-awesome-icon icon="fa-solid fa-arrow-left" class="mr-2 text-sm" />
+              Back to website
             </a>
           </div>
 
@@ -162,6 +162,7 @@
 import Navbar from '../components/navbar.vue';
 import { useLogin } from '../composables/useLogin';
 import loginVisual from '../assets/svg/login-visual.svg'
+
 const {
   username,
   password,

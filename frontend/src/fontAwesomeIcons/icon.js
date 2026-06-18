@@ -9,9 +9,16 @@ import {
   faStar,
   faMobileScreen,
   faServer,
-  faCode,                    // ← Added: used in services
-  faMobileScreenButton,      // ← Added: used in services
-  faCloud,                   // ← Added: used in services
+  faCode,
+  faMobileScreenButton,
+  faCloud,
+  // Add these new icons for login page
+  faShieldHalved,
+  faUser,
+  faLock,
+  faEye,
+  faEyeSlash,
+  faArrowLeft,
 } from '@fortawesome/free-solid-svg-icons'
 import {
   faReact,
@@ -32,9 +39,16 @@ library.add(
     faStar,
     faMobileScreen,
     faServer,
-    faCode,                    // ← Added
-    faMobileScreenButton,      // ← Added
-    faCloud,                   // ← Added
+    faCode,
+    faMobileScreenButton,
+    faCloud,
+    // Add the new icons
+    faShieldHalved,
+    faUser,
+    faLock,
+    faEye,
+    faEyeSlash,
+    faArrowLeft,
     faReact,
     faNodeJs,
     faPython,
