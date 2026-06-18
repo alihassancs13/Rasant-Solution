@@ -1,264 +1,485 @@
 <template>
   <div class="relative w-full z-50">
-    <!-- Mobile Menu Backdrop -->
+
+    <!-- Mobile Backdrop -->
     <div
         v-if="isMobileMenuOpen"
         @click="closeMobileMenu"
-        class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-300 z-40 md:hidden"
+        class="fixed inset-0 bg-slate-900/45 backdrop-blur-[4px] transition-opacity duration-400 z-40 md:hidden"
     ></div>
 
-    <!-- Global Desktop Dropdown Backdrop Mask -->
-    <div
-        v-if="activeDropdown"
-        class="fixed inset-0 bg-slate-900/55 backdrop-blur-[5px] transition-all duration-300 pointer-events-none hidden md:block z-30"
-    ></div>
+    <!-- Desktop Dropdown Backdrop -->
+    <Transition name="backdrop-fade">
+      <div
+          v-if="activeDropdown"
+          class="fixed inset-0 bg-slate-900/45 backdrop-blur-[4px] pointer-events-none hidden md:block z-30"
+      ></div>
+    </Transition>
 
-    <header class="fixed top-0 left-0 right-0 h-20 bg-white border-b border-slate-200/80 shadow-sm flex items-center justify-between px-6 md:px-12 z-50 transition-all duration-300">
-      <router-link to="/home" class="flex items-center shrink-0 group" aria-label="Rasant Solutions home">
+    <!-- ===== HEADER ===== -->
+    <header
+        id="navbar"
+        class="fixed top-0 left-0 right-0 h-20 flex items-center justify-between px-6 md:px-12 z-50 transition-all duration-[450ms]"
+        :class="[
+        isScrolled || isMobileMenuOpen
+          ? 'bg-white/96 shadow-[0_4px_30px_rgba(15,23,42,0.08)] backdrop-blur-[16px]'
+          : 'bg-white/45 backdrop-blur-[12px]'
+      ]"
+    >
+
+      <!-- Logo -->
+      <router-link to="/home" class="flex items-center shrink-0 z-[2]" aria-label="Rasant Solutions home">
         <img
             src="../assets/images/rasant-logo.png"
             alt="Rasant Solutions Logo"
-            class="h-10.5 w-auto transition-transform duration-200 group-hover:scale-[1.01]"
+            class="h-[42px] w-auto transition-opacity duration-200 hover:opacity-86"
             decoding="async"
         />
       </router-link>
 
-      <div class="hidden md:flex items-center h-full relative">
-        <ul class="flex items-center gap-8 h-full m-0 p-0 list-none">
+      <!-- ===== DESKTOP NAV CENTER ===== -->
+      <div class="hidden md:flex items-stretch h-full absolute left-1/2 -translate-x-1/2">
+        <ul class="flex items-center gap-0.5 h-full list-none m-0 p-0">
 
+          <!-- Services -->
           <li
-              class="relative h-full flex items-center group/nav"
+              class="relative h-full flex items-center"
               @mouseenter="activeDropdown = 'services'"
               @mouseleave="activeDropdown = null"
           >
-            <button type="button" class="flex items-center gap-1.5 font-medium text-[15px] text-slate-700 hover:text-blue-600 transition-colors duration-200 h-full cursor-pointer bg-transparent border-0">
+            <button
+                type="button"
+                class="flex items-center gap-1.5 px-5 h-11 rounded-xl font-['Space_Grotesk'] font-bold text-[15px] tracking-[-0.2px] transition-all duration-200 bg-transparent border-0 cursor-pointer whitespace-nowrap"
+                :class="activeDropdown === 'services' ? 'text-blue-600 bg-blue-600/10' : 'text-[#1E3A5F] hover:text-blue-600 hover:bg-blue-600/7'"
+            >
               Services
-              <i class="fa-solid fa-chevron-down text-[11px] transition-transform duration-200 group-hover/nav:rotate-180"></i>
+              <span
+                  class="inline-block w-0 h-0 border-l-[4px] border-r-[4px] border-t-[5px] border-l-transparent border-r-transparent border-t-[#64748B] transition-transform duration-300"
+                  :class="activeDropdown === 'services' ? 'rotate-180 !border-t-blue-600' : ''"
+              ></span>
             </button>
 
-            <div
-                class="absolute top-20 left-1/2 -translate-x-1/2 w-85 bg-white border border-slate-100 rounded-2xl shadow-xl p-4 flex flex-col gap-1 transition-all duration-200 origin-top z-50"
-                :class="[activeDropdown === 'services' ? 'opacity-100 scale-100 pointer-events-auto visible' : 'opacity-0 scale-[0.97] pointer-events-none invisible']"
-            >
-              <div class="absolute top-0 inset-x-0 h-0.75 rounded-t-2xl bg-linear-to-r from-orange-300 via-pink-400 to-blue-400"></div>
-
-              <!-- 👇 UPDATED: navigateToServicesSection with section ID -->
-              <button
-                  @click="navigateToServicesSection('services')"
-                  class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 group/item transition-colors duration-200 w-full text-left"
+            <!-- Services Dropdown -->
+            <Transition name="dropdown">
+              <div
+                  v-show="activeDropdown === 'services'"
+                  class="absolute top-[calc(100%+2px)] left-1/2 -translate-x-1/2 w-[280px] bg-white rounded-[0_0_20px_20px] shadow-[0_20px_60px_rgba(15,23,42,0.14)] border border-[#E2E8F0] border-t-[3px] border-t-blue-500 pt-3 pb-4 px-2.5 z-50"
               >
-                <div class="flex items-center cursor-pointer gap-3.5">
-                  <div class="w-9 h-9 rounded-lg bg-purple-50 flex items-center justify-center text-lg shadow-sm border border-purple-100/40"><font-awesome-icon :icon="['fas', 'gear']" /></div>
-                  <div>
-                    <h4 class="font-bold text-[14px] text-slate-800  m-0">Custom Software</h4>
-                    <p class="text-[12px] text-slate-500 font-normal m-0">Enterprise apps &amp; APIs</p>
+                <button
+                    @click="navigateToServicesSection('services')"
+                    class="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 hover:translate-x-1 group/item transition-all duration-200 w-full text-left relative overflow-hidden"
+                >
+                  <div class="w-10 h-10 rounded-[10px] bg-blue-600/10 flex items-center justify-center text-[18px] shrink-0">
+                    <i class="fa-solid fa-code text-blue-600"></i>
                   </div>
-                </div>
-                <span class="text-slate-400 font-medium -translate-x-1 opacity-0 group-hover/item:translate-x-0 group-hover/item:opacity-100 transition-all duration-200">→</span>
-              </button>
+                  <div class="flex-1">
+                    <h4 class="text-[14px] font-['Space_Grotesk'] font-bold text-[#1E3A5F] mb-[3px] m-0">Custom Software</h4>
+                    <p class="text-[12px] text-slate-500 m-0 leading-[1.45]">Enterprise apps, APIs &amp; AI integration</p>
+                  </div>
+                  <span class="text-blue-500 font-bold opacity-0 -translate-x-3 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-300 mt-2.5">→</span>
+                </button>
 
-              <button
-                  @click="navigateToServicesSection('services')"
-                  class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 group/item transition-colors duration-200 w-full text-left"
-              >
-                <div class="flex items-center gap-3.5">
-                  <div class="w-9 h-9 rounded-lg bg-indigo-50 flex items-center justify-center text-lg shadow-sm border border-indigo-100/40"><font-awesome-icon :icon="['fas', 'mobile-screen']" /></div>
-                  <div>
-                    <h4 class="font-bold text-[14px] text-slate-800 m-0">Web &amp; Mobile</h4>
-                    <p class="text-[12px] text-slate-500 font-normal m-0">React, Flutter &amp; Next.js</p>
+                <button
+                    @click="navigateToServicesSection('services')"
+                    class="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 hover:translate-x-1 group/item transition-all duration-200 w-full text-left relative overflow-hidden"
+                >
+                  <div class="w-10 h-10 rounded-[10px] bg-sky-500/10 flex items-center justify-center text-[18px] shrink-0">
+                    <i class="fa-solid fa-mobile-screen-button text-sky-500"></i>
                   </div>
-                </div>
-                <span class="text-slate-400 font-medium -translate-x-1 opacity-0 group-hover/item:translate-x-0 group-hover/item:opacity-100 transition-all duration-200"><font-awesome-icon :icon="['fas', 'arrow-right']" /></span>
-              </button>
+                  <div class="flex-1">
+                    <h4 class="text-[14px] font-['Space_Grotesk'] font-bold text-[#1E3A5F] mb-[3px] m-0">Web &amp; Mobile</h4>
+                    <p class="text-[12px] text-slate-500 m-0 leading-[1.45]">React, Flutter &amp; Next.js products</p>
+                  </div>
+                  <span class="text-blue-500 font-bold opacity-0 -translate-x-3 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-300 mt-2.5">→</span>
+                </button>
 
-              <button
-                  @click="navigateToServicesSection('services')"
-                  class="flex items-center justify-between p-3 rounded-xl hover:bg-slate-50 group/item transition-colors duration-200 w-full text-left"
-              >
-                <div class="flex items-center gap-3.5">
-                  <div class="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center text-lg shadow-sm border border-blue-100/40"><font-awesome-icon :icon="['fas', 'cloud']" />️</div>
-                  <div>
-                    <h4 class="font-bold text-[14px] text-slate-800 m-0">Cloud &amp; DevOps</h4>
-                    <p class="text-[12px] text-slate-500 font-normal m-0">AWS &amp; Kubernetes</p>
+                <button
+                    @click="navigateToServicesSection('services')"
+                    class="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 hover:translate-x-1 group/item transition-all duration-200 w-full text-left relative overflow-hidden"
+                >
+                  <div class="w-10 h-10 rounded-[10px] bg-blue-400/10 flex items-center justify-center text-[18px] shrink-0">
+                    <i class="fa-solid fa-cloud text-blue-400"></i>
                   </div>
-                </div>
-                <span class="text-slate-400 font-medium -translate-x-1 opacity-0 group-hover/item:translate-x-0 group-hover/item:opacity-100 transition-all duration-200">→</span>
-              </button>
-            </div>
+                  <div class="flex-1">
+                    <h4 class="text-[14px] font-['Space_Grotesk'] font-bold text-[#1E3A5F] mb-[3px] m-0">Cloud &amp; DevOps</h4>
+                    <p class="text-[12px] text-slate-500 m-0 leading-[1.45]">AWS, Kubernetes &amp; CI/CD pipelines</p>
+                  </div>
+                  <span class="text-blue-500 font-bold opacity-0 -translate-x-3 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-300 mt-2.5">→</span>
+                </button>
+              </div>
+            </Transition>
           </li>
 
-          <!-- Projects Dropdown -->
+          <!-- Projects -->
           <li
-              class="relative h-full flex items-center group/nav"
+              class="relative h-full flex items-center"
               @mouseenter="activeDropdown = 'projects'"
               @mouseleave="activeDropdown = null"
           >
-            <button type="button" class="flex items-center gap-1.5 font-medium text-[15px] text-slate-700 hover:text-blue-600 transition-colors duration-200 h-full cursor-pointer bg-transparent border-0">
+            <button
+                type="button"
+                class="flex items-center gap-1.5 px-5 h-11 rounded-xl font-['Space_Grotesk'] font-bold text-[15px] tracking-[-0.2px] transition-all duration-200 bg-transparent border-0 cursor-pointer whitespace-nowrap"
+                :class="activeDropdown === 'projects' ? 'text-blue-600 bg-blue-600/10' : 'text-[#1E3A5F] hover:text-blue-600 hover:bg-blue-600/7'"
+            >
               Projects
-              <i class="fa-solid fa-chevron-down text-[11px] transition-transform duration-200 group-hover/nav:rotate-180"></i>
+              <span
+                  class="inline-block w-0 h-0 border-l-[4px] border-r-[4px] border-t-[5px] border-l-transparent border-r-transparent border-t-[#64748B] transition-transform duration-300"
+                  :class="activeDropdown === 'projects' ? 'rotate-180 !border-t-blue-600' : ''"
+              ></span>
             </button>
 
-            <div
-                class="absolute top-20 left-1/2 -translate-x-1/2 w-115 bg-white border border-slate-100 rounded-2xl shadow-xl p-5 grid grid-cols-2 gap-3 transition-all duration-200 origin-top z-50"
-                :class="[activeDropdown === 'projects' ? 'opacity-100 scale-100 pointer-events-auto visible' : 'opacity-0 scale-[0.97] pointer-events-none invisible']"
+            <!-- Projects Dropdown (wide grid) -->
+            <Transition name="dropdown">
+              <div
+                  v-show="activeDropdown === 'projects'"
+                  class="absolute top-[calc(100%+2px)] left-1/2 -translate-x-1/2 w-[520px] bg-white rounded-[0_0_20px_20px] shadow-[0_20px_60px_rgba(15,23,42,0.14)] border border-[#E2E8F0] border-t-[3px] border-t-blue-500 p-5 grid grid-cols-2 gap-3 z-50"
+              >
+                <router-link
+                    to="/sentra"
+                    @click="activeDropdown = null"
+                    class="block p-3.5 border border-[#E2E8F0] rounded-[14px] hover:border-blue-500/30 hover:shadow-[0_8px_30px_rgba(74,144,226,0.08)] hover:-translate-y-[3px] transition-all duration-300 no-underline"
+                >
+                  <div class="text-[10px] font-bold uppercase tracking-[0.8px] text-blue-600 mb-1.5">Main Product</div>
+                  <h4 class="font-['Space_Grotesk'] text-[14px] font-bold text-[#1E3A5F] mb-1 m-0">Sentra AI</h4>
+                  <p class="text-[11px] text-slate-500 m-0 leading-[1.4]">AI call center — from Rs. 28,000/mo</p>
+                  <div class="h-[3px] bg-[#F1F5F9] rounded mt-2.5 overflow-hidden">
+                    <span class="block h-full w-full bg-gradient-to-r from-[#C96E3A] via-[#B0457A] to-[#3B73C4] rounded"></span>
+                  </div>
+                </router-link>
+
+                <router-link
+                    to="/ai-agent"
+                    @click="activeDropdown = null"
+                    class="block p-3.5 border border-[#E2E8F0] rounded-[14px] hover:border-blue-500/30 hover:shadow-[0_8px_30px_rgba(74,144,226,0.08)] hover:-translate-y-[3px] transition-all duration-300 no-underline"
+                >
+                  <div class="text-[10px] font-bold uppercase tracking-[0.8px] text-blue-600 mb-1.5">Voice</div>
+                  <h4 class="font-['Space_Grotesk'] text-[14px] font-bold text-[#1E3A5F] mb-1 m-0">AI Agent</h4>
+                  <p class="text-[11px] text-slate-500 m-0 leading-[1.4]">Talking voice agents — from Rs. 45,000/mo</p>
+                  <div class="h-[3px] bg-[#F1F5F9] rounded mt-2.5 overflow-hidden">
+                    <span class="block h-full w-[88%] bg-gradient-to-r from-[#C96E3A] via-[#B0457A] to-[#3B73C4] rounded"></span>
+                  </div>
+                </router-link>
+
+                <router-link
+                    to="/chatbot"
+                    @click="activeDropdown = null"
+                    class="block p-3.5 border border-[#E2E8F0] rounded-[14px] hover:border-blue-500/30 hover:shadow-[0_8px_30px_rgba(74,144,226,0.08)] hover:-translate-y-[3px] transition-all duration-300 no-underline"
+                >
+                  <div class="text-[10px] font-bold uppercase tracking-[0.8px] text-purple-600 mb-1.5">Chat</div>
+                  <h4 class="font-['Space_Grotesk'] text-[14px] font-bold text-[#1E3A5F] mb-1 m-0">Chatbot</h4>
+                  <p class="text-[11px] text-slate-500 m-0 leading-[1.4]">Conversational bots — from Rs. 35,000/mo</p>
+                  <div class="h-[3px] bg-[#F1F5F9] rounded mt-2.5 overflow-hidden">
+                    <span class="block h-full w-[94%] bg-gradient-to-r from-[#C96E3A] via-[#B0457A] to-[#3B73C4] rounded"></span>
+                  </div>
+                </router-link>
+
+                <router-link
+                    to="/orchestri"
+                    @click="activeDropdown = null"
+                    class="block p-3.5 border border-[#E2E8F0] rounded-[14px] hover:border-blue-500/30 hover:shadow-[0_8px_30px_rgba(74,144,226,0.08)] hover:-translate-y-[3px] transition-all duration-300 no-underline"
+                >
+                  <div class="text-[10px] font-bold uppercase tracking-[0.8px] text-orange-600 mb-1.5">SDLC</div>
+                  <h4 class="font-['Space_Grotesk'] text-[14px] font-bold text-[#1E3A5F] mb-1 m-0">Orchestri</h4>
+                  <p class="text-[11px] text-slate-500 m-0 leading-[1.4]">AI multi-agent SDLC — from Rs. 85,000/mo</p>
+                  <div class="h-[3px] bg-[#F1F5F9] rounded mt-2.5 overflow-hidden">
+                    <span class="block h-full w-[76%] bg-gradient-to-r from-[#C96E3A] via-[#B0457A] to-[#3B73C4] rounded"></span>
+                  </div>
+                </router-link>
+
+                <router-link
+                    to="/omnipost"
+                    @click="activeDropdown = null"
+                    class="block p-3.5 border border-[#E2E8F0] rounded-[14px] hover:border-blue-500/30 hover:shadow-[0_8px_30px_rgba(74,144,226,0.08)] hover:-translate-y-[3px] transition-all duration-300 no-underline col-span-2"
+                >
+                  <div class="text-[10px] font-bold uppercase tracking-[0.8px] text-pink-600 mb-1.5">Social</div>
+                  <h4 class="font-['Space_Grotesk'] text-[14px] font-bold text-[#1E3A5F] mb-1 m-0">OmniPost</h4>
+                  <p class="text-[11px] text-slate-500 m-0 leading-[1.4]">AI social content platform</p>
+                  <div class="h-[3px] bg-[#F1F5F9] rounded mt-2.5 overflow-hidden">
+                    <span class="block h-full w-[82%] bg-gradient-to-r from-[#C96E3A] via-[#B0457A] to-[#3B73C4] rounded"></span>
+                  </div>
+                </router-link>
+              </div>
+            </Transition>
+          </li>
+
+          <!-- Careers -->
+          <li class="h-full flex items-center">
+            <router-link
+                to="/careers"
+                @click="closeMobileMenu"
+                class="flex items-center px-5 h-11 rounded-xl font-['Space_Grotesk'] font-bold text-[15px] tracking-[-0.2px] transition-all duration-200 no-underline"
+                :class="$route.path === '/careers' ? 'text-blue-600 bg-blue-600/12' : 'text-[#1E3A5F] hover:text-blue-600 hover:bg-blue-600/7'"
             >
-              <div class="absolute top-0 inset-x-0 h-0.75 rounded-t-2xl bg-linear-to-r from-orange-300 via-pink-400 to-blue-400"></div>
-
-              <router-link
-                  to="/sentra"
-                  @click="closeMobileMenu"
-                  class="block p-4 border border-slate-100 rounded-xl hover:border-blue-500/30 hover:bg-slate-50/50 transition-all duration-200"
-              >
-                <div class="inline-block text-[10px] font-bold uppercase tracking-wider text-teal-600 bg-teal-50 px-2 py-0.5 rounded mb-1.5">Voice</div>
-                <h4 class="font-bold text-[15px] text-slate-800 mb-0.5">Sentra AI</h4>
-                <p class="text-[12px] text-slate-500 font-normal">AI call center platform</p>
-              </router-link>
-
-              <router-link
-                  to="/ai-agent"
-                  @click="closeMobileMenu"
-                  class="block p-4 border border-slate-100 rounded-xl hover:border-blue-500/30 hover:bg-slate-50/50 transition-all duration-200"
-              >
-                <div class="inline-block text-[10px] font-bold uppercase tracking-wider text-teal-600 bg-teal-50 px-2 py-0.5 rounded mb-1.5">Voice</div>
-                <h4 class="font-bold text-[15px] text-slate-800 mb-0.5">AI Agent</h4>
-                <p class="text-[12px] text-slate-500 font-normal">Talking voice agents</p>
-              </router-link>
-
-              <router-link to="/chatbot" @click="closeMobileMenu" class="block p-4 border border-slate-100 rounded-xl hover:border-blue-500/30 hover:bg-slate-50/50 transition-all duration-200">
-                <div class="inline-block text-[10px] font-bold uppercase tracking-wider text-purple-600 bg-purple-50 px-2 py-0.5 rounded mb-1.5">Chat</div>
-                <h4 class="font-bold text-[15px] text-slate-800 mb-0.5">Chatbot</h4>
-                <p class="text-[12px] text-slate-500 font-normal">Text and messaging bots</p>
-              </router-link>
-
-              <router-link to="/orchestri" @click="closeMobileMenu" class="block p-4 border border-slate-100 rounded-xl hover:border-blue-500/30 hover:bg-slate-50/50 transition-all duration-200">
-                <div class="inline-block text-[10px] font-bold uppercase tracking-wider text-orange-600 bg-orange-50 px-2 py-0.5 rounded mb-1.5">SDLC</div>
-                <h4 class="font-bold text-[15px] text-slate-800 mb-0.5">Orchestri</h4>
-                <p class="text-[12px] text-slate-500 font-normal">AI multi-agent dev workflow</p>
-              </router-link>
-            </div>
+              Careers
+            </router-link>
           </li>
 
+          <!-- Contact -->
           <li class="h-full flex items-center">
-            <router-link to="/careers" @click="closeMobileMenu" class="font-medium text-[15px] text-slate-700 hover:text-blue-600 transition-colors duration-200">Careers</router-link>
-          </li>
-
-          <li class="h-full flex items-center">
-            <router-link to="/contact" @click="closeMobileMenu" class="font-medium text-[15px] text-slate-700 hover:text-blue-600 transition-colors duration-200">Contact</router-link>
+            <router-link
+                to="/contact"
+                @click="closeMobileMenu"
+                class="flex items-center px-5 h-11 rounded-xl font-['Space_Grotesk'] font-bold text-[15px] tracking-[-0.2px] transition-all duration-200 no-underline"
+                :class="$route.path === '/contact' ? 'text-blue-600 bg-blue-600/12' : 'text-[#1E3A5F] hover:text-blue-600 hover:bg-blue-600/7'"
+            >
+              Contact
+            </router-link>
           </li>
         </ul>
       </div>
 
-      <div class="hidden md:flex items-center gap-4">
-        <router-link to="/login" @click="closeMobileMenu" class="px-5 py-2.5 border border-blue-400/30 text-[14px] font-semibold rounded-full text-blue-900 hover:bg-blue-50 transition-all duration-200 shadow-sm">
+      <!-- ===== DESKTOP RIGHT BUTTONS ===== -->
+      <div class="hidden md:flex items-center gap-3 shrink-0 z-[2]">
+        <router-link
+            to="/login"
+            @click="closeMobileMenu"
+            class="px-5 py-2.5 border border-[#E2E8F0] text-[14px] font-['Space_Grotesk'] font-bold rounded-[50px] text-[#1E3A5F] hover:border-blue-500 hover:text-blue-600 hover:bg-blue-600/5 transition-all duration-200 no-underline"
+        >
+          Login
+        </router-link>
+
+        <router-link
+            to="/contact"
+            @click="closeMobileMenu"
+            class="relative overflow-hidden px-6 py-[11px] text-[14px] font-['Space_Grotesk'] font-bold text-white rounded-[50px] no-underline transition-all duration-200 active:scale-[0.98]"
+            style="background: #C2410C; box-shadow: 0 4px 20px rgba(194,65,12,0.3); animation: ctaGlow 3s ease-in-out infinite;"
+            @mouseover="$event.currentTarget.style.background = '#9A3412'"
+            @mouseout="$event.currentTarget.style.background = '#C2410C'"
+        >
+          Get Quote
+          <span class="absolute inset-0 w-2/5 h-full pointer-events-none" style="background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transform: skewX(-20deg); animation: btnShine 3s ease-in-out infinite;"></span>
+        </router-link>
+      </div>
+
+      <!-- ===== HAMBURGER ===== -->
+      <button
+          @click.stop="toggleMobileMenu"
+          class="flex flex-col gap-[5px] md:hidden w-10 h-10 justify-center items-end bg-transparent border-0 p-2 cursor-pointer z-50 focus:outline-none"
+          aria-label="Toggle Navigation Menu"
+          type="button"
+          :aria-expanded="isMobileMenuOpen"
+      >
+        <span
+            class="h-0.5 bg-[#1E3A5F] rounded-full transition-all duration-300"
+            :class="isMobileMenuOpen ? 'w-6 rotate-45 translate-y-[7px]' : 'w-6'"
+        ></span>
+        <span
+            class="h-0.5 bg-[#1E3A5F] rounded-full transition-all duration-300"
+            :class="isMobileMenuOpen ? 'w-0 opacity-0' : 'w-[18px]'"
+            style="margin-left: auto;"
+        ></span>
+        <span
+            class="h-0.5 bg-[#1E3A5F] rounded-full transition-all duration-300"
+            :class="isMobileMenuOpen ? 'w-6 -rotate-45 -translate-y-[7px]' : 'w-[22px]'"
+            style="margin-left: auto;"
+        ></span>
+      </button>
+    </header>
+
+    <!-- ===== MOBILE DRAWER ===== -->
+    <nav
+        class="fixed top-0 right-0 bottom-0 flex flex-col z-[1002] md:hidden overflow-hidden"
+        style="width: min(340px, 90vw); box-shadow: -16px 0 48px rgba(15,23,42,0.35); background: linear-gradient(165deg, #152a45 0%, #1E3A5F 28%, #2A5F9E 62%, #4A90E2 100%); transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s;"
+        :style="isMobileMenuOpen ? 'transform: translateX(0); visibility: visible;' : 'transform: translateX(100%); visibility: hidden;'"
+        :aria-hidden="!isMobileMenuOpen"
+    >
+      <!-- Glow overlays -->
+      <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(circle at 90% 8%, rgba(255,213,180,0.22) 0%, transparent 42%), radial-gradient(circle at 10% 92%, rgba(143,185,244,0.2) 0%, transparent 45%);"></div>
+
+      <!-- Drawer Head -->
+      <div class="relative z-[2] flex items-center justify-between gap-3 px-[18px] pb-3.5 border-b border-white/12 shrink-0" style="padding-top: max(18px, env(safe-area-inset-top));">
+        <div class="flex items-center gap-3 min-w-0">
+          <div class="w-[42px] h-[42px] rounded-xl flex items-center justify-center font-['Space_Grotesk'] font-extrabold text-[14px] text-[#1E3A5F] shrink-0" style="background: linear-gradient(135deg, #FFD5B4, #8FB9F4); box-shadow: 0 6px 16px rgba(0,0,0,0.2);">RS</div>
+          <div>
+            <strong class="block font-['Space_Grotesk'] text-[15px] font-extrabold text-white">Rasant Solutions</strong>
+            <span class="block text-[11px] text-white/72 mt-0.5">Menu</span>
+          </div>
+        </div>
+        <button
+            type="button"
+            @click="closeMobileMenu"
+            class="w-11 h-11 rounded-full border border-white/28 bg-white/14 text-white text-[30px] leading-none flex items-center justify-center shrink-0 hover:bg-white/24 hover:scale-105 transition-all duration-200 cursor-pointer"
+            aria-label="Close menu"
+        >×</button>
+      </div>
+
+      <!-- Drawer Body -->
+      <div class="relative z-[2] flex-1 overflow-y-auto px-4 py-3.5" style="-webkit-overflow-scrolling: touch;">
+
+        <!-- Services -->
+        <button
+            @click="navigateToServicesSection('services')"
+            class="flex items-center gap-3 w-full text-white font-['Space_Grotesk'] font-bold text-[16px] p-3.5 mb-2 rounded-[14px] border border-white/10 bg-white/7 hover:bg-white/16 hover:translate-x-1 transition-all duration-200 text-left cursor-pointer"
+        >
+          <span class="w-8 h-8 rounded-[10px] bg-white/12 flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-gear text-base"></i>
+          </span>
+          Services
+        </button>
+        <div class="ml-3 mb-2.5 pl-3.5 border-l-2 border-white/20 py-1">
+          <button @click="navigateToServicesSection('services')" class="block text-white/82 text-[13px] py-2 w-full text-left hover:text-white transition-colors duration-150 bg-transparent border-0 cursor-pointer">Custom Software</button>
+          <button @click="navigateToServicesSection('services')" class="block text-white/82 text-[13px] py-2 w-full text-left hover:text-white transition-colors duration-150 bg-transparent border-0 cursor-pointer">Web &amp; Mobile</button>
+          <button @click="navigateToServicesSection('services')" class="block text-white/82 text-[13px] py-2 w-full text-left hover:text-white transition-colors duration-150 bg-transparent border-0 cursor-pointer">Cloud &amp; DevOps</button>
+        </div>
+
+        <!-- Projects -->
+        <router-link
+            to="/#products"
+            @click="closeMobileMenu"
+            class="flex items-center gap-3 text-white font-['Space_Grotesk'] font-bold text-[16px] p-3.5 mb-2 rounded-[14px] border border-white/10 bg-white/7 hover:bg-white/16 hover:translate-x-1 transition-all duration-200 no-underline"
+        >
+          <span class="w-8 h-8 rounded-[10px] bg-white/12 flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-rocket text-base"></i>
+          </span>
+          Projects
+        </router-link>
+        <div class="ml-3 mb-2.5 pl-3.5 border-l-2 border-white/20 py-1">
+          <router-link to="/sentra" @click="closeMobileMenu" class="block text-white/82 text-[13px] py-2 hover:text-white transition-colors no-underline">Sentra AI</router-link>
+          <router-link to="/ai-agent" @click="closeMobileMenu" class="block text-white/82 text-[13px] py-2 hover:text-white transition-colors no-underline">AI Agent</router-link>
+          <router-link to="/chatbot" @click="closeMobileMenu" class="block text-white/82 text-[13px] py-2 hover:text-white transition-colors no-underline">Chatbot</router-link>
+          <router-link to="/orchestri" @click="closeMobileMenu" class="block text-white/82 text-[13px] py-2 hover:text-white transition-colors no-underline">Orchestri</router-link>
+          <router-link to="/omnipost" @click="closeMobileMenu" class="block text-white/82 text-[13px] py-2 hover:text-white transition-colors no-underline">OmniPost</router-link>
+        </div>
+
+        <!-- Careers -->
+        <router-link
+            to="/careers"
+            @click="closeMobileMenu"
+            class="flex items-center gap-3 text-white font-['Space_Grotesk'] font-bold text-[16px] p-3.5 mb-2 rounded-[14px] border border-white/10 bg-white/7 hover:bg-white/16 hover:translate-x-1 transition-all duration-200 no-underline"
+        >
+          <span class="w-8 h-8 rounded-[10px] bg-white/12 flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-briefcase text-base"></i>
+          </span>
+          Careers
+        </router-link>
+
+        <!-- Contact -->
+        <router-link
+            to="/contact"
+            @click="closeMobileMenu"
+            class="flex items-center gap-3 text-white font-['Space_Grotesk'] font-bold text-[16px] p-3.5 mb-2 rounded-[14px] border border-white/10 bg-white/7 hover:bg-white/16 hover:translate-x-1 transition-all duration-200 no-underline"
+        >
+          <span class="w-8 h-8 rounded-[10px] bg-white/12 flex items-center justify-center shrink-0">
+            <i class="fa-solid fa-envelope text-base"></i>
+          </span>
+          Contact
+        </router-link>
+      </div>
+
+      <!-- Drawer Footer -->
+      <div
+          class="relative z-[2] shrink-0 px-[18px] flex flex-col gap-2.5 border-t border-white/12"
+          style="padding-top: 14px; padding-bottom: max(18px, env(safe-area-inset-bottom)); background: rgba(8,18,36,0.28);"
+      >
+        <router-link
+            to="/login"
+            @click="closeMobileMenu"
+            class="w-full text-center py-3.5 rounded-xl font-['Space_Grotesk'] font-bold text-[14px] text-white no-underline transition-all duration-200"
+            style="background: #C2410C;"
+            @mouseover="$event.currentTarget.style.background = '#9A3412'"
+            @mouseout="$event.currentTarget.style.background = '#C2410C'"
+        >
           Login
         </router-link>
         <router-link
             to="/contact"
             @click="closeMobileMenu"
-            class="bg-orange-700 hover:bg-orange-900 relative overflow-hidden px-6 py-2.5 text-[14px] font-semibold text-white rounded-full transition-all duration-200 shadow-[0_0_25px_rgba(74,144,226,0.45)] active:scale-[0.98] cursor-pointer flex items-center justify-center"
+            class="w-full text-center py-3.5 rounded-xl font-['Space_Grotesk'] font-bold text-[14px] text-white border border-white/35 bg-white/10 hover:bg-white/20 no-underline transition-all duration-200"
         >
-          Get Quote
-          <div class="absolute inset-0 w-1/4 h-full bg-white/10 pointer-events-none animate-shine-loop"></div>
+          Get a Free Quote
         </router-link>
       </div>
-
-      <button
-          @click.stop="toggleMobileMenu"
-          class="flex flex-col gap-1.5 md:hidden w-8 h-8 justify-center items-end group p-1 z-50 focus:outline-none"
-          aria-label="Toggle Navigation Control Drawer Menu"
-          type="button"
-      >
-        <span class="h-0.5 bg-slate-800 rounded-full transition-all duration-300" :class="[isMobileMenuOpen ? 'w-6 rotate-45 translate-y-2' : 'w-6']"></span>
-        <span class="h-0.5 bg-slate-800 rounded-full transition-all duration-300" :class="[isMobileMenuOpen ? 'w-0 opacity-0' : 'w-4 group-hover:w-6']"></span>
-        <span class="h-0.5 bg-slate-800 rounded-full transition-all duration-300" :class="[isMobileMenuOpen ? 'w-6 -rotate-45 -translate-y-2' : 'w-5 group-hover:w-6']"></span>
-      </button>
-    </header>
-
-    <!-- Mobile Menu -->
-    <nav
-        class="fixed top-0 right-0 bottom-0 w-70 bg-white border-l border-slate-100 shadow-2xl pt-24 px-6 flex flex-col gap-4 transform transition-transform duration-300 ease-out z-40 md:hidden"
-        :class="[isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full']"
-    >
-      <button @click="navigateToServicesSection('services')" class="text-[16px] font-semibold text-slate-700 hover:text-blue-600 p-2 rounded-lg hover:bg-slate-50 transition-all text-left">Services</button>
-      <router-link to="/#products" @click="closeMobileMenu" class="text-[16px] font-semibold text-slate-700 hover:text-blue-600 p-2 rounded-lg hover:bg-slate-50 transition-all">Projects</router-link>
-      <router-link to="/contact" @click="closeMobileMenu" class="text-[16px] font-semibold text-slate-700 hover:text-blue-600 p-2 rounded-lg hover:bg-slate-50 transition-all">Contact</router-link>
-
-      <router-link
-          to="/login"
-          @click="closeMobileMenu"
-          class="block text-[16px] font-semibold text-blue-900 bg-blue-50/60 p-2 rounded-lg transition-all cursor-pointer text-left w-full sm:w-auto"
-      >
-        Login
-      </router-link>
-
-      <router-link to="/contact" @click="closeMobileMenu" class="mt-4 text-center px-5 py-3 bg-blue-600 text-[14px] font-bold text-white rounded-xl shadow-lg shadow-blue-100 transition-all">
-        Get a Free Quote
-      </router-link>
     </nav>
+
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, onMounted, onUnmounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 
 const router = useRouter();
+const route = useRoute();
+
 const activeDropdown = ref(null);
 const isMobileMenuOpen = ref(false);
+const isScrolled = ref(false);
+
+const handleScroll = () => {
+  isScrolled.value = window.scrollY > 60;
+};
+
+onMounted(() => {
+  window.addEventListener('scroll', handleScroll, { passive: true });
+  handleScroll();
+});
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll);
+});
 
 const toggleMobileMenu = () => {
   isMobileMenuOpen.value = !isMobileMenuOpen.value;
+  document.body.style.overflow = isMobileMenuOpen.value ? 'hidden' : '';
 };
 
 const closeMobileMenu = () => {
   isMobileMenuOpen.value = false;
+  document.body.style.overflow = '';
+  activeDropdown.value = null;
 };
 
-// ✅ Updated: Services section navigation with proper scrolling
 const navigateToServicesSection = (sectionId = 'services') => {
   closeMobileMenu();
   activeDropdown.value = null;
 
   const currentPath = router.currentRoute.value.path;
-
   if (currentPath === '/' || currentPath === '/home') {
-    // Already on home page, just scroll to section
     const section = document.getElementById(sectionId);
-    if (section) {
-      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
   } else {
-    // Navigate to home page with hash, then scroll after navigation
     router.push('/').then(() => {
-      // Wait for DOM to update
       setTimeout(() => {
         const section = document.getElementById(sectionId);
-        if (section) {
-          section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
+        if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 300);
     });
   }
 };
-
-// ✅ Navigation method for services (deprecated - use navigateToServicesSection)
-const navigateToServices = (event) => {
-  event?.preventDefault();
-  navigateToServicesSection('services');
-};
 </script>
 
 <style scoped>
-@keyframes shine-loop {
-  0% {
-    transform: translateX(-100%) skewX(-15deg);
-  }
-  100% {
-    transform: translateX(400%) skewX(-15deg);
-  }
+@keyframes ctaGlow {
+  0%, 100% { box-shadow: 0 4px 20px rgba(194, 65, 12, 0.3); }
+  50%       { box-shadow: 0 6px 28px rgba(194, 65, 12, 0.5), 0 0 0 4px rgba(194, 65, 12, 0.08); }
 }
 
-.animate-shine-loop {
-  animation: shine-loop 3s ease-in-out infinite;
+@keyframes btnShine {
+  0%, 80%, 100% { left: -60%; }
+  40%            { left: 120%; }
+}
+
+.dropdown-enter-active,
+.dropdown-leave-active {
+  transition: opacity 0.35s ease, transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.dropdown-enter-from,
+.dropdown-leave-to {
+  opacity: 0;
+  transform: translateX(-50%) translateY(12px);
+}
+.dropdown-enter-to,
+.dropdown-leave-from {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.backdrop-fade-enter-active,
+.backdrop-fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.backdrop-fade-enter-from,
+.backdrop-fade-leave-to {
+  opacity: 0;
 }
 </style>
