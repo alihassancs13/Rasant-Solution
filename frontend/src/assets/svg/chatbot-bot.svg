@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 -28 280 348" role="img" aria-label="Chatbot widget mascot">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="12 14 256 296" role="img" aria-label="Chatbot widget mascot">
   <defs>
-    <linearGradient id="cwGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#14B8A6"/>
-      <stop offset="55%" stop-color="#2DD4BF"/>
-      <stop offset="100%" stop-color="#0F766E"/>
-    </linearGradient>
     <linearGradient id="cwRing" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="#C96E3A"/>
       <stop offset="50%" stop-color="#B0457A"/>
@@ -13,7 +8,7 @@
     </linearGradient>
     <clipPath id="cwFaceClip"><circle cx="140" cy="168" r="54"/></clipPath>
     <filter id="cwShadow" x="-30%" y="-30%" width="160%" height="160%">
-      <feDropShadow dx="0" dy="14" stdDeviation="18" flood-color="#14B8A6" flood-opacity="0.28"/>
+      <feDropShadow dx="0" dy="12" stdDeviation="16" flood-color="#14B8A6" flood-opacity="0.22"/>
     </filter>
     <style>
       .cw-orbit { animation: cwOrbit 10s linear infinite; transform-box: fill-box; transform-origin: 140px 168px; }
@@ -27,7 +22,8 @@
     </style>
   </defs>
 
-  <ellipse cx="140" cy="298" rx="68" ry="11" fill="#14B8A6" opacity="0.14" class="cw-pulse"/>
+  <ellipse cx="140" cy="168" rx="100" ry="108" fill="#14B8A6" opacity="0.06"/>
+  <ellipse cx="140" cy="286" rx="62" ry="9" fill="#14B8A6" opacity="0.12" class="cw-pulse"/>
 
   <g class="cw-orbit" opacity="0.85">
     <g transform="translate(140,168)">
@@ -55,8 +51,6 @@
   </g>
 
   <g filter="url(#cwShadow)">
-    <circle cx="140" cy="168" r="62" fill="url(#cwGrad)"/>
-    <circle cx="140" cy="168" r="54" fill="none" stroke="white" stroke-width="2" opacity="0.2"/>
     <image href="../images/chatbot-face.png" x="86" y="114" width="108" height="108" clip-path="url(#cwFaceClip)" preserveAspectRatio="xMidYMid slice"/>
     <circle cx="182" cy="126" r="10" fill="#F59E0B" stroke="white" stroke-width="2.5"/>
     <text x="182" y="130" text-anchor="middle" font-family="Space Grotesk,Arial,sans-serif" font-size="9" font-weight="800" fill="white">3</text>

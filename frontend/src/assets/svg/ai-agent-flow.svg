@@ -1,15 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 320" role="img" aria-label="AI Agent workflow diagram">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 900 320" role="img" aria-label="AI Agent workflow diagram">
   <defs>
     <linearGradient id="aaFlowGrad" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="#FFD5B4"/>
       <stop offset="50%" stop-color="#C9C4F8"/>
       <stop offset="100%" stop-color="#4A90E2"/>
     </linearGradient>
-    <linearGradient id="aaHubGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#2A5F9E"/>
-      <stop offset="100%" stop-color="#4A90E2"/>
-    </linearGradient>
+    <clipPath id="aaHubClip"><circle cx="280" cy="152" r="40"/></clipPath>
     <filter id="aaShadow" x="-10%" y="-10%" width="120%" height="120%">
       <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#4A90E2" flood-opacity="0.15"/>
     </filter>
@@ -45,13 +42,10 @@
 
   <g class="aa-fade d2" filter="url(#aaShadow)">
     <circle class="aa-spin" cx="280" cy="160" r="58" fill="none" stroke="url(#aaFlowGrad)" stroke-width="2" stroke-dasharray="6 8" opacity="0.5"/>
-    <circle class="aa-pulse" cx="280" cy="160" r="48" fill="url(#aaHubGrad)"/>
-    <rect x="256" y="136" width="48" height="40" rx="12" fill="rgba(255,255,255,0.15)"/>
-    <circle cx="268" cy="152" r="5" fill="#E0F2FE"/>
-    <circle cx="292" cy="152" r="5" fill="#E0F2FE"/>
-    <rect x="266" y="164" width="28" height="4" rx="2" fill="white" opacity="0.5"/>
-    <text x="280" y="186" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="9" font-weight="700" fill="white">AI AGENT</text>
-    <text x="280" y="198" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="7" fill="rgba(255,255,255,0.85)">Reason - Act - Learn</text>
+    <circle class="aa-pulse" cx="280" cy="160" r="48" fill="#EFF6FF" stroke="#8FB9F4" stroke-width="2"/>
+    <image href="../images/ai-agent-face.png" x="240" y="112" width="80" height="80" clip-path="url(#aaHubClip)" preserveAspectRatio="xMidYMid slice"/>
+    <text x="280" y="186" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="9" font-weight="700" fill="#2A5F9E">AI AGENT</text>
+    <text x="280" y="198" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="7" fill="#64748B">Reason - Act - Learn</text>
   </g>
 
   <path class="aa-flow" d="M328 160 H373" fill="none" stroke="url(#aaFlowGrad)" stroke-width="2.5"/>
