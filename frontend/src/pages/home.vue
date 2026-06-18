@@ -189,8 +189,7 @@
   <section
       id="platform"
       ref="platformRef"
-      class="relative overflow-hidden px-[5%] pt-20 pb-[72px]"
-      style="background: linear-gradient(165deg, #FFF8F3 0%, #FDF2F8 28%, #F5F0FF 52%, #EFF6FF 100%); font-family: 'Inter', sans-serif;"
+      class="relative overflow-hidden px-[5%] pt-20 pb-[72px] scroll-mt-20 bg-[linear-gradient(165deg,_#FFF8F3_0%,_#FDF2F8_28%,_#F5F0FF_52%,_#EFF6FF_100%)] font-[Inter,_sans-serif]"
   >
     <div class="pointer-events-none absolute -top-20 -left-20 w-[420px] h-[420px] rounded-full bg-[radial-gradient(circle,rgba(255,213,180,0.22)_0%,transparent_70%)]"></div>
     <div class="pointer-events-none absolute -bottom-16 -right-16 w-[360px] h-[360px] rounded-full bg-[radial-gradient(circle,rgba(143,185,244,0.18)_0%,transparent_70%)]"></div>
@@ -247,8 +246,7 @@
   <section
       id="products"
       ref="productsRef"
-      class="relative overflow-hidden px-[5%] py-24"
-      style="background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFC 100%); font-family: 'Inter', sans-serif;"
+      class="relative overflow-hidden px-[5%] py-24 scroll-mt-20 font-[Inter,_sans-serif]"
   >
     <div class="pointer-events-none absolute top-[10%] -right-[8%] w-[520px] h-[520px] rounded-full bg-[radial-gradient(circle,rgba(74,144,226,0.08)_0%,transparent_70%)]"></div>
 
@@ -375,8 +373,7 @@
   <section
       id="services"
       ref="servicesRef"
-      class="px-[5%] py-24 bg-white"
-      style="font-family: 'Inter', sans-serif;"
+      class="px-[5%] py-24 bg-white scroll-mt-20 font-[Inter,_sans-serif]"
   >
     <div class="max-w-7xl mx-auto">
 
@@ -740,8 +737,7 @@ const words = ['Intelligent', 'Scalable', 'Beautiful', 'Future-Ready']
 const currentWordIndex = ref(0)
 let rotateInterval = null
 
-
-
+// ─── Data ─────────────────────────────────────────────────────────────────────
 const techList = [
   { name: 'Flutter',      icon: ['fas', 'mobile-screen'], color: 'text-[#0EA5E9]'     },
   { name: 'Next.js',      icon: ['fas', 'server'],         color: 'text-[#1E3A5F]'  },
@@ -875,6 +871,16 @@ function restartAuto() {
   autoTimer = setInterval(next, SLIDE_DURATION)
 }
 
+// ✅ ADD THIS: Scroll to services function
+const scrollToServices = () => {
+  const section = document.getElementById('services');
+  if (section) {
+    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    return true;
+  }
+  return false;
+};
+
 // ─── Lifecycle ────────────────────────────────────────────────────────────────
 onMounted(() => {
   // Hero animation
@@ -943,6 +949,9 @@ onMounted(() => {
   // Carousel auto-play
   restartProgress()
   autoTimer = setInterval(next, SLIDE_DURATION)
+
+  // ✅ ADD THIS: Expose scrollToServices to window for navbar
+  window.scrollToServices = scrollToServices;
 })
 
 onUnmounted(() => {
@@ -950,6 +959,9 @@ onUnmounted(() => {
   clearInterval(autoTimer)
   clearTimeout(exitTimer)
   observers.forEach(o => o.disconnect())
+
+  // ✅ ADD THIS: Clean up
+  delete window.scrollToServices;
 })
 </script>
 

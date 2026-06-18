@@ -199,10 +199,11 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, onMounted, onUnmounted } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 
 const router = useRouter();
+const route = useRoute();
 const activeDropdown = ref(null);
 const isMobileMenuOpen = ref(false);
 
@@ -219,35 +220,68 @@ const navigateToServicesSection = (sectionId = 'services') => {
   closeMobileMenu();
   activeDropdown.value = null;
 
-  const currentPath = router.currentRoute.value.path;
+  const currentPath = route.path;
 
+  // If on home page
   if (currentPath === '/' || currentPath === '/home') {
-    // Already on home page, just scroll to section
-    const section = document.getElementById(sectionId);
-    if (section) {
-      section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Use window.scrollToServices if available (from Home page)
+    if (window.scrollToServices) {
+      window.scrollToServices();
+    } else {
+      // Fallback: direct scroll
+      const section = document.getElementById(sectionId);
+      if (section) {
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }
   } else {
-    // Navigate to home page with hash, then scroll after navigation
+    // Navigate to home page then scroll
     router.push('/').then(() => {
-      // Wait for DOM to update
       setTimeout(() => {
-        const section = document.getElementById(sectionId);
-        if (section) {
-          section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (window.scrollToServices) {
+          window.scrollToServices();
+        } else {
+          const section = document.getElementById(sectionId);
+          if (section) {
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
         }
-      }, 300);
+      }, 500);
     });
   }
 };
 
-// ✅ Navigation method for services (deprecated - use navigateToServicesSection)
+// Navigation for services (backward compatibility)
 const navigateToServices = (event) => {
   event?.preventDefault();
   navigateToServicesSection('services');
 };
-</script>
 
+// ✅ Navigation wrapper that scrolls to top
+const navigateWithScroll = (path) => {
+  closeMobileMenu();
+  router.push(path).then(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+};
+
+// ✅ Close dropdowns on route change
+const closeDropdowns = () => {
+  activeDropdown.value = null;
+};
+
+// ✅ Lifecycle - Cleanup
+onMounted(() => {
+  // Close dropdown on route change
+  router.afterEach(() => {
+    closeDropdowns();
+  });
+});
+
+onUnmounted(() => {
+  // Clean up router afterEach if needed
+});
+</script>
 <style scoped>
 @keyframes shine-loop {
   0% {
