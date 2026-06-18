@@ -679,6 +679,7 @@ import serviceSoftwareSvg from '@/assets/svg/service-software.svg'
 import serviceWebMobileSvg from '@/assets/svg/service-webmobile.svg'
 import serviceCloudSvg from '@/assets/svg/service-cloud.svg'
 import aboutIllustration from '@/assets/svg/hero-illustration.svg'
+import {useLogin} from "@/composables/useLogin.js";
 
 // ─── Scroll animation refs & state ───────────────────────────────────────────
 const statsRef       = ref(null)

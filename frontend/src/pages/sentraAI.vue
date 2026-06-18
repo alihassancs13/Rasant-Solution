@@ -41,8 +41,8 @@
           <div class="relative z-[3] flex justify-center">
             <div class="relative w-[min(360px,86vw)]">
               <div class="absolute inset-[8%] rounded-full bg-[radial-gradient(circle,rgba(74,144,226,0.22)_0%,transparent_70%)] pointer-events-none"></div>
-              <div class="absolute inset-[-14px] rounded-full border-2 border-dashed border-[rgba(42,95,158,0.32)] pointer-events-none"></div>
-              <div class="absolute inset-[-22px] rounded-full border-2 border-dashed border-[rgba(20,184,166,0.22)] pointer-events-none"></div>
+              <div class="absolute inset-[-14px] rounded-full border-2 border-dashed border-[rgba(42,95,158,0.32)] pointer-events-none animate-spin-slow"></div>
+              <div class="absolute inset-[-22px] rounded-full border-2 border-dashed border-[rgba(20,184,166,0.22)] pointer-events-none animate-spin-reverse-slow"></div>
               <img src="@/assets/svg/sentra-bot.svg" alt="Sentra AI call routing"
                    class="w-full relative z-[2] drop-shadow-[0_16px_36px_rgba(42,95,158,0.2)]" />
             </div>
@@ -66,6 +66,7 @@
           </p>
         </div>
         <div class="rounded-2xl p-[14px] bg-white/90 border border-[rgba(203,213,225,0.9)] shadow-[0_20px_60px_rgba(42,95,158,0.1)]">
+          <!-- ✅ sentra-platform.svg added here -->
           <img src="@/assets/svg/sentra-platform.svg" alt="Sentra AI platform architecture"
                class="w-full block rounded-[14px]" />
         </div>
@@ -109,17 +110,18 @@
           <span class="inline-block text-xs font-semibold uppercase tracking-[1.5px] text-[#2A5F9E] bg-white/80 px-4 py-2 rounded-full border border-[rgba(42,95,158,0.12)] mb-4 font-['Inter']">Command Center</span>
           <h2 class="font-['Space_Grotesk'] text-[clamp(24px,3vw,36px)] font-extrabold tracking-[-0.8px] leading-[1.15] text-[#1E3A5F] mb-3">Real-time dashboard overview</h2>
           <p class="text-[15px] text-[#475569] leading-relaxed max-w-[480px] font-['Inter']">A live snapshot of your entire operation — scheduled calls, queue depth, module usage, and activity trends that refresh automatically so supervisors always know what is happening right now.</p>
-          <ul class="mt-[22px] max-w-[480px] space-y-4">
-            <li v-for="item in dashboardFeatures" :key="item.title" class="flex gap-4">
+
+          <div class="mt-[22px] max-w-[480px] grid grid-cols-1 gap-4">
+            <div v-for="item in dashboardFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-[#E2E8F0] hover:border-[#4A90E2]/30 transition-all duration-300">
               <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5" style="background: rgba(74, 144, 226, 0.08);">
-                <i :class="item.icon" class="text-[#4A90E2] text-sm" aria-hidden="true"></i>
+                <i :class="item.icon" class="bg-[#4A90E2]/8 text-sm" aria-hidden="true"></i>
               </span>
               <div>
                 <h4 class="text-sm font-bold text-[#1E3A5F] font-['Space_Grotesk']">{{ item.title }}</h4>
                 <p class="text-[13px] text-[#475569] leading-relaxed font-['Inter']">{{ item.description }}</p>
               </div>
-            </li>
-          </ul>
+            </div>
+          </div>
         </div>
         <div class="relative z-[1]">
           <div class="relative w-full">
@@ -152,17 +154,18 @@
           <span class="inline-block text-xs font-semibold uppercase tracking-[1.5px] text-[#2A5F9E] bg-white/80 px-4 py-2 rounded-full border border-[rgba(42,95,158,0.12)] mb-4 font-['Inter']">Live Calls</span>
           <h2 class="font-['Space_Grotesk'] text-[clamp(24px,3vw,36px)] font-extrabold tracking-[-0.8px] leading-[1.15] text-[#1E3A5F] mb-3">Monitor and manage active calls</h2>
           <p class="text-[15px] text-[#475569] leading-relaxed max-w-[480px] font-['Inter']">Supervisors watch every active conversation in real time — who answered, which AI agent handled it, how long it ran, and whether a human agent has been assigned.</p>
-          <ul class="mt-[22px] max-w-[480px] space-y-4">
-            <li v-for="item in liveCallFeatures" :key="item.title" class="flex gap-4">
+
+          <div class="mt-[22px] max-w-[480px] grid grid-cols-1 gap-4">
+            <div v-for="item in liveCallFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-[#E2E8F0] hover:border-[#4A90E2]/30 transition-all duration-300">
               <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5" style="background: rgba(74, 144, 226, 0.08);">
-                <i :class="item.icon" class="text-[#4A90E2] text-sm" aria-hidden="true"></i>
+                <i :class="item.icon" class="bg-[#4A90E2]/8  text-sm" aria-hidden="true"></i>
               </span>
               <div>
                 <h4 class="text-sm font-bold text-[#1E3A5F] font-['Space_Grotesk']">{{ item.title }}</h4>
                 <p class="text-[13px] text-[#475569] leading-relaxed font-['Inter']">{{ item.description }}</p>
               </div>
-            </li>
-          </ul>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -177,17 +180,18 @@
           <span class="inline-block text-xs font-semibold uppercase tracking-[1.5px] text-[#2A5F9E] bg-white/80 px-4 py-2 rounded-full border border-[rgba(42,95,158,0.12)] mb-4 font-['Inter']">Call Queue</span>
           <h2 class="font-['Space_Grotesk'] text-[clamp(24px,3vw,36px)] font-extrabold tracking-[-0.8px] leading-[1.15] text-[#1E3A5F] mb-3">Intelligent call routing and queue management</h2>
           <p class="text-[15px] text-[#475569] leading-relaxed max-w-[480px] font-['Inter']">Calls waiting for assignment are prioritized by urgency and skill requirement. Managers see wait times, required expertise, and which agents are available to take the next call.</p>
-          <ul class="mt-[22px] max-w-[480px] space-y-4">
-            <li v-for="item in queueFeatures" :key="item.title" class="flex gap-4">
+
+          <div class="mt-[22px] max-w-[480px] grid grid-cols-1 gap-4">
+            <div v-for="item in queueFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-[#E2E8F0] hover:border-[#4A90E2]/30 transition-all duration-300">
               <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5" style="background: rgba(74, 144, 226, 0.08);">
-                <i :class="item.icon" class="text-[#4A90E2] text-sm" aria-hidden="true"></i>
+                <i :class="item.icon" class="bg-[#4A90E2]/8 text-sm" aria-hidden="true"></i>
               </span>
               <div>
                 <h4 class="text-sm font-bold text-[#1E3A5F] font-['Space_Grotesk']">{{ item.title }}</h4>
                 <p class="text-[13px] text-[#475569] leading-relaxed font-['Inter']">{{ item.description }}</p>
               </div>
-            </li>
-          </ul>
+            </div>
+          </div>
         </div>
         <div class="relative z-[1]">
           <div class="relative w-full">
@@ -215,13 +219,13 @@
                      class="w-full h-auto rounded-[10px]" />
               </div>
             </div>
-            <div class="relative w-full">
+            <figure class="relative w-full">
               <div class="relative z-[2] p-[8px] rounded-2xl bg-white/95 border border-[rgba(203,213,225,0.95)] shadow-[0_12px_32px_rgba(15,23,42,0.07)] overflow-hidden">
                 <img src="@/assets/images/bulk-contacts.png" alt="Sentra AI bulk contacts"
                      class="w-full h-auto rounded-[10px]" />
-                <figcaption class="mt-2.5 text-xs text-[#475569] text-center font-['Inter']">Bulk import contacts via CSV with optional campaign assignment.</figcaption>
               </div>
-            </div>
+              <figcaption class="mt-2.5 text-xs text-[#475569] text-center font-['Inter']">Bulk import contacts via CSV with optional campaign assignment.</figcaption>
+            </figure>
           </div>
         </div>
         <div class="relative z-[2] order-1 lg:order-2">
@@ -229,17 +233,18 @@
           <span class="inline-block text-xs font-semibold uppercase tracking-[1.5px] text-[#2A5F9E] bg-white/80 px-4 py-2 rounded-full border border-[rgba(42,95,158,0.12)] mb-4 font-['Inter']">Campaigns &amp; Contacts</span>
           <h2 class="font-['Space_Grotesk'] text-[clamp(24px,3vw,36px)] font-extrabold tracking-[-0.8px] leading-[1.15] text-[#1E3A5F] mb-3">Launch and manage outbound campaigns</h2>
           <p class="text-[15px] text-[#475569] leading-relaxed max-w-[480px] font-['Inter']">Create AI-driven Sales, Service, or custom campaigns — toggle them on or off, set start dates, and import thousands of contacts in one CSV upload with validation built in.</p>
-          <ul class="mt-[22px] max-w-[480px] space-y-4">
-            <li v-for="item in campaignFeatures" :key="item.title" class="flex gap-4">
+
+          <div class="mt-[22px] max-w-[480px] grid grid-cols-1 gap-4">
+            <div v-for="item in campaignFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-[#E2E8F0] hover:border-[#4A90E2]/30 transition-all duration-300">
               <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5" style="background: rgba(74, 144, 226, 0.08);">
-                <i :class="item.icon" class="text-[#4A90E2] text-sm" aria-hidden="true"></i>
+                <i :class="item.icon" class="bg-[#4A90E2]/8  text-sm" aria-hidden="true"></i>
               </span>
               <div>
                 <h4 class="text-sm font-bold text-[#1E3A5F] font-['Space_Grotesk']">{{ item.title }}</h4>
                 <p class="text-[13px] text-[#475569] leading-relaxed font-['Inter']">{{ item.description }}</p>
               </div>
-            </li>
-          </ul>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -254,17 +259,18 @@
           <span class="inline-block text-xs font-semibold uppercase tracking-[1.5px] text-[#2A5F9E] bg-white/80 px-4 py-2 rounded-full border border-[rgba(42,95,158,0.12)] mb-4 font-['Inter']">Call Scheduler</span>
           <h2 class="font-['Space_Grotesk'] text-[clamp(24px,3vw,36px)] font-extrabold tracking-[-0.8px] leading-[1.15] text-[#1E3A5F] mb-3">Automated dialing on your schedule</h2>
           <p class="text-[15px] text-[#475569] leading-relaxed max-w-[480px] font-['Inter']">Per-campaign scheduling dials contacts automatically within your calling window. Monitor pool progress, daily limits, queue depth, and which AI agents are receiving calls.</p>
-          <ul class="mt-[22px] max-w-[480px] space-y-4">
-            <li v-for="item in schedulerFeatures" :key="item.title" class="flex gap-4">
+
+          <div class="mt-[22px] max-w-[480px] grid grid-cols-1 gap-4">
+            <div v-for="item in schedulerFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-[#E2E8F0] hover:border-[#4A90E2]/30 transition-all duration-300">
               <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5" style="background: rgba(74, 144, 226, 0.08);">
-                <i :class="item.icon" class="text-[#4A90E2] text-sm" aria-hidden="true"></i>
+                <i :class="item.icon" class="bg-[#4A90E2]/8  text-sm" aria-hidden="true"></i>
               </span>
               <div>
                 <h4 class="text-sm font-bold text-[#1E3A5F] font-['Space_Grotesk']">{{ item.title }}</h4>
                 <p class="text-[13px] text-[#475569] leading-relaxed font-['Inter']">{{ item.description }}</p>
               </div>
-            </li>
-          </ul>
+            </div>
+          </div>
         </div>
         <div class="relative z-[1]">
           <div class="relative w-full">
@@ -292,13 +298,13 @@
                      class="w-full h-auto rounded-[10px]" />
               </div>
             </div>
-            <div class="relative w-full">
+            <figure class="relative w-full">
               <div class="relative z-[2] p-[8px] rounded-2xl bg-white/95 border border-[rgba(203,213,225,0.95)] shadow-[0_12px_32px_rgba(15,23,42,0.07)] overflow-hidden">
                 <img src="@/assets/images/analytics-charts.png" alt="Sentra AI analytics charts"
                      class="w-full h-auto rounded-[10px]" />
-                <figcaption class="mt-2.5 text-xs text-[#475569] text-center font-['Inter']">Token trends, distribution breakdown, and usage by module.</figcaption>
               </div>
-            </div>
+              <figcaption class="mt-2.5 text-xs text-[#475569] text-center font-['Inter']">Token trends, distribution breakdown, and usage by module.</figcaption>
+            </figure>
           </div>
         </div>
         <div class="relative z-[2] order-1 lg:order-2">
@@ -306,17 +312,18 @@
           <span class="inline-block text-xs font-semibold uppercase tracking-[1.5px] text-[#2A5F9E] bg-white/80 px-4 py-2 rounded-full border border-[rgba(42,95,158,0.12)] mb-4 font-['Inter']">Analytics</span>
           <h2 class="font-['Space_Grotesk'] text-[clamp(24px,3vw,36px)] font-extrabold tracking-[-0.8px] leading-[1.15] text-[#1E3A5F] mb-3">Token usage, embeddings, and chat insights</h2>
           <p class="text-[15px] text-[#475569] leading-relaxed max-w-[480px] font-['Inter']">Filter analytics by client, user, date range, and grouping period. Track total tokens, embedding usage, AI response volume, and request counts — with drill-down into chat history and per-user stats.</p>
-          <ul class="mt-[22px] max-w-[480px] space-y-4">
-            <li v-for="item in analyticsFeatures" :key="item.title" class="flex gap-4">
+
+          <div class="mt-[22px] max-w-[480px] grid grid-cols-1 gap-4">
+            <div v-for="item in analyticsFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-[#E2E8F0] hover:border-[#4A90E2]/30 transition-all duration-300">
               <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5" style="background: rgba(74, 144, 226, 0.08);">
-                <i :class="item.icon" class="text-[#4A90E2] text-sm" aria-hidden="true"></i>
+                <i :class="item.icon" class="bg-[#4A90E2]/8  text-sm" aria-hidden="true"></i>
               </span>
               <div>
                 <h4 class="text-sm font-bold text-[#1E3A5F] font-['Space_Grotesk']">{{ item.title }}</h4>
                 <p class="text-[13px] text-[#475569] leading-relaxed font-['Inter']">{{ item.description }}</p>
               </div>
-            </li>
-          </ul>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -331,17 +338,18 @@
           <span class="inline-block text-xs font-semibold uppercase tracking-[1.5px] text-[#2A5F9E] bg-white/80 px-4 py-2 rounded-full border border-[rgba(42,95,158,0.12)] mb-4 font-['Inter']">Team Workspace</span>
           <h2 class="font-['Space_Grotesk'] text-[clamp(24px,3vw,36px)] font-extrabold tracking-[-0.8px] leading-[1.15] text-[#1E3A5F] mb-3">Agent availability and quick access</h2>
           <p class="text-[15px] text-[#475569] leading-relaxed max-w-[480px] font-['Inter']">See who is online across your organization for call routing and transfers. Agent availability bars, quick-launch shortcuts into key modules, and high-level counts for contacts, campaigns, uploads, and tokens.</p>
-          <ul class="mt-[22px] max-w-[480px] space-y-4">
-            <li v-for="item in teamFeatures" :key="item.title" class="flex gap-4">
+
+          <div class="mt-[22px] max-w-[480px] grid grid-cols-1 gap-4">
+            <div v-for="item in teamFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-[#E2E8F0] hover:border-[#4A90E2]/30 transition-all duration-300">
               <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5" style="background: rgba(74, 144, 226, 0.08);">
-                <i :class="item.icon" class="text-[#4A90E2] text-sm" aria-hidden="true"></i>
+                <i :class="item.icon" class="bg-[#4A90E2]/8  text-sm" aria-hidden="true"></i>
               </span>
               <div>
                 <h4 class="text-sm font-bold text-[#1E3A5F] font-['Space_Grotesk']">{{ item.title }}</h4>
                 <p class="text-[13px] text-[#475569] leading-relaxed font-['Inter']">{{ item.description }}</p>
               </div>
-            </li>
-          </ul>
+            </div>
+          </div>
         </div>
         <div class="relative z-[1]">
           <div class="relative w-full">
@@ -387,7 +395,7 @@
           Deploy Sentra AI on your stack or start with our managed demo environment.
         </p>
         <div class="flex gap-3.5 justify-center flex-wrap">
-          <router-link to="/login" class="inline-flex items-center px-8 py-4 bg-white text-[#2A5F9E] font-semibold rounded-lg hover:bg-gray-100 transition-all duration-300 shadow-lg hover:shadow-xl font-['Inter']">
+          <router-link to="/login" class="inline-flex items-center px-8 py-4 bg-orange-600 text-white font-semibold rounded-lg hover:bg-gray-100 transition-all duration-300 shadow-lg hover:shadow-xl font-['Inter']">
             Open Sentra Portal
           </router-link>
           <router-link to="/contact?project=sentra" class="inline-flex items-center px-8 py-4 border-2 border-white/40 text-white font-semibold rounded-lg hover:bg-white/10 transition-all duration-300 font-['Inter']">
@@ -472,4 +480,21 @@ export default {
 </script>
 
 <style scoped>
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes spin-reverse {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+.animate-spin-slow {
+  animation: spin 22s linear infinite;
+}
+
+.animate-spin-reverse-slow {
+  animation: spin-reverse 30s linear infinite;
+}
 </style>
