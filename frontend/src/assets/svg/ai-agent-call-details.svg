@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 360" role="img" aria-label="Call details modal">
+  <defs>
+    <style>
+      .cd-in { opacity: 0; animation: cdIn 0.7s ease forwards; }
+      @keyframes cdIn { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:none} }
+      .cd-pulse { animation: cdPulse 2s ease-in-out infinite; }
+      @keyframes cdPulse { 0%,100%{opacity:.7} 50%{opacity:1} }
+    </style>
+  </defs>
+  <rect width="480" height="360" rx="16" fill="white" stroke="#E2E8F0"/>
+  <text x="24" y="32" font-family="Inter,Arial,sans-serif" font-size="16" font-weight="700" fill="#1E293B">Call Details</text>
+  <rect x="120" y="18" width="62" height="20" rx="10" fill="#D1FAE5"/>
+  <text x="151" y="32" text-anchor="middle" font-size="9" font-weight="600" fill="#047857" font-family="Inter,Arial,sans-serif">Answered</text>
+  <text x="200" y="32" font-size="10" fill="#64748B" font-family="Inter,Arial,sans-serif">2026-06-12 11:16:54</text>
+  <text x="340" y="32" font-size="10" fill="#64748B" font-family="Inter,Arial,sans-serif">+923155580687</text>
+  <line x1="24" y1="48" x2="456" y2="48" stroke="#F1F5F9"/>
+  <g font-family="Inter,Arial,sans-serif" font-size="10">
+    <text x="24" y="68" font-weight="700" fill="#2DD4BF">Overview</text>
+    <text x="100" y="68" fill="#94A3B8">Transcription</text>
+    <text x="190" y="68" fill="#94A3B8">Summary</text>
+    <text x="260" y="68" fill="#94A3B8">Related Tickets</text>
+    <line x1="24" y1="74" x2="80" y2="74" stroke="#2DD4BF" stroke-width="2"/>
+  </g>
+  <text x="24" y="96" font-size="8" font-weight="700" fill="#94A3B8" font-family="Inter,Arial,sans-serif">CALL DETAILS</text>
+  <g class="cd-in">
+    <rect x="24" y="104" width="100" height="48" rx="8" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <text x="32" y="120" font-size="8" fill="#94A3B8" font-family="Inter,Arial,sans-serif">AI Agent</text>
+    <text x="32" y="138" font-size="11" font-weight="600" fill="#1E293B" font-family="Inter,Arial,sans-serif">Danison</text>
+    <rect x="132" y="104" width="100" height="48" rx="8" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <text x="140" y="120" font-size="8" fill="#94A3B8" font-family="Inter,Arial,sans-serif">Client</text>
+    <text x="140" y="138" font-size="11" font-weight="600" fill="#1E293B" font-family="Inter,Arial,sans-serif">danialali</text>
+    <rect x="240" y="104" width="100" height="48" rx="8" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <text x="248" y="120" font-size="8" fill="#94A3B8" font-family="Inter,Arial,sans-serif">Campaign</text>
+    <text x="248" y="138" font-size="11" font-weight="600" fill="#1E293B" font-family="Inter,Arial,sans-serif">Sales</text>
+    <rect x="348" y="104" width="108" height="48" rx="8" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <text x="356" y="120" font-size="8" fill="#94A3B8" font-family="Inter,Arial,sans-serif">Duration</text>
+    <text x="356" y="138" font-size="11" font-weight="600" fill="#1E293B" font-family="Inter,Arial,sans-serif">00:06:26</text>
+  </g>
+  <text x="24" y="178" font-size="8" font-weight="700" fill="#94A3B8" font-family="Inter,Arial,sans-serif">CALL NOTES</text>
+  <rect x="24" y="186" width="432" height="44" rx="8" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <text x="36" y="212" font-size="10" fill="#94A3B8" font-family="Inter,Arial,sans-serif">No notes available.</text>
+  <text x="24" y="254" font-size="8" font-weight="700" fill="#94A3B8" font-family="Inter,Arial,sans-serif">RECORDING</text>
+  <rect x="24" y="262" width="432" height="72" rx="10" fill="none" stroke="#CBD5E1" stroke-dasharray="6 4"/>
+  <circle class="cd-pulse" cx="240" cy="290" r="18" fill="#2DD4BF"/>
+  <polygon points="236,282 236,298 250,290" fill="white"/>
+  <text x="240" y="318" text-anchor="middle" font-size="9" fill="#64748B" font-family="Inter,Arial,sans-serif">Recording available</text>
+  <rect x="168" y="328" width="144" height="28" rx="8" fill="#2A5F9E"/>
+  <text x="240" y="346" text-anchor="middle" font-size="10" font-weight="600" fill="white" font-family="Inter,Arial,sans-serif">Play Recording</text>
+</svg>

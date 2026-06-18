@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 130" fill="none" aria-hidden="true">
+  <circle cx="80" cy="65" r="52" fill="url(#ibBg)" opacity="0.2"/>
+  <rect x="28" y="36" width="72" height="58" rx="12" fill="#fff" stroke="#C9C4F8" stroke-width="2"/>
+  <path d="M28 48l36 28 36-28" stroke="#8FB9F4" stroke-width="2" fill="none"/>
+  <circle cx="108" cy="44" r="22" fill="url(#ibChat)"/>
+  <path d="M98 44h20M108 34v20" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/>
+  <rect x="44" y="72" width="40" height="5" rx="2" fill="#FFD5B4"/>
+  <rect x="44" y="82" width="28" height="5" rx="2" fill="#E8C1D9"/>
+  <defs>
+    <linearGradient id="ibBg" x1="20" y1="10" x2="140" y2="120">
+      <stop stop-color="#E8C1D9"/><stop offset="1" stop-color="#4A90E2"/>
+    </linearGradient>
+    <linearGradient id="ibChat" x1="86" y1="22" x2="130" y2="66">
+      <stop stop-color="#14B8A6"/><stop offset="1" stop-color="#4A90E2"/>
+    </linearGradient>
+  </defs>
+</svg>

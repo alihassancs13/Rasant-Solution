@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 300" role="img" aria-label="Orchestri multi-agent workflow">
+  <defs>
+    <linearGradient id="oaBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF8F3"/>
+      <stop offset="100%" stop-color="#EFF6FF"/>
+    </linearGradient>
+    <linearGradient id="oaHub" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#6366F1"/>
+      <stop offset="100%" stop-color="#2A5F9E"/>
+    </linearGradient>
+    <style>
+      .oa-float { animation: oaFloat 4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+      .oa-float.f2 { animation-delay: -1.3s; }
+      .oa-float.f3 { animation-delay: -2.6s; }
+      @keyframes oaFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+      .oa-line { stroke-dasharray:6 5; animation: oaLine 1.2s linear infinite; }
+      @keyframes oaLine { to { stroke-dashoffset: -22; } }
+    </style>
+  </defs>
+  <rect width="380" height="300" rx="16" fill="url(#oaBg)" stroke="#CBD5E1"/>
+  <path class="oa-line" d="M190 150 L70 70" stroke="#6366F1" stroke-width="2" fill="none" opacity="0.5"/>
+  <path class="oa-line" d="M190 150 L310 70" stroke="#14B8A6" stroke-width="2" fill="none" opacity="0.5"/>
+  <path class="oa-line" d="M190 150 L70 230" stroke="#4A90E2" stroke-width="2" fill="none" opacity="0.5"/>
+  <path class="oa-line" d="M190 150 L310 230" stroke="#F59E0B" stroke-width="2" fill="none" opacity="0.5"/>
+  <g class="oa-float"><rect x="28" y="44" width="84" height="52" rx="10" fill="#FFFFFF" stroke="#6366F1"/><text x="70" y="68" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="9" font-weight="700" fill="#4338CA">Spec agent</text><text x="70" y="82" text-anchor="middle" font-size="7" fill="#64748B">Requirements</text></g>
+  <g class="oa-float f2"><rect x="268" y="44" width="84" height="52" rx="10" fill="#FFFFFF" stroke="#14B8A6"/><text x="310" y="68" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="9" font-weight="700" fill="#0F766E">Plan agent</text><text x="310" y="82" text-anchor="middle" font-size="7" fill="#64748B">Architecture</text></g>
+  <g class="oa-float f3"><rect x="28" y="204" width="84" height="52" rx="10" fill="#FFFFFF" stroke="#4A90E2"/><text x="70" y="228" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="9" font-weight="700" fill="#2A5F9E">Code agent</text><text x="70" y="242" text-anchor="middle" font-size="7" fill="#64748B">Implementation</text></g>
+  <g class="oa-float"><rect x="268" y="204" width="84" height="52" rx="10" fill="#FFFFFF" stroke="#F59E0B"/><text x="310" y="228" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="9" font-weight="700" fill="#C2410C">Debug agent</text><text x="310" y="242" text-anchor="middle" font-size="7" fill="#64748B">Test / fix loop</text></g>
+  <g><rect x="154" y="118" width="72" height="64" rx="14" fill="url(#oaHub)"/><text x="190" y="146" text-anchor="middle" font-family="Space Grotesk,Arial,sans-serif" font-size="10" font-weight="800" fill="#FFFFFF">ORCHESTRATOR</text><text x="190" y="162" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="7" fill="#FFFFFF" opacity="0.85">FSM state machine</text></g>
+</svg>

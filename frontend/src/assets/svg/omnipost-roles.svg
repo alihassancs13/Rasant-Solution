@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 300" role="img" aria-label="OmniPost team roles workflow">
+  <defs>
+    <linearGradient id="rGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#7C3AED"/>
+      <stop offset="100%" stop-color="#6366F1"/>
+    </linearGradient>
+    <style>
+      .r-flow { animation: rFlow 2.5s ease-in-out infinite; }
+      @keyframes rFlow { 0%,100%{opacity:.35} 50%{opacity:1} }
+    </style>
+  </defs>
+  <rect width="520" height="300" rx="16" fill="#FAFAFE"/>
+  <text x="260" y="32" text-anchor="middle" font-family="Space Grotesk,Arial,sans-serif" font-size="14" font-weight="800" fill="#312E81">One workspace - roles routed together</text>
+  <rect x="40" y="56" width="440" height="56" rx="12" fill="white" stroke="#E2E8F0"/>
+  <circle cx="68" cy="84" r="14" fill="#EDE9FE"/>
+  <text x="68" y="88" text-anchor="middle" font-size="10" font-weight="800" fill="#7C3AED">C</text>
+  <text x="92" y="80" font-family="Inter,Arial,sans-serif" font-size="11" font-weight="700" fill="#1E293B">Creator</text>
+  <text x="92" y="96" font-family="Inter,Arial,sans-serif" font-size="9" fill="#64748B">Drafts &amp; submits posts</text>
+  <rect x="350" y="70" width="58" height="22" rx="11" fill="#D1FAE5"/>
+  <text x="379" y="85" text-anchor="middle" font-size="9" font-weight="700" fill="#059669">Active</text>
+  <path d="M260,112v24" stroke="#C4B5FD" stroke-width="2" class="r-flow"/>
+  <rect x="40" y="136" width="440" height="56" rx="12" fill="white" stroke="#E2E8F0"/>
+  <circle cx="68" cy="164" r="14" fill="#FEF3C7"/>
+  <text x="68" y="168" text-anchor="middle" font-size="10" font-weight="800" fill="#D97706">A</text>
+  <text x="92" y="160" font-family="Inter,Arial,sans-serif" font-size="11" font-weight="700" fill="#1E293B">Approver</text>
+  <text x="92" y="176" font-family="Inter,Arial,sans-serif" font-size="9" fill="#64748B">Reviews before publish</text>
+  <rect x="350" y="154" width="58" height="22" rx="11" fill="#FEF3C7"/>
+  <text x="379" y="169" text-anchor="middle" font-size="9" font-weight="700" fill="#D97706">Queue</text>
+  <path d="M260,192v24" stroke="#C4B5FD" stroke-width="2" class="r-flow"/>
+  <rect x="40" y="216" width="210" height="56" rx="12" fill="white" stroke="#E2E8F0"/>
+  <circle cx="68" cy="244" r="14" fill="#E0E7FF"/>
+  <text x="68" y="248" text-anchor="middle" font-size="10" font-weight="800" fill="#4F46E5">O</text>
+  <text x="92" y="240" font-family="Inter,Arial,sans-serif" font-size="11" font-weight="700" fill="#1E293B">Org owner</text>
+  <text x="92" y="256" font-family="Inter,Arial,sans-serif" font-size="9" fill="#64748B">Users &amp; billing</text>
+  <rect x="168" y="232" width="52" height="22" rx="11" fill="#E0E7FF"/>
+  <text x="194" y="247" text-anchor="middle" font-size="9" font-weight="700" fill="#4F46E5">Admin</text>
+  <rect x="270" y="216" width="210" height="56" rx="12" fill="white" stroke="#E2E8F0"/>
+  <circle cx="298" cy="244" r="14" fill="#DCFCE7"/>
+  <text x="298" y="248" text-anchor="middle" font-size="10" font-weight="800" fill="#16A34A">S</text>
+  <text x="322" y="240" font-family="Inter,Arial,sans-serif" font-size="11" font-weight="700" fill="#1E293B">Scheduler</text>
+  <text x="322" y="256" font-family="Inter,Arial,sans-serif" font-size="9" fill="#64748B">Auto-publish on time</text>
+  <rect x="398" y="232" width="52" height="22" rx="11" fill="#D1FAE5"/>
+  <text x="424" y="247" text-anchor="middle" font-size="9" font-weight="700" fill="#059669">Live</text>
+  <rect x="200" y="268" width="120" height="24" rx="12" fill="url(#rGrad)"/>
+  <text x="260" y="284" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="10" font-weight="700" fill="white">Shared workspace</text>
+</svg>

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260" role="img" aria-label="OmniPost approval workflow">
+  <defs>
+    <linearGradient id="apGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#7C3AED"/>
+      <stop offset="100%" stop-color="#6366F1"/>
+    </linearGradient>
+  </defs>
+  <rect width="400" height="260" rx="14" fill="#FAFAFE"/>
+  <rect x="24" y="24" width="352" height="48" rx="10" fill="white" stroke="#E2E8F0"/>
+  <text x="44" y="54" font-family="Inter,Arial,sans-serif" font-size="12" font-weight="700" fill="#312E81">Draft: Summer product launch</text>
+  <rect x="300" y="38" width="60" height="22" rx="11" fill="#FEF3C7"/>
+  <text x="330" y="53" text-anchor="middle" font-size="9" font-weight="700" fill="#D97706">Pending</text>
+  <path d="M200,72v28" stroke="#C4B5FD" stroke-width="2" stroke-dasharray="4 4"/>
+  <rect x="24" y="100" width="352" height="72" rx="10" fill="white" stroke="#7C3AED" stroke-width="1.5"/>
+  <text x="44" y="128" font-family="Inter,Arial,sans-serif" font-size="11" font-weight="700" fill="#1E293B">Approver review</text>
+  <text x="44" y="148" font-family="Inter,Arial,sans-serif" font-size="9" fill="#64748B">Quality check before anything goes live</text>
+  <rect x="44" y="158" width="52" height="22" rx="6" fill="#D1FAE5"/>
+  <text x="70" y="173" text-anchor="middle" font-size="9" font-weight="700" fill="#059669">Approve</text>
+  <rect x="104" y="158" width="48" height="22" rx="6" fill="#FEE2E2"/>
+  <text x="128" y="173" text-anchor="middle" font-size="9" font-weight="700" fill="#DC2626">Reject</text>
+  <path d="M200,172v28" stroke="#C4B5FD" stroke-width="2"/>
+  <rect x="24" y="200" width="352" height="44" rx="10" fill="url(#apGrad)"/>
+  <text x="200" y="228" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="11" font-weight="700" fill="white">Scheduled - audit trail saved</text>
+</svg>

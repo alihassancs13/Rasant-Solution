@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+  <circle cx="60" cy="60" r="52" fill="url(#delBg)" opacity="0.2"/>
+  <rect x="38" y="32" width="44" height="56" rx="8" fill="#fff" stroke="#FECACA" stroke-width="2"/>
+  <path d="M48 32V28a6 6 0 0 1 6-6h12a6 6 0 0 1 6 6v4" stroke="#F87171" stroke-width="2" stroke-linecap="round"/>
+  <line x1="34" y1="32" x2="86" y2="32" stroke="#F87171" stroke-width="2" stroke-linecap="round"/>
+  <rect x="52" y="48" width="6" height="24" rx="2" fill="#FCA5A5"/>
+  <rect x="62" y="48" width="6" height="24" rx="2" fill="#FCA5A5"/>
+  <circle cx="60" cy="88" r="18" fill="url(#delWarn)"/>
+  <text x="60" y="93" text-anchor="middle" fill="#fff" font-size="20" font-weight="800" font-family="system-ui,sans-serif">!</text>
+  <defs>
+    <linearGradient id="delBg" x1="8" y1="8" x2="112" y2="112">
+      <stop stop-color="#FECACA"/><stop offset="1" stop-color="#F87171"/>
+    </linearGradient>
+    <linearGradient id="delWarn" x1="42" y1="70" x2="78" y2="106">
+      <stop stop-color="#EF4444"/><stop offset="1" stop-color="#DC2626"/>
+    </linearGradient>
+  </defs>
+</svg>

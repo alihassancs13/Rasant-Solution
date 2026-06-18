@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="16 20 888 248" role="img" aria-label="Voice AI agent call flow">
+  <defs>
+    <linearGradient id="vfGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#8FB9F4"/>
+      <stop offset="50%" stop-color="#6B52B8"/>
+      <stop offset="100%" stop-color="#2A5F9E"/>
+    </linearGradient>
+    <clipPath id="vfAgentClip"><circle cx="332" cy="118" r="34"/></clipPath>
+    <style>
+      .vf-flow { stroke-dasharray:7 5; animation: vfFlow 1s linear infinite; }
+      @keyframes vfFlow { to{stroke-dashoffset:-24} }
+      .vf-pulse { animation: vfPulse 2.2s ease-in-out infinite; transform-box:fill-box; transform-origin:center; }
+      @keyframes vfPulse { 0%,100%{opacity:1} 50%{opacity:.85} }
+      .vf-wave { animation: vfWave 1.4s ease-in-out infinite; transform-box: fill-box; transform-origin: bottom; }
+      .vf-wave.w2{animation-delay:.2s}.vf-wave.w3{animation-delay:.4s}
+      @keyframes vfWave { 0%,100%{transform:scaleY(.45)} 50%{transform:scaleY(1)} }
+    </style>
+  </defs>
+
+  <ellipse cx="460" cy="148" rx="380" ry="96" fill="#4A90E2" opacity="0.05"/>
+
+  <text x="460" y="32" text-anchor="middle" font-family="Space Grotesk,Arial,sans-serif" font-size="14" font-weight="700" fill="#1E3A5F">How your voice agent handles a call</text>
+
+  <g>
+    <rect x="24" y="56" width="150" height="200" rx="14" fill="white" stroke="#E2E8F0"/>
+    <text x="99" y="82" text-anchor="middle" font-size="11" font-weight="700" fill="#1E3A5F" font-family="Inter,Arial,sans-serif">Call sources</text>
+    <rect x="40" y="96" width="118" height="32" rx="8" fill="#EFF6FF" stroke="#8FB9F4"/>
+    <text x="99" y="116" text-anchor="middle" font-size="9" fill="#2A5F9E" font-family="Inter,Arial,sans-serif">Customer service line</text>
+    <rect x="40" y="136" width="118" height="32" rx="8" fill="#F5F3FF" stroke="#C4B5FD"/>
+    <text x="99" y="156" text-anchor="middle" font-size="9" fill="#6D28D9" font-family="Inter,Arial,sans-serif">Internal dialing</text>
+    <rect x="40" y="176" width="118" height="32" rx="8" fill="#ECFDF5" stroke="#34D399"/>
+    <text x="99" y="196" text-anchor="middle" font-size="9" fill="#047857" font-family="Inter,Arial,sans-serif">Outbound campaigns</text>
+    <rect x="40" y="216" width="118" height="28" rx="8" fill="#FFF7ED" stroke="#FDBA74"/>
+    <text x="99" y="234" text-anchor="middle" font-size="9" fill="#C2410C" font-family="Inter,Arial,sans-serif">Scheduled callbacks</text>
+  </g>
+
+  <path class="vf-flow" d="M174 156 H218" stroke="url(#vfGrad)" stroke-width="2.5" fill="none"/>
+  <polygon points="218,151 228,156 218,161" fill="#2A5F9E"/>
+
+  <g class="vf-pulse">
+    <rect x="232" y="56" width="200" height="200" rx="16" fill="white" stroke="#8FB9F4" stroke-width="2"/>
+    <text x="332" y="82" text-anchor="middle" font-size="11" font-weight="700" fill="#2A5F9E" font-family="Inter,Arial,sans-serif">Voice AI Agent</text>
+    <circle cx="332" cy="118" r="36" fill="#EFF6FF"/>
+    <image href="../images/ai-agent-face.png" x="294" y="80" width="76" height="76" clip-path="url(#vfAgentClip)" preserveAspectRatio="xMidYMid slice"/>
+    <text x="332" y="162" text-anchor="middle" font-size="9" fill="#64748B" font-family="Inter,Arial,sans-serif">Natural speech - STT and TTS</text>
+    <g transform="translate(332,178)" fill="#4A90E2">
+      <rect class="vf-wave" x="-20" y="-6" width="4" height="12" rx="2"/>
+      <rect class="vf-wave w2" x="-12" y="-10" width="4" height="20" rx="2"/>
+      <rect class="vf-wave w3" x="-4" y="-8" width="4" height="16" rx="2"/>
+      <rect class="vf-wave" x="4" y="-12" width="4" height="24" rx="2"/>
+      <rect class="vf-wave w2" x="12" y="-8" width="4" height="16" rx="2"/>
+    </g>
+    <rect x="262" y="198" width="60" height="22" rx="6" fill="#EFF6FF" stroke="#BFDBFE"/>
+    <text x="292" y="212" text-anchor="middle" font-size="8" fill="#2A5F9E" font-family="Inter,Arial,sans-serif">Understand</text>
+    <rect x="330" y="198" width="60" height="22" rx="6" fill="#F5F3FF" stroke="#DDD6FE"/>
+    <text x="360" y="212" text-anchor="middle" font-size="8" fill="#6D28D9" font-family="Inter,Arial,sans-serif">Respond</text>
+    <rect x="262" y="226" width="128" height="22" rx="6" fill="#ECFDF5" stroke="#A7F3D0"/>
+    <text x="326" y="240" text-anchor="middle" font-size="8" fill="#047857" font-family="Inter,Arial,sans-serif">Route or escalate call</text>
+  </g>
+
+  <path class="vf-flow" d="M432 156 H476" stroke="url(#vfGrad)" stroke-width="2.5" fill="none"/>
+  <polygon points="476,151 486,156 476,161" fill="#2A5F9E"/>
+
+  <g>
+    <rect x="490" y="56" width="170" height="200" rx="14" fill="white" stroke="#E2E8F0"/>
+    <text x="575" y="82" text-anchor="middle" font-size="11" font-weight="700" fill="#1E3A5F" font-family="Inter,Arial,sans-serif">During the call</text>
+    <text x="508" y="108" font-size="9" fill="#475569" font-family="Inter,Arial,sans-serif">- Understand intent</text>
+    <text x="508" y="126" font-size="9" fill="#475569" font-family="Inter,Arial,sans-serif">- Answer from knowledge</text>
+    <text x="508" y="144" font-size="9" fill="#475569" font-family="Inter,Arial,sans-serif">- Collect caller details</text>
+    <text x="508" y="162" font-size="9" fill="#475569" font-family="Inter,Arial,sans-serif">- Route or escalate</text>
+    <text x="508" y="180" font-size="9" fill="#475569" font-family="Inter,Arial,sans-serif">- Record and transcribe</text>
+    <rect x="508" y="196" width="134" height="44" rx="8" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <text x="575" y="216" text-anchor="middle" font-size="8" fill="#64748B" font-family="Inter,Arial,sans-serif">Reasonable pacing</text>
+    <text x="575" y="230" text-anchor="middle" font-size="8" fill="#64748B" font-family="Inter,Arial,sans-serif">and professional tone</text>
+  </g>
+
+  <path class="vf-flow" d="M660 156 H704" stroke="url(#vfGrad)" stroke-width="2.5" fill="none"/>
+  <polygon points="704,151 714,156 704,161" fill="#2A5F9E"/>
+
+  <g>
+    <rect x="716" y="56" width="180" height="200" rx="14" fill="white" stroke="#E2E8F0"/>
+    <text x="806" y="82" text-anchor="middle" font-size="11" font-weight="700" fill="#1E3A5F" font-family="Inter,Arial,sans-serif">Outcomes</text>
+    <rect x="732" y="96" width="148" height="36" rx="8" fill="#ECFDF5" stroke="#34D399"/>
+    <text x="806" y="118" text-anchor="middle" font-size="9" fill="#047857" font-family="Inter,Arial,sans-serif">Issue resolved on call</text>
+    <rect x="732" y="140" width="148" height="36" rx="8" fill="#F5F3FF" stroke="#C4B5FD"/>
+    <text x="806" y="162" text-anchor="middle" font-size="9" fill="#6D28D9" font-family="Inter,Arial,sans-serif">CRM note created</text>
+    <rect x="732" y="184" width="148" height="36" rx="8" fill="#FFF7ED" stroke="#FDBA74"/>
+    <text x="806" y="206" text-anchor="middle" font-size="9" fill="#C2410C" font-family="Inter,Arial,sans-serif">Warm transfer to agent</text>
+    <rect x="732" y="228" width="148" height="24" rx="8" fill="#EFF6FF" stroke="#8FB9F4"/>
+    <text x="806" y="243" text-anchor="middle" font-size="8" fill="#2A5F9E" font-family="Inter,Arial,sans-serif">Call logged and analyzed</text>
+  </g>
+</svg>
