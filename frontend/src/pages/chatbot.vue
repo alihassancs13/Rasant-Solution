@@ -55,7 +55,7 @@
                 class="relative overflow-hidden cursor-pointer w-50 flex items-center justify-center px-6 py-3.5 bg-orange-700 hover:bg-orange-900 text-base font-semibold text-white rounded-xl transition-all duration-200 shadow-[0_4px_14px_rgba(42,95,158,0.4)] hover:shadow-[0_6px_20px_rgba(42,95,158,0.6)] active:scale-[0.98] group"
             >
               Book a Chat Demo
-              <div class="absolute inset-0 w-1/4 h-full bg-white/10 pointer-events-none animate-shine-loop"></div>
+              <div class="absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/25 to-transparent pointer-events-none animate-[fastShineLoop_2.5s_ease-in-out_infinite]"></div>
             </button>
             <button
                 @click="scrollToPricing"
@@ -76,17 +76,8 @@
             <div class="relative w-full z-20 aspect-square max-w-sm mx-auto">
 
               <svg class="absolute inset-0 w-full h-full z-10 pointer-events-none" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="200" cy="200" r="160"
-                        stroke="#93c5fd" stroke-width="2" stroke-dasharray="8 6" opacity="0.6"
-                        class="animate-spin-slow" style="transform-origin: 200px 200px; animation-direction: reverse;" />
-
-                <circle cx="200" cy="200" r="130"
-                        stroke="#60a5fa" stroke-width="2" stroke-dasharray="6 4" opacity="0.8"
-                        class="animate-spin-reverse-slow" style="transform-origin: 200px 200px;" />
               </svg>
-
-              <img src="../assets/svg/chatbot-bot.svg" alt="Chatbot agent" class="w-full h-full object-contain drop-shadow-[0_16px_36px_rgba(42,95,158,0.2)]" title="Chatbot Agent" />
-
+              <img src="../assets/svg/chatbot-bot.svg" alt="Chatbot agent" class="w-80 h-80 object-contain drop-shadow-[0_16px_36px_rgba(42,95,158,0.2)]" title="Chatbot Agent" />
               <img src="../assets/images/chatbot-face.png" alt="Bot face" class="absolute top-[22%] left-1/2 -translate-x-1/2 w-[55%] object-contain z-30" title="Bot Face" />
             </div>
           </div>
@@ -108,7 +99,7 @@
           </div>
 
           <div class="lg:col-span-7">
-            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100 shadow-inner flex items-center justify-center">
+            <div class="p-4 bg-white rounded-2xl border border-slate-100/50 shadow-2xl shadow-purple-500/20 flex items-center justify-center">
               <img
                   src="../assets/svg/chatbot-flow.svg"
                   alt="Chatbot flow diagram"
@@ -122,15 +113,18 @@
       </div>
     </section>
 
-    <section class="py-20 lg:py-28 bg-slate-50 relative overflow-hidden">
+    <section class="py-20 lg:py-28 bg-slate-100 relative overflow-hidden">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center lg:direction-rtl">
 
-          <div class="lg:col-span-7 space-y-6 lg:order-1">
-            <div class="bg-white p-6 rounded-2xl shadow-xl border border-slate-200/60 space-y-6">
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="lg:col-span-7 lg:order-1">
+
+            <div class="bg-white  p-6 rounded-2xl shadow-xl border border-slate-200/60 space-y-6 max-w-lg mx-auto">
+
+              <div class="w-full">
                 <img src="../assets/images/chatbot-analytics-tokens.png" alt="Token metrics and activity trends" class="w-full h-auto rounded-xl border border-slate-100" />
               </div>
+
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="p-2 border border-slate-100 rounded-xl bg-slate-50/50">
                   <img src="../assets/images/chatbot-token-distribution.png" alt="Token distribution pie chart" class="w-full h-auto" />
@@ -139,9 +133,9 @@
                   <img src="../assets/images/chatbot-usage-overview.png" alt="Usage overview bar chart" class="w-full h-auto" />
                 </div>
               </div>
+
             </div>
           </div>
-
           <div class="lg:col-span-5 space-y-5 lg:order-2">
             <div class="font-['Space_Grotesk'] text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] text-slate-900/[0.065] pointer-events-none select-none">02</div>
             <span class="inline-block text-xs font-bold uppercase tracking-wider text-indigo-600">Live Analytics</span>
@@ -185,12 +179,16 @@
           </div>
 
           <div class="lg:col-span-6 flex justify-center">
-            <div class="relative p-6 bg-slate-50 rounded-2xl border border-slate-100 w-full max-w-md aspect-square flex items-center justify-center">
-              <div class="absolute inset-0 rounded-full border border-slate-200/50 animate-[spin_50s_linear_infinite]"></div>
+            <div class="relative p-6 bg-slate-50 rounded-2xl border border-slate-100 w-full max-w-md aspect-square flex items-center justify-center overflow-visible">
+
+              <div class="absolute inset-[-12%] rounded-full border-2 border-dashed border-purple-400/60 scale-y-[0.85] -rotate-12 animate-[spin_30s_linear_infinite] pointer-events-none"></div>
+
+              <div class="absolute inset-[-4%] rounded-full border-2 border-dashed border-sky-400/50 scale-x-[0.90] rotate-45 animate-[spin_20s_linear_infinite_reverse] pointer-events-none"></div>
+
               <img
                   src="../assets/svg/chatbot-messenger-bot.svg"
                   alt="Chatbot with messages"
-                  class="w-56 h-56 mx-auto relative z-10"
+                  class="w-80 h-100 mx-auto relative z-10"
                   title="Chatbot agent messaging"
               />
             </div>
@@ -229,7 +227,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
 
           <div class="lg:col-span-6 flex justify-center">
-            <div class="relative p-6 bg-white rounded-2xl shadow-md w-full max-w-lg">
+            <div class="relative p-6 bg-white rounded-2xl shadow-md w-full max-w-lg overflow-visible">
 
               <img
                   src="../assets/svg/chatbot-capabilities.svg"
@@ -237,6 +235,8 @@
                   class="w-full h-auto block relative z-10"
                   title="Chatbot capabilities and integrations"
               />
+
+              <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100%] h-[90%] rounded-3xl border-2 border-dashed border-purple-500/60 animate-[spin_35s_linear_infinite] z-10 pointer-events-none"></div>
 
               <img
                   src="../assets/images/chatbot-face.png"
@@ -414,7 +414,27 @@ const scrollToPricing = () => {
 .font-space-grotesk {
   font-family: 'Space Grotesk', sans-serif;
 }
-
+@keyframes fastShineLoop {
+  0% {
+    transform: translateX(-160%) skewX(-15deg);
+  }
+  /* Swift journey from Left to Right */
+  35% {
+    transform: translateX(260%) skewX(-15deg);
+  }
+  /* Quick pause at the right edge */
+  45% {
+    transform: translateX(260%) skewX(-15deg);
+  }
+  /* Swift journey back from Right to Left */
+  80% {
+    transform: translateX(-160%) skewX(-15deg);
+  }
+  /* Pause at the left edge before restarting the loop */
+  100% {
+    transform: translateX(-160%) skewX(-15deg);
+  }
+}
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
