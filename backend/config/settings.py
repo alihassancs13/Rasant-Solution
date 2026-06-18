@@ -77,17 +77,16 @@ WSGI_APPLICATION = 'config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'rasant',
-        'USER': 'root',
-        'PASSWORD': '',
-        'HOST': '192.168.18.21',
+        'NAME': 'rasant solutions',
+        'USER': 'remoteuser',  # or root if you configured root access
+        'PASSWORD': 'Password123',  # replace with your actual password
+        'HOST': '192.168.18.140',
         'PORT': '3306',
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
         },
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
