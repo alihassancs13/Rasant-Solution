@@ -27,7 +27,7 @@
         <div class="flex flex-col gap-3.5">
           <div class="animate-reveal-left flex items-start gap-4 p-4 sm:p-5 bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md hover:border-indigo-200 hover:translate-x-1 transition-all duration-300" style="animation-delay: 0.05s;">
             <div class="w-11 h-11 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-xl shrink-0">
-              <i class="fas fa-envelope text-indigo-600"></i>
+              <i class="fas fa-envelope border-[#4A90E2]/12"></i>
             </div>
             <div>
               <h4 class="text-sm font-bold text-slate-900 mb-1 font-['Space_Grotesk']">Email Us</h4>
@@ -37,7 +37,7 @@
 
           <div class="animate-reveal-left flex items-start gap-4 p-4 sm:p-5 bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md hover:border-indigo-200 hover:translate-x-1 transition-all duration-300" style="animation-delay: 0.12s;">
             <div class="w-11 h-11 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-xl shrink-0">
-              <i class="fas fa-phone text-indigo-600"></i>
+              <i class="fas fa-phone border-[#4A90E2]/12"></i>
             </div>
             <div>
               <h4 class="text-sm font-bold text-slate-900 mb-1 font-['Space_Grotesk']">Call Us</h4>
@@ -47,7 +47,7 @@
 
           <div class="animate-reveal-left flex items-start gap-4 p-4 sm:p-5 bg-white border border-slate-200 rounded-2xl shadow-sm hover:shadow-md hover:border-indigo-200 hover:translate-x-1 transition-all duration-300" style="animation-delay: 0.19s;">
             <div class="w-11 h-11 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-xl shrink-0">
-              <i class="fas fa-location-dot text-indigo-600"></i>
+              <i class="fas fa-location-dot border-[#4A90E2]/12"></i>
             </div>
             <div>
               <h4 class="text-sm font-bold text-slate-900 mb-1 font-['Space_Grotesk']">Visit Us</h4>
@@ -55,11 +55,11 @@
             </div>
           </div>
 
-          <div class="animate-reveal-left p-4 sm:p-5 bg-white border border-slate-200 border-l-4 border-l-indigo-600 rounded-2xl shadow-sm mt-1" style="animation-delay: 0.26s;">
-            <h4 class="text-xs font-bold uppercase tracking-wide text-indigo-600 mb-2 font-['Space_Grotesk']">
-              <i class="far fa-clock mr-2"></i>Business Hours
+          <div class="animate-reveal-left p-4 sm:p-5 bg-white border border-slate-200 border-l-4 border-l-orange-600 rounded-2xl shadow-sm mt-1" style="animation-delay: 0.26s;">
+            <h4 class="text-xs font-bold uppercase  tracking-wide text-orange-600 mb-2 font-['Space_Grotesk']">
+              Business Hours
             </h4>
-            <p class="text-sm text-slate-500 leading-relaxed font-['Inter']">Mon – Fri: 9:00 AM – 6:00 PM PKT<br />Sat: 10:00 AM – 2:00 PM PKT</p>
+            <p class="text-sm text-slate-500 leading-relaxed font-['Inter']">Mon – Fri: 9:00 AM – 6:00 PM PKT</p>
             <div class="inline-flex items-center gap-2 mt-3 text-xs font-semibold text-slate-900 bg-teal-50 border border-teal-200 px-3 py-1.5 rounded-full font-['Inter']">
               <span class="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse"></span> Available for new projects
             </div>
@@ -67,11 +67,11 @@
         </div>
 
         <div class="animate-reveal-right relative bg-white border border-slate-200 rounded-2xl shadow-lg p-5 sm:p-7 lg:p-9 overflow-hidden" style="animation-delay: 0.1s;">
-          <div class="absolute top-0 left-0 right-0 h-1 bg-orange-800"></div>
+          <div class="absolute top-0 left-0 right-0 h-1 bg-orange-600"></div>
 
           <div class="mb-5">
             <h2 class="text-xl font-bold text-slate-900 tracking-tight font-['Space_Grotesk']">
-              <i class="far fa-paper-plane mr-2 text-indigo-600"></i>Send a message
+              Send a message
             </h2>
             <p class="text-sm text-slate-500 mt-1 font-['Inter']">Tell us about your project — we'll reply within one business day.</p>
           </div>
@@ -131,7 +131,7 @@
               </label>
             </div>
 
-            <button type="submit" class="w-full rounded-xl bg-orange-800 text-white font-semibold py-3.5 hover:bg-orange-900 transition-colors relative overflow-hidden group font-['Inter']">
+            <button type="submit" class="w-full rounded-xl bg-orange-600 text-white font-semibold py-3.5 hover:bg-orange-900 transition-colors relative overflow-hidden group font-['Inter']">
               <span class="relative z-10 inline-flex items-center justify-center">
                 <i class="fas fa-paper-plane mr-2"></i>Send Message
               </span>
@@ -143,7 +143,7 @@
 
       <div class="max-w-6xl mx-auto px-4 sm:px-6 pb-10 sm:pb-14">
         <div class="animate-reveal flex items-center gap-4 bg-white border border-slate-200 rounded-2xl shadow-sm px-4 sm:px-6 py-4 sm:py-5" style="animation-delay: 0.3s;">
-          <span class="text-2xl text-slate-400 flex-shrink-0">→</span>
+          <font-awesome-icon :icon="['fas', 'video']" />
           <p class="text-sm text-slate-500 leading-relaxed font-['Inter']">
             <strong class="text-slate-900 font-['Space_Grotesk']">Remote-first, globally delivered.</strong> We work with clients across 20+ countries. Schedule a video call at a time that works for you — no office visit required.
           </p>
@@ -158,6 +158,7 @@
 <script setup>
 import Footer from '@/components/footer.vue';
 import Navbar from '@/components/navbar.vue';
+import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 
 const handleSubmit = (e) => {
   e.preventDefault();
