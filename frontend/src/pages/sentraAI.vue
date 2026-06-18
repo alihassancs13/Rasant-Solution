@@ -1,7 +1,6 @@
 <template>
   <Navbar />
-  <div class="min-h-screen bg-[#F8FAFC] font-['Inter'] text-[#1E3A5F] antialiased selection:bg-[#4A90E2]/20">
-
+  <div class="min-h-screen bg-[#f8fafc] font-['Inter'] text-[#1E3A5F] antialiased selection:bg-[#4A90E2]/20">
     <!-- Showcase Section -->
     <section class="relative pt-[68px] overflow-hidden" style="background: linear-gradient(180deg, #eff6ff 0%, #fff8f3 38%, #f8fafc 100%);">
       <div class="absolute inset-[-10%_-5%] pointer-events-none" :style="{
@@ -14,7 +13,6 @@
 
       <div class="max-w-7xl mx-auto px-[5%] relative z-10">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center py-16 lg:py-24">
-
           <!-- Left Content -->
           <div>
             <span class="inline-block text-xs font-semibold uppercase tracking-[1.5px] text-[#2A5F9E] bg-white/80 px-4 py-2 rounded-full border border-[rgba(42,95,158,0.12)] mb-4 font-['Inter']">
@@ -30,7 +28,7 @@
               Inbound and outbound voice, AI bots, live agents, chatbots, and supervisor analytics — one platform for modern contact centers.
             </p>
             <div class="flex gap-3 flex-wrap">
-              <router-link to="/login" class="inline-flex items-center px-6 py-3 bg-orange-600 text-white font-semibold rounded-lg hover:bg-[#9A3412] transition-all duration-300 shadow-lg shadow-[#C2410C]/30 hover:shadow-xl font-['Inter']">
+              <router-link to="/login" class="inline-flex items-center px-6 py-3 bg-[#C2410C] text-white font-semibold rounded-lg hover:bg-[#9A3412] transition-all duration-300 shadow-lg shadow-[#C2410C]/30 hover:shadow-xl font-['Inter']">
                 Open Sentra Portal
               </router-link>
               <router-link to="/contact?project=sentra" class="inline-flex items-center px-6 py-3 border-2 border-[#E2E8F0] text-[#1E3A5F] font-semibold rounded-lg hover:border-[#4A90E2] hover:text-[#4A90E2] transition-all duration-300 font-['Inter']">
@@ -43,8 +41,8 @@
           <div class="relative z-[3] flex justify-center">
             <div class="relative w-[min(360px,86vw)]">
               <div class="absolute inset-[8%] rounded-full bg-[radial-gradient(circle,rgba(74,144,226,0.22)_0%,transparent_70%)] pointer-events-none"></div>
-              <div class="absolute inset-[-14px] rounded-full border-2 border-dashed border-[rgba(42,95,158,0.32)] animate-[spin_22s_linear_infinite] pointer-events-none"></div>
-              <div class="absolute inset-[-22px] rounded-full border-2 border-dashed border-[rgba(20,184,166,0.22)] animate-[spin_30s_linear_infinite_reverse] pointer-events-none"></div>
+              <div class="absolute inset-[-14px] rounded-full border-2 border-dashed border-[rgba(42,95,158,0.32)] pointer-events-none"></div>
+              <div class="absolute inset-[-22px] rounded-full border-2 border-dashed border-[rgba(20,184,166,0.22)] pointer-events-none"></div>
               <img src="@/assets/svg/sentra-bot.svg" alt="Sentra AI call routing"
                    class="w-full relative z-[2] drop-shadow-[0_16px_36px_rgba(42,95,158,0.2)]" />
             </div>
@@ -125,7 +123,7 @@
         </div>
         <div class="relative z-[1]">
           <div class="relative w-full">
-            <div class="absolute inset-[6%_2%] rounded-full bg-[radial-gradient(circle,rgba(74,144,226,0.16)_0%,rgba(20,184,166,0.08)_45%,transparent_72%)] blur-[10px] animate-[uiGlow_4.5s_ease-in-out_infinite] pointer-events-none"></div>
+            <div class="absolute inset-[6%_2%] rounded-full bg-[radial-gradient(circle,rgba(74,144,226,0.16)_0%,rgba(20,184,166,0.08)_45%,transparent_72%)] blur-[10px] pointer-events-none"></div>
             <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-[rgba(203,213,225,0.95)] shadow-[0_22px_56px_rgba(15,23,42,0.1)] overflow-hidden">
               <img src="@/assets/images/scheduled-overview.png" alt="Sentra AI scheduled calls overview dashboard"
                    class="w-full h-auto rounded-[10px]" />
@@ -142,7 +140,7 @@
       <div class="max-w-[1140px] mx-auto relative grid grid-cols-1 lg:grid-cols-[1.08fr_0.92fr] gap-[clamp(28px,5vw,56px)] items-center z-[2]">
         <div class="relative z-[1] order-2 lg:order-1">
           <div class="relative w-full">
-            <div class="absolute inset-[6%_2%] rounded-full bg-[radial-gradient(circle,rgba(20,184,166,0.2)_0%,rgba(74,144,226,0.1)_45%,transparent_72%)] blur-[10px] animate-[uiGlow_4.5s_ease-in-out_infinite] pointer-events-none"></div>
+            <div class="absolute inset-[6%_2%] rounded-full bg-[radial-gradient(circle,rgba(20,184,166,0.2)_0%,rgba(74,144,226,0.1)_45%,transparent_72%)] blur-[10px] pointer-events-none"></div>
             <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-[rgba(203,213,225,0.95)] shadow-[0_22px_56px_rgba(15,23,42,0.1)] overflow-hidden">
               <img src="@/assets/images/live-calls.png" alt="Sentra AI live calls table"
                    class="w-full h-auto rounded-[10px]" />
@@ -193,7 +191,7 @@
         </div>
         <div class="relative z-[1]">
           <div class="relative w-full">
-            <div class="absolute inset-[6%_2%] rounded-full bg-[radial-gradient(circle,rgba(74,144,226,0.16)_0%,rgba(20,184,166,0.08)_45%,transparent_72%)] blur-[10px] animate-[uiGlow_4.5s_ease-in-out_infinite] pointer-events-none"></div>
+            <div class="absolute inset-[6%_2%] rounded-full bg-[radial-gradient(circle,rgba(74,144,226,0.16)_0%,rgba(20,184,166,0.08)_45%,transparent_72%)] blur-[10px] pointer-events-none"></div>
             <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-[rgba(203,213,225,0.95)] shadow-[0_22px_56px_rgba(15,23,42,0.1)] overflow-hidden">
               <img src="@/assets/images/call-queue.png" alt="Sentra AI call queue"
                    class="w-full h-auto rounded-[10px]" />
@@ -211,7 +209,7 @@
         <div class="relative z-[1] order-2 lg:order-1">
           <div class="flex flex-col gap-4">
             <div class="relative w-full">
-              <div class="absolute inset-[6%_2%] rounded-full bg-[radial-gradient(circle,rgba(20,184,166,0.2)_0%,rgba(74,144,226,0.1)_45%,transparent_72%)] blur-[10px] animate-[uiGlow_4.5s_ease-in-out_infinite] pointer-events-none"></div>
+              <div class="absolute inset-[6%_2%] rounded-full bg-[radial-gradient(circle,rgba(20,184,166,0.2)_0%,rgba(74,144,226,0.1)_45%,transparent_72%)] blur-[10px] pointer-events-none"></div>
               <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-[rgba(203,213,225,0.95)] shadow-[0_22px_56px_rgba(15,23,42,0.1)] overflow-hidden">
                 <img src="@/assets/images/campaigns.png" alt="Sentra AI campaigns"
                      class="w-full h-auto rounded-[10px]" />
@@ -270,7 +268,7 @@
         </div>
         <div class="relative z-[1]">
           <div class="relative w-full">
-            <div class="absolute inset-[6%_2%] rounded-full bg-[radial-gradient(circle,rgba(74,144,226,0.16)_0%,rgba(20,184,166,0.08)_45%,transparent_72%)] blur-[10px] animate-[uiGlow_4.5s_ease-in-out_infinite] pointer-events-none"></div>
+            <div class="absolute inset-[6%_2%] rounded-full bg-[radial-gradient(circle,rgba(74,144,226,0.16)_0%,rgba(20,184,166,0.08)_45%,transparent_72%)] blur-[10px] pointer-events-none"></div>
             <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-[rgba(203,213,225,0.95)] shadow-[0_22px_56px_rgba(15,23,42,0.1)] overflow-hidden">
               <img src="@/assets/images/call-scheduler.png" alt="Sentra AI call scheduler"
                    class="w-full h-auto rounded-[10px]" />
@@ -288,7 +286,7 @@
         <div class="relative z-[1] order-2 lg:order-1">
           <div class="flex flex-col gap-4">
             <div class="relative w-full">
-              <div class="absolute inset-[6%_2%] rounded-full bg-[radial-gradient(circle,rgba(20,184,166,0.2)_0%,rgba(74,144,226,0.1)_45%,transparent_72%)] blur-[10px] animate-[uiGlow_4.5s_ease-in-out_infinite] pointer-events-none"></div>
+              <div class="absolute inset-[6%_2%] rounded-full bg-[radial-gradient(circle,rgba(20,184,166,0.2)_0%,rgba(74,144,226,0.1)_45%,transparent_72%)] blur-[10px] pointer-events-none"></div>
               <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-[rgba(203,213,225,0.95)] shadow-[0_22px_56px_rgba(15,23,42,0.1)] overflow-hidden">
                 <img src="@/assets/images/chatbot-analytics.png" alt="Sentra AI chatbot analytics"
                      class="w-full h-auto rounded-[10px]" />
@@ -347,7 +345,7 @@
         </div>
         <div class="relative z-[1]">
           <div class="relative w-full">
-            <div class="absolute inset-[6%_2%] rounded-full bg-[radial-gradient(circle,rgba(74,144,226,0.16)_0%,rgba(20,184,166,0.08)_45%,transparent_72%)] blur-[10px] animate-[uiGlow_4.5s_ease-in-out_infinite] pointer-events-none"></div>
+            <div class="absolute inset-[6%_2%] rounded-full bg-[radial-gradient(circle,rgba(74,144,226,0.16)_0%,rgba(20,184,166,0.08)_45%,transparent_72%)] blur-[10px] pointer-events-none"></div>
             <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-[rgba(203,213,225,0.95)] shadow-[0_22px_56px_rgba(15,23,42,0.1)] overflow-hidden">
               <img src="@/assets/images/team-dashboard.png" alt="Sentra AI team workspace"
                    class="w-full h-auto rounded-[10px]" />
@@ -389,7 +387,7 @@
           Deploy Sentra AI on your stack or start with our managed demo environment.
         </p>
         <div class="flex gap-3.5 justify-center flex-wrap">
-          <router-link to="/login" class="inline-flex items-center px-8 py-4 bg-orange-700 text-white font-semibold rounded-lg hover:bg-orange-900 transition-all duration-300 shadow-lg hover:shadow-xl font-['Inter']">
+          <router-link to="/login" class="inline-flex items-center px-8 py-4 bg-white text-[#2A5F9E] font-semibold rounded-lg hover:bg-gray-100 transition-all duration-300 shadow-lg hover:shadow-xl font-['Inter']">
             Open Sentra Portal
           </router-link>
           <router-link to="/contact?project=sentra" class="inline-flex items-center px-8 py-4 border-2 border-white/40 text-white font-semibold rounded-lg hover:bg-white/10 transition-all duration-300 font-['Inter']">
@@ -469,67 +467,9 @@ export default {
         { title: 'Contact Management', description: 'Bulk CSV import with validation, campaign assignment, and searchable contact records.' }
       ]
     }
-  },
-  mounted() {
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes spin {
-        to { transform: rotate(360deg); }
-      }
-      @keyframes spin-reverse {
-        to { transform: rotate(-360deg); }
-      }
-      .animate-\\[spin_22s_linear_infinite\\] {
-        animation: spin 22s linear infinite;
-      }
-      .animate-\\[spin_30s_linear_infinite_reverse\\] {
-        animation: spin-reverse 30s linear infinite;
-      }
-      @keyframes uiGlow {
-        0%, 100% { opacity: 0.6; transform: scale(0.98); }
-        50% { opacity: 1; transform: scale(1.02); }
-      }
-      .animate-\\[uiGlow_4\\.5s_ease-in-out_infinite\\] {
-        animation: uiGlow 4.5s ease-in-out infinite;
-      }
-    `;
-    document.head.appendChild(style);
-  },
-  beforeUnmount() {
-    const styles = document.head.querySelectorAll('style');
-    styles.forEach(style => {
-      if (style.textContent.includes('spin') || style.textContent.includes('uiGlow')) {
-        style.remove();
-      }
-    });
   }
 }
 </script>
 
 <style scoped>
-/* Shine effect for buttons if needed */
-.btn-shine {
-  position: relative;
-  overflow: hidden;
-}
-.btn-shine::after {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -60%;
-  width: 200%;
-  height: 200%;
-  background: linear-gradient(
-      to right,
-      rgba(255, 255, 255, 0) 0%,
-      rgba(255, 255, 255, 0.15) 50%,
-      rgba(255, 255, 255, 0) 100%
-  );
-  transform: rotate(25deg);
-  animation: shine 3s infinite;
-}
-@keyframes shine {
-  0% { transform: translateX(-100%) rotate(25deg); }
-  100% { transform: translateX(100%) rotate(25deg); }
-}
 </style>
