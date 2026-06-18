@@ -19,6 +19,7 @@ import {
   faEye,
   faEyeSlash,
   faArrowLeft,
+  faVideo
 } from '@fortawesome/free-solid-svg-icons'
 import {
   faReact,
@@ -54,5 +55,6 @@ library.add(
     faPython,
     faAws,
     faDocker,
-    faGoogle
+    faGoogle,
+    faVideo
 )
