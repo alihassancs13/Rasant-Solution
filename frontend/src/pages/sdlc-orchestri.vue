@@ -70,15 +70,9 @@
             <div class="absolute -inset-3.5 rounded-full border-2 border-dashed border-[rgba(139,92,246,0.35)] animate-[botRingSpin_22s_linear_infinite]"></div>
             <div class="absolute -inset-5.5 rounded-full border-2 border-dashed border-[rgba(245,158,11,0.22)] animate-[botRingSpin_30s_linear_infinite_reverse]"></div>
             <div class="relative w-full z-20 aspect-square max-w-sm mx-auto">
-              <svg class="absolute inset-0 w-full h-full z-10 pointer-events-none" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <circle cx="200" cy="200" r="160"
-                        stroke="#93c5fd" stroke-width="2" stroke-dasharray="8 6" opacity="0.6"
-                        class="animate-[spin_20s_linear_infinite]" style="transform-origin: 200px 200px; animation-direction: reverse;" />
-                <circle cx="200" cy="200" r="130"
-                        stroke="#60a5fa" stroke-width="2" stroke-dasharray="6 4" opacity="0.8"
-                        class="animate-[spin_12s_linear_infinite]" style="transform-origin: 200px 200px;" />
+              <svg class="absolute inset-0 w-full h-full z-10 pointer-events-none" viewBox="0 0 400 400" fill="none" >
               </svg>
-              <img src="../assets/svg/orchestri-bot.svg" alt="Orchestri orchestrator" class="w-full h-full object-contain drop-shadow-[0_16px_36px_rgba(42,95,158,0.2)]" title="Orchestri Bot" />
+              <img src="../assets/svg/orchestri-bot.svg" alt="Orchestri orchestrator" class="w-120 h-100 object-contain drop-shadow-[0_16px_36px_rgba(42,95,158,0.2)]" title="Orchestri Bot" />
             </div>
           </div>
         </div>
@@ -232,7 +226,7 @@
             <li v-for="(feat, i) in platformFeatures" :key="i"
                 class="flex gap-4 items-start p-[14px_16px] bg-white border border-slate-200/50 rounded-xl shadow-sm animate-[featIn_0.6s_ease_both]"
                 :style="i > 0 ? { animationDelay: `${i * 0.07}s` } : {}">
-              <span class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm bg-indigo-50 text-indigo-700">
+              <span class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm bg-indigo-50 ">
                 <i :class="feat.icon"></i>
               </span>
               <div>
@@ -242,8 +236,8 @@
             </li>
           </ul>
 
-          <p class="text-left text-sm text-slate-500 mt-4 mb-0">
-            Need voice or chat products? See <a href="ai-agent.html" class="text-orange-600 font-semibold hover:underline">Voice AI Agent</a> and <a href="chatbot.html" class="text-orange-600 font-semibold hover:underline">Chatbot</a>.
+          <p class="text-left text-sm text-slate-500 mt-4 ml-15">
+            Need voice or chat products? See <a href="ai-agent.html" class="text-orange-700 underline font-semibold hover:underline">Voice AI Agent</a> and <a href="chatbot.html" class="text-orange-700 underline font-semibold hover:underline">Chatbot</a>.
           </p>
         </div>
       </div>
