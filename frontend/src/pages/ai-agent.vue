@@ -45,13 +45,20 @@
           <p class="text-[15px] text-slate-500 leading-relaxed mb-6">Phone-first AI that handles customer service calls, internal dialing, outbound campaigns, and scheduled callbacks — with live queue visibility and call analytics built in.</p>
           <div class="flex justify-start gap-3 flex-wrap">
             <button
-                type="submit"
+                @click="goToContact"
+                type="button"
                 class="relative overflow-hidden cursor-pointer w-50 flex items-center justify-center px-6 py-3.5 bg-orange-700 hover:bg-orange-900 text-base font-semibold text-white rounded-xl transition-all duration-200 shadow-[0_4px_14px_rgba(42,95,158,0.4)] hover:shadow-[0_6px_20px_rgba(42,95,158,0.6)] active:scale-[0.98] group"
             >
               Book a Voice Demo
               <div class="absolute inset-0 w-1/4 h-full bg-white/10 pointer-events-none animate-shine-loop"></div>
             </button>
-            <a href="pricing.html?project=ai-agent" class="px-6 py-3 border border-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition-colors text-sm">View Pricing</a>
+            <button
+                @click="scrollToPricing"
+                type="button"
+                class="px-6 py-3 border border-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition-colors text-sm cursor-pointer"
+            >
+              View Pricing
+            </button>
           </div>
         </div>
 
@@ -348,8 +355,20 @@
           <p class="text-white text-sm md:text-base leading-relaxed">Book a demo and hear how your calls can sound — customer service, internal lines, and outbound included.</p>
         </div>
         <div class="flex gap-3 flex-wrap items-center">
-          <a href="contact.html?project=ai-agent" class="px-6 py-3.5 bg-white from-teal-400 to-emerald-500 text-orange-600 font-bold rounded-xl shadow-md transition-transform hover:scale-[1.02] text-sm">Contact Sales</a>
-          <a href="pricing.html?project=ai-agent" class="px-6 py-3.5 border border-white/80 text-white font-semibold rounded-xl hover:bg-white/5 transition-colors text-sm">View Pricing</a>
+          <button
+              @click="goToContact"
+              type="button"
+              class="px-6 py-3.5 bg-white text-orange-600 font-bold rounded-xl shadow-md transition-transform hover:scale-[1.02] text-sm cursor-pointer inline-flex items-center justify-center"
+          >
+            Contact Sales
+          </button>
+          <button
+              @click="scrollToPricing"
+              type="button"
+              class="px-6 py-3 border border-slate-300 text-white font-semibold rounded-lg  transition-colors text-sm cursor-pointer"
+          >
+            View Pricing
+          </button>
         </div>
       </div>
     </section>
@@ -489,6 +508,22 @@ export default {
   },
 
   methods: {
+    scrollToPricing() {
+      const pricingSection = document.getElementById('pricing');
+      if (pricingSection) {
+        pricingSection.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+    },
+    goToContact() {
+      // Option A: Using Vue Router (if configured)
+      this.$router.push('/contact?project=ai-agent')
+
+      // Option B: Using window.location
+      // window.location.href = '/contact?project=ai-agent'
+    },
     handleParallax(event) {
       const box = event.currentTarget.getBoundingClientRect()
       const rx = -((event.clientY - box.top  - box.height / 2) / (box.height / 2)) * 8

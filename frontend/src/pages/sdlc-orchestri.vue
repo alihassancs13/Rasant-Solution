@@ -2,38 +2,74 @@
   <div class="min-h-screen bg-slate-50 font-sans text-slate-800 selection:bg-indigo-500 selection:text-white">
     <Navbar />
 
-    <section class="relative overflow-hidden bg-gradient-to-tr from-orange-50/40 via-white to-indigo-100/50 py-20 lg:py-32" id="top">
-      <div class="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:16px_16px] opacity-40"></div>
-      <div class="absolute -top-40 -left-40 h-96 w-96 rounded-full bg-orange-200/40 blur-3xl"></div>
-      <div class="absolute top-1/3 -right-20 h-96 w-96 rounded-full bg-indigo-200/50 blur-3xl"></div>
+    <section class="relative pt-17 pb-0 overflow-hidden bg-gradient-to-b from-[#fdf4ff] via-[#fff8f3] to-[#f8fafc]" id="top">
+      <!-- Background mesh -->
+      <div class="absolute inset-[-10%_-5%] pointer-events-none bg-[radial-gradient(circle_at_18%_20%,rgba(255,213,180,0.35)_0%,transparent_42%),radial-gradient(circle_at_82%_18%,rgba(201,196,248,0.32)_0%,transparent_40%),radial-gradient(circle_at_50%_80%,rgba(45,212,191,0.12)_0%,transparent_45%)] animate-[meshShift_10s_ease-in-out_infinite_alternate]"></div>
 
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-          
-          <div class="lg:col-span-7 space-y-6">
-            <span class="inline-flex items-center rounded-full bg-indigo-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-indigo-600 ring-1 ring-inset ring-indigo-500/10">
-              Orchestri
-            </span>
-            <h1 class="text-4xl font-extrabold tracking-tight text-slate-900 sm:text-5xl lg:text-6xl font-display leading-tight">
-              AI-driven multi-agent <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-indigo-600">SDLC in one monorepo</span>
-            </h1>
-            <p class="text-lg text-slate-600 max-w-2xl leading-relaxed">
-              Web UI and FastAPI backend that drive a gated workflow: specification, user approval, plan, implementation, test/debug loop, deployment, and optional execution — on your local project folder.
-            </p>
-            <div class="flex flex-wrap gap-4 pt-2">
-              <a href="contact.html?project=orchestri" class="inline-flex items-center justify-center rounded-xl bg-orange-600 px-6 py-3.5 text-base font-semibold text-white shadow-sm hover:bg-orange-500 transition-colors duration-200">
-                Request a Demo
-              </a>
-              <a href="pricing.html?project=orchestri" class="inline-flex items-center justify-center rounded-xl bg-white px-6 py-3.5 text-base font-semibold text-slate-700 shadow-sm ring-1 ring-inset ring-slate-200 hover:bg-slate-50 transition-colors duration-200">
-                View Pricing
-              </a>
+      <!-- Orb backgrounds -->
+      <div class="absolute rounded-full blur-[70px] pointer-events-none w-80 h-80 bg-[rgba(255,213,180,0.45)] -top-5 -left-20 animate-[orbDrift_14s_ease-in-out_infinite]"></div>
+      <div class="absolute rounded-full blur-[70px] pointer-events-none w-70 h-70 bg-[rgba(143,185,244,0.35)] top-15 -right-15 animate-[orbDrift_14s_ease-in-out_infinite] [animation-delay:-6s]"></div>
+      <div class="absolute rounded-full blur-[70px] pointer-events-none w-50 h-50 bg-[rgba(45,212,191,0.22)] bottom-[10%] left-[55%] animate-[orbDrift_14s_ease-in-out_infinite] [animation-delay:-3s]"></div>
+
+      <!-- Decorative side grids -->
+      <div class="absolute left-0 right-0 top-13 bottom-0 z-10 pointer-events-none overflow-hidden hidden sm:block" aria-hidden="true">
+        <!-- Left grid -->
+        <div class="absolute top-[6%] bottom-[8%] w-[clamp(160px,calc(50%-280px),300px)] z-10 opacity-[0.78] left-[max(12px,2vw)] [mask-image:linear-gradient(90deg,rgba(0,0,0,0.88)_0%,rgba(0,0,0,0.42)_68%,transparent_100%)]">
+          <div class="grid grid-cols-3 grid-rows-5 gap-[7px] h-full relative before:absolute before:inset-0 before:bg-[linear-gradient(rgba(94,234,212,0.14)_1px,transparent_1px),linear-gradient(90deg,rgba(74,144,226,0.14)_1px,transparent_1px)] before:bg-[length:calc((100%+7px)/3)_calc((100%+7px)/5)]">
+            <div v-for="(cell, i) in gridCellsLeft" :key="'left-'+i"
+                 class="rounded-lg border border-[rgba(74,144,226,0.2)] relative z-10 animate-[cellBreathe_7s_ease-in-out_infinite]"
+                 :class="cell.bgClass"
+                 :style="cell.delay ? { animationDelay: cell.delay } : {}"></div>
+          </div>
+        </div>
+
+        <!-- Right grid -->
+        <div class="absolute top-[6%] bottom-[8%] w-[clamp(160px,calc(50%-280px),300px)] z-10 opacity-[0.78] right-[max(12px,2vw)] [mask-image:linear-gradient(270deg,rgba(0,0,0,0.88)_0%,rgba(0,0,0,0.42)_68%,transparent_100%)]">
+          <div class="grid grid-cols-3 grid-rows-5 gap-[7px] h-full relative before:absolute before:inset-0 before:bg-[linear-gradient(rgba(94,234,212,0.14)_1px,transparent_1px),linear-gradient(90deg,rgba(74,144,226,0.14)_1px,transparent_1px)] before:bg-[length:calc((100%+7px)/3)_calc((100%+7px)/5)]">
+            <div v-for="(cell, i) in gridCellsRight" :key="'right-'+i"
+                 class="rounded-lg border border-[rgba(74,144,226,0.2)] relative z-10 animate-[cellBreathe_7s_ease-in-out_infinite]"
+                 :class="cell.bgClass"
+                 :style="cell.delay ? { animationDelay: cell.delay } : {}"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main content -->
+      <div class="relative max-w-[1040px] mx-auto px-6 z-30 grid grid-cols-1 md:grid-cols-2 gap-8 items-center pt-8 pb-12">
+        <!-- Left text content -->
+        <div class="relative z-30 text-left max-w-[560px] mx-auto md:mx-0 mt-15">
+          <span class="inline-block uppercase tracking-wider text-[11px] font-bold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full mb-4">Orchestri</span>
+          <h1 class="font-['Space_Grotesk'] text-[clamp(28px,4vw,44px)] font-extrabold tracking-[-1px] leading-[1.15] mb-4 text-slate-900">
+            AI-driven multi-agent <em class="not-italic bg-gradient-to-r from-orange-500 to-indigo-600 bg-clip-text text-transparent">SDLC in one monorepo</em>
+          </h1>
+          <p class="text-[15px] text-slate-500 leading-relaxed mb-6">Web UI and FastAPI backend that drive a gated workflow: specification, user approval, plan, implementation, test/debug loop, deployment, and optional execution — on your local project folder.</p>
+          <div class="flex justify-start gap-3 flex-wrap">
+            <a href="contact.html?project=orchestri" class="relative overflow-hidden cursor-pointer w-50 flex items-center justify-center px-6 py-3.5 bg-orange-700 hover:bg-orange-900 text-base font-semibold text-white rounded-xl transition-all duration-200 shadow-[0_4px_14px_rgba(42,95,158,0.4)] hover:shadow-[0_6px_20px_rgba(42,95,158,0.6)] active:scale-[0.98] group">
+              Contact Sales
+              <div class="absolute inset-0 w-1/4 h-full bg-white/10 pointer-events-none animate-shine-loop"></div>
+            </a>
+            <a href="pricing.html?project=orchestri" class="px-6 py-3 border border-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition-colors text-sm">View Pricing</a>
+          </div>
+        </div>
+
+        <!-- Right bot image -->
+        <div class="relative z-30 flex justify-center py-1 mx-auto md:mr-0 md:ml-auto">
+          <div class="relative w-[min(280px,72vw)] animate-[botEnter_0.9s_cubic-bezier(0.22,1,0.36,1)_both]">
+            <div class="absolute inset-[8%] rounded-full bg-[radial-gradient(circle,rgba(45,212,191,0.2)_0%,transparent_70%)] animate-[botGlow_3s_ease-in-out_infinite]"></div>
+            <div class="absolute -inset-3.5 rounded-full border-2 border-dashed border-[rgba(45,212,191,0.35)] animate-[botRingSpin_22s_linear_infinite]"></div>
+            <div class="absolute -inset-5.5 rounded-full border-2 border-dashed border-[rgba(139,92,246,0.2)] animate-[botRingSpin_30s_linear_infinite_reverse]"></div>
+            <div class="relative w-full z-20 aspect-square max-w-sm mx-auto">
+              <svg class="absolute inset-0 w-full h-full z-10 pointer-events-none" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="200" cy="200" r="160"
+                        stroke="#93c5fd" stroke-width="2" stroke-dasharray="8 6" opacity="0.6"
+                        class="animate-[spin_20s_linear_infinite]" style="transform-origin: 200px 200px; animation-direction: reverse;" />
+                <circle cx="200" cy="200" r="130"
+                        stroke="#60a5fa" stroke-width="2" stroke-dasharray="6 4" opacity="0.8"
+                        class="animate-[spin_12s_linear_infinite]" style="transform-origin: 200px 200px;" />
+              </svg>
+              <img src="../assets/svg/orchestri-bot.svg" alt="Orchestri Orchestrator Vector Graphic" class="w-full h-full object-contain drop-shadow-[0_16px_36px_rgba(42,95,158,0.2)]" title="Orchestri Bot" />
             </div>
           </div>
-
-          <div class="lg:col-span-5 flex justify-center relative">
-            <img src="../assets/svg/orchestri-bot.svg" alt="Orchestri Orchestrator Vector Graphic" class="w-full max-w-[360px] h-auto object-contain drop-shadow-md" />
-          </div>
-
         </div>
       </div>
     </section>
