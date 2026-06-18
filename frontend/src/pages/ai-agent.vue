@@ -2,59 +2,62 @@
   <div data-page="ai-agent" class="bg-[#f8fafc] min-h-screen font-sans text-[#1e293b]">
     <Navbar />
 
-    <section class="relative pt-17 pb-0 overflow-hidden bg-[linear-gradient(180deg,#fdf4ff_0%,#fff8f3_38%,#f8fafc_100%)]" id="top">
-      <div class="absolute inset-[-10%_-5%] pointer-events-none bg-[radial-gradient(circle_at_18%_20%,rgba(255,213,180,0.35)_0%,transparent_42%),radial-gradient(circle_at_82%_18%,rgba(201,196,248,0.32)_0%,transparent_40%),radial-gradient(circle_at_50%_80%,rgba(45,212,191,0.12)_0%,transparent_45%)] animate-[aaMeshShift_10s_ease-in-out_infinite_alternate]"></div>
+    <section class="relative pt-17 pb-0 overflow-hidden bg-gradient-to-b from-[#fdf4ff] via-[#fff8f3] to-[#f8fafc]" id="top">
+      <!-- Background mesh -->
+      <div class="absolute inset-[-10%_-5%] pointer-events-none bg-[radial-gradient(circle_at_18%_20%,rgba(255,213,180,0.35)_0%,transparent_42%),radial-gradient(circle_at_82%_18%,rgba(201,196,248,0.32)_0%,transparent_40%),radial-gradient(circle_at_50%_80%,rgba(45,212,191,0.12)_0%,transparent_45%)] animate-[meshShift_10s_ease-in-out_infinite_alternate]"></div>
 
-      <div class="absolute rounded-full blur-[70px] pointer-events-none w-80 h-80 bg-[rgba(255,213,180,0.45)] -top-5 -left-20 animate-[aaOrbDrift_14s_ease-in-out_infinite]"></div>
-      <div class="absolute rounded-full blur-[70px] pointer-events-none w-70 h-70 bg-[rgba(143,185,244,0.35)] top-15 -right-15 animate-[aaOrbDrift_14s_ease-in-out_infinite] [animation-delay:-6s]"></div>
-      <div class="absolute rounded-full blur-[70px] pointer-events-none w-50 h-50 bg-[rgba(45,212,191,0.22)] bottom-[10%] left-[55%] animate-[aaOrbDrift_14s_ease-in-out_infinite] [animation-delay:-3s]"></div>
+      <!-- Orb backgrounds -->
+      <div class="absolute rounded-full blur-[70px] pointer-events-none w-80 h-80 bg-[rgba(255,213,180,0.45)] -top-5 -left-20 animate-[orbDrift_14s_ease-in-out_infinite]"></div>
+      <div class="absolute rounded-full blur-[70px] pointer-events-none w-70 h-70 bg-[rgba(143,185,244,0.35)] top-15 -right-15 animate-[orbDrift_14s_ease-in-out_infinite] [animation-delay:-6s]"></div>
+      <div class="absolute rounded-full blur-[70px] pointer-events-none w-50 h-50 bg-[rgba(45,212,191,0.22)] bottom-[10%] left-[55%] animate-[orbDrift_14s_ease-in-out_infinite] [animation-delay:-3s]"></div>
 
+      <!-- Decorative side grids -->
       <div class="absolute left-0 right-0 top-13 bottom-0 z-10 pointer-events-none overflow-hidden hidden sm:block" aria-hidden="true">
-        <div v-for="side in ['left', 'right']" :key="side"
-          :class="[
-            'absolute top-[6%] bottom-[8%] w-[clamp(160px,calc(50%-280px),300px)] z-10 opacity-[0.78]',
-            side === 'left'
-              ? 'left-[max(12px,2vw)] [mask-image:linear-gradient(90deg,rgba(0,0,0,0.88)_0%,rgba(0,0,0,0.42)_68%,transparent_100%)]'
-              : 'right-[max(12px,2vw)] [mask-image:linear-gradient(270deg,rgba(0,0,0,0.88)_0%,rgba(0,0,0,0.42)_68%,transparent_100%)]'
-          ]">
-          <div class="grid grid-cols-3 grid-rows-5 gap-1.75 h-full relative before:absolute before:inset-0 before:bg-[linear-gradient(rgba(94,234,212,0.14)_1px,transparent_1px),linear-gradient(90deg,rgba(74,144,226,0.14)_1px,transparent_1px)] before:bg-size-[calc((100%+7px)/3)_calc((100%+7px)/5)]">
-            <div v-for="(cell, i) in gridCells" :key="i"
-              :class="['rounded-lg border border-[rgba(74,144,226,0.2)] relative z-10 animate-[aaCellBreathe_7s_ease-in-out_infinite]', cell.bg]"
-              :style="cell.delay ? { animationDelay: cell.delay } : {}">
-            </div>
+        <!-- Left grid -->
+        <div class="absolute top-[6%] bottom-[8%] w-[clamp(160px,calc(50%-280px),300px)] z-10 opacity-[0.78] left-[max(12px,2vw)] [mask-image:linear-gradient(90deg,rgba(0,0,0,0.88)_0%,rgba(0,0,0,0.42)_68%,transparent_100%)]">
+          <div class="grid grid-cols-3 grid-rows-5 gap-[7px] h-full relative before:absolute before:inset-0 before:bg-[linear-gradient(rgba(94,234,212,0.14)_1px,transparent_1px),linear-gradient(90deg,rgba(74,144,226,0.14)_1px,transparent_1px)] before:bg-[length:calc((100%+7px)/3)_calc((100%+7px)/5)]">
+            <div v-for="(cell, i) in gridCellsLeft" :key="'left-'+i"
+                 class="rounded-lg border border-[rgba(74,144,226,0.2)] relative z-10 animate-[cellBreathe_7s_ease-in-out_infinite]"
+                 :class="cell.bgClass"
+                 :style="cell.delay ? { animationDelay: cell.delay } : {}"></div>
+          </div>
+        </div>
+
+        <!-- Right grid -->
+        <div class="absolute top-[6%] bottom-[8%] w-[clamp(160px,calc(50%-280px),300px)] z-10 opacity-[0.78] right-[max(12px,2vw)] [mask-image:linear-gradient(270deg,rgba(0,0,0,0.88)_0%,rgba(0,0,0,0.42)_68%,transparent_100%)]">
+          <div class="grid grid-cols-3 grid-rows-5 gap-[7px] h-full relative before:absolute before:inset-0 before:bg-[linear-gradient(rgba(94,234,212,0.14)_1px,transparent_1px),linear-gradient(90deg,rgba(74,144,226,0.14)_1px,transparent_1px)] before:bg-[length:calc((100%+7px)/3)_calc((100%+7px)/5)]">
+            <div v-for="(cell, i) in gridCellsRight" :key="'right-'+i"
+                 class="rounded-lg border border-[rgba(74,144,226,0.2)] relative z-10 animate-[cellBreathe_7s_ease-in-out_infinite]"
+                 :class="cell.bgClass"
+                 :style="cell.delay ? { animationDelay: cell.delay } : {}"></div>
           </div>
         </div>
       </div>
 
-      <div class="relative max-w-260 mx-auto px-6 z-30 grid grid-cols-1 md:grid-cols-2 gap-8 items-center pt-8 pb-12">
-        
-        <div class="relative z-30 text-left max-w-140 mx-auto md:mx-0">
+      <!-- Main content -->
+      <div class="relative max-w-[1040px] mx-auto px-6 z-30 grid grid-cols-1 md:grid-cols-2 gap-8 items-center pt-8 pb-12">
+        <!-- Left text content -->
+        <div class="relative z-30 text-left max-w-[560px] mx-auto md:mx-0">
           <span class="inline-block uppercase tracking-wider text-[11px] font-bold text-teal-600 bg-teal-50 px-3 py-1 rounded-full mb-4">Voice AI Agent</span>
           <h1 class="font-['Space_Grotesk'] text-[clamp(28px,4vw,44px)] font-extrabold tracking-[-1px] leading-[1.15] mb-4 text-slate-900">
             Talking agents with <em class="not-italic bg-gradient-to-r from-teal-500 to-indigo-600 bg-clip-text text-transparent">clear, natural voice</em>
           </h1>
           <p class="text-[15px] text-slate-500 leading-relaxed mb-6">Phone-first AI that handles customer service calls, internal dialing, outbound campaigns, and scheduled callbacks — with live queue visibility and call analytics built in.</p>
           <div class="flex justify-start gap-3 flex-wrap">
-            <a href="contact.html?project=ai-agent" class="px-6 py-3 bg-orange-800 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all text-sm ">Book a Voice Demo</a>
+            <a href="contact.html?project=ai-agent" class="px-6 py-3 bg-orange-600 text-white font-semibold rounded-lg shadow-md hover:shadow-lg transition-all text-sm">Book a Voice Demo</a>
             <a href="pricing.html?project=ai-agent" class="px-6 py-3 border border-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition-colors text-sm">View Pricing</a>
           </div>
         </div>
 
+        <!-- Right bot image -->
         <div class="relative z-30 flex justify-center py-1 mx-auto md:mr-0 md:ml-auto">
-          <div class="relative w-[min(280px,72vw)] animate-[aaBotEnter_0.9s_cubic-bezier(0.22,1,0.36,1)_both]">
-            <div class="absolute inset-[8%] rounded-full bg-[radial-gradient(circle,rgba(45,212,191,0.2)_0%,transparent_70%)] animate-[aaBotGlow_3s_ease-in-out_infinite]"></div>
-            <div class="absolute -inset-3.5 rounded-full border-2 border-dashed border-[rgba(45,212,191,0.35)] animate-[aaBotRingSpin_22s_linear_infinite]"></div>
-            <div class="absolute -inset-5.5 rounded-full border-2 border-dashed border-[rgba(139,92,246,0.2)] animate-[aaBotRingSpin_30s_linear_infinite_reverse]"></div>
-
-            <img
-              src="../assets/svg/ai-agent-bot.svg"
-              alt="Chatbot agent"
-              class="w-full block relative z-20 drop-shadow-[0_16px_36px_rgba(42,95,158,0.2)]"
-              title="Chatbot Agent"
-            />
+          <div class="relative w-[min(280px,72vw)] animate-[botEnter_0.9s_cubic-bezier(0.22,1,0.36,1)_both]">
+            <div class="absolute inset-[8%] rounded-full bg-[radial-gradient(circle,rgba(45,212,191,0.2)_0%,transparent_70%)] animate-[botGlow_3s_ease-in-out_infinite]"></div>
+            <div class="absolute -inset-3.5 rounded-full border-2 border-dashed border-[rgba(45,212,191,0.35)] animate-[botRingSpin_22s_linear_infinite]"></div>
+            <div class="absolute -inset-5.5 rounded-full border-2 border-dashed border-[rgba(139,92,246,0.2)] animate-[botRingSpin_30s_linear_infinite_reverse]"></div>
+            <img src="../assets/svg/ai-agent-bot.svg" alt="Chatbot agent" class="w-full block relative z-20 drop-shadow-[0_16px_36px_rgba(42,95,158,0.2)]" title="Chatbot Agent" />
           </div>
         </div>
-
       </div>
     </section>
 
@@ -210,12 +213,12 @@
           <h2 class="font-['Space_Grotesk'] text-[clamp(24px,3vw,36px)] font-extrabold tracking-[-0.8px] leading-[1.15] text-slate-900 my-2 relative z-10">Everything a voice agent needs</h2>
           <p class="text-[15px] text-slate-500 leading-relaxed max-w-115">Recordings, warm transfer, and telephony integrations — the full toolkit for production voice deployments.</p>
 
-
           <ul class="mt-4.5 flex flex-col gap-2.5 list-none p-0">
             <li v-for="(feat, i) in capabilityFeatures" :key="i"
-              class="flex gap-4 items-start p-[14px_16px] bg-white border border-slate-200/50 rounded-xl shadow-sm animate-[aaFeatIn_0.6s_ease_both]"
-              :style="i > 0 ? { animationDelay: `${i * 0.07}s` } : {}">
-              <span :class="`font-extrabold text-[10px] tracking-wider px-2 py-1 rounded bg-${feat.color}-50 text-${feat.color}-700`">{{ feat.badge }}</span>
+                class="flex gap-4 items-start p-[14px_16px] bg-white border border-slate-200/50 rounded-xl shadow-sm animate-[aaFeatIn_0.6s_ease_both]"
+                :style="i > 0 ? { animationDelay: `${i * 0.07}s` } : {}"><span class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm bg-teal-50 text-teal-700">
+  <i :class="feat.icon"></i>
+</span>
               <div>
                 <h4 class="text-sm font-bold text-slate-800">{{ feat.title }}</h4>
                 <p class="text-xs text-slate-500 mt-0.5">{{ feat.desc }}</p>
@@ -224,14 +227,14 @@
           </ul>
 
           <p class="text-left text-sm text-slate-500 mt-4 mb-0">
-            Looking for text and chat automation? See our <a href="chatbot.html" class="text-teal-600 font-semibold hover:underline">Chatbot Agent</a>.
+            Looking for text and chat automation? See our <a href="chatbot.html" class="text-orange-600 font-semibold hover:underline">Chatbot Agent</a>.
           </p>
         </div>
       </div>
     </section>
 
     <section class="p-6 md:p-12 max-w-7xl mx-auto">
-      <div class="bg-orange-800 text-white p-8 md:p-12 rounded-3xl flex flex-col lg:flex-row lg:items-center justify-between gap-8 shadow-xl">
+      <div class="bg-orange-600 text-white p-8 md:p-12 rounded-3xl flex flex-col lg:flex-row lg:items-center justify-between gap-8 shadow-xl">
         <div class="max-w-2xl">
           <h2 class="text-2xl md:text-3xl font-extrabold tracking-tight font-['Space_Grotesk'] mb-2">Ready to deploy a voice agent?</h2>
           <p class="text-white text-sm md:text-base leading-relaxed">Book a demo and hear how your calls can sound — customer service, internal lines, and outbound included.</p>
@@ -295,9 +298,24 @@ export default {
       ],
 
       capabilityFeatures: [
-        { badge: 'REC', color: 'teal',   title: 'Recordings and logs',      desc: 'Every call captured for review, training, and compliance.' },
-        { badge: 'TR',  color: 'violet', title: 'Warm transfer',             desc: 'Pass context to a human agent when the caller needs a person.' },
-        { badge: 'API', color: 'sky',    title: 'CRM and telephony hooks',   desc: 'Connect to your phone system, CRM, and ticketing tools via API.' },
+        {
+
+          icon: 'fas fa-microphone',
+          title: 'Recordings and logs',
+          desc: 'Every call captured for review, training, and compliance.'
+        },
+        {
+
+          icon: 'fas fa-phone-alt',
+          title: 'Warm transfer',
+          desc: 'Pass context to a human agent when the caller needs a person.'
+        },
+        {
+
+          icon: 'fas fa-plug',
+          title: 'CRM and telephony hooks',
+          desc: 'Connect to your phone system, CRM, and ticketing tools via API.'
+        },
       ],
     }
   },
