@@ -82,7 +82,7 @@
 
               <img src="../assets/svg/ai-agent-bot.svg" alt="Chatbot agent" class="w-full h-full object-contain drop-shadow-[0_16px_36px_rgba(42,95,158,0.2)]" title="Chatbot Agent" />
 
-              <img src="../assets/images/ai-agent-face.png" alt="Bot face" class="absolute top-[22%] left-1/2 -translate-x-1/2 w-[55%] object-contain z-30" title="Bot Face" />
+
             </div>
           </div>
         </div>
