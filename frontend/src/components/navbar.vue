@@ -60,54 +60,56 @@
             </button>
 
             <!-- Services Dropdown -->
-            <Transition name="dropdown">
-              <div
-                  v-show="activeDropdown === 'services'"
-                  class="absolute top-[calc(100%+2px)] left-1/2 -translate-x-1/2 w-[280px] bg-white rounded-[0_0_20px_20px] shadow-[0_20px_60px_rgba(15,23,42,0.14)] border border-[#E2E8F0] border-t-[3px] border-t-blue-500 pt-3 pb-4 px-2.5 z-50"
-              >
-                <button
-                    @click="navigateToServicesSection('services')"
-                    class="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 hover:translate-x-1 group/item transition-all duration-200 w-full text-left relative overflow-hidden"
+            <div class="absolute top-[calc(100%+2px)] left-1/2 -translate-x-1/2 w-[280px] z-50">
+              <Transition name="dropdown">
+                <div
+                    v-show="activeDropdown === 'services'"
+                    class="bg-white rounded-[0_0_20px_20px] shadow-[0_20px_60px_rgba(15,23,42,0.14)] border border-[#E2E8F0] border-t-[3px] border-t-blue-500 pt-3 pb-4 px-2.5"
                 >
-                  <div class="w-10 h-10 rounded-[10px] bg-blue-600/10 flex items-center justify-center text-[18px] shrink-0">
-                    <i class="fa-solid fa-code text-blue-600"></i>
-                  </div>
-                  <div class="flex-1">
-                    <h4 class="text-[14px] font-['Space_Grotesk'] font-bold text-[#1E3A5F] mb-[3px] m-0">Custom Software</h4>
-                    <p class="text-[12px] text-slate-500 m-0 leading-[1.45]">Enterprise apps, APIs &amp; AI integration</p>
-                  </div>
-                  <span class="text-blue-500 font-bold opacity-0 -translate-x-3 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-300 mt-2.5">→</span>
-                </button>
+                  <button
+                      @click="navigateToServicesSection('services')"
+                      class="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 hover:translate-x-1 group/item transition-all duration-200 w-full text-left relative overflow-hidden"
+                  >
+                    <div class="w-10 h-10 rounded-[10px] bg-blue-600/10 flex items-center justify-center text-[18px] shrink-0">
+                      <i class="fa-solid fa-code text-blue-600"></i>
+                    </div>
+                    <div class="flex-1">
+                      <h4 class="text-[14px] font-['Space_Grotesk'] font-bold text-[#1E3A5F] mb-[3px] m-0">Custom Software</h4>
+                      <p class="text-[12px] text-slate-500 m-0 leading-[1.45]">Enterprise apps, APIs &amp; AI integration</p>
+                    </div>
+                    <span class="text-blue-500 font-bold opacity-0 -translate-x-3 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-300 mt-2.5">→</span>
+                  </button>
 
-                <button
-                    @click="navigateToServicesSection('services')"
-                    class="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 hover:translate-x-1 group/item transition-all duration-200 w-full text-left relative overflow-hidden"
-                >
-                  <div class="w-10 h-10 rounded-[10px] bg-sky-500/10 flex items-center justify-center text-[18px] shrink-0">
-                    <i class="fa-solid fa-mobile-screen-button text-sky-500"></i>
-                  </div>
-                  <div class="flex-1">
-                    <h4 class="text-[14px] font-['Space_Grotesk'] font-bold text-[#1E3A5F] mb-[3px] m-0">Web &amp; Mobile</h4>
-                    <p class="text-[12px] text-slate-500 m-0 leading-[1.45]">React, Flutter &amp; Next.js products</p>
-                  </div>
-                  <span class="text-blue-500 font-bold opacity-0 -translate-x-3 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-300 mt-2.5">→</span>
-                </button>
+                  <button
+                      @click="navigateToServicesSection('services')"
+                      class="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 hover:translate-x-1 group/item transition-all duration-200 w-full text-left relative overflow-hidden"
+                  >
+                    <div class="w-10 h-10 rounded-[10px] bg-sky-500/10 flex items-center justify-center text-[18px] shrink-0">
+                      <i class="fa-solid fa-mobile-screen-button text-sky-500"></i>
+                    </div>
+                    <div class="flex-1">
+                      <h4 class="text-[14px] font-['Space_Grotesk'] font-bold text-[#1E3A5F] mb-[3px] m-0">Web &amp; Mobile</h4>
+                      <p class="text-[12px] text-slate-500 m-0 leading-[1.45]">React, Flutter &amp; Next.js products</p>
+                    </div>
+                    <span class="text-blue-500 font-bold opacity-0 -translate-x-3 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-300 mt-2.5">→</span>
+                  </button>
 
-                <button
-                    @click="navigateToServicesSection('services')"
-                    class="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 hover:translate-x-1 group/item transition-all duration-200 w-full text-left relative overflow-hidden"
-                >
-                  <div class="w-10 h-10 rounded-[10px] bg-blue-400/10 flex items-center justify-center text-[18px] shrink-0">
-                    <i class="fa-solid fa-cloud text-blue-400"></i>
-                  </div>
-                  <div class="flex-1">
-                    <h4 class="text-[14px] font-['Space_Grotesk'] font-bold text-[#1E3A5F] mb-[3px] m-0">Cloud &amp; DevOps</h4>
-                    <p class="text-[12px] text-slate-500 m-0 leading-[1.45]">AWS, Kubernetes &amp; CI/CD pipelines</p>
-                  </div>
-                  <span class="text-blue-500 font-bold opacity-0 -translate-x-3 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-300 mt-2.5">→</span>
-                </button>
-              </div>
-            </Transition>
+                  <button
+                      @click="navigateToServicesSection('services')"
+                      class="flex items-start gap-3 p-3 rounded-xl hover:bg-slate-50 hover:translate-x-1 group/item transition-all duration-200 w-full text-left relative overflow-hidden"
+                  >
+                    <div class="w-10 h-10 rounded-[10px] bg-blue-400/10 flex items-center justify-center text-[18px] shrink-0">
+                      <i class="fa-solid fa-cloud text-blue-400"></i>
+                    </div>
+                    <div class="flex-1">
+                      <h4 class="text-[14px] font-['Space_Grotesk'] font-bold text-[#1E3A5F] mb-[3px] m-0">Cloud &amp; DevOps</h4>
+                      <p class="text-[12px] text-slate-500 m-0 leading-[1.45]">AWS, Kubernetes &amp; CI/CD pipelines</p>
+                    </div>
+                    <span class="text-blue-500 font-bold opacity-0 -translate-x-3 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-300 mt-2.5">→</span>
+                  </button>
+                </div>
+              </Transition>
+            </div>
           </li>
 
           <!-- Projects -->
@@ -466,14 +468,13 @@ const navigateToServicesSection = (sectionId = 'services') => {
 .dropdown-enter-from,
 .dropdown-leave-to {
   opacity: 0;
-  transform: translateX(-50%) translateY(12px);
+  transform: translateY(12px);
 }
 .dropdown-enter-to,
 .dropdown-leave-from {
   opacity: 1;
-  transform: translateX(-50%) translateY(0);
+  transform: translateY(0);
 }
-
 .backdrop-fade-enter-active,
 .backdrop-fade-leave-active {
   transition: opacity 0.3s ease;
