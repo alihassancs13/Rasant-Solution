@@ -90,7 +90,7 @@
           </p>
         </div>
         <div class="rounded-2xl p-[14px] bg-white/90 border border-[rgba(203,213,225,0.9)] shadow-[0_20px_60px_rgba(42,95,158,0.1)]">
-          <!-- ✅ sentra-platform.svg added here -->
+          <!--  sentra-platform.svg added here -->
           <img src="../assets/svg/sentra-platform.svg" alt="Sentra AI platform architecture"
                class="w-full block rounded-[14px]" />
         </div>

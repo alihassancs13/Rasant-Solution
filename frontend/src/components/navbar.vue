@@ -19,14 +19,8 @@
     <!-- ===== HEADER ===== -->
     <header
         id="navbar"
-        class="fixed top-0 left-0 right-0 h-20 flex items-center justify-between px-6 md:px-12 z-50 transition-all duration-[450ms]"
-        :class="[
-        isScrolled || isMobileMenuOpen
-          ? 'bg-white/96 shadow-[0_4px_30px_rgba(15,23,42,0.08)] backdrop-blur-[16px]'
-          : 'bg-white/45 backdrop-blur-[12px]'
-      ]"
+        class="fixed top-0 left-0 right-0 h-20 flex items-center justify-between px-6 md:px-12 z-50 bg-white shadow-[0_4px_30px_rgba(15,23,42,0.08)]"
     >
-
       <!-- Logo -->
       <router-link to="/home" class="flex items-center shrink-0 z-[2]" aria-label="Rasant Solutions home">
         <img

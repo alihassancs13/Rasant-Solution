@@ -3,21 +3,21 @@
     <Navbar />
 
     <!-- Hero Section -->
-    <section class="relative overflow-hidden py-20 lg:py-24 bg-gradient-to-b from-[#f8f0ff] via-[#f5ebe6] to-[#eef2f6]">
-      <div class="absolute inset-0 opacity-60 pointer-events-none bg-[radial-gradient(circle_at_top_left,rgba(255,213,180,0.15),transparent_45%),radial-gradient(circle_at_top_right,rgba(201,196,248,0.12),transparent_50%)]" aria-hidden="true"></div>
+    <section class="relative overflow-hidden px-6 py-20 text-center bg-pink-50 mt-5">
+      <div class="absolute inset-0 opacity-70 mix-blend-multiply pointer-events-none bg-[radial-gradient(circle_at_top_right,rgba(244,63,94,0.09),transparent_45%),radial-gradient(circle_at_bottom_left,rgba(59,130,246,0.1),transparent_50%),radial-gradient(circle_at_top_left,rgba(219,39,119,0.06),transparent_40%),radial-gradient(circle_at_bottom_right,rgba(241,245,249,1),transparent_60%)]" aria-hidden="true"></div>
 
-      <div class="relative max-w-4xl mx-auto px-6 text-center z-10">
-        <span class="inline-flex items-center gap-2 px-3 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase bg-[#4A90E2]/10 text-[#4A90E2] border border-[#4A90E2]/20 mb-5 transition-all duration-700 ease-out" :class="heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'">
-          <span class="w-1.5 h-1.5 rounded-full bg-[#14B8A6] animate-pulse"></span>
-          Careers
-        </span>
+      <div class="relative z-10 max-w-3xl mx-auto">
+    <span class="inline-flex items-center gap-2 px-3 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase bg-slate-400/10 text-orange-700 border border-slate-300/30 mb-5">
+      <span class="w-1.5 h-1.5 rounded-full bg-teal-500 animate-pulse"></span>
+      Careers
+    </span>
 
-        <h1 class="font-['Space_Grotesk'] text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#1E3A5F] tracking-tight leading-[1.2] mb-5 transition-all duration-700 delay-150 ease-out" :class="heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'">
+        <h1 class="font-['Space_Grotesk',sans-serif] text-4xl sm:text-5xl font-extrabold text-[#1e3a5f] leading-tight">
           Build the future<br />
-          <em class="not-italic bg-gradient-to-r from-[#C96E3A] via-[#B0457A] to-[#6B52B8] bg-clip-text text-transparent">with us</em>
+          <em class="not-italic text-orange-700">with us</em>
         </h1>
 
-        <p class="text-sm sm:text-base text-[#475569] max-w-2xl mx-auto leading-relaxed font-normal transition-all duration-700 delay-300 ease-out" :class="heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'">
+        <p class="mt-4 text-slate-500 text-base sm:text-lg font-['Inter']">
           Join Rasant Solutions — innovation, growth, and meaningful work <br> across AI products and custom software.
         </p>
       </div>
