@@ -240,17 +240,17 @@
           Login
         </router-link>
 
-        <router-link
-            to="/contact"
-            @click="closeMobileMenu"
-            class="relative overflow-hidden px-6 py-[11px] text-[14px] font-['Space_Grotesk'] font-bold text-white rounded-[50px] no-underline transition-all duration-200 active:scale-[0.98]"
-            style="background: #C2410C; box-shadow: 0 4px 20px rgba(194,65,12,0.3); animation: ctaGlow 3s ease-in-out infinite;"
+        <button
+            type="button"
+            @click="() => { closeMobileMenu(); $router.push('/contact'); }"
+            class="relative overflow-hidden px-6 py-[11px] text-[14px] font-['Space_Grotesk'] font-bold text-white rounded-[50px] no-underline transition-all duration-200 active:scale-[0.98] btn-shine-wrapper"
+            style="background: #C2410C; box-shadow: 0 4px 20px rgba(194,65,12,0.3);"
             @mouseover="$event.currentTarget.style.background = '#9A3412'"
             @mouseout="$event.currentTarget.style.background = '#C2410C'"
         >
           Get Quote
-          <span class="absolute inset-0 w-2/5 h-full pointer-events-none" style="background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent); transform: skewX(-20deg); animation: btnShine 3s ease-in-out infinite;"></span>
-        </router-link>
+          <span class="absolute inset-0 pointer-events-none btn-shine"></span>
+        </button>
       </div>
 
       <!-- ===== HAMBURGER ===== -->
@@ -455,10 +455,48 @@ const navigateToServicesSection = (sectionId = 'services') => {
   0%, 100% { box-shadow: 0 4px 20px rgba(194, 65, 12, 0.3); }
   50%       { box-shadow: 0 6px 28px rgba(194, 65, 12, 0.5), 0 0 0 4px rgba(194, 65, 12, 0.08); }
 }
-
+/* Fast Shine Animation - Left to Right */
+/* TRUE LEFT-TO-RIGHT AND RIGHT-TO-LEFT SHINE */
+/* TRUE LEFT-TO-RIGHT AND RIGHT-TO-LEFT SHINE - FIXED */
+/* TRUE LEFT-TO-RIGHT AND RIGHT-TO-LEFT SHINE */
 @keyframes btnShine {
-  0%, 80%, 100% { left: -60%; }
-  40%            { left: 120%; }
+  0% {
+    transform: translateX(-100%) skewX(-20deg);
+  }
+  100% {
+    transform: translateX(300%) skewX(-20deg);
+  }
+}
+
+.btn-shine {
+  width: 30%;
+  height: 100%;
+  background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.15) 25%,
+      rgba(255, 255, 255, 0.4) 50%,
+      rgba(255, 255, 255, 0.15) 75%,
+      transparent 100%
+  );
+  animation: btnShine 0.8s ease-in-out infinite alternate;
+  filter: blur(0.5px);
+  border-radius: 50%;
+}
+
+/* Glow animation */
+@keyframes ctaGlow {
+  0%, 100% { box-shadow: 0 4px 20px rgba(194, 65, 12, 0.3); }
+  50% { box-shadow: 0 6px 28px rgba(194, 65, 12, 0.5), 0 0 0 4px rgba(194, 65, 12, 0.08); }
+}
+
+.btn-shine-wrapper {
+  animation: ctaGlow 3s ease-in-out infinite;
+}
+
+/* Optional: Pause shine on hover */
+.btn-shine-wrapper:hover .btn-shine {
+  animation-play-state: paused;
 }
 
 .dropdown-enter-active,
