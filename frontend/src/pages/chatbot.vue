@@ -194,8 +194,14 @@
           <div class="lg:col-span-6 flex justify-center">
             <div class="relative p-6 bg-slate-50 rounded-2xl border border-slate-100 w-full max-w-md aspect-square flex items-center justify-center overflow-visible">
 
-              <div class="absolute inset-[-12%] rounded-full border-2 border-dashed border-purple-400/60 scale-y-[0.85] -rotate-12 animate-[spin_30s_linear_infinite] pointer-events-none"></div>
-              <div class="absolute inset-[-4%] rounded-full border-2 border-dashed border-sky-400/50 scale-x-[0.90] rotate-45 animate-[spin_20s_linear_infinite_reverse] pointer-events-none"></div>
+              <div class="absolute inset-0">
+                <div class="orbit-1">
+                  <div class="absolute inset-[-10%] rounded-full border-2 border-dashed border-purple-400/60 scale-y-[0.85] -rotate-12 animate-[spin_30s_linear_infinite] pointer-events-none"></div>
+                </div>
+                <div class="orbit-2">
+                  <div class="absolute inset-[-6%] rounded-full border-2 border-dashed border-sky-400/50 scale-x-[0.90] rotate-45 animate-[spin_20s_linear_infinite_reverse] pointer-events-none"></div>
+                </div>
+              </div>
 
               <div class="relative w-80 h-100 mx-auto z-10 flex items-center justify-center">
                 <img
@@ -430,6 +436,22 @@ const scrollToPricing = () => {
 .font-space-grotesk {
   font-family: 'Space Grotesk', sans-serif;
 }
+@keyframes orbit-1 {
+  0%   { transform: translate(0, 0); }
+  25%  { transform: translate(18px, -10px); }
+  50%  { transform: translate(0, -18px); }
+  75%  { transform: translate(-18px, -10px); }
+  100% { transform: translate(0, 0); }
+}
+@keyframes orbit-2 {
+  0%   { transform: translate(0, 0); }
+  25%  { transform: translate(-14px, 12px); }
+  50%  { transform: translate(0, 20px); }
+  75%  { transform: translate(14px, 12px); }
+  100% { transform: translate(0, 0); }
+}
+.orbit-1 { position: absolute; inset: 0; animation: orbit-1 14s ease-in-out infinite; }
+.orbit-2 { position: absolute; inset: 0; animation: orbit-2 9s ease-in-out infinite; }
 @keyframes fastShineLoop {
   0% {
     transform: translateX(-160%) skewX(-15deg);
