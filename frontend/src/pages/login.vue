@@ -25,12 +25,12 @@
             </p>
           </div>
 
-          <div class="w-full max-w-65 mx-auto" aria-hidden="true">
+          <div class="w-full" aria-hidden="true">
             <img
                 :src="loginVisual"
                 alt="Platform access visualization"
-                width="270"
-                height="102"
+                width="300"
+                height="150"
                 class="w-full h-auto max-h-[33vh] object-contain rounded-2xl shadow-md bg-pink-50 border border-slate-100"
             />
           </div>

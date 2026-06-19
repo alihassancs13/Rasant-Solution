@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 360" role="img" aria-label="Rasant workspace login">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 680 360" role="img" aria-label="Rasant workspace login">
   <defs>
     <linearGradient id="lvBg" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#FFF8F3"/>
@@ -10,67 +10,68 @@
       <stop offset="0%" stop-color="#2A5F9E"/>
       <stop offset="100%" stop-color="#1E3A5F"/>
     </linearGradient>
-    <linearGradient id="lvLine" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#14B8A6" stop-opacity="0.3"/>
-      <stop offset="100%" stop-color="#4A90E2" stop-opacity="0.55"/>
-    </linearGradient>
-    <filter id="lvSh" x="-8%" y="-8%" width="116%" height="116%">
-      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#2A5F9E" flood-opacity="0.1"/>
+    <radialGradient id="lvGlowBlue" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#4A90E2" stop-opacity="0.16"/>
+      <stop offset="100%" stop-color="#4A90E2" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="lvGlowTeal" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#14B8A6" stop-opacity="0.14"/>
+      <stop offset="100%" stop-color="#14B8A6" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="lvSh" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="3" stdDeviation="5" flood-color="#1E3A5F" flood-opacity="0.14"/>
+    </filter>
+    <filter id="lvShBadge" x="-40%" y="-40%" width="180%" height="180%">
+      <feDropShadow dx="0" dy="4" stdDeviation="7" flood-color="#1E3A5F" flood-opacity="0.3"/>
     </filter>
     <style>
-      .lv-flow { stroke-dasharray:8 6; animation: lvFlow 1.2s linear infinite; }
-      @keyframes lvFlow { to { stroke-dashoffset:-28; } }
-      .lv-pulse { animation: lvPulse 2.5s ease-in-out infinite; transform-box:fill-box; transform-origin:center; }
-      @keyframes lvPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.04)} }
-      .lv-float { animation: lvFloat 4s ease-in-out infinite; }
-      .lv-float.f2 { animation-delay:-1.3s; }
-      .lv-float.f3 { animation-delay:-2.6s; }
-      @keyframes lvFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
       .lv-blink { animation: lvBlink 1.8s ease-in-out infinite; }
-      @keyframes lvBlink { 0%,100%{opacity:.45} 50%{opacity:1} }
+      @keyframes lvBlink { 0%,100%{opacity:.4} 50%{opacity:1} }
+      .lv-pulsering { animation: lvPulseRing 3s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+      @keyframes lvPulseRing { 0%,100%{opacity:.5} 50%{opacity:1} }
     </style>
   </defs>
 
-  <rect width="480" height="360" rx="18" fill="url(#lvBg)" stroke="#CBD5E1"/>
+  <rect width="680" height="360" rx="20" fill="url(#lvBg)" stroke="#E2E8F0"/>
+  <circle cx="110" cy="70" r="100" fill="url(#lvGlowBlue)"/>
+  <circle cx="570" cy="300" r="110" fill="url(#lvGlowTeal)"/>
 
-  <path class="lv-flow" d="M240 188 L88 88" fill="none" stroke="url(#lvLine)" stroke-width="2"/>
-  <path class="lv-flow" d="M240 188 L392 88" fill="none" stroke="url(#lvLine)" stroke-width="2"/>
-  <path class="lv-flow" d="M240 188 L88 272" fill="none" stroke="url(#lvLine)" stroke-width="2"/>
-  <path class="lv-flow" d="M240 188 L392 272" fill="none" stroke="url(#lvLine)" stroke-width="2"/>
+  <circle class="lv-pulsering" cx="340" cy="172" r="110" fill="none" stroke="#2A5F9E" stroke-opacity="0.22" stroke-width="1.5" stroke-dasharray="3 7"/>
 
-  <g class="lv-pulse" filter="url(#lvSh)">
-    <rect x="204" y="152" width="72" height="72" rx="16" fill="url(#lvNavy)"/>
-    <text x="240" y="198" text-anchor="middle" font-family="Space Grotesk,Arial,sans-serif" font-size="24" font-weight="800" fill="#FFFFFF">RS</text>
-  </g>
+  <g>
+    <animateTransform attributeName="transform" type="rotate" from="0 340 172" to="360 340 172" dur="26s" repeatCount="indefinite"/>
 
-  <g class="lv-blink">
-    <rect x="224" y="232" width="32" height="24" rx="6" fill="#FFFFFF" stroke="#CBD5E1"/>
-    <path d="M232 232v-8a8 8 0 0 1 16 0v8" fill="none" stroke="#2A5F9E" stroke-width="3"/>
-    <circle cx="240" cy="244" r="3.5" fill="#14B8A6"/>
-  </g>
+    <g filter="url(#lvSh)">
+      <animateTransform attributeName="transform" type="rotate" from="0 340 62" to="-360 340 62" dur="26s" repeatCount="indefinite"/>
+      <rect x="295" y="45" width="90" height="34" rx="9" fill="#FFFFFF" stroke="#5EEAD4" stroke-width="1.5"/>
+      <text x="340" y="67" text-anchor="middle" font-size="13" font-weight="700" fill="#0F766E" font-family="Inter,Arial,sans-serif">Sentra AI</text>
+    </g>
 
-  <g class="lv-float" filter="url(#lvSh)">
-    <rect x="32" y="56" width="112" height="58" rx="12" fill="#FFFFFF" stroke="#5EEAD4"/>
-    <text x="88" y="84" text-anchor="middle" font-size="10" font-weight="700" fill="#0F766E" font-family="Inter,Arial,sans-serif">Sentra AI</text>
-    <text x="88" y="100" text-anchor="middle" font-size="8" fill="#64748B" font-family="Inter,Arial,sans-serif">Call center</text>
-  </g>
-  <g class="lv-float f2" filter="url(#lvSh)">
-    <rect x="336" y="56" width="112" height="58" rx="12" fill="#FFFFFF" stroke="#7DD3FC"/>
-    <text x="392" y="84" text-anchor="middle" font-size="10" font-weight="700" fill="#2A5F9E" font-family="Inter,Arial,sans-serif">Voice AI</text>
-    <text x="392" y="100" text-anchor="middle" font-size="8" fill="#64748B" font-family="Inter,Arial,sans-serif">Phone agents</text>
-  </g>
-  <g class="lv-float f3" filter="url(#lvSh)">
-    <rect x="32" y="246" width="112" height="58" rx="12" fill="#FFFFFF" stroke="#93C5FD"/>
-    <text x="88" y="274" text-anchor="middle" font-size="10" font-weight="700" fill="#2A5F9E" font-family="Inter,Arial,sans-serif">Chatbot</text>
-    <text x="88" y="290" text-anchor="middle" font-size="8" fill="#64748B" font-family="Inter,Arial,sans-serif">Web + WhatsApp</text>
-  </g>
-  <g class="lv-float" filter="url(#lvSh)">
-    <rect x="336" y="246" width="112" height="58" rx="12" fill="#FFFFFF" stroke="#FDBA74"/>
-    <text x="392" y="274" text-anchor="middle" font-size="10" font-weight="700" fill="#C2410C" font-family="Inter,Arial,sans-serif">Analytics</text>
-    <text x="392" y="290" text-anchor="middle" font-size="8" fill="#64748B" font-family="Inter,Arial,sans-serif">Live dashboards</text>
+    <g filter="url(#lvSh)">
+      <animateTransform attributeName="transform" type="rotate" from="0 340 282" to="-360 340 282" dur="26s" repeatCount="indefinite"/>
+      <rect x="295" y="265" width="90" height="34" rx="9" fill="#FFFFFF" stroke="#93C5FD" stroke-width="1.5"/>
+      <text x="340" y="287" text-anchor="middle" font-size="13" font-weight="700" fill="#2A5F9E" font-family="Inter,Arial,sans-serif">Voice AI</text>
+    </g>
+
+    <g filter="url(#lvSh)">
+      <animateTransform attributeName="transform" type="rotate" from="0 230 172" to="-360 230 172" dur="26s" repeatCount="indefinite"/>
+      <rect x="185" y="155" width="90" height="34" rx="9" fill="#FFFFFF" stroke="#7DD3FC" stroke-width="1.5"/>
+      <text x="230" y="177" text-anchor="middle" font-size="13" font-weight="700" fill="#2A5F9E" font-family="Inter,Arial,sans-serif">Chatbot</text>
+    </g>
+
+    <g filter="url(#lvSh)">
+      <animateTransform attributeName="transform" type="rotate" from="0 450 172" to="-360 450 172" dur="26s" repeatCount="indefinite"/>
+      <rect x="405" y="155" width="90" height="34" rx="9" fill="#FFFFFF" stroke="#FDBA74" stroke-width="1.5"/>
+      <text x="450" y="177" text-anchor="middle" font-size="13" font-weight="700" fill="#C2410C" font-family="Inter,Arial,sans-serif">Analytics</text>
+    </g>
   </g>
 
-  <rect x="140" y="318" width="200" height="28" rx="14" fill="#FFFFFF" stroke="#14B8A6" stroke-width="1.5"/>
-  <circle class="lv-blink" cx="158" cy="332" r="4" fill="#14B8A6"/>
-  <text x="172" y="336" font-family="Inter,Arial,sans-serif" font-size="9" font-weight="600" fill="#1E3A5F">Secure workspace access</text>
+  <g filter="url(#lvShBadge)">
+    <rect x="304" y="136" width="72" height="72" rx="18" fill="url(#lvNavy)"/>
+    <text x="340" y="181" text-anchor="middle" font-family="Space Grotesk,Arial,sans-serif" font-size="22" font-weight="800" fill="#FFFFFF">RS</text>
+  </g>
+
+  <rect x="248" y="306" width="184" height="30" rx="15" fill="#FFFFFF" stroke="#14B8A6" stroke-width="1.5" filter="url(#lvSh)"/>
+  <circle class="lv-blink" cx="266" cy="321" r="4" fill="#14B8A6"/>
+  <text x="280" y="325" font-family="Inter,Arial,sans-serif" font-size="10.5" font-weight="600" fill="#1E3A5F">Secure workspace access</text>
 </svg>
