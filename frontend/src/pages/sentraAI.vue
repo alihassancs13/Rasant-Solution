@@ -2,49 +2,73 @@
   <Navbar />
   <div class="min-h-screen bg-[#f8fafc] font-['Inter'] text-[#1E3A5F] antialiased selection:bg-[#4A90E2]/20">
     <!-- Showcase Section -->
-    <section class="relative pt-[68px] overflow-hidden" style="background: linear-gradient(180deg, #eff6ff 0%, #fff8f3 38%, #f8fafc 100%);">
-      <div class="absolute inset-[-10%_-5%] pointer-events-none" :style="{
-        background: `
-          radial-gradient(circle at 18% 20%, rgba(143, 185, 244, 0.35) 0%, transparent 42%),
-          radial-gradient(circle at 82% 18%, rgba(201, 196, 248, 0.28) 0%, transparent 40%),
-          radial-gradient(circle at 50% 80%, rgba(20, 184, 166, 0.1) 0%, transparent 45%)
-        `
-      }"></div>
+    <section class="relative pt-17 pb-0 overflow-hidden bg-gradient-to-b from-[#fdf4ff] via-[#fff8f3] to-[#f8fafc]" id="top">
+      <!-- Background mesh -->
+      <div class="absolute inset-[-10%_-5%] pointer-events-none bg-[radial-gradient(circle_at_18%_20%,rgba(255,213,180,0.35)_0%,transparent_42%),radial-gradient(circle_at_82%_18%,rgba(201,196,248,0.32)_0%,transparent_40%),radial-gradient(circle_at_50%_80%,rgba(45,212,191,0.12)_0%,transparent_45%)] animate-[meshShift_10s_ease-in-out_infinite_alternate]"></div>
 
-      <div class="max-w-7xl mx-auto px-[5%] relative z-10">
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center py-16 lg:py-24">
-          <!-- Left Content -->
-          <div>
-            <span class="inline-block text-xs font-semibold uppercase tracking-[1.5px] text-[#2A5F9E] bg-white/80 px-4 py-2 rounded-full border border-[rgba(42,95,158,0.12)] mb-4 font-['Inter']">
-              Sentra AI Platform
-            </span>
-            <h1 class="font-['Space_Grotesk'] text-3xl md:text-4xl lg:text-5xl font-extrabold leading-[1.15] tracking-[-1px] mb-2.5 text-[#1E3A5F]">
-              Omni-channel call center with <br/>
-              <em class="not-italic bg-gradient-to-r from-[#C96E3A] via-[#B0457A] to-[#6B52B8] bg-clip-text text-transparent">
-                AI routing and live supervision
-              </em>
-            </h1>
-            <p class="text-[15px] text-[#475569] leading-relaxed mb-4 max-w-2xl font-['Inter']">
-              Inbound and outbound voice, AI bots, live agents, chatbots, and supervisor analytics — one platform for modern contact centers.
-            </p>
-            <div class="flex gap-3 flex-wrap">
-              <router-link to="/login" class="inline-flex items-center px-6 py-3 bg-[#C2410C] text-white font-semibold rounded-lg hover:bg-[#9A3412] transition-all duration-300 shadow-lg shadow-[#C2410C]/30 hover:shadow-xl font-['Inter']">
-                Open Sentra Portal
-              </router-link>
-              <router-link to="/contact?project=sentra" class="inline-flex items-center px-6 py-3 border-2 border-[#E2E8F0] text-[#1E3A5F] font-semibold rounded-lg hover:border-[#4A90E2] hover:text-[#4A90E2] transition-all duration-300 font-['Inter']">
-                Contact Sales
-              </router-link>
-            </div>
+      <!-- Orb backgrounds -->
+      <div class="absolute rounded-full blur-[70px] pointer-events-none w-80 h-80 bg-[rgba(255,213,180,0.45)] -top-5 -left-20 animate-[orbDrift_14s_ease-in-out_infinite]"></div>
+      <div class="absolute rounded-full blur-[70px] pointer-events-none w-70 h-70 bg-[rgba(143,185,244,0.35)] top-15 -right-15 animate-[orbDrift_14s_ease-in-out_infinite] [animation-delay:-6s]"></div>
+      <div class="absolute rounded-full blur-[70px] pointer-events-none w-50 h-50 bg-[rgba(45,212,191,0.22)] bottom-[10%] left-[55%] animate-[orbDrift_14s_ease-in-out_infinite] [animation-delay:-3s]"></div>
+
+      <!-- Decorative side grids -->
+      <div class="absolute left-0 right-0 top-13 bottom-0 z-10 pointer-events-none overflow-hidden hidden sm:block" aria-hidden="true">
+        <!-- Left grid -->
+        <div class="absolute top-[6%] bottom-[8%] w-[clamp(160px,calc(50%-280px),300px)] z-10 opacity-[0.78] left-[max(12px,2vw)] [mask-image:linear-gradient(90deg,rgba(0,0,0,0.88)_0%,rgba(0,0,0,0.42)_68%,transparent_100%)]">
+          <div class="grid grid-cols-3 grid-rows-5 gap-[7px] h-full relative before:absolute before:inset-0 before:bg-[linear-gradient(rgba(94,234,212,0.14)_1px,transparent_1px),linear-gradient(90deg,rgba(74,144,226,0.14)_1px,transparent_1px)] before:bg-[length:calc((100%+7px)/3)_calc((100%+7px)/5)]">
+            <div v-for="(cell, i) in gridCellsLeft" :key="'left-'+i"
+                 class="rounded-lg border border-[rgba(74,144,226,0.2)] relative z-10 animate-[cellBreathe_7s_ease-in-out_infinite]"
+                 :class="cell.bgClass"
+                 :style="cell.delay ? { animationDelay: cell.delay } : {}"></div>
           </div>
+        </div>
 
-          <!-- Right Visual -->
-          <div class="relative z-[3] flex justify-center">
-            <div class="relative w-[min(360px,86vw)]">
-              <div class="absolute inset-[8%] rounded-full bg-[radial-gradient(circle,rgba(74,144,226,0.22)_0%,transparent_70%)] pointer-events-none"></div>
-              <div class="absolute inset-[-14px] rounded-full border-2 border-dashed border-[rgba(42,95,158,0.32)] pointer-events-none animate-spin-slow"></div>
-              <div class="absolute inset-[-22px] rounded-full border-2 border-dashed border-[rgba(20,184,166,0.22)] pointer-events-none animate-spin-reverse-slow"></div>
-              <img src="@/assets/svg/sentra-bot.svg" alt="Sentra AI call routing"
-                   class="w-full relative z-[2] drop-shadow-[0_16px_36px_rgba(42,95,158,0.2)]" />
+        <!-- Right grid -->
+        <div class="absolute top-[6%] bottom-[8%] w-[clamp(160px,calc(50%-280px),300px)] z-10 opacity-[0.78] right-[max(12px,2vw)] [mask-image:linear-gradient(270deg,rgba(0,0,0,0.88)_0%,rgba(0,0,0,0.42)_68%,transparent_100%)]">
+          <div class="grid grid-cols-3 grid-rows-5 gap-[7px] h-full relative before:absolute before:inset-0 before:bg-[linear-gradient(rgba(94,234,212,0.14)_1px,transparent_1px),linear-gradient(90deg,rgba(74,144,226,0.14)_1px,transparent_1px)] before:bg-[length:calc((100%+7px)/3)_calc((100%+7px)/5)]">
+            <div v-for="(cell, i) in gridCellsRight" :key="'right-'+i"
+                 class="rounded-lg border border-[rgba(74,144,226,0.2)] relative z-10 animate-[cellBreathe_7s_ease-in-out_infinite]"
+                 :class="cell.bgClass"
+                 :style="cell.delay ? { animationDelay: cell.delay } : {}"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main content -->
+      <div class="relative max-w-[1040px] mx-auto px-6 z-30 grid grid-cols-1 md:grid-cols-2 gap-8 items-center pt-8 pb-12">
+        <!-- Left text content -->
+        <div class="relative z-30 text-left max-w-[560px] mx-auto md:mx-0 mt-15">
+          <span class="inline-block uppercase tracking-wider text-[11px] font-bold text-teal-600 bg-teal-50 px-3 py-1 rounded-full mb-4">Sentra AI Platform</span>
+          <h1 class="font-['Space_Grotesk'] text-[clamp(28px,4vw,44px)] font-extrabold tracking-[-1px] leading-[1.15] mb-4 text-slate-900">
+            Omni-channel call center with <br/>
+            <em class="not-italic bg-gradient-to-r from-[#C96E3A] via-[#B0457A] to-[#6B52B8] bg-clip-text text-transparent">
+              AI routing and live supervision
+            </em>
+          </h1>
+          <p class="text-[15px] text-slate-500 leading-relaxed mb-6">Inbound and outbound voice, AI bots, live agents, chatbots, and supervisor analytics — one platform for modern contact centers.</p>
+          <div class="flex gap-3 flex-wrap">
+            <button
+                @click="$router.push('/login')"
+                type="button"
+                class="relative overflow-hidden cursor-pointer w-50 flex items-center justify-center px-6 py-3.5 bg-orange-700 hover:bg-orange-900 text-base font-semibold text-white rounded-xl transition-all duration-200 shadow-[0_4px_14px_rgba(42,95,158,0.4)] hover:shadow-[0_6px_20px_rgba(42,95,158,0.6)] active:scale-[0.98] group"
+            >
+              Open Sentra Portal
+              <div class="absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 pointer-events-none animate-shine-fast-loop"></div>
+            </button>
+            <router-link to="/contact?project=sentra" class="px-6 py-3 border border-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition-colors text-sm cursor-pointer no-underline">
+              Contact Sales
+            </router-link>
+          </div>
+        </div>
+
+        <!-- Right Visual -->
+        <div class="relative z-30 flex justify-center py-1 mx-auto md:mr-0 md:ml-auto">
+          <div class="relative w-[min(400px,80vw)] animate-[botEnter_0.9s_cubic-bezier(0.22,1,0.36,1)_both]">
+            <div class="absolute inset-[8%] rounded-full bg-[radial-gradient(circle,rgba(45,212,191,0.2)_0%,transparent_70%)] animate-[botGlow_3s_ease-in-out_infinite]"></div>
+            <div class="absolute -inset-3.5 rounded-full border-2 border-dashed border-[rgba(45,212,191,0.35)] animate-[botRingSpin_22s_linear_infinite]"></div>
+            <div class="absolute -inset-5.5 rounded-full border-2 border-dashed border-[rgba(139,92,246,0.2)] animate-[botRingSpin_30s_linear_infinite_reverse]"></div>
+            <div class="relative w-full z-20 aspect-square max-w-sm mx-auto flex items-center justify-center overflow-visible">
+              <img src="../assets/svg/sentra-bot.svg" alt="Sentra AI call routing" class="w-full h-[450px] object-contain drop-shadow-[0_16px_36px_rgba(42,95,158,0.2)] relative z-10" />
             </div>
           </div>
         </div>
@@ -67,7 +91,7 @@
         </div>
         <div class="rounded-2xl p-[14px] bg-white/90 border border-[rgba(203,213,225,0.9)] shadow-[0_20px_60px_rgba(42,95,158,0.1)]">
           <!-- ✅ sentra-platform.svg added here -->
-          <img src="@/assets/svg/sentra-platform.svg" alt="Sentra AI platform architecture"
+          <img src="../assets/svg/sentra-platform.svg" alt="Sentra AI platform architecture"
                class="w-full block rounded-[14px]" />
         </div>
       </div>
@@ -386,25 +410,24 @@
     </section>
 
     <!-- CTA Section -->
-    <section class="py-20 px-[5%] text-center" style="background: linear-gradient(165deg, #1e3a5f 0%, #2a5f9e 100%);">
-      <div class="max-w-4xl mx-auto">
-        <h2 class="font-['Space_Grotesk'] text-3xl md:text-5xl font-extrabold mb-3 text-white">
+    <section class="py-16 px-[5%] text-center bg-orange-700">
+      <div class="max-w-3xl mx-auto">
+        <p class="font-['Space_Grotesk'] text-3xl md:text-4xl font-extrabold mb-3 text-white">
           Ready to modernize your contact center?
-        </h2>
-        <p class="text-white/80 mb-6 font-['Inter'] text-lg">
+        </p>
+        <p class="text-white/80 mb-6 font-['Inter'] text-base md:text-lg">
           Deploy Sentra AI on your stack or start with our managed demo environment.
         </p>
-        <div class="flex gap-3.5 justify-center flex-wrap">
-          <router-link to="/login" class="inline-flex items-center px-8 py-4 bg-orange-600 text-white font-semibold rounded-lg hover:bg-gray-100 transition-all duration-300 shadow-lg hover:shadow-xl font-['Inter']">
+        <div class="flex gap-4 justify-center flex-wrap">
+          <router-link to="/login" class="shadow-md transition-transform hover:scale-[1.02] inline-flex items-center px-6 py-3 bg-white text-orange-600 font-semibold rounded-lg hover:bg-orange-100 transition-all duration-300 shadow-lg hover:shadow-xl font-['Inter']">
             Open Sentra Portal
           </router-link>
-          <router-link to="/contact?project=sentra" class="inline-flex items-center px-8 py-4 border-2 border-white/40 text-white font-semibold rounded-lg hover:bg-white/10 transition-all duration-300 font-['Inter']">
+          <router-link to="/contact?project=sentra" class="inline-flex items-center px-6 py-3 border-2 border-white/40 text-white font-semibold rounded-lg hover:bg-white/10 transition-all duration-300 font-['Inter']">
             Contact Sales
           </router-link>
         </div>
       </div>
     </section>
-
   </div>
   <Footer />
 </template>
@@ -489,7 +512,32 @@ export default {
   from { transform: rotate(360deg); }
   to { transform: rotate(0deg); }
 }
+@keyframes shineFastLoop {
+  0% {
+    transform: translateX(-150%) skewX(-12deg);
+  }
+  /* Fast journey from Left to Right */
+  40% {
+    transform: translateX(250%) skewX(-12deg);
+  }
+  /* Tiny pause at the right edge before returning */
+  50% {
+    transform: translateX(250%) skewX(-12deg);
+  }
+  /* Fast journey back from Right to Left */
+  90% {
+    transform: translateX(-150%) skewX(-12deg);
+  }
+  /* Pause at the left edge before restarting the whole loop */
+  100% {
+    transform: translateX(-150%) skewX(-12deg);
+  }
+}
 
+.animate-shine-fast-loop {
+  /* Adjust 3s to make the total cycle (including pauses) longer or shorter */
+  animation: shineFastLoop 2s ease-in-out infinite;
+}
 .animate-spin-slow {
   animation: spin 22s linear infinite;
 }
