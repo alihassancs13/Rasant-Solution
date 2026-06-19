@@ -33,24 +33,67 @@
           <p class="text-[#64748B] text-sm sm:text-base">Explore roles at Rasant Solutions and apply directly below.</p>
         </div>
 
-        <!-- No Jobs Message -->
-        <div class="text-center py-16 px-4">
-          <h3 class="font-['Space_Grotesk'] text-xl font-bold text-[#1E3A5F] mb-2">No Current Openings</h3>
-          <p class="text-[#64748B] text-sm max-w-md mx-auto">
-            We don't have any open positions right now, but we're always looking for great talent.
-            Submit your CV below and we'll reach out when something matches your profile.
-          </p>
+        <!-- No Jobs Message + CTA (merged card) -->
+
+        <div
+            class="relative rounded-[24px] py-12 px-8 sm:px-12 overflow-hidden max-w-3xl mx-auto transition-all duration-700 delay-150 ease-out bg-gradient-to-br from-[#0F2A4A] via-[#1E3A5F] to-[#2A5F9E] shadow-[0_20px_50px_rgba(30,58,95,0.25)]"
+            :class="cardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'"
+        >
+          <div class="absolute -top-24 -right-16 w-72 h-72 rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(74,144,226,0.35),transparent_70%)]"></div>
+          <div class="absolute -bottom-24 -left-10 w-64 h-64 rounded-full pointer-events-none bg-[radial-gradient(circle,rgba(20,184,166,0.25),transparent_70%)]"></div>
+          <div class="absolute inset-0 opacity-50 pointer-events-none bg-[radial-gradient(circle_at_2px_2px,rgba(255,255,255,0.06)_1px,transparent_0)] [background-size:24px_24px]"></div>
+
+          <div class="relative z-10">
+            <div class="flex items-center gap-7 flex-wrap">
+
+              <div class="shrink-0 w-20 h-20 rounded-2xl flex items-center justify-center border border-white/[0.18] bg-white/10">
+                <i class="fa-solid fa-briefcase text-[26px] text-white" aria-hidden="true"></i>
+              </div>
+
+              <div class="flex-1 min-w-[260px] text-left">
+        <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[10.5px] font-bold tracking-wide uppercase mb-3 bg-teal-400/[0.16] text-teal-300 border border-teal-300/25">
+          <span class="w-1.5 h-1.5 rounded-full bg-teal-300"></span>
+          Currently fully staffed
+        </span>
+                <h3 class="font-['Space_Grotesk'] text-[22px] sm:text-2xl font-bold text-white mb-2">No open roles at the moment</h3>
+                <p class="text-sm sm:text-[15px] leading-relaxed max-w-md text-white/72">
+                  Our team is at full strength right now — but that changes often.
+                  Leave your CV with us and we'll be the first to reach out when a role opens up.
+                </p>
+              </div>
+
+              <div class="shrink-0">
+                <button
+                    type="button"
+                    @click="openModal('')"
+                    class="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl font-bold text-sm whitespace-nowrap transition-all duration-200 hover:scale-[1.03] active:scale-95 cursor-pointer bg-orange-700 text-white shadow-[0_10px_24px_rgba(0,0,0,0.18)]"
+                >
+                  Submit your CV
+                  <span aria-hidden="true">&rarr;</span>
+                </button>
+              </div>
+
+            </div>
+
+            <div class="flex items-center gap-9 mt-8 pt-6 flex-wrap border-t border-white/[0.14]">
+              <div>
+                <div class="font-['Space_Grotesk'] text-xl font-bold text-white">48h</div>
+                <div class="text-xs mt-0.5 text-white/55">avg. response</div>
+              </div>
+              <div class="w-px h-[30px] bg-white/[0.14]"></div>
+              <div>
+                <div class="font-['Space_Grotesk'] text-xl font-bold text-white">5</div>
+                <div class="text-xs mt-0.5 text-white/55">teams hiring soon</div>
+              </div>
+              <div class="w-px h-[30px] bg-white/[0.14]"></div>
+              <div>
+                <div class="font-['Space_Grotesk'] text-xl font-bold text-white">100%</div>
+                <div class="text-xs mt-0.5 text-white/55">remote friendly</div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        <!-- General CTA -->
-        <div class="bg-gradient-to-r from-[#FFF8F3] to-[#EFF6FF] border border-[#E2E8F0] rounded-2xl p-8 text-center max-w-3xl mx-auto mt-4 space-y-4 transition-all duration-500 delay-300 ease-out" :class="cardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'">
-          <p class="text-[#475569] text-sm sm:text-base font-medium">
-            Don't see the right fit? Submit your CV and we'll keep you in mind for future roles.
-          </p>
-          <button type="button" @click="openModal('')" class="inline-flex items-center justify-center px-8 py-3 rounded-xl text-white font-semibold text-sm transition-all duration-200 bg-gradient-to-br from-[#2A5F9E] to-[#4A90E2] shadow-lg shadow-[#2A5F9E]/35 hover:brightness-110 hover:scale-105 active:scale-95 cursor-pointer">
-            Submit Your CV
-          </button>
-        </div>
       </div>
 
     </main>
