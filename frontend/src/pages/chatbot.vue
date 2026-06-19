@@ -78,7 +78,7 @@
               <svg class="absolute inset-0 w-full h-full z-10 pointer-events-none" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
               </svg>
               <img src="../assets/svg/chatbot-bot.svg" alt="Chatbot agent" class="w-80 h-80 object-contain drop-shadow-[0_16px_36px_rgba(42,95,158,0.2)]" title="Chatbot Agent" />
-              <img src="../assets/images/chatbot-face.png" alt="Bot face" class="absolute top-[22%] left-1/2 -translate-x-1/2 w-[55%] object-contain z-30" title="Bot Face" />
+              <img src="../assets/images/chatbot-face.png" alt="Bot face" class=" mt-11 rounded-full absolute top-[22%] left-1/2 -translate-x-1/2 w-[45%] object-contain z-30" title="Bot Face" />
             </div>
           </div>
         </div>
@@ -99,13 +99,26 @@
           </div>
 
           <div class="lg:col-span-7">
-            <div class="p-4 bg-white rounded-2xl border border-slate-100/50 shadow-2xl shadow-purple-500/20 flex items-center justify-center">
+            <!-- Added 'relative' to this wrapper container to anchor the absolute avatar -->
+            <div class="p-4 bg-white rounded-2xl border border-slate-100/50 shadow-2xl shadow-purple-500/20 flex items-center justify-center relative">
+
+              <!-- Base Flow Diagram -->
               <img
                   src="../assets/svg/chatbot-flow.svg"
                   alt="Chatbot flow diagram"
                   class="w-full h-auto max-w-2xl"
                   title="Chatbot conversation flow"
               />
+
+              <!-- Chatbot Face Avatar Overlay -->
+              <div class="absolute top-[32%] left-[34.8%] w-[6.5%] max-w-[44px] aspect-square flex items-center justify-center">
+                <img
+                    src="../assets/images/chatbot-face.png"
+                    alt="Chatbot agent face avatar"
+                    class="w-6 h-6 mr-12 mb-12 pt-0 object-contain rounded-full bg-linear-to-b from-teal-50 to-emerald-100/60 shadow-inner"
+                />
+              </div>
+
             </div>
           </div>
 
@@ -182,16 +195,19 @@
             <div class="relative p-6 bg-slate-50 rounded-2xl border border-slate-100 w-full max-w-md aspect-square flex items-center justify-center overflow-visible">
 
               <div class="absolute inset-[-12%] rounded-full border-2 border-dashed border-purple-400/60 scale-y-[0.85] -rotate-12 animate-[spin_30s_linear_infinite] pointer-events-none"></div>
-
               <div class="absolute inset-[-4%] rounded-full border-2 border-dashed border-sky-400/50 scale-x-[0.90] rotate-45 animate-[spin_20s_linear_infinite_reverse] pointer-events-none"></div>
 
-              <img
-                  src="../assets/svg/chatbot-messenger-bot.svg"
-                  alt="Chatbot with messages"
-                  class="w-80 h-100 mx-auto relative z-10"
-                  title="Chatbot agent messaging"
-              />
+              <div class="relative w-80 h-100 mx-auto z-10 flex items-center justify-center">
+                <img
+                    src="../assets/svg/chatbot-messenger-bot.svg"
+                    alt="Chatbot with messages"
+                    class="w-full h-full object-contain"
+                    title="Chatbot agent messaging"
+                />
+              </div>
+
             </div>
+
           </div>
         </div>
 
@@ -241,7 +257,7 @@
               <img
                   src="../assets/images/chatbot-face.png"
                   alt="Chatbot face indicator"
-                  class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[22%] object-contain z-20"
+                  class=" mt-3 rounded-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[20%] object-contain z-20"
                   title="Chatbot center face view"
               />
 
