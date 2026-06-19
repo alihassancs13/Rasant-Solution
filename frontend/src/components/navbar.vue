@@ -115,7 +115,7 @@
             <button
                 type="button"
                 class="flex items-center gap-1.5 px-5 h-11 rounded-xl font-['Space_Grotesk'] font-bold text-[15px] tracking-[-0.2px] transition-all duration-200 bg-transparent border-0 cursor-pointer whitespace-nowrap"
-                :class="activeDropdown === 'projects' ? 'text-blue-600 bg-blue-600/10' : 'text-[#1E3A5F] hover:text-blue-600 hover:bg-blue-600/7'"
+                :class="['/sentra','/ai-agent','/chatbot','/orchestri','/omnipost'].includes($route.path) ? 'bg-blue-600/12text-blue-600 ' : 'text-[#1E3A5F] hover:text-blue-600 hover:bg-blue-600/12'"
             >
               Projects
               <span
@@ -237,7 +237,7 @@
         <button
             type="button"
             @click="() => { closeMobileMenu(); $router.push('/contact'); }"
-            class="relative overflow-hidden px-6 py-[11px] text-[14px] font-['Space_Grotesk'] font-bold text-white rounded-[50px] no-underline transition-all duration-200 active:scale-[0.98] btn-shine-wrapper"
+            class="cursor-pointer relative overflow-hidden px-6 py-[11px] text-[14px] font-['Space_Grotesk'] font-bold text-white rounded-[50px] no-underline transition-all duration-200 active:scale-[0.98] btn-shine-wrapper"
             style="background: #C2410C; box-shadow: 0 4px 20px rgba(194,65,12,0.3);"
             @mouseover="$event.currentTarget.style.background = '#9A3412'"
             @mouseout="$event.currentTarget.style.background = '#C2410C'"
