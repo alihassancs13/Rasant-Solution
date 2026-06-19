@@ -38,7 +38,7 @@
           <ul class="flex flex-col gap-2.5 m-0 p-0 list-none">
             <li class="flex items-start gap-3 p-2.5 bg-white/90 border border-slate-200/50 rounded-xl shadow-sm backdrop-blur-sm">
               <span class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600 shrink-0" aria-hidden="true">
-                <font-awesome-icon icon="ffa-solid fa-lock" class="absolute left-4 text-slate-400 pointer-events-none text-base" />
+                <font-awesome-icon icon="fa-solid fa-lock" class="text-slate-400 text-base" />
               </span>
               <div>
                 <strong class="block text-[15px] font-bold text-slate-800 mb-0.5">Role-based access</strong>
@@ -47,7 +47,7 @@
             </li>
             <li class="flex items-start gap-3 p-2.5 bg-white/90 border border-slate-200/50 rounded-xl shadow-sm backdrop-blur-sm">
               <span class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-600 shrink-0" aria-hidden="true">
-                <font-awesome-icon icon="fa-solid fa-rocket" class="absolute left-4 text-slate-400 pointer-events-none text-base" />
+                <font-awesome-icon icon="fa-solid fa-rocket" class="text-slate-400 text-base" />
               </span>
               <div>
                 <strong class="block text-[15px] font-bold text-slate-800 mb-0.5">All products, one login</strong>
@@ -137,7 +137,7 @@
                 class="relative overflow-hidden cursor-pointer w-full flex items-center justify-center px-6 py-3.5 bg-orange-700 hover:bg-orange-900 text-base font-semibold text-white rounded-xl transition-all duration-200 shadow-[0_4px_14px_rgba(42,95,158,0.4)] hover:shadow-[0_6px_20px_rgba(42,95,158,0.6)] active:scale-[0.98] group"
             >
               Sign In
-              <div class="absolute inset-0 w-1/4 h-full bg-white/10 pointer-events-none animate-shine-loop"></div>
+              <div class="absolute inset-0 w-1/3 h-full pointer-events-none animate-shine-loop"></div>
             </button>
           </form>
 
@@ -158,6 +158,32 @@
   </div>
 </template>
 
+<style scoped>
+@keyframes shine-loop {
+  0% {
+    transform: translateX(-150%) skewX(-20deg);
+  }
+  100% {
+    transform: translateX(450%) skewX(-20deg);
+  }
+}
+
+.animate-shine-loop {
+  /* Added 'alternate' to bounce back & forth, speed adjusted to 1.0s */
+  animation: shine-loop 1.0s ease-in-out infinite alternate;
+  width: 30%;
+  height: 100%;
+  background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.1) 20%,
+      rgba(255, 255, 255, 0.5) 50%,
+      rgba(255, 255, 255, 0.1) 80%,
+      transparent 100%
+  );
+  filter: blur(0.5px);
+}
+</style>
 <script setup>
 import Navbar from '../components/navbar.vue';
 import { useLogin } from '../composables/useLogin';
