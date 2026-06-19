@@ -146,10 +146,7 @@
               Need an account?
               <a href="" class="font-bold text-orange-700 no-underline hover:underline">Contact sales</a>
             </p>
-            <a href="#" class="inline-block font-medium text-base text-slate-500 no-underline transition-colors duration-200 hover:text-blue-600">
-              <font-awesome-icon icon="fa-solid fa-arrow-left" class="mr-2 text-sm" />
-              Back to website
-            </a>
+
           </div>
 
         </div>
