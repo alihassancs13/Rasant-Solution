@@ -51,7 +51,7 @@
                 class="relative overflow-hidden cursor-pointer px-6 py-3.5 bg-orange-700 hover:bg-orange-900 text-base font-semibold text-white rounded-xl transition-all duration-200 shadow-[0_4px_14px_rgba(42,95,158,0.4)] hover:shadow-[0_6px_20px_rgba(42,95,158,0.6)] active:scale-[0.98] group inline-flex items-center justify-center"
             >
               Contact Sales
-              <div class="absolute inset-0 w-[200%] h-full bg-gradient-to-r from-transparent via-white/15 to-transparent pointer-events-none animate-shine-loop"></div>
+              <div class="absolute inset-0 w-1/3 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 pointer-events-none animate-shine-loop"></div>
             </button>
             <button
                 @click="scrollToPricing"
@@ -596,14 +596,23 @@ export default {
 
 @keyframes shine-loop {
   0% {
-    transform: translateX(-50%) skewX(-15deg);
+    transform: translateX(-150%) skewX(-12deg);
+  }
+  40% {
+    transform: translateX(250%) skewX(-12deg);
+  }
+  50% {
+    transform: translateX(250%) skewX(-12deg);
+  }
+  90% {
+    transform: translateX(-150%) skewX(-12deg);
   }
   100% {
-    transform: translateX(50%) skewX(-15deg);
+    transform: translateX(-150%) skewX(-12deg);
   }
 }
 
 .animate-shine-loop {
-  animation: shine-loop 2.3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation: shine-loop 2s ease-in-out infinite;
 }
 </style>
