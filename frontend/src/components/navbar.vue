@@ -43,8 +43,10 @@
           >
             <button
                 type="button"
-                class="flex items-center gap-1.5 px-5 h-11 rounded-xl font-['Space_Grotesk'] font-bold text-[15px] tracking-[-0.2px] transition-all duration-200 bg-transparent border-0 cursor-pointer whitespace-nowrap"
-                :class="activeDropdown === 'services' ? 'text-blue-600 bg-blue-600/10' : 'text-[#1E3A5F] hover:text-blue-600 hover:bg-blue-600/7'"
+                class="flex items-center gap-1.5 px-5 h-11 rounded-xl font-['Space_Grotesk'] font-bold text-[15px] tracking-[-0.2px] transition-all duration-200 border-0 cursor-pointer whitespace-nowrap"
+                :class="activeDropdown === 'services' || $route.hash === '#services'
+      ? 'text-blue-600 bg-blue-600/12'
+      : 'text-[#1E3A5F] bg-transparent hover:text-blue-600 hover:bg-blue-600/7'"
             >
               Services
               <span
@@ -114,8 +116,10 @@
           >
             <button
                 type="button"
-                class="flex items-center gap-1.5 px-5 h-11 rounded-xl font-['Space_Grotesk'] font-bold text-[15px] tracking-[-0.2px] transition-all duration-200 bg-transparent border-0 cursor-pointer whitespace-nowrap"
-                :class="['/sentra','/ai-agent','/chatbot','/orchestri','/omnipost'].includes($route.path) ? 'bg-blue-600/12text-blue-600 ' : 'text-[#1E3A5F] hover:text-blue-600 hover:bg-blue-600/12'"
+                class="flex items-center gap-1.5 px-5 h-11 rounded-xl font-['Space_Grotesk'] font-bold text-[15px] tracking-[-0.2px] transition-all duration-200 border-0 cursor-pointer whitespace-nowrap"
+                :class="['/sentra', '/ai-agent', '/chatbot', '/orchestri', '/omnipost'].includes($route.path) || activeDropdown === 'projects'
+      ? 'text-blue-600 bg-blue-600/12'
+      : 'text-[#1E3A5F] bg-transparent hover:text-blue-600 hover:bg-blue-600/7'"
             >
               Projects
               <span
@@ -237,10 +241,8 @@
         <button
             type="button"
             @click="() => { closeMobileMenu(); $router.push('/contact'); }"
-            class="cursor-pointer relative overflow-hidden px-6 py-[11px] text-[14px] font-['Space_Grotesk'] font-bold text-white rounded-[50px] no-underline transition-all duration-200 active:scale-[0.98] btn-shine-wrapper"
-            style="background: #C2410C; box-shadow: 0 4px 20px rgba(194,65,12,0.3);"
-            @mouseover="$event.currentTarget.style.background = '#9A3412'"
-            @mouseout="$event.currentTarget.style.background = '#C2410C'"
+            class="cursor-pointer relative overflow-hidden px-6 py-[11px] text-[14px] font-['Space_Grotesk'] font-bold text-white rounded-[50px] no-underline transition-all duration-200 active:scale-[0.98] bg-orange-700 hover:bg-orange-900"
+
         >
           Get Quote
           <span class="absolute inset-0 pointer-events-none btn-shine"></span>
@@ -304,13 +306,17 @@
 
         <!-- Services -->
         <button
-            @click="navigateToServicesSection('services')"
-            class="flex items-center gap-3 w-full text-white font-['Space_Grotesk'] font-bold text-[16px] p-3.5 mb-2 rounded-[14px] border border-white/10 bg-white/7 hover:bg-white/16 hover:translate-x-1 transition-all duration-200 text-left cursor-pointer"
+            type="button"
+            class="flex items-center gap-1.5 px-5 h-11 rounded-xl font-['Space_Grotesk'] font-bold text-[15px] tracking-[-0.2px] transition-all duration-200 border-0 cursor-pointer whitespace-nowrap"
+            :class="activeDropdown === 'services' || $route.hash === '#services'
+      ? 'text-blue-600 bg-blue-600/12'
+      : 'text-[#1E3A5F] bg-transparent hover:text-blue-600 hover:bg-blue-600/7'"
         >
-          <span class="w-8 h-8 rounded-[10px] bg-white/12 flex items-center justify-center shrink-0">
-            <i class="fa-solid fa-gear text-base"></i>
-          </span>
           Services
+          <span
+              class="inline-block w-0 h-0 border-l-[4px] border-r-[4px] border-t-[5px] border-l-transparent border-r-transparent border-t-[#64748B] transition-transform duration-300"
+              :class="activeDropdown === 'services' ? 'rotate-180 !border-t-blue-600' : ''"
+          ></span>
         </button>
         <div class="ml-3 mb-2.5 pl-3.5 border-l-2 border-white/20 py-1">
           <button @click="navigateToServicesSection('services')" class="block text-white/82 text-[13px] py-2 w-full text-left hover:text-white transition-colors duration-150 bg-transparent border-0 cursor-pointer">Custom Software</button>
@@ -431,10 +437,12 @@ const navigateToServicesSection = (sectionId = 'services') => {
 
   const currentPath = router.currentRoute.value.path;
   if (currentPath === '/' || currentPath === '/home') {
+    // Update hash so the active styling kicks in
+    router.push({ hash: `#${sectionId}` });
     const section = document.getElementById(sectionId);
     if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
   } else {
-    router.push('/').then(() => {
+    router.push({ path: '/', hash: `#${sectionId}` }).then(() => {
       setTimeout(() => {
         const section = document.getElementById(sectionId);
         if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
