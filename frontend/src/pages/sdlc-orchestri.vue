@@ -320,14 +320,14 @@
           <button
               @click="goToContact"
               type="button"
-              class="px-6 py-3.5 bg-white text-orange-600 font-bold rounded-xl shadow-md transition-transform hover:scale-[1.02] text-sm cursor-pointer inline-flex items-center justify-center"
+              class="px-6 py-3.5 bg-white text-orange-600 font-bold rounded-xl shadow-md transition-transform hover:hover:bg-orange-100 text-sm cursor-pointer inline-flex items-center justify-center"
           >
             Contact Sales
           </button>
           <button
               @click="scrollToPricing"
               type="button"
-              class="px-6 py-3.5 border border-white/80 text-white font-semibold rounded-xl hover:bg-white/5 transition-colors text-sm cursor-pointer inline-flex items-center justify-center"
+              class="px-6 py-3.5 border border-white/80 text-white font-semibold rounded-xl hover:bg-white/10 transition-colors text-sm cursor-pointer inline-flex items-center justify-center"
           >
             View Pricing
           </button>

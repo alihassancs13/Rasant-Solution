@@ -410,19 +410,21 @@
     </section>
 
     <!-- CTA Section -->
-    <section class="py-16 px-[5%] text-center bg-orange-700">
-      <div class="max-w-3xl mx-auto">
-        <p class="font-['Space_Grotesk'] text-3xl md:text-4xl font-extrabold mb-3 text-white">
-          Ready to modernize your contact center?
-        </p>
-        <p class="text-white/80 mb-6 font-['Inter'] text-base md:text-lg">
-          Deploy Sentra AI on your stack or start with our managed demo environment.
-        </p>
-        <div class="flex gap-4 justify-center flex-wrap">
-          <router-link to="/login" class="shadow-md transition-transform hover:scale-[1.02] inline-flex items-center px-6 py-3 bg-white text-orange-600 font-semibold rounded-lg hover:bg-orange-100 transition-all duration-300 shadow-lg hover:shadow-xl font-['Inter']">
+    <section class="p-6 md:p-12 max-w-7xl mx-auto">
+      <div class="bg-orange-700 text-white p-8 md:p-12 rounded-3xl flex flex-col lg:flex-row lg:items-center justify-between gap-8 shadow-xl">
+        <div class="max-w-2xl text-left">
+          <p class="font-['Space_Grotesk'] text-2xl md:text-3xl font-extrabold mb-3 text-white">
+            Ready to modernize your contact center?
+          </p>
+          <p class="text-white/80 font-['Inter'] text-sm md:text-base leading-relaxed">
+            Deploy Sentra AI on your stack or start with our managed demo environment.
+          </p>
+        </div>
+        <div class="flex gap-3 flex-wrap items-center lg:justify-end shrink-0">
+          <router-link to="/login" class="shadow-md transition-transform hover:scale-[1.02] inline-flex items-center justify-center px-6 py-3.5 bg-white text-orange-600 font-bold rounded-xl hover:bg-orange-100 transition-all duration-300 font-['Inter'] text-sm">
             Open Sentra Portal
           </router-link>
-          <router-link to="/contact?project=sentra" class="inline-flex items-center px-6 py-3 border-2 border-white/40 text-white font-semibold rounded-lg hover:bg-white/10 transition-all duration-300 font-['Inter']">
+          <router-link to="/contact?project=sentra" class="inline-flex items-center justify-center px-6 py-3.5 border border-white/40 text-white font-semibold rounded-xl hover:bg-white/10 transition-all duration-300 font-['Inter'] text-sm">
             Contact Sales
           </router-link>
         </div>

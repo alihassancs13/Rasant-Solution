@@ -321,10 +321,8 @@
       </div>
     </section>
 
-    <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-      <div class="relative bg-orange-800 rounded-3xl p-8 md:p-12 shadow-xl overflow-hidden">
-        <div class="absolute right-0 top-0 -mt-12 -mr-12 h-72 w-72 rounded-full bg-white/10 blur-2xl"></div>
-        <div class="absolute left-1/3 bottom-0 -mb-16 h-48 w-48 rounded-full bg-white/10 blur-xl"></div>
+    <section class="p-6 md:p-12 max-w-7xl mx-auto">
+      <div class="relative bg-orange-700 rounded-3xl p-8 md:p-12 shadow-xl overflow-hidden">
 
         <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           <div class="lg:col-span-8 text-center lg:text-left space-y-3">
@@ -337,7 +335,7 @@
             <button
                 @click="goToContact"
                 type="button"
-                class="px-6 py-3.5 bg-white text-orange-700 font-bold rounded-xl shadow-md hover:bg-orange-50 transition duration-200 cursor-pointer"
+                class="px-6 py-3.5 bg-white text-orange-700 font-bold rounded-xl shadow-md hover:bg-orange-100 transition duration-200 cursor-pointer"
             >
               Contact Sales
             </button>
