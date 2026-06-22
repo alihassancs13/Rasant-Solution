@@ -1,7 +1,7 @@
 <template>
   <component
       :is="to ? RouterLink : 'button'"
-      v-bind="to ? { to } : { type: 'button' }"
+      v-bind="to ? { to } : { type: props.type }"
       :class="[
       'cursor-pointer relative overflow-hidden',
       'font-[\'Space_Grotesk\'] font-bold',
@@ -27,6 +27,7 @@ const props = defineProps({
   variant: { type: String, default: 'primary' }, // primary | outline | blue | green
   size:    { type: String, default: 'md' },       // sm | md | lg | xl
   shape:   { type: String, default: 'xl' },       // xl | pill | 2xl
+  type:    { type: String, default: 'button' },
 })
 
 defineEmits(['click'])
