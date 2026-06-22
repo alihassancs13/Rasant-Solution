@@ -2,7 +2,6 @@
   <div class="flex h-dvh w-full overflow-hidden bg-gradient-primary font-primary antialiased">
 
     <div class="flex min-h-0 flex-1 overflow-hidden">
-
       <!-- Left panel -->
       <aside class="relative hidden min-h-0 flex-[1.08] flex-col justify-between overflow-hidden border-r border-neutral-300/70 px-10 pt-8 pb-8 lg:px-12 lg:pt-10 lg:pb-10 xl:px-14 lg:flex">
 
@@ -314,6 +313,8 @@
 <script setup>
 import ShineButton from '../components/ShineButton.vue';
 import { useLogin } from '../composables/useLogin';
+import LoginVisual from "@/components/LoginVisual.vue";
+import Navbar from "@/components/navbar.vue";
 
 const stats = [
   { value: '99%', label: 'Uptime SLA' },
