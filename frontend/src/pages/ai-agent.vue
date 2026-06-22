@@ -92,7 +92,7 @@
             <img src="../assets/svg/ai-agent-voice-flow.svg" title="Voice AI agent call flow" class="w-full min-h-[280px] block" />
 
             <img
-                src="../assets/images/ai-agent-face.png"
+                src="../assets/images/ai-agents-face.png"
                 alt="Bot face"
                 class="absolute top-[42%] left-[34.5%] -translate-x-1/2 -translate-y-1/2 w-[7%] min-w-[45px] max-w-[65px] h-auto z-10"
                 title="Bot Face"
@@ -194,7 +194,7 @@
               />
 
               <img
-                  src="../assets/images/ai-agent-face.png"
+                  src="../assets/images/ai-agents-face.png"
                   alt="Bot face"
                   class="absolute top-1/2 left-[46%] -translate-x-1/2 -translate-y-1/2 w-[50%] h-auto z-20 animate-[botBob_5s_ease-in-out_infinite]"
                   title="Bot Face"
@@ -242,7 +242,7 @@
             <div class="relative z-10 rounded-2xl overflow-hidden border border-slate-200/80 shadow-[0_22px_56px_rgba(15,23,42,0.1)] bg-white transition-all duration-350 min-h-75 md:min-h-85 hover:shadow-[0_28px_64px_rgba(15,76,129,0.14)] hover:-translate-y-1 hover:scale-[1.01]">
               <img src="../assets/svg/ai-agent-capabilities.svg" alt="Voice AI capabilities and telephony integrations" class="w-full min-h-80 block" />
 
-              <img src="../assets/images/ai-agent-face.png" alt="Bot Face" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[18%] object-contain z-20" title="Bot Face" />
+              <img src="../assets/images/ai-agents-face.png" alt="Bot Face" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[18%] object-contain z-20" title="Bot Face" />
             </div>
           </div>
         </div>
