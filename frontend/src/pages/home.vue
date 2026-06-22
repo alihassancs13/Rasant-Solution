@@ -45,10 +45,7 @@
             </svg>
           </ShineButton>
           <ShineButton to="/#products" variant="outline" size="xl">
-            <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
+            
             See Our Work
           </ShineButton>
         </div>
@@ -81,7 +78,7 @@
           :class="heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-16'"
       >
         <!-- Card 1: Code example -->
-        <div class="md:col-span-2 bg-white rounded-2xl shadow-blue border border-neutral-300 flex flex-col h-44 max-w-md overflow-hidden">
+        <div class="md:col-span-2 bg-white rounded-xl shadow-blue border border-neutral-300 flex flex-col h-44 max-w-md overflow-hidden">
           <div class="flex items-center justify-between px-4 py-2 border-b border-neutral-300 bg-neutral-200/50">
             <div class="flex space-x-1.5">
               <span class="w-2.5 h-2.5 rounded-full bg-error"></span>
@@ -105,7 +102,7 @@
         </div>
 
         <!-- Card 2: Deployed -->
-        <div class="bg-white rounded-2xl shadow-blue border border-neutral-300 p-6 flex flex-col items-center justify-center text-center h-44 md:h-auto md:row-span-2 self-stretch">
+        <div class="bg-white rounded-xl shadow-blue border border-neutral-300 p-6 flex flex-col items-center justify-center text-center h-44 md:h-auto md:row-span-2 self-stretch">
           <div class="w-14 h-14 rounded-full bg-accent-1/10 flex items-center justify-center border-4 border-accent-1/20 mb-3">
             <svg class="w-6 h-6 text-accent-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
@@ -116,7 +113,7 @@
         </div>
 
         <!-- Card 3: Uptime -->
-        <div class="bg-white rounded-2xl shadow-blue border border-neutral-300 p-5 flex flex-col justify-between h-36">
+        <div class="bg-white rounded-xl shadow-blue border border-neutral-300 p-5 flex flex-col justify-between h-36">
           <div>
             <div class="text-3xl font-bold text-primary-500 tracking-tight font-display">{{ uptimeCounter }}%</div>
             <div class="text-[10px] font-bold text-neutral-600 tracking-wider uppercase mt-1 font-primary">Uptime SLA</div>
@@ -130,7 +127,7 @@
         </div>
 
         <!-- Card 4: Tech Stack -->
-        <div class="bg-white rounded-2xl shadow-blue border border-neutral-300 p-5 flex flex-col justify-between h-36">
+        <div class="bg-white rounded-xl shadow-blue border border-neutral-300 p-5 flex flex-col justify-between h-36">
           <span class="text-[10px] font-bold text-neutral-600 tracking-wider uppercase font-primary">Tech Stack</span>
           <div class="grid grid-cols-2 gap-1.5">
             <span
@@ -144,7 +141,7 @@
         </div>
 
         <!-- Card 5: Faster Delivery -->
-        <div class="md:col-span-3 bg-white rounded-2xl shadow-blue border border-neutral-300 p-4 flex items-center justify-between space-x-6">
+        <div class="md:col-span-3 bg-white rounded-xl shadow-blue border border-neutral-300 p-4 flex items-center justify-between space-x-6">
           <div class="flex-1 h-10 flex items-end relative overflow-hidden">
             <svg class="w-full h-full text-primary-500/10" viewBox="0 0 300 50" preserveAspectRatio="none">
               <path d="M0 45 C 50 43, 80 30, 120 32 C 160 34, 200 15, 250 18 L 300 5 L 300 50 L 0 50 Z" fill="currentColor"/>
@@ -317,7 +314,7 @@
                     :data="product.svg"
                     type="image/svg+xml"
                     :title="product.title"
-                    class="relative z-[1] w-full max-h-[220px] lg:max-h-[300px] block rounded-2xl drop-shadow-[0_16px_36px_rgba(15,23,42,0.1)] animate-float transition-transform duration-500 ease-out hover:scale-105"
+                    class="relative z-[1] w-full max-h-[220px] lg:max-h-[300px] block rounded-xl drop-shadow-[0_16px_36px_rgba(15,23,42,0.1)] animate-float transition-transform duration-500 ease-out hover:scale-105"
                 >
                   {{ product.title }}
                 </object>
@@ -398,7 +395,7 @@
         <div
             v-for="(service, i) in services"
             :key="service.title"
-            class="group bg-white rounded-2xl border border-neutral-300 shadow-blue p-7 transition-all duration-700 ease-out hover:-translate-y-1.5 hover:shadow-[inset_0_0_15px_rgba(74,144,226,0.3)]"
+            class="group bg-white rounded-xl border border-neutral-300 shadow-blue p-7 transition-all duration-700 ease-out hover:-translate-y-1.5 hover:shadow-[inset_0_0_15px_rgba(74,144,226,0.3)]"
             :class="visible.services ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-14 scale-95'"
             :style="{ transitionDelay: visible.services ? `${i * 150}ms` : '0ms', animationDelay: `${i * 0.4}s` }"
         >
@@ -491,12 +488,12 @@
         <div class="w-full rounded-[20px] overflow-hidden bg-neutral-100 border border-neutral-300 shadow-lg">
           <img :src="aboutIllustration" alt="About Rasant Solutions" class="w-full block" />
         </div>
-        <div class="absolute -bottom-5 -left-7 max-w-[200px] bg-white rounded-2xl px-5 py-4 shadow-xl border border-neutral-300 font-primary">
+        <div class="absolute -bottom-5 -left-7 max-w-[200px] bg-white rounded-xl px-5 py-4 shadow-xl border border-neutral-300 font-primary">
           <div class="text-[10px] uppercase tracking-wide text-neutral-600 mb-1">Avg. Delivery</div>
           <div class="text-[22px] font-bold text-primary-500 font-display">3 Weeks</div>
           <div class="text-[11px] text-neutral-600 mt-0.5">From design to launch</div>
         </div>
-        <div class="absolute -top-5 -right-5 max-w-[200px] bg-white rounded-2xl px-5 py-4 shadow-xl border border-neutral-300 font-primary">
+        <div class="absolute -top-5 -right-5 max-w-[200px] bg-white rounded-xl px-5 py-4 shadow-xl border border-neutral-300 font-primary">
           <div class="text-[10px] uppercase tracking-wide text-neutral-600 mb-1">Client Retention</div>
           <div class="text-[22px] font-bold text-accent-1 font-display">94%</div>
           <div class="text-[11px] text-neutral-600 mt-0.5">Return for new projects</div>
@@ -519,7 +516,7 @@
           <li
               v-for="(feature, i) in aboutFeatures"
               :key="feature.title"
-              class="group flex items-start gap-4 bg-white border border-neutral-300 rounded-2xl px-5 py-[18px] shadow-sm transition-all duration-700 ease-out hover:bg-primary-500/5 hover:border-primary-500/25 hover:translate-x-1.5 hover:shadow-md"
+              class="group flex items-start gap-4 bg-white border border-neutral-300 rounded-xl px-5 py-[18px] shadow-sm transition-all duration-700 ease-out hover:bg-primary-500/5 hover:border-primary-500/25 hover:translate-x-1.5 hover:shadow-md"
               :class="visible.about ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'"
               :style="{ transitionDelay: visible.about ? `${300 + i * 100}ms` : '0ms' }"
           >

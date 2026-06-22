@@ -312,7 +312,6 @@
 </style>
 
 <script setup>
-import LoginVisual from '../components/LoginVisual.vue';
 import ShineButton from '../components/ShineButton.vue';
 import { useLogin } from '../composables/useLogin';
 

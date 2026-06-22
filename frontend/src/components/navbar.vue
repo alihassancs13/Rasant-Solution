@@ -22,7 +22,7 @@
         class="fixed top-0 left-0 right-0 h-20 flex items-center justify-between px-6 md:px-12 z-50 bg-white shadow-[0_4px_30px_rgba(15,23,42,0.08)]"
     >
       <!-- Logo -->
-      <router-link to="/home" class="flex items-center shrink-0 z-[2]" aria-label="Rasant Solutions home">
+      <router-link to="/home" class="flex items-center shrink-0 z-[2]" aria-label="Rasant Solutions home"  @click="handleLogoClick">
         <img
             src="../assets/images/rasant-logo.png"
             alt="Rasant Solutions Logo"
@@ -189,7 +189,7 @@
                 <router-link
                     to="/omnipost"
                     @click="activeDropdown = null"
-                    class="block p-3.5 border border-neutral-300 rounded-[14px] hover:border-primary-500/30 hover:shadow-[0_8px_30px_rgba(74,144,226,0.08)] hover:-translate-y-[3px] transition-all duration-300 no-underline col-span-2"
+                    class="block p-3.5 border border-neutral-300 rounded-[14px] hover:border-primary-500/30 hover:shadow-[0_8px_30px_rgba(74,144,226,0.08)] hover:-translate-y-[3px] transition-all duration-300 no-underline"
                 >
                   <div class="text-[10px] font-bold uppercase tracking-[0.8px] text-accent-4 mb-1.5">Social</div>
                   <h4 class="font-display text-[14px] font-bold text-primary-900 mb-1 m-0">OmniPost</h4>
@@ -198,6 +198,8 @@
                     <span class="block h-full w-[82%] bg-gradient-to-r from-secondary-500 via-accent-4 to-primary-500 rounded"></span>
                   </div>
                 </router-link>
+
+
               </div>
             </Transition>
           </li>
@@ -402,7 +404,13 @@ const isScrolled = ref(false);
 const handleScroll = () => {
   isScrolled.value = window.scrollY > 60;
 };
-
+const handleLogoClick = (event) => {
+  const currentPath = router.currentRoute.value.path;
+  if (currentPath === '/' || currentPath === '/home') {
+    event.preventDefault();
+    window.location.reload();
+  }
+};
 onMounted(() => {
   window.addEventListener('scroll', handleScroll, { passive: true });
   handleScroll();
