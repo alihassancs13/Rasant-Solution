@@ -27,7 +27,7 @@
         <div class="flex flex-col gap-3.5">
           <div class="animate-reveal-left flex items-start gap-4 p-4 sm:p-5 bg-white border border-neutral-300 rounded-xl shadow-sm hover:shadow-md hover:border-accent-3/50 hover:translate-x-1 transition-all duration-300" style="animation-delay: 0.05s;">
             <div class="w-11 h-11 rounded-xl bg-accent-3/10 border border-accent-3/20 flex items-center justify-center text-xl shrink-0">
-              <i class="fas fa-envelope text-accent-3"></i>
+              <i class="fas fa-envelope text-accent-3accent-neutral-900"></i>
             </div>
             <div>
               <h4 class="text-sm font-bold text-primary-900 mb-1 font-display">Email Us</h4>
@@ -37,7 +37,7 @@
 
           <div class="animate-reveal-left flex items-start gap-4 p-4 sm:p-5 bg-white border border-neutral-300 rounded-xl shadow-sm hover:shadow-md hover:border-accent-3/50 hover:translate-x-1 transition-all duration-300" style="animation-delay: 0.12s;">
             <div class="w-11 h-11 rounded-xl bg-accent-3/10 border border-accent-3/20 flex items-center justify-center text-xl shrink-0">
-              <i class="fas fa-phone text-accent-3"></i>
+              <i class="fas fa-phone accent-neutral-900"></i>
             </div>
             <div>
               <h4 class="text-sm font-bold text-primary-900 mb-1 font-display">Call Us</h4>
@@ -47,7 +47,7 @@
 
           <div class="animate-reveal-left flex items-start gap-4 p-4 sm:p-5 bg-white border border-neutral-300 rounded-xl shadow-sm hover:shadow-md hover:border-accent-3/50 hover:translate-x-1 transition-all duration-300" style="animation-delay: 0.19s;">
             <div class="w-11 h-11 rounded-xl bg-accent-3/10 border border-accent-3/20 flex items-center justify-center text-xl shrink-0">
-              <i class="fas fa-location-dot text-accent-3"></i>
+              <i class="fas fa-location-dot accent-neutral-900"></i>
             </div>
             <div>
               <h4 class="text-sm font-bold text-primary-900 mb-1 font-display">Visit Us</h4>
@@ -140,7 +140,7 @@
 
       <div class="max-w-6xl mx-auto px-4 sm:px-6 pb-10 sm:pb-14">
         <div class="animate-reveal flex items-center gap-4 bg-white border border-neutral-300 rounded-2xl shadow-sm px-4 sm:px-6 py-4 sm:py-5" style="animation-delay: 0.3s;">
-          <font-awesome-icon :icon="['fas', 'video']" class="text-accent-3 text-xl" />
+          <font-awesome-icon :icon="['fas', 'video']" class="accent-neutral-900 text-xl" />
           <p class="text-sm text-neutral-500 leading-relaxed font-primary">
             <strong class="text-primary-900 font-display">Remote-first, globally delivered.</strong> We work with clients across 20+ countries. Schedule a video call at a time that works for you — no office visit required.
           </p>

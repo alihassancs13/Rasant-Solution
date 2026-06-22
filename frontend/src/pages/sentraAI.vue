@@ -136,7 +136,7 @@
 
           <div class="mt-[22px] max-w-[480px] grid grid-cols-1 gap-4">
             <div v-for="item in dashboardFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-neutral-300 hover:border-primary-500/30 transition-all duration-300">
-              <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-primary-500/10 text-primary-500">
+              <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-primary-500/10 accent-neutral-900">
                 <i :class="item.icon" class="text-sm" aria-hidden="true"></i>
               </span>
               <div>
@@ -180,7 +180,7 @@
 
           <div class="mt-[22px] max-w-[480px] grid grid-cols-1 gap-4">
             <div v-for="item in liveCallFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-neutral-300 hover:border-primary-500/30 transition-all duration-300">
-              <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-primary-500/10 text-primary-500">
+              <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-primary-500/10 accent-neutral-900">
                 <i :class="item.icon" class="text-sm" aria-hidden="true"></i>
               </span>
               <div>
@@ -206,7 +206,7 @@
 
           <div class="mt-[22px] max-w-[480px] grid grid-cols-1 gap-4">
             <div v-for="item in queueFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-neutral-300 hover:border-primary-500/30 transition-all duration-300">
-              <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-primary-500/10 text-primary-500">
+              <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-primary-500/10 accent-neutral-900">
                 <i :class="item.icon" class="text-sm" aria-hidden="true"></i>
               </span>
               <div>
@@ -259,7 +259,7 @@
 
           <div class="mt-[22px] max-w-[480px] grid grid-cols-1 gap-4">
             <div v-for="item in campaignFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-neutral-300 hover:border-primary-500/30 transition-all duration-300">
-              <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-primary-500/10 text-primary-500">
+              <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-primary-500/10 accent-neutral-900">
                 <i :class="item.icon" class="text-sm" aria-hidden="true"></i>
               </span>
               <div>
@@ -285,7 +285,7 @@
 
           <div class="mt-[22px] max-w-[480px] grid grid-cols-1 gap-4">
             <div v-for="item in schedulerFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-neutral-300 hover:border-primary-500/30 transition-all duration-300">
-              <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-primary-500/10 text-primary-500">
+              <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-primary-500/10 accent-neutral-900">
                 <i :class="item.icon" class="text-sm" aria-hidden="true"></i>
               </span>
               <div>
@@ -338,7 +338,7 @@
 
           <div class="mt-[22px] max-w-[480px] grid grid-cols-1 gap-4">
             <div v-for="item in analyticsFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-neutral-300 hover:border-primary-500/30 transition-all duration-300">
-              <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-primary-500/10 text-primary-500">
+              <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-primary-500/10 accent-neutral-900">
                 <i :class="item.icon" class="text-sm" aria-hidden="true"></i>
               </span>
               <div>
@@ -364,7 +364,7 @@
 
           <div class="mt-[22px] max-w-[480px] grid grid-cols-1 gap-4">
             <div v-for="item in teamFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-neutral-300 hover:border-primary-500/30 transition-all duration-300">
-              <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-primary-500/10 text-primary-500">
+              <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-primary-500/10 accent-neutral-900">
                 <i :class="item.icon" class="text-sm" aria-hidden="true"></i>
               </span>
               <div>

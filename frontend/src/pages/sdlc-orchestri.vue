@@ -226,7 +226,7 @@
             <li v-for="(feat, i) in platformFeatures" :key="i"
                 class="flex gap-4 items-start p-[14px_16px] bg-white border border-neutral-300/50 rounded-xl shadow-sm animate-[featIn_0.6s_ease_both] font-primary"
                 :style="i > 0 ? { animationDelay: `${i * 0.07}s` } : {}">
-              <span class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm bg-accent-3/10 text-accent-3">
+              <span class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm bg-accent-3/10 accent-neutral-900">
                 <i :class="feat.icon"></i>
               </span>
               <div>
