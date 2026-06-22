@@ -5,6 +5,7 @@ import Careers from "../pages/careers.vue";
 import Home from "../pages/home.vue";
 import Chatbot from "../pages/chatbot.vue";
 import sentraAI from "../pages/sentraAI.vue";
+import omnipost from "@/pages/omnipost.vue";
 
 const routes = [
   {
@@ -50,6 +51,11 @@ const routes = [
     path: "/sentra",
     name: "sentraAI",
     component: () => import("../pages/sentraAI.vue"),
+  },
+  {
+    path: "/omnipost",
+    name: "omnipost",
+    component: () => import("../pages/omnipost.vue"),
   },
 ];
 

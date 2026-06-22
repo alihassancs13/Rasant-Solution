@@ -184,7 +184,7 @@
             <span class="inline-block text-xs font-bold uppercase tracking-wider text-indigo-600">Chat Workflows</span>
             <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 font-space-grotesk">
               Built for real conversations. <br/>
-              <span class="text-indigo-600 italic">Knowledge-grounded replies.</span>
+              <span class="text-slate-900 ">Knowledge-grounded replies.</span>
             </h2>
             <p class="text-slate-600 leading-relaxed max-w-xl">
               Support, sales, and onboarding across web, WhatsApp, and in-app chat - with RAG, live handoff, and usage analytics in one stack.
