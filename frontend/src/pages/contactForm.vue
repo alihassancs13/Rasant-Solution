@@ -130,12 +130,10 @@
               </label>
             </div>
 
-            <button type="submit" class="w-full rounded-xl bg-orange-600 text-white font-semibold py-3.5 hover:bg-orange-900 transition-colors relative overflow-hidden group font-['Inter']">
-              <span class="relative z-10 inline-flex items-center justify-center">
-                <i class="fas fa-paper-plane mr-2"></i>Send Message
-              </span>
-              <div class="absolute inset-0 top-0 w-1/3 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none animate-[shineLoop_0.98s_ease-in-out_infinite_alternate]"></div>
-            </button>
+            <ShineButton type="submit" size="lg" class="w-full">
+              <i class="fas fa-paper-plane"></i>
+              Send Message
+            </ShineButton>
           </form>
         </div>
       </section>
@@ -158,67 +156,10 @@
 import Footer from '@/components/footer.vue';
 import Navbar from '@/components/navbar.vue';
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
+import ShineButton from "@/components/ShineButton.vue";
 
 const handleSubmit = (e) => {
   e.preventDefault();
   alert('Message sent! Our team will get back to you within 24 hours.');
 };
 </script>
-
-<style scoped>
-/* Keyframes for entrance reveal animations */
-@keyframes revealLeft {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes revealRight {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes revealUp {
-  from {
-    opacity: 0;
-    transform: translateY(15px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Custom animation utility classes */
-.animate-reveal-left {
-  opacity: 0;
-  animation: revealLeft 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.animate-reveal-right {
-  opacity: 0;
-  animation: revealRight 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.animate-reveal {
-  opacity: 0;
-  animation: revealUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-/* Shine Loop effect rules */
-@keyframes shineLoop {
-  0% { transform: translateX(-200%); }
-  100% { transform: translateX(400%); }
-}
-</style>
