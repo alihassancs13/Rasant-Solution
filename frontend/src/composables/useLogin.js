@@ -18,7 +18,6 @@ export function useLogin() {
     isPasswordVisible.value = !isPasswordVisible.value;
   };
 
-
   const handleLoginSubmit = () => {
     errorMessage.value = '';
 

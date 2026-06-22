@@ -4,7 +4,7 @@
 
     <section class="relative pt-17 pb-0 overflow-hidden bg-gradient-to-b from-secondary-50 via-primary-50 to-neutral-100" id="top">
       <!-- Background mesh -->
-      <div class="absolute inset-[-10%_-5%] pointer-events-none bg-[radial-gradient(circle_at_18%_20%,rgba(255,213,180,0.35)_0%,transparent_42%),radial-gradient(circle_at_82%_18%,rgba(201,196,248,0.32)_0%,transparent_40%),radial-gradient(circle_at_50%_80%,rgba(45,212,191,0.12)_0%,transparent_45%)] animate-mesh-shift"></div>
+      <div class="absolute inset-[-10%_-5%] pointer-events-none bg-[radial-gradient(circle_at_18%_20%,rgba(255,213,180,0.35)_0%,transparent_42%),radial-gradient(circle_at_82%_18%,rgba(201,196,248,0.32)_0%,transparent_40%),radial-gradient(circle_at_50%_80%,rgba(45,212,191,0.12)_0%,transparent_45%)] animate-[meshShift_10s_ease-in-out_infinite_alternate]"></div>
 
       <!-- Orb backgrounds -->
       <div class="absolute rounded-full blur-[70px] pointer-events-none w-80 h-80 bg-secondary-100/45 -top-5 -left-20 animate-[orbDrift_14s_ease-in-out_infinite]"></div>
@@ -18,7 +18,7 @@
           <div class="grid grid-cols-3 grid-rows-5 gap-[7px] h-full relative before:absolute before:inset-0 before:bg-[linear-gradient(rgba(94,234,212,0.14)_1px,transparent_1px),linear-gradient(90deg,rgba(74,144,226,0.14)_1px,transparent_1px)] before:bg-[length:calc((100%+7px)/3)_calc((100%+7px)/5)]">
             <div v-for="(cell, i) in gridCellsLeft" :key="'left-'+i"
                  class="rounded-lg border border-primary-500/20 relative z-10 animate-[cellBreathe_7s_ease-in-out_infinite]"
-                 :class="cell.bg"
+                 :class="cell.bgClass"
                  :style="cell.delay ? { animationDelay: cell.delay } : {}"></div>
           </div>
         </div>
@@ -28,7 +28,7 @@
           <div class="grid grid-cols-3 grid-rows-5 gap-[7px] h-full relative before:absolute before:inset-0 before:bg-[linear-gradient(rgba(94,234,212,0.14)_1px,transparent_1px),linear-gradient(90deg,rgba(74,144,226,0.14)_1px,transparent_1px)] before:bg-[length:calc((100%+7px)/3)_calc((100%+7px)/5)]">
             <div v-for="(cell, i) in gridCellsRight" :key="'right-'+i"
                  class="rounded-lg border border-primary-500/20 relative z-10 animate-[cellBreathe_7s_ease-in-out_infinite]"
-                 :class="cell.bg"
+                 :class="cell.bgClass"
                  :style="cell.delay ? { animationDelay: cell.delay } : {}"></div>
           </div>
         </div>
@@ -62,14 +62,14 @@
           </div>
         </div>
 
-        <!-- Right bot image -->
+        <!-- Right Visual -->
         <div class="relative z-30 flex justify-center py-1 mx-auto md:mr-0 md:ml-auto">
-          <div class="relative w-[min(280px,72vw)] animate-[botEnter_0.9s_cubic-bezier(0.22,1,0.36,1)_both]">
+          <div class="relative w-[min(400px,80vw)] animate-[botEnter_0.9s_cubic-bezier(0.22,1,0.36,1)_both]">
             <div class="absolute inset-[8%] rounded-full bg-[radial-gradient(circle,rgba(45,212,191,0.2)_0%,transparent_70%)] animate-[botGlow_3s_ease-in-out_infinite]"></div>
             <div class="absolute -inset-3.5 rounded-full border-2 border-dashed border-accent-1/35 animate-[botRingSpin_22s_linear_infinite]"></div>
             <div class="absolute -inset-5.5 rounded-full border-2 border-dashed border-accent-3/20 animate-[botRingSpin_30s_linear_infinite_reverse]"></div>
             <div class="relative w-full z-20 aspect-square max-w-sm mx-auto flex items-center justify-center overflow-visible">
-              <img src="../assets/svg/ai-agent-bot.svg" alt="AI voice agent robot" class="w-full h-75 object-contain drop-shadow-[0_16px_36px_rgba(42,95,158,0.2)] relative z-10" title="Voice AI Agent" />
+              <img src="../assets/svg/ai-agent-bot.svg" alt="AI voice agent robot" class="w-full h-[450px] object-contain drop-shadow-[0_16px_36px_rgba(42,95,158,0.2)] relative z-10" title="Voice AI Agent" />
             </div>
           </div>
         </div>
@@ -358,23 +358,23 @@
 import Footer from '../components/footer.vue'
 import Navbar from '../components/navbar.vue'
 
-// Grid cell config for hero side panels
+// Grid cell config
 const CELL_CONFIGS = [
-  { bg: 'bg-accent-1/20' },
-  { bg: 'bg-accent-7/20',  delay: '-0.9s' },
-  { bg: 'bg-primary-500/20', delay: '-1.8s' },
-  { bg: 'bg-accent-1/15',  delay: '-2.7s' },
-  { bg: 'bg-accent-1/20', delay: '-3.6s' },
+  { bg: 'bg-accent-3/20' },
+  { bg: 'bg-accent-4/20', delay: '-0.9s' },
+  { bg: 'bg-secondary-100/20', delay: '-1.8s' },
+  { bg: 'bg-accent-3/20', delay: '-2.7s' },
+  { bg: 'bg-secondary-100/20', delay: '-3.6s' },
   { bg: 'bg-primary-500/20', delay: '-4.5s' },
-  { bg: 'bg-accent-1/20', delay: '-5.4s' },
-  { bg: 'bg-accent-3/20', delay: '-6.3s' },
-  { bg: 'bg-accent-1/20' },
-  { bg: 'bg-primary-500/20', delay: '-1.8s' },
-  { bg: 'bg-accent-7/20',  delay: '-0.9s' },
-  { bg: 'bg-accent-1/15',  delay: '-2.7s' },
-  { bg: 'bg-accent-1/20', delay: '-3.6s' },
+  { bg: 'bg-accent-3/20', delay: '-5.4s' },
+  { bg: 'bg-secondary-100/20', delay: '-6.3s' },
+  { bg: 'bg-accent-3/20' },
+  { bg: 'bg-secondary-100/20', delay: '-1.8s' },
+  { bg: 'bg-accent-4/20', delay: '-0.9s' },
+  { bg: 'bg-accent-3/20', delay: '-2.7s' },
+  { bg: 'bg-secondary-100/20', delay: '-3.6s' },
   { bg: 'bg-primary-500/20', delay: '-4.5s' },
-  { bg: 'bg-primary-500/20', delay: '-1.8s' },
+  { bg: 'bg-secondary-100/20', delay: '-1.8s' },
 ]
 
 export default {
@@ -486,10 +486,10 @@ export default {
 
   computed: {
     gridCellsLeft() {
-      return this.gridCells
+      return this.gridCells.slice(0, 15)
     },
     gridCellsRight() {
-      return this.gridCells.map(cell => ({ ...cell }))
+      return this.gridCells.slice(0, 15)
     }
   },
 
@@ -624,15 +624,5 @@ export default {
 
 .animate-shine-fast-loop {
   animation: shineFastLoop 2s ease-in-out infinite;
-}
-
-/* Use Tailwind animations where possible */
-.animate-mesh-shift {
-  animation: meshShift 10s ease-in-out infinite alternate;
-}
-
-@keyframes meshShift {
-  0% { transform: translate(0, 0) scale(1); opacity: 0.9; }
-  100% { transform: translate(1.5%, -1%) scale(1.04); opacity: 1; }
 }
 </style>
