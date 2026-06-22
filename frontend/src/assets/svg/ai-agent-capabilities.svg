@@ -44,7 +44,27 @@
 
   <g class="aa-cap-pulse">
     <circle cx="320" cy="200" r="72" fill="#FFFFFF" stroke="#8FB9F4" stroke-width="2"/>
-    <image href="../images/ai-agent-face.png" x="262" y="142" width="116" height="116" clip-path="url(#aaCapFaceClip)" preserveAspectRatio="xMidYMid slice"/>
+    <g clip-path="url(#aaCapFaceClip)">
+      <rect x="272" y="154" width="96" height="82" rx="22" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+      <rect x="284" y="166" width="72" height="54" rx="12" fill="#1E3A5F"/>
+      <circle cx="304" cy="186" r="7" fill="#14B8A6"/>
+      <circle cx="306" cy="184" r="2.5" fill="#FFFFFF" opacity="0.85"/>
+      <circle cx="336" cy="186" r="7" fill="#14B8A6"/>
+      <circle cx="338" cy="184" r="2.5" fill="#FFFFFF" opacity="0.85"/>
+      <rect x="296" y="200" width="4" height="11" rx="2" fill="#4A90E2"/>
+      <rect x="304" y="197" width="4" height="14" rx="2" fill="#6B52B8"/>
+      <rect x="312" y="199" width="4" height="12" rx="2" fill="#4A90E2"/>
+      <rect x="320" y="195" width="4" height="16" rx="2" fill="#14B8A6"/>
+      <rect x="328" y="199" width="4" height="12" rx="2" fill="#4A90E2"/>
+      <rect x="336" y="197" width="4" height="14" rx="2" fill="#6B52B8"/>
+      <line x1="320" y1="142" x2="320" y2="154" stroke="#94A3B8" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="320" cy="138" r="5.5" fill="#4A90E2"/>
+      <rect x="262" y="176" width="10" height="32" rx="5" fill="#F1F5F9" stroke="#E2E8F0"/>
+      <rect x="368" y="176" width="10" height="32" rx="5" fill="#F1F5F9" stroke="#E2E8F0"/>
+      <rect x="288" y="236" width="64" height="52" rx="18" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5"/>
+      <circle cx="320" cy="262" r="18" fill="#F8FAFC" stroke="#4A90E2" stroke-width="1.5"/>
+      <circle cx="320" cy="262" r="7" fill="#4A90E2"/>
+    </g>
   </g>
 
   <rect x="248" y="24" width="144" height="28" rx="14" fill="#EFF6FF"/>
