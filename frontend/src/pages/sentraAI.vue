@@ -421,10 +421,7 @@
           </p>
         </div>
         <div class="flex gap-3 flex-wrap items-center lg:justify-end shrink-0">
-          <router-link to="/login" class="shadow-md transition-transform hover:scale-[1.02] inline-flex items-center justify-center px-6 py-3.5 bg-white text-orange-600 font-bold rounded-xl hover:bg-orange-100 transition-all duration-300 font-['Inter'] text-sm">
-            Open Sentra Portal
-          </router-link>
-          <router-link to="/contact?project=sentra" class="inline-flex items-center justify-center px-6 py-3.5 border border-white/40 text-white font-semibold rounded-xl hover:bg-white/10 transition-all duration-300 font-['Inter'] text-sm">
+          <ShineButton to="/login" variant="white">Open Sentra Portal</ShineButton>          <router-link to="/contact?project=sentra" class="inline-flex items-center justify-center px-6 py-3.5 border border-white/40 text-white font-semibold rounded-xl hover:bg-white/10 transition-all duration-300 font-['Inter'] text-sm">
             Contact Sales
           </router-link>
         </div>
@@ -437,6 +434,7 @@
 <script>
 import Navbar from '@/components/navbar.vue'
 import Footer from '@/components/footer.vue'
+import ShineButton from "@/components/ShineButton.vue";
 
 export default {
   name: 'SentraPage',

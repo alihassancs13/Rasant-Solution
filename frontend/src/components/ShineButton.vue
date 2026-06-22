@@ -48,11 +48,12 @@ const shapeClass = computed(() => ({
 const variantClass = computed(() => ({
   primary: 'bg-[#C2410C] hover:bg-[#9A3412] text-white shadow-lg shadow-[#C2410C]/20',
   outline: 'bg-white border border-[#E2E8F0] hover:bg-[#F8FAFC] text-[#1E3A5F] shadow-sm',
+  white:   'bg-white text-orange-600 hover:bg-orange-100 shadow-md',
   blue:    'bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/20',
   green:   'bg-emerald-600 hover:bg-emerald-700 text-white shadow-lg shadow-emerald-600/20',
 }[props.variant] ?? 'bg-[#C2410C] hover:bg-[#9A3412] text-white'))
 
-const hasShine = computed(() => props.variant !== 'outline')
+const hasShine = computed(() => !['outline', 'white'].includes(props.variant))
 </script>
 
 <style scoped>
