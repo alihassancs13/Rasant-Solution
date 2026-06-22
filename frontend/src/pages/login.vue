@@ -1,190 +1,332 @@
 <template>
-  <div class="h-screen w-screen overflow-hidden bg-neutral-100 flex flex-col font-primary select-none antialiased">
-    <Navbar />
+  <div class="flex h-dvh w-full overflow-hidden bg-gradient-primary font-primary antialiased">
 
-    <section class="grid grid-cols-1 lg:grid-cols-[3fr_2fr] h-full pt-20 overflow-hidden w-full">
+    <div class="flex min-h-0 flex-1 overflow-hidden">
 
-      <aside class="relative hidden lg:flex items-center justify-center p-8 xl:p-12 overflow-hidden bg-gradient-to-b from-secondary-50 via-primary-50 to-neutral-100 border-r border-neutral-300/60 h-full">
+      <!-- Left panel -->
+      <aside class="relative hidden min-h-0 flex-[1.08] flex-col justify-between overflow-hidden border-r border-neutral-300/70 px-10 pt-8 pb-8 lg:px-12 lg:pt-10 lg:pb-10 xl:px-14 lg:flex">
 
-        <div class="absolute inset-x-[-5%] inset-y-[-10%] pointer-events-none bg-[radial-gradient(circle_at_18%_20%,rgba(255,213,180,0.35)_0%,transparent_42%),radial-gradient(circle_at_82%_18%,rgba(201,196,248,0.32)_0%,transparent_40%),radial-gradient(circle_at_50%_85%,rgba(143,185,244,0.18)_0%,transparent_45%)]" aria-hidden="true"></div>
+        <div class="absolute inset-0 bg-gradient-primary" aria-hidden="true"></div>
 
-        <div class="relative z-10 w-full max-w-135 flex flex-col justify-center h-full gap-4 mt-4">
+        <!-- Animated grid -->
+        <div
+            class="pointer-events-none absolute inset-0 animate-login-grid bg-[radial-gradient(circle,rgba(30,58,95,0.055)_1px,transparent_1px)] bg-[length:26px_26px]"
+            aria-hidden="true"
+        ></div>
 
-          <div class="inline-flex items-center gap-2 px-3.5 py-1.5 bg-primary-500/10 border border-primary-500/20 rounded-full text-[11px] font-bold tracking-wider uppercase text-secondary-800 w-fit font-display">
-            <span class="w-1.5 h-1.5 rounded-full bg-accent-1 shadow-[0_0_0_3px_rgba(20,184,166,0.2)]"></span>
-            Secure portal
-          </div>
+        <!-- Floating orbs — bigger, more visible -->
+        <div class="pointer-events-none absolute -top-32 -left-24 h-[520px] w-[520px] animate-login-orb rounded-full bg-[radial-gradient(circle,#FFD5B4,transparent_65%)] opacity-60 blur-[72px]" aria-hidden="true"></div>
+        <div class="pointer-events-none absolute -right-12 -bottom-16 h-[440px] w-[440px] animate-login-orb rounded-full bg-[radial-gradient(circle,#C9C4F8,transparent_65%)] opacity-60 blur-[72px] [animation-direction:reverse] [animation-duration:18s]" aria-hidden="true"></div>
+        <!-- Extra mid orb for depth -->
+        <div class="pointer-events-none absolute top-1/2 left-1/2 h-[280px] w-[280px] -translate-x-1/2 -translate-y-1/2 animate-login-orb rounded-full bg-[radial-gradient(circle,rgba(74,144,226,0.12),transparent_70%)] blur-[60px] [animation-duration:14s] [animation-delay:3s]" aria-hidden="true"></div>
 
-          <div class="space-y-1.5">
-            <h2 class="font-display text-3xl xl:text-4xl font-bold text-primary-900 leading-tight">
-              Sign in to your
-              <span class="text-secondary-700">workspace</span>
-            </h2>
-            <p class="text-[13px] xl:text-[14px] leading-relaxed text-neutral-500 font-normal font-primary">
-              One account for Sentra AI, Voice AI Agent, Chatbot dashboards, and client billing — role-based access for your team.
-            </p>
-          </div>
+        <!-- Animated scanline shimmer -->
+        <div class="pointer-events-none absolute inset-0 animate-scanline opacity-[0.03] bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(255,255,255,0.5)_2px,rgba(255,255,255,0.5)_4px)]" aria-hidden="true"></div>
 
-          <div class="w-full" aria-hidden="true">
-            <img
-                :src="loginVisual"
-                alt="Platform access visualization"
-                width="300"
-                height="150"
-                class="w-full h-auto max-h-[33vh] object-contain rounded-2xl shadow-md bg-secondary-50 border border-neutral-100"
-            />
-          </div>
-
-          <ul class="flex flex-col gap-2.5 m-0 p-0 list-none">
-            <li class="flex items-start gap-3 p-2.5 bg-white/90 border border-neutral-300/50 rounded-xl shadow-sm backdrop-blur-sm">
-              <span class="w-8 h-8 rounded-lg bg-neutral-100 flex items-center justify-center text-neutral-600 shrink-0" aria-hidden="true">
-                <font-awesome-icon icon="fa-solid fa-lock" class="text-neutral-400 text-base" />
+        <div class="relative z-10 animate-login-fade-up">
+          <!-- Live badge with pulsing ring -->
+          <div class="mb-5 inline-flex items-center gap-2 rounded-full border border-neutral-300 bg-white/85 px-3.5 py-1.5 text-[0.67rem] font-bold tracking-widest text-neutral-600 uppercase shadow-sm backdrop-blur-sm">
+              <span class="relative flex h-2 w-2 shrink-0">
+                <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary-500 opacity-60"></span>
+                <span class="relative inline-flex h-2 w-2 rounded-full bg-primary-500"></span>
               </span>
-              <div>
-                <strong class="block text-[15px] font-bold text-primary-800 mb-0.5 font-display">Role-based access</strong>
-                <span class="text-[13px] text-neutral-500 leading-tight block font-primary">Admin, employee, and client portals</span>
-              </div>
-            </li>
-            <li class="flex items-start gap-3 p-2.5 bg-white/90 border border-neutral-300/50 rounded-xl shadow-sm backdrop-blur-sm">
-              <span class="w-8 h-8 rounded-lg bg-neutral-100 flex items-center justify-center text-neutral-600 shrink-0" aria-hidden="true">
-                <font-awesome-icon icon="fa-solid fa-rocket" class="text-neutral-400 text-base" />
-              </span>
-              <div>
-                <strong class="block text-[15px] font-bold text-primary-800 mb-0.5 font-display">All products, one login</strong>
-                <span class="text-[13px] text-neutral-500 leading-tight block font-primary">Sentra, Voice AI, Chatbot &amp; analytics</span>
-              </div>
-            </li>
-          </ul>
+            Secure · Role-based · Always on
+          </div>
+
+          <h1 class="mb-2.5 font-display text-[clamp(1.65rem,2.4vw,2.5rem)] leading-[1.12] font-bold tracking-tight text-primary-900">
+            Everything you build,<br />
+            <span class="text-gradient-primary relative inline-block after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:bg-gradient-to-r after:from-secondary-500 after:to-primary-500 after:animate-underline-grow">one place to manage.</span>
+          </h1>
+
+          <p class="max-w-[380px] text-sm leading-relaxed text-neutral-700">
+            Unified access to Sentra AI, Voice AI Agent, Chatbot dashboards and client billing — secured with role-based controls.
+          </p>
+        </div>
+
+        <div class="relative z-10 flex min-h-0 flex-1 items-center justify-center py-4 animate-login-fade-up [animation-delay:80ms]">
+          <LoginVisual class="w-full max-w-[min(100%,540px)] min-h-[240px] max-h-[min(46vh,480px)] drop-shadow-[0_16px_48px_rgba(74,144,226,0.25)] transition-all duration-700 hover:drop-shadow-[0_24px_64px_rgba(74,144,226,0.35)] hover:-translate-y-1" />
+        </div>
+
+        <div class="relative z-10 flex flex-wrap gap-2 animate-login-fade-up [animation-delay:160ms]">
+          <div
+              v-for="(stat, i) in stats"
+              :key="stat.label"
+              :style="{ animationDelay: `${200 + i * 80}ms` }"
+              class="stat-card flex min-w-[88px] flex-col rounded-xl border border-neutral-300 bg-white/90 px-4 py-2.5 shadow-sm backdrop-blur-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_8px_24px_rgba(74,144,226,0.18)] hover:border-primary-200 animate-login-fade-up cursor-default"
+          >
+            <span class="font-display text-xl leading-none font-extrabold text-primary-900">{{ stat.value }}</span>
+            <span class="mt-0.5 text-[0.68rem] font-medium text-neutral-600">{{ stat.label }}</span>
+          </div>
         </div>
       </aside>
 
-      <main class="flex items-center justify-center sm:p-6 bg-white w-full h-full overflow-y-auto lg:overflow-hidden rounded-lg">
-        <div class="w-full max-w-120 bg-white border border-neutral-300/80 rounded-2xl sm:p-8 shadow-xl shadow-neutral-100/50">
+      <!-- Right panel -->
+      <main class="relative flex min-h-0 flex-[0.92] items-center justify-center overflow-x-hidden overflow-y-auto bg-gradient-primary px-5 py-6 sm:px-8 lg:bg-white/80 lg:backdrop-blur-sm">
 
-          <div class="mb-6 text-center lg:text-left">
-            <h2 class="font-display text-3xl sm:text-2xl font-bold tracking-tight text-primary-900">Welcome back</h2>
-            <p class="text-base sm:text-sm text-neutral-500 font-normal mt-1.5 font-primary">Sign in with your username and password.</p>
+        <!-- Animated concentric rings -->
+        <div class="pointer-events-none absolute -top-48 -right-48 h-[580px] w-[580px] animate-login-ring rounded-full border border-primary-500/10" aria-hidden="true"></div>
+        <div class="pointer-events-none absolute -top-28 -right-28 h-[380px] w-[380px] animate-login-ring rounded-full border border-primary-500/10 [animation-delay:2s]" aria-hidden="true"></div>
+        <div class="pointer-events-none absolute -top-14 -right-14 h-[200px] w-[200px] animate-login-ring rounded-full border border-primary-500/8 [animation-delay:4s]" aria-hidden="true"></div>
+
+        <div class="pointer-events-none absolute -bottom-24 -left-20 h-[340px] w-[340px] rounded-full bg-[radial-gradient(circle,rgba(201,110,58,0.08)_0%,rgba(107,82,184,0.06)_50%,transparent_70%)] blur-2xl" aria-hidden="true"></div>
+
+        <!-- Floating particles -->
+        <div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+          <span class="particle absolute top-[15%] left-[8%] h-1 w-1 rounded-full bg-primary-400/30 animate-float-1"></span>
+          <span class="particle absolute top-[35%] right-[12%] h-1.5 w-1.5 rounded-full bg-secondary-400/25 animate-float-2"></span>
+          <span class="particle absolute bottom-[22%] left-[15%] h-1 w-1 rounded-full bg-accent-3/20 animate-float-3"></span>
+          <span class="particle absolute top-[65%] right-[8%] h-1 w-1 rounded-full bg-primary-300/30 animate-float-1 [animation-delay:1.5s]"></span>
+          <span class="particle absolute bottom-[40%] left-[5%] h-1 w-1 rounded-full bg-secondary-300/20 animate-float-2 [animation-delay:2.5s]"></span>
+        </div>
+
+        <div class="relative z-10 w-full max-w-[400px] animate-login-card overflow-hidden rounded-2xl border border-neutral-300/80 bg-white p-6 shadow-blue sm:max-w-[420px] sm:p-7 [animation-delay:60ms] lg:max-w-[400px] transition-shadow duration-500 hover:shadow-[0_20px_60px_rgba(74,144,226,0.18)]">
+
+          <!-- Animated top accent bar -->
+          <div class="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-secondary-500 via-accent-4 to-primary-500 animate-gradient-shift" aria-hidden="true"></div>
+
+          <!-- Corner glow -->
+          <div class="pointer-events-none absolute -top-12 -right-12 h-28 w-28 rounded-full bg-[radial-gradient(circle,rgba(74,144,226,0.10),transparent_70%)] blur-xl" aria-hidden="true"></div>
+
+          <div class="mb-4 flex justify-center lg:hidden">
+            <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-primary-900 to-primary-500 text-sm font-extrabold text-white shadow-lg shadow-primary-500/25 animate-logo-bounce">
+              RS
+            </div>
+          </div>
+
+          <div class="mb-5">
+            <div class="inline-flex items-center gap-1.5 rounded-full border border-primary-200 bg-primary-50 px-3 py-1 text-[0.68rem] font-bold tracking-widest text-primary-700 uppercase">
+              <font-awesome-icon icon="fa-solid fa-shield-halved" class="text-[0.65rem] text-primary-500 animate-shield-pulse" />
+              Secure Sign-In
+            </div>
+            <h2 class="mt-3 font-display text-2xl font-bold text-primary-900 animate-login-fade-up [animation-delay:120ms]">Welcome back</h2>
+            <p class="mt-1 text-sm leading-relaxed text-neutral-600 animate-login-fade-up [animation-delay:180ms]">
+              Sign in to access your Rasant Solutions workspace.
+            </p>
           </div>
 
           <div
               v-if="errorMessage"
-              class="mb-4 p-3 bg-error/10 border border-error/30 rounded-lg text-error text-sm font-medium font-primary"
+              class="mb-3 flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 animate-shake"
           >
+            <font-awesome-icon icon="fa-solid fa-circle-exclamation" class="shrink-0 text-[0.7rem]" />
             {{ errorMessage }}
           </div>
 
-          <form @submit.prevent="handleLoginSubmit" novalidate class="flex flex-col gap-5">
-
-            <div class="flex flex-col gap-2">
-              <label for="username" class="block text-base font-semibold text-neutral-700 font-primary">Username</label>
-              <div class="relative flex items-center w-full">
-                <font-awesome-icon icon="fa-solid fa-user" class="absolute left-4 text-neutral-400 pointer-events-none text-base" />
+          <form @submit.prevent="handleLoginSubmit" novalidate class="space-y-4">
+            <div class="animate-login-fade-up [animation-delay:220ms]">
+              <label for="username" class="mb-1.5 block text-[0.7rem] font-bold tracking-wider text-primary-900 uppercase">
+                Username
+              </label>
+              <div class="relative group">
+                  <span class="pointer-events-none absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-sm text-primary-500 transition-transform duration-200 group-focus-within:scale-110">
+                    <font-awesome-icon icon="fa-solid fa-user" />
+                  </span>
                 <input
-                    type="text"
                     id="username"
                     v-model="username"
-                    placeholder="admin, employee, or client"
+                    type="text"
+                    placeholder="Enter your username"
                     required
                     autocomplete="username"
-                    class="w-full pl-11 pr-4 py-3 border border-neutral-300 rounded-xl font-primary text-base text-primary-800 bg-neutral-50/50 outline-none transition-all duration-200 focus:border-primary-500 focus:bg-white focus:ring-4 focus:ring-primary-500/10"
+                    class="login-input w-full rounded-xl border border-neutral-300 bg-neutral-100 py-2.5 pr-3 pl-10 text-[0.9375rem] text-primary-900 outline-none transition-all duration-200 placeholder:text-neutral-500 focus:border-primary-500 focus:bg-white focus:ring-4 focus:ring-primary-500/12 focus:shadow-[0_0_0_4px_rgba(74,144,226,0.08),0_2px_8px_rgba(74,144,226,0.12)]"
                 />
               </div>
             </div>
 
-            <div class="flex flex-col gap-2">
-              <div class="flex items-center justify-between gap-2">
-                <label for="password" class="block text-base font-semibold text-neutral-700 font-primary">Password</label>
-                <a href="mailto:sales@rasantsolutions.com?subject=Forgot%20Password" class="text-base font-semibold text-secondary-700 no-underline whitespace-nowrap hover:text-accent-3 hover:underline transition-colors duration-150 font-primary">
+            <div class="animate-login-fade-up [animation-delay:280ms]">
+              <div class="mb-1.5 flex items-center justify-between">
+                <label for="password" class="text-[0.7rem] font-bold tracking-wider text-primary-900 uppercase">
+                  Password
+                </label>
+                <a
+                    href="mailto:sales@rasantsolutions.com?subject=Forgot%20Password"
+                    class="text-xs font-semibold text-secondary-500 transition-all duration-200 hover:text-accent-4 hover:underline hover:underline-offset-2"
+                >
                   Forgot password?
                 </a>
               </div>
-              <div class="relative flex items-center w-full">
-                <font-awesome-icon icon="fa-solid fa-lock" class="absolute left-4 text-neutral-400 pointer-events-none text-base" />
+              <div class="relative group">
+                  <span class="pointer-events-none absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-sm text-primary-500 transition-transform duration-200 group-focus-within:scale-110">
+                    <font-awesome-icon icon="fa-solid fa-lock" />
+                  </span>
                 <input
-                    :type="isPasswordVisible ? 'text' : 'password'"
                     id="password"
                     v-model="password"
+                    :type="isPasswordVisible ? 'text' : 'password'"
                     placeholder="Enter your password"
                     required
                     autocomplete="current-password"
-                    class="w-full pl-11 pr-11 py-3 border border-neutral-300 rounded-xl font-primary text-base text-primary-800 bg-neutral-50/50 outline-none transition-all duration-200 focus:border-primary-500 focus:bg-white focus:ring-4 focus:ring-primary-500/10"
+                    class="login-input w-full rounded-xl border border-neutral-300 bg-neutral-100 py-2.5 pr-11 pl-10 text-[0.9375rem] text-primary-900 outline-none transition-all duration-200 placeholder:text-neutral-500 focus:border-primary-500 focus:bg-white focus:ring-4 focus:ring-primary-500/12 focus:shadow-[0_0_0_4px_rgba(74,144,226,0.08),0_2px_8px_rgba(74,144,226,0.12)]"
                 />
-
                 <button
                     type="button"
-                    @click="togglePasswordVisibility"
-                    class="absolute right-2 w-8 h-8 border-none bg-transparent rounded-lg cursor-pointer text-neutral-400 flex items-center justify-center transition-all duration-200 hover:text-primary-500 hover:bg-neutral-100"
+                    class="absolute top-1/2 right-0 flex h-full w-10 -translate-y-1/2 items-center justify-center rounded-r-xl text-accent-3 transition-all duration-200 hover:bg-primary-500/10 hover:text-primary-600 active:scale-90"
                     :aria-label="isPasswordVisible ? 'Hide password' : 'Show password'"
+                    @click="togglePasswordVisibility"
                 >
-                  <font-awesome-icon :icon="isPasswordVisible ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye'" class="text-base" />
+                  <font-awesome-icon
+                      :icon="isPasswordVisible ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'"
+                      class="text-[0.95rem] transition-transform duration-200"
+                      :class="isPasswordVisible ? 'scale-90' : 'scale-100'"
+                  />
                 </button>
               </div>
             </div>
 
-            <div class="flex items-center my-0.5">
-              <label class="inline-flex items-center gap-3 text-base text-neutral-500 font-normal cursor-pointer select-none font-primary">
-                <input
-                    type="checkbox"
-                    v-model="rememberMe"
-                    class="w-4.5 h-4.5 rounded border-neutral-300 text-secondary-700 focus:ring-secondary-600 cursor-pointer accent-secondary-700"
-                />
-                <span>Remember me on this device</span>
-              </label>
-            </div>
+            <label class="inline-flex cursor-pointer items-center gap-2.5 text-sm text-neutral-600 select-none group animate-login-fade-up [animation-delay:320ms]">
+              <input v-model="rememberMe" type="checkbox" class="h-4 w-4 cursor-pointer accent-primary-500 transition-transform duration-150 group-hover:scale-110" />
+              <span class="transition-colors duration-200 group-hover:text-primary-700">Remember me on this device</span>
+            </label>
 
-            <button
-                type="submit"
-                class="relative overflow-hidden cursor-pointer w-full flex items-center justify-center px-6 py-3.5 bg-secondary-700 hover:bg-secondary-800 text-base font-semibold text-white rounded-xl transition-all duration-200 shadow-[0_4px_14px_rgba(42,95,158,0.4)] hover:shadow-[0_6px_20px_rgba(42,95,158,0.6)] active:scale-[0.98] group font-primary"
-            >
-              Sign In
-              <div class="absolute inset-0 w-1/3 h-full pointer-events-none animate-shine-loop"></div>
-            </button>
+            <div class="animate-login-fade-up [animation-delay:360ms]">
+              <ShineButton type="submit" size="md" shape="xl" class="w-full! transition-transform duration-150 active:scale-[0.98]">
+                Sign In
+              </ShineButton>
+            </div>
           </form>
 
-          <div class="mt-6 space-y-3 text-center">
-            <p class="text-base text-neutral-500 font-normal font-primary">
-              Need an account?
-              <a href="/contact" class="font-bold text-secondary-700 no-underline hover:underline">Contact sales</a>
-            </p>
-
+          <div class="my-4 flex items-center gap-3 text-xs text-neutral-500 animate-login-fade-up [animation-delay:400ms]">
+            <span class="h-px flex-1 bg-gradient-to-r from-transparent to-neutral-300"></span>
+            <span class="whitespace-nowrap font-medium tracking-wide">Rasant Solutions</span>
+            <span class="h-px flex-1 bg-gradient-to-l from-transparent to-neutral-300"></span>
           </div>
 
+          <div class="mb-4 grid grid-cols-3 gap-2 animate-login-fade-up [animation-delay:440ms]">
+            <div
+                v-for="(badge, i) in securityBadges"
+                :key="badge.label"
+                :style="{ animationDelay: `${460 + i * 60}ms` }"
+                class="group flex flex-col items-center gap-1.5 rounded-xl border border-neutral-300 bg-neutral-100 px-2 py-2.5 text-center text-[0.68rem] font-medium text-neutral-600 transition-all duration-300 hover:-translate-y-1 hover:border-primary-200 hover:bg-white hover:shadow-[0_4px_16px_rgba(74,144,226,0.12)] cursor-default animate-login-fade-up"
+            >
+                <span :class="['flex h-7 w-7 items-center justify-center rounded-lg text-xs transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6', badge.iconClass]">
+                  <font-awesome-icon :icon="badge.icon" />
+                </span>
+              <span>{{ badge.label }}</span>
+            </div>
+          </div>
+
+          <div class="space-y-1.5 text-center animate-login-fade-up [animation-delay:520ms]">
+            <p class="text-sm text-neutral-500">
+              Need access?
+              <router-link to="/contact" class="font-semibold text-secondary-500 transition-all duration-200 hover:text-accent-4 hover:underline hover:underline-offset-2">
+                Contact sales →
+              </router-link>
+            </p>
+            <router-link to="/home" class="inline-block text-sm text-neutral-500 transition-all duration-200 hover:text-primary-900 hover:-translate-x-0.5">
+              ← Back to website
+            </router-link>
+          </div>
         </div>
       </main>
-    </section>
+    </div>
   </div>
 </template>
 
 <style scoped>
-@keyframes shine-loop {
-  0% {
-    transform: translateX(-150%) skewX(-20deg);
-  }
-  100% {
-    transform: translateX(450%) skewX(-20deg);
-  }
+.login-input:-webkit-autofill,
+.login-input:-webkit-autofill:hover,
+.login-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #1e3a5f;
+  -webkit-box-shadow: 0 0 0 1000px #f8fafc inset;
+  transition: background-color 9999s ease-out;
 }
 
-.animate-shine-loop {
-  animation: shine-loop 1.0s ease-in-out infinite alternate;
-  width: 30%;
-  height: 100%;
-  background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.1) 20%,
-      rgba(255, 255, 255, 0.5) 50%,
-      rgba(255, 255, 255, 0.1) 80%,
-      transparent 100%
-  );
-  filter: blur(0.5px);
+/* Scanline sweep animation */
+@keyframes scanline {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 100px; }
 }
+.animate-scanline {
+  animation: scanline 4s linear infinite;
+}
+
+/* Gradient shift on top bar */
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.animate-gradient-shift {
+  background-size: 200% 200%;
+  animation: gradient-shift 4s ease infinite;
+}
+
+/* Underline grow for headline */
+@keyframes underline-grow {
+  0% { transform: scaleX(0); opacity: 0; }
+  100% { transform: scaleX(1); opacity: 1; }
+}
+.animate-underline-grow {
+  animation: underline-grow 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.6s both;
+}
+
+/* Logo bounce */
+@keyframes logo-bounce {
+  0%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-6px); }
+  60% { transform: translateY(-3px); }
+}
+.animate-logo-bounce {
+  animation: logo-bounce 2.4s ease-in-out 0.8s infinite;
+}
+
+/* Shield pulse */
+@keyframes shield-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(0.92); }
+}
+.animate-shield-pulse {
+  animation: shield-pulse 2.5s ease-in-out infinite;
+}
+
+/* Error shake */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  15% { transform: translateX(-5px); }
+  30% { transform: translateX(5px); }
+  45% { transform: translateX(-4px); }
+  60% { transform: translateX(4px); }
+  75% { transform: translateX(-2px); }
+}
+.animate-shake {
+  animation: shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+/* Floating particles */
+@keyframes float-1 {
+  0%, 100% { transform: translateY(0) translateX(0); opacity: 0.4; }
+  33% { transform: translateY(-18px) translateX(8px); opacity: 0.8; }
+  66% { transform: translateY(-8px) translateX(-6px); opacity: 0.5; }
+}
+@keyframes float-2 {
+  0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
+  40% { transform: translateY(14px) translateX(-10px); opacity: 0.7; }
+  70% { transform: translateY(6px) translateX(8px); opacity: 0.4; }
+}
+@keyframes float-3 {
+  0%, 100% { transform: translateY(0) translateX(0) scale(1); opacity: 0.35; }
+  50% { transform: translateY(-12px) translateX(12px) scale(1.5); opacity: 0.6; }
+}
+.animate-float-1 { animation: float-1 6s ease-in-out infinite; }
+.animate-float-2 { animation: float-2 8s ease-in-out infinite; }
+.animate-float-3 { animation: float-3 7s ease-in-out infinite; }
 </style>
 
 <script setup>
-import Navbar from '../components/navbar.vue';
+import LoginVisual from '../components/LoginVisual.vue';
+import ShineButton from '../components/ShineButton.vue';
 import { useLogin } from '../composables/useLogin';
-import loginVisual from '../assets/svg/login-visual.svg'
+
+const stats = [
+  { value: '99%', label: 'Uptime SLA' },
+  { value: '150+', label: 'Clients worldwide' },
+  { value: '3×', label: 'Faster delivery' },
+];
+
+const securityBadges = [
+  { label: 'SSL Encrypted', icon: 'fa-solid fa-lock', iconClass: 'bg-primary-50 text-primary-500' },
+  { label: 'SOC 2 Ready', icon: 'fa-solid fa-shield-halved', iconClass: 'bg-[#F5F3FF] text-accent-3' },
+  { label: 'Role-based', icon: 'fa-solid fa-user-shield', iconClass: 'bg-secondary-50 text-secondary-500' },
+];
 
 const {
   username,
@@ -193,7 +335,6 @@ const {
   isPasswordVisible,
   errorMessage,
   togglePasswordVisibility,
-  injectQuickCredentials,
   handleLoginSubmit,
 } = useLogin();
 </script>

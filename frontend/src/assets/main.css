@@ -155,6 +155,60 @@
     }
 }
 
+@keyframes loginGridDrift {
+    0% { background-position: 0 0; }
+    100% { background-position: 26px 26px; }
+}
+
+@keyframes loginOrbDrift {
+    0%, 100% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-30px) scale(1.05); }
+}
+
+@keyframes loginDotPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(74, 144, 226, 0.55); }
+    60% { box-shadow: 0 0 0 8px rgba(74, 144, 226, 0); }
+}
+
+@keyframes loginCardRise {
+    from { opacity: 0; transform: translateY(18px) scale(0.99); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes loginFadeUp {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes loginRingPulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.04); opacity: 0.5; }
+}
+
+@utility animate-login-grid {
+    animation: loginGridDrift 32s linear infinite;
+}
+
+@utility animate-login-orb {
+    animation: loginOrbDrift 14s ease-in-out infinite;
+}
+
+@utility animate-login-dot {
+    animation: loginDotPulse 2.2s ease-in-out infinite;
+}
+
+@utility animate-login-card {
+    animation: loginCardRise 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@utility animate-login-fade-up {
+    animation: loginFadeUp 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@utility animate-login-ring {
+    animation: loginRingPulse 10s ease-in-out infinite;
+}
+
 /* Global Styles */
 @layer base {
     body {
