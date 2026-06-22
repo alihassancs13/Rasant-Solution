@@ -608,46 +608,7 @@
 
     </div>
   </section>
-
-  <!-- Pricing CTA -->
-  <section
-      ref="pricingRef"
-      class="relative mx-[5%] mb-20 overflow-hidden rounded-[22px] border border-[#CBD5E1] border-l-[5px] border-l-[#2A5F9E] bg-white px-7 sm:px-12 py-9 sm:py-11 shadow-[0_4px_6px_rgba(30,58,95,0.04),0_24px_64px_rgba(42,95,158,0.12)] transition-all duration-700 ease-out hover:-translate-y-0.5 hover:shadow-[0_8px_12px_rgba(30,58,95,0.06),0_32px_72px_rgba(42,95,158,0.16)]"
-      :class="visible.pricing ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'"
-      style="font-family: 'Inter', sans-serif;"
-  >
-    <div class="pointer-events-none absolute -top-[40%] -right-[8%] w-80 h-80 rounded-full bg-[radial-gradient(circle,rgba(143,185,244,0.18)_0%,transparent_68%)]"></div>
-    <div class="pointer-events-none absolute -bottom-[50%] left-[28%] w-52 h-52 rounded-full bg-[radial-gradient(circle,rgba(201,196,248,0.14)_0%,transparent_70%)]"></div>
-
-    <div class="relative z-10 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-9">
-      <div>
-        <span class="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[1.3px] text-[#2A5F9E] bg-[#2A5F9E]/10 border border-[#2A5F9E]/20 px-3.5 py-1.5 rounded-full mb-3.5" style="font-family: 'Inter', sans-serif;">
-          <span class="w-[7px] h-[7px] rounded-full bg-[#14B8A6] shadow-[0_0_0_3px_rgba(20,184,166,0.2)]"></span>
-          Pricing
-        </span>
-        <h3 class="text-2xl sm:text-[32px] font-extrabold tracking-tight text-[#1E3A5F] leading-tight mb-2.5" style="font-family: 'Space Grotesk', sans-serif;">
-          Transparent pricing for every product
-        </h3>
-        <p class="text-[15px] text-[#475569] max-w-[500px] leading-relaxed mb-4.5" style="font-family: 'Inter', sans-serif;">
-          Compare plans side by side — no hidden fees. All prices shown in PKR.
-        </p>
-        <div class="flex flex-wrap gap-2">
-          <span
-              v-for="pill in ctaPills"
-              :key="pill.label"
-              :class="['text-xs font-semibold text-[#1E3A5F] px-3 py-1.5 rounded-lg border', pill.class]"
-              style="font-family: 'Inter', sans-serif;"
-          >
-            {{ pill.label }}
-          </span>
-        </div>
-      </div>
-      <div class="flex flex-wrap gap-3 shrink-0">
-        <ShineButton to="/pricing" size="lg">Explore Pricing</ShineButton>
-        <ShineButton to="/contact" variant="outline" size="lg">Talk to Sales</ShineButton>
-      </div>
-    </div>
-  </section>
+  
 
   <Footer />
 </template>
