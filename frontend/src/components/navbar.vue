@@ -56,7 +56,7 @@
             </button>
 
             <!-- Services Dropdown -->
-            <div class="absolute top-[calc(100%+2px)] left-1/2 -translate-x-1/2 w-[280px] z-50">
+            <div class="absolute top-full left-1/2 -translate-x-1/2 w-[280px] z-50">
               <Transition name="dropdown">
                 <div
                     v-show="activeDropdown === 'services'"
@@ -132,7 +132,7 @@
             <Transition name="dropdown">
               <div
                   v-show="activeDropdown === 'projects'"
-                  class="absolute top-[calc(100%+2px)] left-1/2 -translate-x-1/2 w-[520px] bg-white rounded-[0_0_20px_20px] shadow-[0_20px_60px_rgba(15,23,42,0.14)] border border-neutral-300 border-t-[3px] border-t-primary-500 p-5 grid grid-cols-2 gap-3 z-50"
+                  class="absolute top-full left-1/2 -translate-x-1/2 w-[520px] bg-white rounded-[0_0_20px_20px] shadow-[0_20px_60px_rgba(15,23,42,0.14)] border border-neutral-300 border-t-[3px] border-t-primary-500 p-5 grid grid-cols-2 gap-3 z-50"
               >
                 <router-link
                     to="/sentra"

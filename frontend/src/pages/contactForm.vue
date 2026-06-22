@@ -96,8 +96,7 @@
               </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-              <div class="relative">
+            <div class="relative">
                 <input type="tel" id="fphone" name="phone" placeholder=" " autocomplete="tel"
                        class="peer w-full rounded-[11px] border border-neutral-300 bg-white px-4 pt-4 pb-2 text-sm text-primary-900 outline-none transition-colors duration-200 focus:border-accent-3 focus:ring-[3px] focus:ring-accent-3/10 [&:not(:placeholder-shown)]:border-accent-3 [&:not(:placeholder-shown)]:ring-[3px] [&:not(:placeholder-shown)]:ring-accent-3/10 font-primary" />
                 <label for="fphone"
@@ -105,21 +104,6 @@
                   <i class="fas fa-phone mr-1.5"></i>Phone (optional)
                 </label>
               </div>
-              <div class="relative">
-                <input
-                    type="text"
-                    id="project"
-                    name="project"
-                    placeholder=" "
-                    required
-                    class="peer w-full rounded-[11px] border border-neutral-300 bg-white px-4 pt-4 pb-2 text-sm text-primary-900 outline-none transition-colors duration-200 focus:border-accent-3 focus:ring-[3px] focus:ring-accent-3/10 [&:not(:placeholder-shown)]:border-accent-3 [&:not(:placeholder-shown)]:ring-[3px] [&:not(:placeholder-shown)]:ring-accent-3/10 font-primary"
-                />
-                <label for="project"
-                       class="absolute left-4 top-4 text-sm text-neutral-500 pointer-events-none transition-all duration-200 peer-focus:top-1.5 peer-focus:text-[10px] peer-focus:font-semibold peer-focus:uppercase peer-focus:tracking-wide peer-focus:text-accent-3 peer-[:not(:placeholder-shown)]:top-1.5 peer-[:not(:placeholder-shown)]:text-[10px] peer-[:not(:placeholder-shown)]:font-semibold peer-[:not(:placeholder-shown)]:uppercase peer-[:not(:placeholder-shown)]:tracking-wide peer-[:not(:placeholder-shown)]:text-accent-3 font-primary">
-                  <i class="far fa-folder mr-1.5"></i>Project Type
-                </label>
-              </div>
-            </div>
 
             <div class="relative">
               <textarea id="fmessage" name="message" placeholder=" " required
