@@ -1,28 +1,163 @@
+/* main.css */
 @import "tailwindcss";
 
 @theme {
-  --animate-mesh-shift: meshShift 10s ease-in-out infinite alternate;
-  --animate-shine: shine 0.75s ease-in-out;
-  --animate-shake: shake 0.35s ease-in-out;
-  
-  /* Sped up to 0.9 seconds for a snappy, high-end reflection look */
-  --animate-shine-loop: shineLoop 0.9s ease-in-out infinite alternate;
+    /* Custom Animations */
+    --animate-mesh-shift: meshShift 10s ease-in-out infinite alternate;
+    --animate-shine: shine 0.75s ease-in-out;
+    --animate-shake: shake 0.35s ease-in-out;
+    --animate-shine-loop: shineLoop 0.9s ease-in-out infinite alternate;
 
-  @keyframes meshShift {
-    0% { transform: translate(0, 0) scale(1); opacity: 0.9; }
-    100% { transform: translate(1.5%, -1%) scale(1.03); opacity: 1; }
-  }
-  @keyframes shine {
-    100% { transform: translateX(250%); }
-  }
-  @keyframes shake {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-5px); }
-    75% { transform: translateX(5px); }
-  }
-  
-  @keyframes shineLoop {
-    0% { transform: translateX(-250%) skewX(-12deg); }
-    100% { transform: translateX(400%) skewX(-12deg); }
-  }
+    /* Primary Colors - Blue */
+    --color-primary-50: #EFF6FF;
+    --color-primary-100: #DCEAFD;
+    --color-primary-200: #B5D4F8;
+    --color-primary-300: #8FB9F4;
+    --color-primary-400: #6BA3E8;
+    --color-primary-500: #4A90E2;
+    --color-primary-600: #4A6ABA;
+    --color-primary-700: #3B5A9A;
+    --color-primary-800: #2A4A7A;
+    --color-primary-900: #1E3A5F;
+
+    /* Secondary Colors - Orange */
+    --color-secondary-50: #FFF8F3;
+    --color-secondary-100: #FFD5B4;
+    --color-secondary-200: #F5C49A;
+    --color-secondary-300: #F0A67A;
+    --color-secondary-400: #E08A5A;
+    --color-secondary-500: #C96E3A;
+    --color-secondary-600: #EA580C;
+    --color-secondary-700: #EA580C;
+    --color-secondary-800: #D45A1A;
+    --color-secondary-900: #C2410C;
+
+    /* Accent Colors */
+    --color-accent-1: #14B8A6;    /* Teal */
+    --color-accent-2: #0D9488;    /* Dark Teal */
+    --color-accent-3: #6B52B8;    /* Purple */
+    --color-accent-4: #B0457A;    /* Pink */
+    --color-accent-5: #F59E0B;    /* Amber */
+    --color-accent-6: #B45309;    /* Dark Amber */
+    --color-accent-7: #0EA5E9;    /* Sky Blue */
+    --color-accent-8: #61DAFB;    /* React Blue */
+    --color-accent-9: #339933;    /* Node Green */
+    --color-accent-10: #3776AB;   /* Python Blue */
+    --color-accent-11: #FF9900;   /* AWS Orange */
+    --color-accent-12: #2496ED;   /* Docker Blue */
+    --color-accent-13: #4285F4;   /* Google Blue */
+    /* Neutral Colors */
+    --color-neutral-50: #FFFFFF;
+    --color-neutral-100: #F8FAFC;
+    --color-neutral-200: #F1F5F9;
+    --color-neutral-300: #E2E8F0;
+    --color-neutral-400: #CBD5E1;
+    --color-neutral-500: #94A3B8;
+    --color-neutral-600: #64748B;
+    --color-neutral-700: #475569;
+    --color-neutral-800: #334155;
+    --color-neutral-900: #1E293B;
+    --color-neutral-950: #0F172A;
+
+    /* Semantic Colors */
+    --color-success: #22C55E;
+    --color-warning: #F59E0B;
+    --color-error: #EF4444;
+    --color-info: #4A90E2;
+
+    /* Fonts */
+    --font-primary: 'Inter', sans-serif;
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    /* Shadows */
+    --shadow-blue: 0 16px 48px rgba(74, 144, 226, 0.1);
+    --shadow-orange: 0 8px 24px rgba(194, 65, 12, 0.25);
+    --shadow-teal: 0 8px 24px rgba(20, 184, 166, 0.25);
+    --shadow-purple: 0 8px 24px rgba(107, 82, 184, 0.25);
+    --shadow-dark: 0 8px 24px rgba(15, 23, 42, 0.2);
+
+    /* Border Radius */
+    --radius-2xl: 2.5rem;
+}
+
+/* Custom Utility Classes */
+@utility bg-gradient-primary {
+    background: linear-gradient(165deg, #FFFFFF 0%, #FFF8F3 35%, #F5F0FF 65%, #EFF6FF 100%);
+}
+
+@utility bg-gradient-secondary {
+    background: linear-gradient(165deg, #FFF8F3 0%, #FDF2F8 28%, #F5F0FF 52%, #EFF6FF 100%);
+}
+
+@utility text-gradient-primary {
+    background: linear-gradient(to right, #C96E3A, #B0457A, #6B52B8, #3B73C4);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+@utility shadow-blue {
+    box-shadow: 0 16px 48px rgba(74, 144, 226, 0.1);
+}
+
+@utility shadow-orange {
+    box-shadow: 0 8px 24px rgba(194, 65, 12, 0.25);
+}
+
+@utility shadow-teal {
+    box-shadow: 0 8px 24px rgba(20, 184, 166, 0.25);
+}
+
+@utility shadow-purple {
+    box-shadow: 0 8px 24px rgba(107, 82, 184, 0.25);
+}
+
+@utility shadow-dark {
+    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.2);
+}
+
+/* Keyframe Animations */
+@keyframes meshShift {
+    0% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.9;
+    }
+    100% {
+        transform: translate(1.5%, -1%) scale(1.03);
+        opacity: 1;
+    }
+}
+
+@keyframes shine {
+    100% {
+        transform: translateX(250%);
+    }
+}
+
+@keyframes shake {
+    0%, 100% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-5px);
+    }
+    75% {
+        transform: translateX(5px);
+    }
+}
+
+@keyframes shineLoop {
+    0% {
+        transform: translateX(-250%) skewX(-12deg);
+    }
+    100% {
+        transform: translateX(400%) skewX(-12deg);
+    }
+}
+
+/* Global Styles */
+@layer base {
+    body {
+        font-family: var(--font-primary);
+    }
 }
