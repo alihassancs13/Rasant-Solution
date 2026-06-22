@@ -106,18 +106,17 @@
                 </label>
               </div>
               <div class="relative">
-                <select id="fservice" name="service" required
-                        class="peer w-full rounded-[11px] border border-slate-200 bg-white px-4 pt-[22px] pb-2 text-sm text-slate-900 outline-none cursor-pointer transition-colors duration-200 focus:border-indigo-600 focus:ring-[3px] focus:ring-indigo-600/10 valid:border-indigo-600 valid:ring-[3px] valid:ring-indigo-600/10 font-['Inter']">
-                  <option value="" disabled selected hidden></option>
-                  <option value="sentra">Sentra AI — Call Center</option>
-                  <option value="ai-agent">AI Agent — Automation</option>
-                  <option value="chatbot">Chatbot — Conversational</option>
-                  <option value="orchestri">Orchestri — SDLC Platform</option>
-                  <option value="custom">Custom Project</option>
-                </select>
-                <label for="fservice"
-                       class="absolute left-4 top-4 text-sm text-slate-500 pointer-events-none transition-all duration-200 peer-focus:top-1.5 peer-focus:text-[10px] peer-focus:font-semibold peer-focus:uppercase peer-focus:tracking-wide peer-focus:text-indigo-600 peer-valid:top-1.5 peer-valid:text-[10px] peer-valid:font-semibold peer-valid:uppercase peer-valid:tracking-wide peer-valid:text-indigo-600 font-['Inter']">
-                  <i class="fas fa-project-diagram mr-1.5"></i>Project Type
+                <input
+                    type="text"
+                    id="project"
+                    name="project"
+                    placeholder=" "
+                    required
+                    class="peer w-full rounded-[11px] border border-slate-200 bg-white px-4 pt-4 pb-2 text-sm text-slate-900 outline-none transition-colors duration-200 focus:border-indigo-600 focus:ring-[3px] focus:ring-indigo-600/10 [&:not(:placeholder-shown)]:border-indigo-600 [&:not(:placeholder-shown)]:ring-[3px] [&:not(:placeholder-shown)]:ring-indigo-600/10 font-['Inter']"
+                />
+                <label for="femail"
+                       class="absolute left-4 top-4 text-sm text-slate-500 pointer-events-none transition-all duration-200 peer-focus:top-1.5 peer-focus:text-[10px] peer-focus:font-semibold peer-focus:uppercase peer-focus:tracking-wide peer-focus:text-indigo-600 peer-[:not(:placeholder-shown)]:top-1.5 peer-[:not(:placeholder-shown)]:text-[10px] peer-[:not(:placeholder-shown)]:font-semibold peer-[:not(:placeholder-shown)]:uppercase peer-[:not(:placeholder-shown)]:tracking-wide peer-[:not(:placeholder-shown)]:text-indigo-600 font-['Inter']">
+                  <i class="far fa-folder mr-1.5"></i>Project Type
                 </label>
               </div>
             </div>
