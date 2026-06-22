@@ -92,7 +92,7 @@
             <img src="../assets/svg/ai-agent-voice-flow.svg" title="Voice AI agent call flow" class="w-full min-h-[280px] block" />
 
             <img
-                src="../assets/images/ai-agent-face.png"
+                src="../assets/images/ai-agents-face.png"
                 alt="Bot face"
                 class="absolute top-[42%] left-[34.5%] -translate-x-1/2 -translate-y-1/2 w-[7%] min-w-[45px] max-w-[65px] h-auto z-10"
                 title="Bot Face"
