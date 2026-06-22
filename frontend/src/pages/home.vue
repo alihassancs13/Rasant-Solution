@@ -39,21 +39,23 @@
         </p>
 
         <div class="flex flex-wrap gap-4 pt-4">
-          <button class="inline-flex items-center justify-center bg-[#C2410C] hover:bg-[#9A3412] text-white font-semibold px-7 py-4 rounded-xl shadow-lg shadow-[#C2410C]/20 transition-all duration-200 group transform hover:-translate-y-0.5 cursor-pointer" style="font-family: 'Inter', sans-serif;">
-            <span>Start Your Project</span>
-            <svg class="w-5 h-5 ml-2 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+          <ShineButton to="/contact" size="xl">
+            Start Your Project
+            <svg class="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1"
+                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                    d="M14 5l7 7m0 0l-7 7m7-7H3"/>
             </svg>
-          </button>
-
-          <button class="inline-flex items-center justify-center cursor-pointer bg-white border border-[#E2E8F0] hover:bg-[#F8FAFC] text-[#1E3A5F] font-semibold px-7 py-4 rounded-xl shadow-sm transition-all duration-200 transform hover:-translate-y-0.5" style="font-family: 'Inter', sans-serif;">
-            <svg class="w-5 h-5 mr-2 text-[#64748B]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </ShineButton>
+          <ShineButton to="/#products" variant="outline" size="xl">
+            <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <span>See Our Work</span>
-          </button>
-        </div>
+            See Our Work
+          </ShineButton>        </div>
 
         <!-- Trust section moved here -->
         <div class="flex items-center gap-4 pt-2">
@@ -233,12 +235,8 @@
         class="relative z-10 flex flex-wrap justify-center gap-4 mt-9 transition-all duration-700 ease-out delay-300"
         :class="visible.platform ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
     >
-      <RouterLink to="/sentra" class="inline-flex items-center justify-center bg-[#C2410C] hover:bg-[#9A3412] text-white font-semibold px-6 py-3.5 rounded-xl shadow-lg shadow-[#C2410C]/20 transition-all duration-200 transform hover:-translate-y-0.5" style="font-family: 'Inter', sans-serif;">
-        Explore Sentra Platform
-      </RouterLink>
-      <RouterLink to="/login" class="inline-flex items-center justify-center bg-white border border-[#E2E8F0] hover:bg-[#F8FAFC] text-[#1E3A5F] font-semibold px-6 py-3.5 rounded-xl shadow-sm transition-all duration-200 transform hover:-translate-y-0.5" style="font-family: 'Inter', sans-serif;">
-        Open Sentra Portal
-      </RouterLink>
+      <ShineButton to="/sentra">Explore Sentra Platform</ShineButton>
+      <ShineButton to="/login" variant="outline">Open Sentra Portal</ShineButton>
     </div>
   </section>
 
@@ -301,14 +299,11 @@
                 <p class="text-[15px] text-[#475569] leading-relaxed mb-5 max-w-[420px]" style="font-family: 'Inter', sans-serif;">
                   {{ product.description }}
                 </p>
-                <RouterLink
-                    :to="product.ctaLink"
-                    class="group inline-flex items-center justify-center gap-2 bg-[#C2410C] hover:bg-[#9A3412] text-white font-semibold text-sm px-6 py-3 rounded-xl shadow-lg shadow-[#C2410C]/20 transition-all duration-200 transform hover:-translate-y-0.5"
-                    style="font-family: 'Inter', sans-serif;"
-                >
+                <ShineButton :to="product.ctaLink" size="sm">
                   {{ product.ctaText }}
-                  <font-awesome-icon :icon="['fas', 'arrow-right']" class="text-xs transition-transform duration-200 group-hover:translate-x-1" />
-                </RouterLink>
+                  <font-awesome-icon :icon="['fas', 'arrow-right']"
+                                     class="text-xs transition-transform duration-200 group-hover:translate-x-1" />
+                </ShineButton>
               </div>
 
               <div class="relative flex cursor-pointer items-center justify-center min-h-[200px] lg:min-h-[280px] lg:max-h-[320px] order-first lg:order-none">
@@ -391,13 +386,9 @@
           <p class="text-[#475569] leading-relaxed" style="font-family: 'Inter', sans-serif;">
             From idea to deployment — we handle every layer of your digital product.
           </p>
-          <RouterLink
-              to="/services"
-              class="inline-flex items-center gap-2 mt-4 bg-white border border-[#E2E8F0] hover:bg-[#F8FAFC] text-[#1E3A5F] font-semibold px-5 py-3 rounded-xl shadow-sm transition-all duration-200"
-              style="font-family: 'Inter', sans-serif;"
-          >
+          <ShineButton to="/services" variant="outline" size="sm" class="mt-4">
             All Services
-          </RouterLink>
+          </ShineButton>
         </div>
       </div>
 
@@ -652,12 +643,8 @@
         </div>
       </div>
       <div class="flex flex-wrap gap-3 shrink-0">
-        <RouterLink to="/pricing" class="inline-flex items-center justify-center bg-[#C2410C] hover:bg-[#9A3412] text-white font-semibold px-7 py-3.5 rounded-xl shadow-lg shadow-[#C2410C]/20 transition-all duration-200 transform hover:-translate-y-0.5" style="font-family: 'Inter', sans-serif;">
-          Explore Pricing
-        </RouterLink>
-        <RouterLink to="/contact" class="inline-flex items-center justify-center bg-white border border-[#E2E8F0] hover:bg-[#F8FAFC] text-[#1E3A5F] font-semibold px-7 py-3.5 rounded-xl shadow-sm transition-all duration-200 transform hover:-translate-y-0.5" style="font-family: 'Inter', sans-serif;">
-          Talk to Sales
-        </RouterLink>
+        <ShineButton to="/pricing" size="lg">Explore Pricing</ShineButton>
+        <ShineButton to="/contact" variant="outline" size="lg">Talk to Sales</ShineButton>
       </div>
     </div>
   </section>
@@ -679,6 +666,7 @@ import serviceSoftwareSvg from '@/assets/svg/service-software.svg'
 import serviceWebMobileSvg from '@/assets/svg/service-webmobile.svg'
 import serviceCloudSvg from '@/assets/svg/service-cloud.svg'
 import aboutIllustration from '@/assets/svg/hero-illustration.svg'
+import ShineButton from "@/components/ShineButton.vue";
 import {useLogin} from "@/composables/useLogin.js";
 
 // ─── Scroll animation refs & state ───────────────────────────────────────────

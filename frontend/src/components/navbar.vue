@@ -238,15 +238,8 @@
           Login
         </router-link>
 
-        <button
-            type="button"
-            @click="() => { closeMobileMenu(); $router.push('/contact'); }"
-            class="cursor-pointer relative overflow-hidden px-6 py-[11px] text-[14px] font-['Space_Grotesk'] font-bold text-white rounded-[50px] no-underline transition-all duration-200 active:scale-[0.98] bg-orange-700 hover:bg-orange-900"
+        <ShineButton to="/contact" shape="pill" @click="closeMobileMenu">Get Quote</ShineButton>
 
-        >
-          Get Quote
-          <span class="absolute inset-0 pointer-events-none btn-shine"></span>
-        </button>
       </div>
 
       <!-- ===== HAMBURGER ===== -->
@@ -399,6 +392,8 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import ShineButton from '@/components/ShineButton.vue'
+
 
 const router = useRouter();
 const route = useRoute();
@@ -457,10 +452,6 @@ const navigateToServicesSection = (sectionId = 'services') => {
   0%, 100% { box-shadow: 0 4px 20px rgba(194, 65, 12, 0.3); }
   50%       { box-shadow: 0 6px 28px rgba(194, 65, 12, 0.5), 0 0 0 4px rgba(194, 65, 12, 0.08); }
 }
-/* Fast Shine Animation - Left to Right */
-/* TRUE LEFT-TO-RIGHT AND RIGHT-TO-LEFT SHINE */
-/* TRUE LEFT-TO-RIGHT AND RIGHT-TO-LEFT SHINE - FIXED */
-/* TRUE LEFT-TO-RIGHT AND RIGHT-TO-LEFT SHINE */
 @keyframes btnShine {
   0% {
     transform: translateX(-100%) skewX(-20deg);
