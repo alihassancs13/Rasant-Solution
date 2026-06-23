@@ -49,14 +49,7 @@
             Grounded chatbots that answer from your documents, handle support and sales conversations, and hand off to humans with full context - with token analytics built in.
           </p>
           <div class="flex justify-start gap-3 flex-wrap">
-            <button
-                @click="goToContact"
-                type="button"
-                class="relative overflow-hidden cursor-pointer w-50 flex items-center justify-center px-6 py-3.5 bg-orange-700 hover:bg-orange-900 text-base font-semibold text-white rounded-xl transition-all duration-200 shadow-[0_4px_14px_rgba(42,95,158,0.4)] hover:shadow-[0_6px_20px_rgba(42,95,158,0.6)] active:scale-[0.98] group"
-            >
-              Book a Chat Demo
-              <div class="absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/25 to-transparent pointer-events-none animate-[fastShineLoop_2.5s_ease-in-out_infinite]"></div>
-            </button>
+            <ShineButton to="/contact" >Book a Chat Demo</ShineButton>
             <button
                 @click="scrollToPricing"
                 type="button"
@@ -71,8 +64,8 @@
         <div class="relative z-30 flex justify-center py-1 mx-auto md:mr-0 md:ml-auto">
           <div class="relative w-[min(280px,72vw)] animate-[botEnter_0.9s_cubic-bezier(0.22,1,0.36,1)_both]">
             <div class="absolute inset-[8%] rounded-full bg-[radial-gradient(circle,rgba(45,212,191,0.2)_0%,transparent_70%)] animate-[botGlow_3s_ease-in-out_infinite]"></div>
-            <div class="absolute -inset-3.5 rounded-full border-2 border-dashed border-[rgba(45,212,191,0.35)] animate-[botRingSpin_22s_linear_infinite]"></div>
-            <div class="absolute -inset-5.5 rounded-full border-2 border-dashed border-[rgba(139,92,246,0.2)] animate-[botRingSpin_30s_linear_infinite_reverse]"></div>
+            <div class="absolute -inset-3.5 rounded-full border-4 border-dashed border-[rgba(45,212,191,0.35)] animate-[botRingSpin_22s_linear_infinite]"></div>
+            <div class="absolute -inset-5.5 rounded-full border-4 border-dashed border-[rgba(139,92,246,0.2)] animate-[botRingSpin_30s_linear_infinite_reverse]"></div>
             <div class="relative w-full z-20 aspect-square max-w-sm mx-auto">
 
               <svg class="absolute inset-0 w-full h-full z-10 pointer-events-none" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -196,10 +189,10 @@
 
               <div class="absolute inset-0">
                 <div class="orbit-1">
-                  <div class="absolute inset-[-10%] rounded-full border-2 border-dashed border-purple-400/60 scale-y-[0.85] -rotate-12 animate-[spin_30s_linear_infinite] pointer-events-none"></div>
+                  <div class="absolute inset-[-10%] rounded-full border-4 border-dashed border-purple-400/60 scale-y-[0.85] -rotate-12 animate-[spin_30s_linear_infinite] pointer-events-none"></div>
                 </div>
                 <div class="orbit-2">
-                  <div class="absolute inset-[-6%] rounded-full border-2 border-dashed border-sky-400/50 scale-x-[0.90] rotate-45 animate-[spin_20s_linear_infinite_reverse] pointer-events-none"></div>
+                  <div class="absolute inset-[-6%] rounded-full border-4 border-dashed border-sky-400/50 scale-x-[0.90] rotate-45 animate-[spin_20s_linear_infinite_reverse] pointer-events-none"></div>
                 </div>
               </div>
 
@@ -258,7 +251,7 @@
                   title="Chatbot capabilities and integrations"
               />
 
-              <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100%] h-[90%] rounded-3xl border-2 border-dashed border-purple-500/60 animate-[spin_35s_linear_infinite] z-10 pointer-events-none"></div>
+              <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100%] h-[90%] rounded-3xl border-4 border-dashed border-purple-500/60 animate-[spin_35s_linear_infinite] z-10 pointer-events-none"></div>
 
               <img
                   src="../assets/images/chatbot-face.png"
@@ -322,7 +315,7 @@
     </section>
 
     <section class="p-6 md:p-12 max-w-7xl mx-auto">
-      <div class="relative bg-orange-700 rounded-3xl p-8 md:p-12 shadow-xl overflow-hidden">
+      <div class="relative bg-buttonBackground rounded-3xl p-8 md:p-12 shadow-xl overflow-hidden">
 
         <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           <div class="lg:col-span-8 text-center lg:text-left space-y-3">
@@ -359,6 +352,7 @@
 import Navbar from '../components/navbar.vue';
 import Footer from '../components/footer.vue';
 import { useRouter } from 'vue-router';
+import ShineButton from "@/components/ShineButton.vue";
 
 // Initialize router
 const router = useRouter();

@@ -52,13 +52,13 @@ const shapeClass = computed(() => ({
 const variantClass = computed(() => {
   const variants = {
     // Primary - Orange
-    primary: 'bg-secondary-900 hover:bg-secondary-800 text-white shadow-orange',
+    primary: 'bg-buttonBackground hover:bg-buttonHover text-buttonTextColor shadow-orange',
 
     // Outline
     outline: 'bg-white border border-neutral-300 hover:bg-neutral-100 text-primary-900 shadow-sm',
 
     // White
-    white: 'bg-white text-secondary-600 hover:bg-secondary-50 shadow-md',
+    white: 'bg-buttonBackground text-buttonTextColor hover:bg-secondary-50 shadow-md',
 
     // Blue
     blue: 'bg-primary-500 hover:bg-primary-600 text-white shadow-blue',

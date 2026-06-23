@@ -44,14 +44,7 @@
           </h1>
           <p class="text-[15px] text-neutral-600 leading-relaxed mb-6 font-primary">Phone-first AI that handles customer service calls, internal dialing, outbound campaigns, and scheduled callbacks — with live queue visibility and call analytics built in.</p>
           <div class="flex justify-start gap-3 flex-wrap">
-            <button
-                @click="goToContact"
-                type="button"
-                class="relative overflow-hidden cursor-pointer w-50 flex items-center justify-center px-6 py-3.5 bg-secondary-900 hover:bg-secondary-800 text-base font-semibold text-white rounded-xl transition-all duration-200 shadow-[0_4px_14px_rgba(42,95,158,0.4)] hover:shadow-[0_6px_20px_rgba(42,95,158,0.6)] active:scale-[0.98] group font-primary"
-            >
-              Book a Voice Demo
-              <div class="absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 pointer-events-none animate-shine-fast-loop"></div>
-            </button>
+            <ShineButton to="/contact" >Book a Demo</ShineButton>
             <button
                 @click="scrollToPricing"
                 type="button"
@@ -66,8 +59,8 @@
         <div class="relative z-30 flex justify-center py-1 mx-auto md:mr-0 md:ml-auto">
           <div class="relative w-[min(400px,80vw)] animate-[botEnter_0.9s_cubic-bezier(0.22,1,0.36,1)_both]">
             <div class="absolute inset-[8%] rounded-full bg-[radial-gradient(circle,rgba(45,212,191,0.2)_0%,transparent_70%)] animate-[botGlow_3s_ease-in-out_infinite]"></div>
-            <div class="absolute -inset-3.5 rounded-full border-2 border-dashed border-accent-1/35 animate-[botRingSpin_22s_linear_infinite]"></div>
-            <div class="absolute -inset-5.5 rounded-full border-2 border-dashed border-accent-3/20 animate-[botRingSpin_30s_linear_infinite_reverse]"></div>
+            <div class="absolute -inset-3.5 rounded-full border-4 border-dashed border-accent-1/35 animate-[botRingSpin_22s_linear_infinite]"></div>
+            <div class="absolute -inset-5.5 rounded-full border-4 border-dashed border-accent-3/20 animate-[botRingSpin_30s_linear_infinite_reverse]"></div>
             <div class="relative w-full z-20 aspect-square max-w-sm mx-auto flex items-center justify-center overflow-visible">
               <img src="../assets/svg/ai-agent-bot.svg" alt="AI voice agent robot" class="w-full h-[450px] object-contain drop-shadow-[0_16px_36px_rgba(42,95,158,0.2)] relative z-10" title="Voice AI Agent" />
             </div>
@@ -176,9 +169,9 @@
 
               <div class="absolute inset-5 rounded-full bg-[radial-gradient(circle,rgba(45,212,191,0.22)_0%,transparent_68%)]"></div>
 
-              <div class="absolute inset-[-8%] rounded-full border-2 border-dashed border-neutral-400/30 animate-[spin_24s_linear_infinite]"></div>
+              <div class="absolute inset-[-8%] rounded-full border-4 border-dashed border-neutral-400/30 animate-[spin_24s_linear_infinite]"></div>
 
-              <div class="absolute inset-[-18%] rounded-full border-2 border-dashed border-primary-400/20 animate-[spin_30s_linear_infinite_reverse]"></div>
+              <div class="absolute inset-[-18%] rounded-full border-4 border-dashed border-primary-400/20 animate-[spin_30s_linear_infinite_reverse]"></div>
 
               <img
                   src="../assets/svg/ai-agent-phone-bot.svg"
@@ -326,7 +319,7 @@
 
     <!-- CTA Section -->
     <section class="p-6 md:p-12 max-w-7xl mx-auto">
-      <div class="bg-secondary-700 text-white p-8 md:p-12 rounded-3xl flex flex-col lg:flex-row lg:items-center justify-between gap-8 shadow-xl">
+      <div class="bg-buttonBackground text-white p-8 md:p-12 rounded-3xl flex flex-col lg:flex-row lg:items-center justify-between gap-8 shadow-xl">
         <div class="max-w-2xl">
           <h2 class="text-2xl md:text-3xl font-bold tracking-tight font-display mb-2">Ready to deploy a voice agent?</h2>
           <p class="text-white/90 text-sm md:text-base leading-relaxed font-primary">Book a demo and hear how your calls can sound — customer service, internal lines, and outbound included.</p>
@@ -357,6 +350,7 @@
 <script>
 import Footer from '../components/footer.vue'
 import Navbar from '../components/navbar.vue'
+import ShineButton from "../components/ShineButton.vue";
 
 // Grid cell config
 const CELL_CONFIGS = [
@@ -379,7 +373,7 @@ const CELL_CONFIGS = [
 
 export default {
   name: 'AiAgentComponent',
-  components: { Footer, Navbar },
+  components: {ShineButton, Footer, Navbar },
 
   data() {
     return {
@@ -437,7 +431,7 @@ export default {
             { text: 'Usage analytics', included: true },
           ],
           ctaText: 'Get Started',
-          ctaClass: 'bg-secondary-700 border border-neutral-300 text-white hover:bg-secondary-800',
+          ctaClass: 'bg-buttonBackground border border-neutral-300 text-white hover:bg-buttonHover',
           ctaLink: '/contact'
         },
         {
@@ -450,14 +444,13 @@ export default {
           checkColor: 'text-secondary-500',
           features: [
             { text: '10 voice agents', included: true },
-            { text: '1,000 voice minutes / mo', included: true },
-            { text: 'Advanced workflows', included: true },
-            { text: 'Call recordings & logs', included: true },
-            { text: 'Priority support', included: true },
+            { text: '2,000 voice minutes / mo', included: true },
+            { text: 'Custom voices', included: true },
+            { text: 'CRM webhook', included: true },
             { text: 'Warm transfer', included: true },
           ],
           ctaText: 'Get Started',
-          ctaClass: 'bg-secondary-700 text-white hover:bg-secondary-800 shadow-md hover:shadow-lg',
+          ctaClass: 'bg-buttonBackground text-white hover:bg-buttonHover shadow-md hover:shadow-lg',
           ctaLink: '/contact'
         },
         {
@@ -469,12 +462,11 @@ export default {
           featured: false,
           checkColor: 'text-accent-3',
           features: [
-            { text: 'Unlimited voice agents', included: true },
-            { text: 'Custom voice minutes', included: true },
-            { text: 'Custom workflows', included: true },
-            { text: 'Dedicated account manager', included: true },
-            { text: 'Advanced analytics & insights', included: true },
-            { text: '24/7 phone support', included: true },
+            { text: '50+ voice agents', included: true },
+            { text: '10,000+ minutes / mo', included: true },
+            { text: 'On-prem option', included: true },
+            { text: 'Unlimited workflows', included: true },
+            { text: 'Priority support', included: true },
           ],
           ctaText: 'Contact Sales',
           ctaClass: 'border border-neutral-300 text-neutral-700 hover:bg-neutral-100',

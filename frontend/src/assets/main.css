@@ -2,13 +2,154 @@
 @import "tailwindcss";
 
 @theme {
-    /* Custom Animations */
+    /* ═══════════════════════════════════════════════════════════
+       ANIMATIONS
+       ═══════════════════════════════════════════════════════════ */
     --animate-mesh-shift: meshShift 10s ease-in-out infinite alternate;
     --animate-shine: shine 0.75s ease-in-out;
     --animate-shake: shake 0.35s ease-in-out;
     --animate-shine-loop: shineLoop 0.9s ease-in-out infinite alternate;
 
-    /* Primary Colors - Blue */
+    /* ═══════════════════════════════════════════════════════════
+       HEADING COLORS
+       ═══════════════════════════════════════════════════════════ */
+    --color-headingMain: #1E3A5F;        /* Main page headings (Hero, Section titles) */
+    --color-headingSection: #1E3A5F;     /* Section headings (H2) */
+    --color-headingCard: #1E3A5F;        /* Card titles (H3, H4) */
+
+    /* ═══════════════════════════════════════════════════════════
+       BODY / SUPPORTING TEXT
+       ═══════════════════════════════════════════════════════════ */
+    --color-textBody: #334155;           /* Paragraph text, descriptions */
+    --color-textSupporting: #475569;     /* Supporting text, subtext */
+
+    --color-textBrand: #4A90E2;          /* Brand color text (links, highlights) */
+    --color-text-brand-hover: #1D4ED8;   /* Brand text hover state */
+    --color-brandDark: #1E3A5F;          /* Dark brand text (headings) */
+    --color-numberbackground: rgba(255, 255, 255, 0.8) ;
+
+    --color-CheckMarks_Success: #4A90E2; /* Blue accent text (checkmarks, success) */
+    --color-Gradients: #8B5CF6;          /* Purple accent text (gradients, highlights) */
+    --color-Syntax_Special: #14B8A6;     /* Teal accent text (code syntax, special) */
+
+    /* ═══════════════════════════════════════════════════════════
+       BORDERS (consolidated — used everywhere instead of one-off greys)
+       ═══════════════════════════════════════════════════════════ */
+    --color-borderDefault: #E2E8F0;      /* default card/section/input border */
+    --color-activeBorder: #4A90E2;       /* focused/active element border */
+    --color-platformBorder: #C9C4F8;     /* platform card gradient border stop */
+
+    /* ═══════════════════════════════════════════════════════════
+       SECTION BACKGROUNDS
+       ═══════════════════════════════════════════════════════════ */
+    --color-sectionLight: #F1F5F9;
+    --color-sectionWhite: #FFFFFF;
+
+    /* ═══════════════════════════════════════════════════════════
+       CARD BACKGROUNDS
+       ═══════════════════════════════════════════════════════════ */
+    --color-card: #FFFFFF;
+    --color-cardSemi: rgba(255, 255, 255, 0.9);
+    --color-badgeSemi: rgba(255, 255, 255, 0.8);
+    --color-cardHeader: rgba(241, 245, 249, 0.5);
+    --color-techItem: #F8FAFC;
+
+    /* ═══════════════════════════════════════════════════════════
+       STATUS COLORS (text + background pairs)
+       ═══════════════════════════════════════════════════════════ */
+    --color-Success: #10B981;
+    --color-Warning: #F59E0B;
+    --color-Error: #EF4444;
+    --color-SuccessLight: rgba(74, 144, 226, 0.1);
+    --color-dotBlue: #4A90E2;
+    --color-statusActive: #4A90E2;       /* live/active pulse dot */
+
+    /* ═══════════════════════════════════════════════════════════
+       TAGS / BADGES (bg + text pairs, reused across product tags,
+       service tags, and step circles)
+       ═══════════════════════════════════════════════════════════ */
+    --color-tagBlueBg: rgba(74, 144, 226, 0.10);
+    --color-tagBlueText: #4A90E2;
+    --color-tagSkyBg: rgba(14, 165, 233, 0.10);
+    --color-tagSkyText: #0EA5E9;
+    --color-tagTealBg: rgba(20, 184, 166, 0.10);
+    --color-tagTealText: #0D9488;
+    --color-tagPurpleBg: rgba(107, 82, 184, 0.10);
+    --color-tagPurpleText: #6B52B8;
+    --color-tagAmberBg: rgba(245, 158, 11, 0.10);
+    --color-tagAmberText: #B45309;
+
+    /* ═══════════════════════════════════════════════════════════
+       PROCESS STEP CIRCLES (bg / border / text per step)
+       ═══════════════════════════════════════════════════════════ */
+    --color-step1Bg: rgba(74, 144, 226, 0.10);
+    --color-step1Border: #4A90E2;
+    --color-step1Text: #4A90E2;
+    --color-step2Bg: rgba(14, 165, 233, 0.10);
+    --color-step2Border: #0EA5E9;
+    --color-step2Text: #0EA5E9;
+    --color-step3Bg: rgba(20, 184, 166, 0.10);
+    --color-step3Border: #14B8A6;
+    --color-step3Text: #14B8A6;
+    --color-step4Bg: rgba(245, 158, 11, 0.10);
+    --color-step4Border: #F59E0B;
+    --color-step4Text: #F59E0B;
+
+    /* ═══════════════════════════════════════════════════════════
+       AVATAR GRADIENTS
+       ═══════════════════════════════════════════════════════════ */
+    --color-avatarPinkTeal: linear-gradient(135deg, #CCFBF1, #E8C1D9);
+    --color-avatarPurpleBlue: linear-gradient(135deg, #C9C4F8, #93C5FD);
+    --color-avatarBlue: linear-gradient(135deg, #4A90E2, #93C5FD);
+    --color-avatarTeal: #0D9488;
+    --color-avatarTestimonial1: linear-gradient(135deg, #4A90E2, #8FB9F4);
+    --color-avatarTestimonial2: linear-gradient(135deg, #3A7BC8, #8FB9F4);
+    --color-avatarTestimonial3: linear-gradient(135deg, #F59E0B, #EF4444);
+
+    /* ═══════════════════════════════════════════════════════════
+       GLOW OVERLAYS (product card radial glows)
+       ═══════════════════════════════════════════════════════════ */
+    --color-glowBlue: radial-gradient(circle, rgba(74,144,226,0.16) 0%, rgba(20,184,166,0.08) 45%, transparent 72%);
+    --color-glowTeal: radial-gradient(circle, rgba(20,184,166,0.18) 0%, rgba(74,144,226,0.08) 50%, transparent 72%);
+    --color-glowPurple: radial-gradient(circle, rgba(139,92,246,0.18) 0%, rgba(236,72,153,0.08) 50%, transparent 72%);
+
+    /* ═══════════════════════════════════════════════════════════
+       PILLS (CTA chips)
+       ═══════════════════════════════════════════════════════════ */
+    --color-pillBlueBorder: #93C5FD;
+    --color-pillBlueBg: #EFF6FF;
+    --color-pillTealBorder: #5EEAD4;
+    --color-pillTealBg: #F0FDFA;
+    --color-pillPurpleBorder: #C4B5FD;
+    --color-pillPurpleBg: #F5F3FF;
+    --color-pillAmberBorder: #FDBA74;
+    --color-pillAmberBg: #FFF7ED;
+
+    /* ═══════════════════════════════════════════════════════════
+       GRADIENT FILLS (progress bars, lines)
+       ═══════════════════════════════════════════════════════════ */
+    --color-gradientProgress: linear-gradient(135deg, #14B8A6, #8B5CF6, #4A90E2);
+    --color-gradientLine: linear-gradient(135deg, #4A90E2, #237EE6);
+    --color-progressBar: #E2E8F0;
+
+    /* ═══════════════════════════════════════════════════════════
+       BUTTONS
+       ═══════════════════════════════════════════════════════════ */
+    --color-buttonTextColor: #FFFFFF;
+    --color-buttonHover: #D45A1A;
+    --color-buttonBackground: #C2410C;
+    --color-buttonPrimaryHover: #1D4ED8;
+    --color-buttonPrimaryBorder: #9A3412;
+
+    /* ═══════════════════════════════════════════════════════════
+       DECORATIVE BLOBS / ORBS
+       ═══════════════════════════════════════════════════════════ */
+    --color-blobPrimary: rgba(74, 144, 226, 0.08);
+    --color-orbPrimary: rgba(74, 144, 226, 0.08);
+
+    /* ═══════════════════════════════════════════════════════════
+       PRIMARY COLORS — Blue
+       ═══════════════════════════════════════════════════════════ */
     --color-primary-50: #EFF6FF;
     --color-primary-100: #DCEAFD;
     --color-primary-200: #B5D4F8;
@@ -20,8 +161,9 @@
     --color-primary-800: #2A4A7A;
     --color-primary-900: #1E3A5F;
 
-    /* Secondary Colors - Orange */
-    --color-secondary-50: #FFF8F3;
+    /* ═══════════════════════════════════════════════════════════
+       SECONDARY COLORS — Orange
+       ═══════════════════════════════════════════════════════════ */
     --color-secondary-100: #FFD5B4;
     --color-secondary-200: #F5C49A;
     --color-secondary-300: #F0A67A;
@@ -29,10 +171,10 @@
     --color-secondary-500: #C96E3A;
     --color-secondary-600: #EA580C;
     --color-secondary-700: #EA580C;
-    --color-secondary-800: #D45A1A;
-    --color-secondary-900: #C2410C;
 
-    /* Accent Colors */
+    /* ═══════════════════════════════════════════════════════════
+       ACCENT COLORS (includes brand-fixed tech logo colors)
+       ═══════════════════════════════════════════════════════════ */
     --color-accent-1: #14B8A6;    /* Teal */
     --color-accent-2: #0D9488;    /* Dark Teal */
     --color-accent-3: #6B52B8;    /* Purple */
@@ -46,7 +188,10 @@
     --color-accent-11: #FF9900;   /* AWS Orange */
     --color-accent-12: #2496ED;   /* Docker Blue */
     --color-accent-13: #4285F4;   /* Google Blue */
-    /* Neutral Colors */
+
+    /* ═══════════════════════════════════════════════════════════
+       NEUTRAL COLORS
+       ═══════════════════════════════════════════════════════════ */
     --color-neutral-50: #FFFFFF;
     --color-neutral-100: #F8FAFC;
     --color-neutral-200: #F1F5F9;
@@ -59,61 +204,117 @@
     --color-neutral-900: #1E293B;
     --color-neutral-950: #0F172A;
 
-    /* Semantic Colors */
+    /* ═══════════════════════════════════════════════════════════
+       SEMANTIC COLORS
+       ═══════════════════════════════════════════════════════════ */
     --color-success: #22C55E;
     --color-warning: #F59E0B;
     --color-error: #EF4444;
     --color-info: #4A90E2;
 
-    /* Fonts */
+    /* ═══════════════════════════════════════════════════════════
+       FONTS
+       ═══════════════════════════════════════════════════════════ */
     --font-primary: 'Inter', sans-serif;
     --font-display: 'Space Grotesk', sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
 
-    /* Shadows */
+    /* ═══════════════════════════════════════════════════════════
+       SHADOWS
+       ═══════════════════════════════════════════════════════════ */
     --shadow-blue: 0 16px 48px rgba(74, 144, 226, 0.1);
     --shadow-orange: 0 8px 24px rgba(194, 65, 12, 0.25);
     --shadow-teal: 0 8px 24px rgba(20, 184, 166, 0.25);
     --shadow-purple: 0 8px 24px rgba(107, 82, 184, 0.25);
     --shadow-dark: 0 8px 24px rgba(15, 23, 42, 0.2);
+    --shadow-insetBlue: inset 0 0 15px rgba(74, 144, 226, 0.3);
 
-    /* Border Radius */
+    /* ═══════════════════════════════════════════════════════════
+       BORDER RADIUS
+       ═══════════════════════════════════════════════════════════ */
     --radius-2xl: 2.5rem;
+
+
+    /* ═══════════════════════════════════════════════════════════
+       SECTION NUMBERS (01, 02, 03, etc.)
+       ═══════════════════════════════════════════════════════════ */
+    --color-sectionNumber: rgba(74, 144, 226, 0.10);  /* Default section number color */
+    --color-sectionNumberHover: rgba(74, 144, 226, 0.20); /* Hover state */
+}
+
+:root {
+    --gradient-hero: linear-gradient(165deg, #FFFFFF 0%, #FFF8F3 35%, #F5F0FF 65%, #EFF6FF 100%);
+    --gradient-platform: linear-gradient(135deg, #ebf3f1, #e8e7f8, #b5d0f1);
+    --gradient-secondary-bg: linear-gradient(165deg, #FFF8F3 0%, #FDF2F8 28%, #F5F0FF 52%, #EFF6FF 100%);
+    --gradient-text-primary: linear-gradient(to right, #C96E3A, #B0457A, #6B52B8, #3B73C4);
 }
 
 /* Custom Utility Classes */
-@utility bg-gradient-primary {
-    background: linear-gradient(165deg, #FFFFFF 0%, #FFF8F3 35%, #F5F0FF 65%, #EFF6FF 100%);
-}
+@layer utilities {
+    /* Gradients */
+    .bg-hero-gradient        { background: var(--gradient-hero); }
+    .bg-platform-gradient    { background: var(--gradient-platform); }
+    .bg-gradient-secondary   { background: var(--gradient-secondary-bg); }
+    .text-gradient-primary {
+        background: var(--gradient-text-primary);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
 
-@utility bg-gradient-secondary {
-    background: linear-gradient(165deg, #FFF8F3 0%, #FDF2F8 28%, #F5F0FF 52%, #EFF6FF 100%);
-}
+    /* Avatars */
+    .bg-avatarPinkTeal       { background: var(--color-avatarPinkTeal); }
+    .bg-avatarPurpleBlue     { background: var(--color-avatarPurpleBlue); }
+    .bg-avatarBlue           { background: var(--color-avatarBlue); }
+    .bg-avatarTeal           { background: var(--color-avatarTeal); }
+    .bg-avatarTestimonial1   { background: var(--color-avatarTestimonial1); }
+    .bg-avatarTestimonial2   { background: var(--color-avatarTestimonial2); }
+    .bg-avatarTestimonial3   { background: var(--color-avatarTestimonial3); }
 
-@utility text-gradient-primary {
-    background: linear-gradient(to right, #C96E3A, #B0457A, #6B52B8, #3B73C4);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
+    /* Progress / lines */
+    .bg-gradientLine         { background: var(--color-gradientLine); }
+    .bg-gradientProgress     { background: var(--color-gradientProgress); }
 
-@utility shadow-blue {
-    box-shadow: 0 16px 48px rgba(74, 144, 226, 0.1);
-}
+    /* Glows */
+    .bg-glowBlue             { background: var(--color-glowBlue); }
+    .bg-glowTeal             { background: var(--color-glowTeal); }
+    .bg-glowPurple           { background: var(--color-glowPurple); }
 
-@utility shadow-orange {
-    box-shadow: 0 8px 24px rgba(194, 65, 12, 0.25);
-}
+    /* Tags / badges */
+    .tag-blue   { background-color: var(--color-tagBlueBg);   color: var(--color-tagBlueText);   }
+    .tag-sky    { background-color: var(--color-tagSkyBg);    color: var(--color-tagSkyText);    }
+    .tag-teal   { background-color: var(--color-tagTealBg);   color: var(--color-tagTealText);   }
+    .tag-purple { background-color: var(--color-tagPurpleBg); color: var(--color-tagPurpleText); }
+    .tag-amber  { background-color: var(--color-tagAmberBg);  color: var(--color-tagAmberText);  }
 
-@utility shadow-teal {
-    box-shadow: 0 8px 24px rgba(20, 184, 166, 0.25);
-}
+    /* Process step circles */
+    .step-1 { background-color: var(--color-step1Bg); border-color: var(--color-step1Border); color: var(--color-step1Text); }
+    .step-2 { background-color: var(--color-step2Bg); border-color: var(--color-step2Border); color: var(--color-step2Text); }
+    .step-3 { background-color: var(--color-step3Bg); border-color: var(--color-step3Border); color: var(--color-step3Text); }
+    .step-4 { background-color: var(--color-step4Bg); border-color: var(--color-step4Border); color: var(--color-step4Text); }
+    .ring-step-1 { border-color: var(--color-step1Border); }
+    .ring-step-2 { border-color: var(--color-step2Border); }
+    .ring-step-3 { border-color: var(--color-step3Border); }
+    .ring-step-4 { border-color: var(--color-step4Border); }
 
-@utility shadow-purple {
-    box-shadow: 0 8px 24px rgba(107, 82, 184, 0.25);
-}
+    /* Pills */
+    .pill-blue   { border-color: var(--color-pillBlueBorder);   background-color: var(--color-pillBlueBg);   }
+    .pill-teal   { border-color: var(--color-pillTealBorder);   background-color: var(--color-pillTealBg);   }
+    .pill-purple { border-color: var(--color-pillPurpleBorder); background-color: var(--color-pillPurpleBg); }
+    .pill-amber  { border-color: var(--color-pillAmberBorder);  background-color: var(--color-pillAmberBg);  }
 
-@utility shadow-dark {
-    box-shadow: 0 8px 24px rgba(15, 23, 42, 0.2);
+    /* Decorative blobs */
+    .bg-blobPrimary { background-color: var(--color-blobPrimary); }
+    .text-blobPrimary { color: var(--color-blobPrimary); }
+    .bg-orbPrimary  { background-color: var(--color-orbPrimary); }
+
+    .section-number {
+        color: var(--color-sectionNumber);
+        transition: color 0.3s ease;
+    }
+
+    .section-number:hover {
+        color: var(--color-sectionNumberHover);
+    }
 }
 
 /* Keyframe Animations */

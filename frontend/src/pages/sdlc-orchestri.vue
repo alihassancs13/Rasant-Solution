@@ -45,14 +45,7 @@
           </h1>
           <p class="text-[15px] text-neutral-600 leading-relaxed mb-6 font-primary">Web UI and FastAPI backend that drive a gated workflow: specification, user approval, plan, implementation, test/debug loop, deployment, and optional execution — on your local project folder.</p>
           <div class="flex justify-start gap-3 flex-wrap">
-            <button
-                @click="goToContact"
-                type="button"
-                class="relative overflow-hidden cursor-pointer px-6 py-3.5 bg-secondary-700 hover:bg-secondary-800 text-base font-semibold text-white rounded-xl transition-all duration-200 shadow-[0_4px_14px_rgba(42,95,158,0.4)] hover:shadow-[0_6px_20px_rgba(42,95,158,0.6)] active:scale-[0.98] group inline-flex items-center justify-center font-primary"
-            >
-              Contact Sales
-              <div class="absolute inset-0 w-1/3 bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 pointer-events-none animate-shine-loop"></div>
-            </button>
+            <ShineButton to="/contact" >Contact Sales</ShineButton>
             <button
                 @click="scrollToPricing"
                 type="button"
@@ -311,7 +304,7 @@
 
     <!-- CTA Section -->
     <section class="p-6 md:p-12 max-w-7xl mx-auto">
-      <div class="bg-secondary-700 text-white p-8 md:p-12 rounded-3xl flex flex-col lg:flex-row lg:items-center justify-between gap-8 shadow-xl">
+      <div class="bg-buttonBackground text-white p-8 md:p-12 rounded-3xl flex flex-col lg:flex-row lg:items-center justify-between gap-8 shadow-xl">
         <div class="max-w-2xl">
           <h2 class="text-2xl md:text-3xl font-bold tracking-tight font-display mb-2">Ready to orchestrate your SDLC?</h2>
           <p class="text-white/90 text-sm md:text-base leading-relaxed font-primary">Start orchestrating spec, plan, implement, test, and deploy with human gates and multi-agent automation.</p>
@@ -342,6 +335,7 @@
 <script>
 import Footer from '../components/footer.vue'
 import Navbar from '../components/navbar.vue'
+import ShineButton from "@/components/ShineButton.vue";
 
 const CELL_CONFIGS = [
   { bg: 'bg-accent-3/20' },
@@ -363,7 +357,7 @@ const CELL_CONFIGS = [
 
 export default {
   name: 'OrchestriComponent',
-  components: { Footer, Navbar },
+  components: {ShineButton, Footer, Navbar },
 
   data() {
     return {
@@ -413,14 +407,14 @@ export default {
           featured: false,
           checkColor: 'text-accent-3',
           features: [
-            { text: '1 orchestrator agent', included: true },
-            { text: '50 runs / mo', included: true },
-            { text: 'Basic workflow', included: true },
-            { text: 'Local DATA_DIR storage', included: true },
-            { text: 'Desktop .exe build', included: true },
+            { text: '5 team seats', included: true },
+            { text: 'Desktop .exe / .app', included: true },
+            { text: '2 agent workflows', included: true },
+            { text: 'Local folder bridge', included: true },
+            { text: 'Run history', included: true },
           ],
           ctaText: 'Get Started',
-          ctaClass: 'bg-secondary-700 border border-neutral-300 text-white hover:bg-secondary-800',
+          ctaClass: 'bg-buttonBackground border border-neutral-300 text-white hover:bg-buttonHover',
           ctaLink: '/contact'
         },
         {
@@ -432,15 +426,14 @@ export default {
           featured: true,
           checkColor: 'text-secondary-500',
           features: [
-            { text: '5 orchestrator agents', included: true },
-            { text: '200 runs / mo', included: true },
-            { text: 'Advanced workflow', included: true },
-            { text: 'VCS integration', included: true },
-            { text: 'Priority support', included: true },
-            { text: 'Desktop .exe & .app builds', included: true },
+            { text: '15 team seats', included: true },
+            { text: 'Hosted bridge', included: true },
+            { text: '6 agent workflows', included: true },
+            { text: 'Git integration', included: true },
+            { text: 'Priority runs', included: true },
           ],
           ctaText: 'Get Started',
-          ctaClass: 'bg-secondary-700 text-white hover:bg-secondary-800 shadow-md hover:shadow-lg',
+          ctaClass: 'bg-buttonBackground text-white hover:bg-buttonHover shadow-md hover:shadow-lg',
           ctaLink: '/contact'
         },
         {
@@ -452,12 +445,11 @@ export default {
           featured: false,
           checkColor: 'text-accent-3',
           features: [
-            { text: 'Unlimited orchestrator agents', included: true },
-            { text: 'Custom runs', included: true },
-            { text: 'Custom workflows', included: true },
-            { text: 'Dedicated account manager', included: true },
-            { text: 'Advanced analytics & insights', included: true },
-            { text: '24/7 support', included: true },
+            { text: '100+ team seats', included: true },
+            { text: 'On-prem evaluation', included: true },
+            { text: '15+ agent workflows', included: true },
+            { text: 'Custom agents', included: true },
+            { text: 'Dedicated support', included: true },
           ],
           ctaText: 'Contact Sales',
           ctaClass: 'border border-neutral-300 text-neutral-700 hover:bg-neutral-100',
