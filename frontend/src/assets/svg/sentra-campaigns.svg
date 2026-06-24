@@ -1,70 +1,76 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 480" role="img" aria-label="Sentra AI campaigns illustration">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 520" role="img" aria-label="Sentra AI campaigns and bulk contacts illustration">
   <defs>
     <style>
       .sc-pulse{animation:scPulse 2s ease-in-out infinite}
       @keyframes scPulse{0%,100%{opacity:1}50%{opacity:.5}}
+      .bc-dash{stroke-dasharray:8 5;animation:bcDash 1.2s linear infinite}
+      @keyframes bcDash{to{stroke-dashoffset:-26}}
     </style>
   </defs>
-  <rect width="960" height="480" rx="16" fill="#F8FAFC"/>
-  <text x="24" y="36" font-family="Space Grotesk,sans-serif" font-size="16" font-weight="700" fill="#1E3A5F">Outbound Campaigns</text>
-  <text x="24" y="56" font-family="Inter,sans-serif" font-size="11" fill="#64748B">3 active · 1 paused · AI voice scripts</text>
-  <rect x="800" y="20" width="136" height="36" rx="10" fill="#4A90E2"/>
-  <text x="868" y="43" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="700" fill="#FFFFFF">+ New campaign</text>
+  <rect width="960" height="520" rx="16" fill="#F8FAFC"/>
+  <text x="24" y="32" font-family="Space Grotesk,sans-serif" font-size="15" font-weight="700" fill="#1E3A5F">Campaigns &amp; Contacts</text>
+  <text x="24" y="50" font-family="Inter,sans-serif" font-size="10" fill="#64748B">Outbound voice campaigns · CSV bulk import</text>
+  <rect x="800" y="16" width="136" height="32" rx="10" fill="#4A90E2"/>
+  <text x="868" y="37" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="#FFFFFF">+ New campaign</text>
 
   <g>
-    <rect x="24" y="76" width="448" height="132" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/>
-    <rect x="40" y="92" width="56" height="20" rx="6" fill="#FFF7ED"/><text x="52" y="106" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#C2410C">SALES</text>
-    <text x="40" y="132" font-family="Space Grotesk,sans-serif" font-size="14" font-weight="700" fill="#1E3A5F">Q2 Renewal Outreach</text>
-    <text x="40" y="150" font-family="Inter,sans-serif" font-size="10" fill="#64748B">2,400 contacts · Started Mar 1</text>
-    <text x="40" y="168" font-family="Inter,sans-serif" font-size="10" fill="#64748B">Agent: Nova · Daily cap 120 calls</text>
-    <rect x="380" y="92" width="44" height="24" rx="12" fill="#DCFCE7"/>
-    <circle cx="408" cy="104" r="8" fill="#22C55E" class="sc-pulse"/><text x="404" y="107" font-size="8" fill="#fff"> </text>
-    <rect x="40" y="188" width="280" height="8" rx="4" fill="#F1F5F9"/><rect x="40" y="188" width="196" height="8" rx="4" fill="#4A90E2"/>
-    <text x="332" y="196" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#2A5F9E">70%</text>
+    <rect x="24" y="64" width="448" height="118" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <rect x="40" y="78" width="52" height="18" rx="5" fill="#FFF7ED"/><text x="50" y="90" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="#C2410C">SALES</text>
+    <text x="40" y="114" font-family="Space Grotesk,sans-serif" font-size="13" font-weight="700" fill="#1E3A5F">Q2 Renewal Outreach</text>
+    <text x="40" y="130" font-family="Inter,sans-serif" font-size="9" fill="#64748B">2,400 contacts · Agent Nova</text>
+    <rect x="380" y="78" width="40" height="22" rx="11" fill="#DCFCE7"/><circle cx="396" cy="89" r="7" fill="#22C55E" class="sc-pulse"/>
+    <rect x="40" y="158" width="240" height="6" rx="3" fill="#F1F5F9"/><rect x="40" y="158" width="168" height="6" rx="3" fill="#4A90E2"/>
+    <text x="292" y="164" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="#2A5F9E">70%</text>
   </g>
   <g>
-    <rect x="488" y="76" width="448" height="132" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/>
-    <rect x="504" y="92" width="72" height="20" rx="6" fill="#F5F3FF"/><text x="516" y="106" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#6D28D9">SERVICE</text>
-    <text x="504" y="132" font-family="Space Grotesk,sans-serif" font-size="14" font-weight="700" fill="#1E3A5F">Post-Sale Follow-up</text>
-    <text x="504" y="150" font-family="Inter,sans-serif" font-size="10" fill="#64748B">860 contacts · AI script v3</text>
-    <rect x="844" y="92" width="44" height="24" rx="12" fill="#F1F5F9" stroke="#E2E8F0"/>
-    <circle cx="856" cy="104" r="8" fill="#94A3B8"/>
-    <text x="504" y="196" font-family="Inter,sans-serif" font-size="9" fill="#64748B">Paused · resumes Mon 09:00</text>
+    <rect x="488" y="64" width="448" height="118" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <rect x="504" y="78" width="64" height="18" rx="5" fill="#F5F3FF"/><text x="514" y="90" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="#6D28D9">SERVICE</text>
+    <text x="504" y="114" font-family="Space Grotesk,sans-serif" font-size="13" font-weight="700" fill="#1E3A5F">Post-Sale Follow-up</text>
+    <text x="504" y="130" font-family="Inter,sans-serif" font-size="9" fill="#64748B">860 contacts · Paused Mon 09:00</text>
+    <rect x="844" y="78" width="40" height="22" rx="11" fill="#F1F5F9" stroke="#E2E8F0"/><circle cx="856" cy="89" r="7" fill="#94A3B8"/>
   </g>
   <g>
-    <rect x="24" y="224" width="448" height="132" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/>
-    <rect x="40" y="240" width="64" height="20" rx="6" fill="#ECFDF5"/><text x="52" y="254" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#047857">REMINDER</text>
-    <text x="40" y="280" font-family="Space Grotesk,sans-serif" font-size="14" font-weight="700" fill="#1E3A5F">Appointment Callbacks</text>
-    <text x="40" y="298" font-family="Inter,sans-serif" font-size="10" fill="#64748B">412 contacts · Scheduled window</text>
-    <rect x="380" y="240" width="44" height="24" rx="12" fill="#DCFCE7"/>
-    <circle cx="408" cy="252" r="8" fill="#22C55E" class="sc-pulse"/>
-    <rect x="40" y="336" width="280" height="8" rx="4" fill="#F1F5F9"/><rect x="40" y="336" width="168" height="8" rx="4" fill="#14B8A6"/>
-    <text x="332" y="344" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#0F766E">60%</text>
+    <rect x="24" y="194" width="448" height="118" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <rect x="40" y="208" width="60" height="18" rx="5" fill="#ECFDF5"/><text x="50" y="220" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="#047857">REMINDER</text>
+    <text x="40" y="244" font-family="Space Grotesk,sans-serif" font-size="13" font-weight="700" fill="#1E3A5F">Appointment Callbacks</text>
+    <text x="40" y="260" font-family="Inter,sans-serif" font-size="9" fill="#64748B">412 contacts · Scheduled window</text>
+    <rect x="380" y="208" width="40" height="22" rx="11" fill="#DCFCE7"/><circle cx="396" cy="219" r="7" fill="#22C55E"/>
+    <rect x="40" y="288" width="240" height="6" rx="3" fill="#F1F5F9"/><rect x="40" y="288" width="144" height="6" rx="3" fill="#14B8A6"/>
+    <text x="292" y="294" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="#0F766E">60%</text>
   </g>
   <g>
-    <rect x="488" y="224" width="448" height="132" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/>
-    <rect x="504" y="240" width="56" height="20" rx="6" fill="#EFF6FF"/><text x="516" y="254" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#2A5F9E">CUSTOM</text>
-    <text x="504" y="280" font-family="Space Grotesk,sans-serif" font-size="14" font-weight="700" fill="#1E3A5F">VIP Win-back List</text>
-    <text x="504" y="298" font-family="Inter,sans-serif" font-size="10" fill="#64748B">128 contacts · Warm transfer enabled</text>
-    <rect x="844" y="240" width="44" height="24" rx="12" fill="#DCFCE7"/>
-    <circle cx="856" cy="252" r="8" fill="#22C55E"/>
-    <rect x="504" y="336" width="280" height="8" rx="4" fill="#F1F5F9"/><rect x="504" y="336" width="84" height="8" rx="4" fill="#6B52B8"/>
-    <text x="796" y="344" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#6D28D9">30%</text>
+    <rect x="488" y="194" width="448" height="118" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <rect x="504" y="208" width="52" height="18" rx="5" fill="#EFF6FF"/><text x="514" y="220" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="#2A5F9E">CUSTOM</text>
+    <text x="504" y="244" font-family="Space Grotesk,sans-serif" font-size="13" font-weight="700" fill="#1E3A5F">VIP Win-back List</text>
+    <text x="504" y="260" font-family="Inter,sans-serif" font-size="9" fill="#64748B">128 contacts · Warm transfer</text>
+    <rect x="844" y="208" width="40" height="22" rx="11" fill="#DCFCE7"/><circle cx="856" cy="219" r="7" fill="#22C55E"/>
+    <rect x="504" y="288" width="240" height="6" rx="3" fill="#F1F5F9"/><rect x="504" y="288" width="72" height="6" rx="3" fill="#6B52B8"/>
+    <text x="756" y="294" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="#6D28D9">30%</text>
   </g>
 
-  <rect x="24" y="372" width="912" height="40" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
-  <text x="40" y="396" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#64748B">Campaign</text>
-  <text x="200" y="396" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#64748B">Status</text>
-  <text x="360" y="396" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#64748B">Contacts</text>
-  <text x="520" y="396" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#64748B">Completed</text>
-  <text x="680" y="396" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#64748B">Success rate</text>
-  <text x="840" y="396" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#64748B">Actions</text>
-  <rect x="24" y="420" width="912" height="44" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
-  <text x="40" y="446" font-family="Inter,sans-serif" font-size="10" fill="#1E3A5F">Q2 Renewal Outreach</text>
-  <text x="200" y="446" font-family="Inter,sans-serif" font-size="10" fill="#22C55E">Active</text>
-  <text x="360" y="446" font-family="Inter,sans-serif" font-size="10" fill="#1E3A5F">2,400</text>
-  <text x="520" y="446" font-family="Inter,sans-serif" font-size="10" fill="#1E3A5F">1,680</text>
-  <text x="680" y="446" font-family="Inter,sans-serif" font-size="10" fill="#2A5F9E">38%</text>
-  <text x="840" y="446" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="#4A90E2">Edit · Pause</text>
+  <line x1="24" y1="328" x2="936" y2="328" stroke="#E2E8F0"/>
+  <text x="24" y="348" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="700" fill="#1E3A5F">Bulk contact import</text>
+  <text x="24" y="364" font-family="Inter,sans-serif" font-size="9" fill="#64748B">CSV upload · phone_number validation · campaign tags</text>
+
+  <rect x="24" y="378" width="280" height="120" rx="12" fill="#FFFFFF" stroke="#8FB9F4" stroke-width="1.5" stroke-dasharray="8 5" class="bc-dash"/>
+  <rect x="120" y="398" width="56" height="44" rx="8" fill="#EFF6FF"/>
+  <path d="M140 414h16M148 406v16" stroke="#4A90E2" stroke-width="2" stroke-linecap="round"/>
+  <text x="144" y="458" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#2A5F9E">Drop CSV</text>
+  <rect x="24" y="378" width="280" height="120" rx="12" fill="none"/>
+  <rect x="320" y="378" width="616" height="120" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="336" y="400" font-family="Inter,sans-serif" font-size="10" font-weight="600" fill="#1E3A5F">contacts_march.csv</text>
+  <text x="336" y="414" font-family="Inter,sans-serif" font-size="9" fill="#22C55E">✓ 2,412 rows validated</text>
+  <rect x="336" y="424" width="584" height="22" rx="5" fill="#F1F5F9"/>
+  <text x="348" y="439" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="#64748B">phone_number</text>
+  <text x="480" y="439" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="#64748B">name</text>
+  <text x="600" y="439" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="#64748B">campaign_tag</text>
+  <text x="348" y="458" font-family="Inter,sans-serif" font-size="9" fill="#1E3A5F">+92 300 ••• 1102</text>
+  <text x="480" y="458" font-family="Inter,sans-serif" font-size="9" fill="#64748B">Alex M.</text>
+  <text x="600" y="458" font-family="Inter,sans-serif" font-size="9" fill="#6B52B8">renewal-q2</text>
+  <text x="348" y="476" font-family="Inter,sans-serif" font-size="9" fill="#1E3A5F">+92 321 ••• 8844</text>
+  <text x="480" y="476" font-family="Inter,sans-serif" font-size="9" fill="#64748B">Sana T.</text>
+  <text x="600" y="476" font-family="Inter,sans-serif" font-size="9" fill="#6B52B8">renewal-q2</text>
+  <rect x="760" y="456" width="140" height="28" rx="8" fill="#4A90E2"/>
+  <text x="830" y="474" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="#FFFFFF">Import contacts</text>
 </svg>

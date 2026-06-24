@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 300" role="img" aria-label="Orchestri multi-agent workflow">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 440" role="img" aria-label="Orchestri multi-agent workflow">
   <defs>
+    <filter id="oaSh"><feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#4338CA" flood-opacity="0.15"/></filter>
     <linearGradient id="oaBg" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#FFF8F3"/>
       <stop offset="100%" stop-color="#EFF6FF"/>
@@ -13,19 +14,86 @@
       .oa-float { animation: oaFloat 4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
       .oa-float.f2 { animation-delay: -1.3s; }
       .oa-float.f3 { animation-delay: -2.6s; }
-      @keyframes oaFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+      .oa-float.f4 { animation-delay: -0.7s; }
+      @keyframes oaFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
       .oa-line { stroke-dasharray:6 5; animation: oaLine 1.2s linear infinite; }
       @keyframes oaLine { to { stroke-dashoffset: -22; } }
+      .oa-pulse{animation:oaPulse 2s ease-in-out infinite}
+      @keyframes oaPulse{0%,100%{opacity:1}50%{opacity:.4}}
     </style>
   </defs>
-  <rect width="380" height="300" rx="16" fill="url(#oaBg)" stroke="#CBD5E1"/>
-  <path class="oa-line" d="M190 150 L70 70" stroke="#6366F1" stroke-width="2" fill="none" opacity="0.5"/>
-  <path class="oa-line" d="M190 150 L310 70" stroke="#14B8A6" stroke-width="2" fill="none" opacity="0.5"/>
-  <path class="oa-line" d="M190 150 L70 230" stroke="#4A90E2" stroke-width="2" fill="none" opacity="0.5"/>
-  <path class="oa-line" d="M190 150 L310 230" stroke="#F59E0B" stroke-width="2" fill="none" opacity="0.5"/>
-  <g class="oa-float"><rect x="28" y="44" width="84" height="52" rx="10" fill="#FFFFFF" stroke="#6366F1"/><text x="70" y="68" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="9" font-weight="700" fill="#4338CA">Spec agent</text><text x="70" y="82" text-anchor="middle" font-size="7" fill="#64748B">Requirements</text></g>
-  <g class="oa-float f2"><rect x="268" y="44" width="84" height="52" rx="10" fill="#FFFFFF" stroke="#14B8A6"/><text x="310" y="68" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="9" font-weight="700" fill="#0F766E">Plan agent</text><text x="310" y="82" text-anchor="middle" font-size="7" fill="#64748B">Architecture</text></g>
-  <g class="oa-float f3"><rect x="28" y="204" width="84" height="52" rx="10" fill="#FFFFFF" stroke="#4A90E2"/><text x="70" y="228" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="9" font-weight="700" fill="#2A5F9E">Code agent</text><text x="70" y="242" text-anchor="middle" font-size="7" fill="#64748B">Implementation</text></g>
-  <g class="oa-float"><rect x="268" y="204" width="84" height="52" rx="10" fill="#FFFFFF" stroke="#F59E0B"/><text x="310" y="228" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="9" font-weight="700" fill="#C2410C">Debug agent</text><text x="310" y="242" text-anchor="middle" font-size="7" fill="#64748B">Test / fix loop</text></g>
-  <g><rect x="154" y="118" width="72" height="64" rx="14" fill="url(#oaHub)"/><text x="190" y="146" text-anchor="middle" font-family="Space Grotesk,Arial,sans-serif" font-size="10" font-weight="800" fill="#FFFFFF">ORCHESTRATOR</text><text x="190" y="162" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="7" fill="#FFFFFF" opacity="0.85">FSM state machine</text></g>
+  <rect width="560" height="440" rx="16" fill="url(#oaBg)" stroke="#CBD5E1"/>
+
+  <text x="40" y="40" font-family="Space Grotesk,sans-serif" font-size="15" font-weight="800" fill="#1E3A5F">Multi-agent orchestration</text>
+  <text x="40" y="58" font-family="Inter,sans-serif" font-size="9" fill="#64748B">Specialized agents coordinate through the central FSM orchestrator</text>
+  <rect x="400" y="22" width="120" height="28" rx="14" fill="#CCFBF1"/>
+  <circle cx="416" cy="36" r="5" fill="#14B8A6" class="oa-pulse"/>
+  <text x="428" y="40" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#0F766E">4 agents active</text>
+
+  <!-- Connection lines -->
+  <path class="oa-line" d="M280 210 L100 100" stroke="#6366F1" stroke-width="2.5" fill="none" opacity="0.45"/>
+  <path class="oa-line" d="M280 210 L460 100" stroke="#14B8A6" stroke-width="2.5" fill="none" opacity="0.45"/>
+  <path class="oa-line" d="M280 210 L100 340" stroke="#4A90E2" stroke-width="2.5" fill="none" opacity="0.45"/>
+  <path class="oa-line" d="M280 210 L460 340" stroke="#F59E0B" stroke-width="2.5" fill="none" opacity="0.45"/>
+
+  <!-- Spec agent -->
+  <g class="oa-float" filter="url(#oaSh)">
+    <rect x="40" y="72" width="140" height="88" rx="14" fill="#FFFFFF" stroke="#6366F1" stroke-width="2"/>
+    <rect x="40" y="72" width="140" height="4" rx="14" fill="#6366F1"/>
+    <circle cx="68" cy="102" r="16" fill="#EEF2FF"/><text x="68" y="107" text-anchor="middle" font-size="14">📋</text>
+    <text x="92" y="100" font-family="Space Grotesk,sans-serif" font-size="11" font-weight="800" fill="#4338CA">Spec agent</text>
+    <text x="56" y="124" font-family="Inter,sans-serif" font-size="8" fill="#64748B">Draft requirements</text>
+    <text x="56" y="138" font-family="Inter,sans-serif" font-size="8" fill="#64748B">spec.md artifact</text>
+    <rect x="56" y="146" width="56" height="16" rx="8" fill="#F0FDF4" stroke="#14B8A6"/><text x="84" y="157" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" font-weight="600" fill="#0F766E">IDLE</text>
+  </g>
+
+  <!-- Plan agent -->
+  <g class="oa-float f2" filter="url(#oaSh)">
+    <rect x="380" y="72" width="140" height="88" rx="14" fill="#FFFFFF" stroke="#14B8A6" stroke-width="2"/>
+    <rect x="380" y="72" width="140" height="4" rx="14" fill="#14B8A6"/>
+    <circle cx="408" cy="102" r="16" fill="#F0FDF4"/><text x="408" y="107" text-anchor="middle" font-size="14">🗺</text>
+    <text x="432" y="100" font-family="Space Grotesk,sans-serif" font-size="11" font-weight="800" fill="#0F766E">Plan agent</text>
+    <text x="396" y="124" font-family="Inter,sans-serif" font-size="8" fill="#64748B">12 tasks · 4 tests</text>
+    <text x="396" y="138" font-family="Inter,sans-serif" font-size="8" fill="#64748B">plan.json ready</text>
+    <rect x="396" y="146" width="56" height="16" rx="8" fill="#EFF6FF" stroke="#4A90E2"/><text x="424" y="157" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" font-weight="600" fill="#2A5F9E">DONE</text>
+  </g>
+
+  <!-- Code agent -->
+  <g class="oa-float f3" filter="url(#oaSh)">
+    <rect x="40" y="312" width="140" height="88" rx="14" fill="#FFFFFF" stroke="#4A90E2" stroke-width="2"/>
+    <rect x="40" y="312" width="140" height="4" rx="14" fill="#4A90E2"/>
+    <circle cx="68" cy="342" r="16" fill="#EFF6FF"/><text x="68" y="347" text-anchor="middle" font-size="14">⚡</text>
+    <text x="92" y="340" font-family="Space Grotesk,sans-serif" font-size="11" font-weight="800" fill="#2A5F9E">Code agent</text>
+    <text x="56" y="364" font-family="Inter,sans-serif" font-size="8" fill="#64748B">Writing checkout.py</text>
+    <text x="56" y="378" font-family="Inter,sans-serif" font-size="8" fill="#64748B">+42 −3 lines</text>
+    <rect x="56" y="386" width="72" height="16" rx="8" fill="#CCFBF1" stroke="#14B8A6"/><text x="92" y="397" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" font-weight="700" fill="#0F766E">RUNNING</text>
+  </g>
+
+  <!-- Debug agent -->
+  <g class="oa-float f4" filter="url(#oaSh)">
+    <rect x="380" y="312" width="140" height="88" rx="14" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2"/>
+    <rect x="380" y="312" width="140" height="4" rx="14" fill="#F59E0B"/>
+    <circle cx="408" cy="342" r="16" fill="#FFFBEB"/><text x="408" y="347" text-anchor="middle" font-size="14">🔄</text>
+    <text x="432" y="340" font-family="Space Grotesk,sans-serif" font-size="11" font-weight="800" fill="#C2410C">Debug agent</text>
+    <text x="396" y="364" font-family="Inter,sans-serif" font-size="8" fill="#64748B">pytest subprocess</text>
+    <text x="396" y="378" font-family="Inter,sans-serif" font-size="8" fill="#64748B">Retry 1 of 4 max</text>
+    <rect x="396" y="386" width="56" height="16" rx="8" fill="#F8FAFC" stroke="#CBD5E1"/><text x="424" y="397" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#64748B">WAIT</text>
+  </g>
+
+  <!-- Central orchestrator hub -->
+  <g filter="url(#oaSh)">
+    <circle cx="280" cy="210" r="72" fill="url(#oaHub)"/>
+    <circle cx="280" cy="210" r="64" fill="none" stroke="#FFFFFF" stroke-width="2" opacity="0.25"/>
+    <text x="280" y="196" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="800" fill="#FFFFFF">ORCHESTRATOR</text>
+    <text x="280" y="214" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#FFFFFF" opacity="0.9">FSM state machine</text>
+    <text x="280" y="230" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#FFFFFF" opacity="0.75">Implementing</text>
+    <rect x="236" y="238" width="88" height="20" rx="10" fill="#FFFFFF" opacity="0.2"/>
+    <text x="280" y="252" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" font-weight="600" fill="#FFFFFF">SSE · events.jsonl</text>
+  </g>
+
+  <!-- Bottom status bar -->
+  <rect x="40" y="412" width="480" height="1" fill="#E2E8F0" opacity="0"/>
+  <rect x="100" y="408" width="360" height="24" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <circle cx="118" cy="420" r="4" fill="#14B8A6" class="oa-pulse"/>
+  <text x="130" y="424" font-family="Inter,sans-serif" font-size="8" fill="#64748B">Run #b7e3 · payments-service · gate: user approval pending on deploy</text>
 </svg>

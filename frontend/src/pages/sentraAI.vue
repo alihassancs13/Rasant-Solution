@@ -240,21 +240,12 @@
 
       <div class="max-w-[1140px] mx-auto relative grid grid-cols-1 lg:grid-cols-[1.08fr_0.92fr] gap-[clamp(28px,5vw,56px)] items-center z-[2]">
         <div class="relative z-[1] order-2 lg:order-1">
-          <div class="flex flex-col gap-4">
-            <div class="relative w-full">
-              <div class="absolute inset-[6%_2%] rounded-full bg-glow-campaign blur-[10px] pointer-events-none"></div>
-              <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-borderDefault shadow-[var(--shadow-card)] overflow-hidden">
-                <img src="@/assets/svg/sentra-campaigns.svg" alt="Sentra AI campaigns"
-                     class="w-full h-auto rounded-[10px]" />
-              </div>
+          <div class="relative w-full">
+            <div class="absolute inset-[6%_2%] rounded-full bg-glow-campaign blur-[10px] pointer-events-none"></div>
+            <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-borderDefault shadow-[var(--shadow-card)] overflow-hidden">
+              <img src="@/assets/svg/sentra-campaigns.svg" alt="Sentra AI campaigns and bulk contacts"
+                   class="w-full h-auto rounded-[10px]" />
             </div>
-            <figure class="relative w-full">
-              <div class="relative z-[2] p-[8px] rounded-2xl bg-white/95 border border-borderDefault shadow-[var(--shadow-card-small)] overflow-hidden">
-                <img src="@/assets/svg/sentra-bulk-contacts.svg" alt="Sentra AI bulk contacts"
-                     class="w-full h-auto rounded-[10px]" />
-              </div>
-              <figcaption class="mt-2.5 text-xs text-textSupporting text-center font-primary">Bulk import contacts via CSV with optional campaign assignment.</figcaption>
-            </figure>
           </div>
         </div>
         <div class="relative z-[2] order-1 lg:order-2">
@@ -319,21 +310,12 @@
 
       <div class="max-w-[1140px] mx-auto relative grid grid-cols-1 lg:grid-cols-[1.08fr_0.92fr] gap-[clamp(28px,5vw,56px)] items-center z-[2]">
         <div class="relative z-[1] order-2 lg:order-1">
-          <div class="flex flex-col gap-4">
-            <div class="relative w-full">
-              <div class="absolute inset-[6%_2%] rounded-full bg-glow-analytics blur-[10px] pointer-events-none"></div>
-              <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-borderDefault shadow-[var(--shadow-card)] overflow-hidden">
-                <img src="@/assets/svg/sentra-chatbot-analytics.svg" alt="Sentra AI chatbot analytics"
-                     class="w-full h-auto rounded-[10px]" />
-              </div>
+          <div class="relative w-full">
+            <div class="absolute inset-[6%_2%] rounded-full bg-glow-analytics blur-[10px] pointer-events-none"></div>
+            <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-borderDefault shadow-[var(--shadow-card)] overflow-hidden">
+              <img src="@/assets/svg/sentra-chatbot-analytics.svg" alt="Sentra AI analytics and token insights"
+                   class="w-full h-auto rounded-[10px]" />
             </div>
-            <figure class="relative w-full">
-              <div class="relative z-[2] p-[8px] rounded-2xl bg-white/95 border border-borderDefault shadow-[var(--shadow-card-small)] overflow-hidden">
-                <img src="@/assets/svg/sentra-analytics-charts.svg" alt="Sentra AI analytics charts"
-                     class="w-full h-auto rounded-[10px]" />
-              </div>
-              <figcaption class="mt-2.5 text-xs text-textSupporting text-center font-primary">Token trends, distribution breakdown, and usage by module.</figcaption>
-            </figure>
           </div>
         </div>
         <div class="relative z-[2] order-1 lg:order-2">

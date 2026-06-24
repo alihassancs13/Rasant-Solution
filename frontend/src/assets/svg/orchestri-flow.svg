@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 320" role="img" aria-label="Orchestri SDLC workflow">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-label="Orchestri SDLC workflow">
   <defs>
+    <filter id="ofSh"><feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#4338CA" flood-opacity="0.12"/></filter>
     <linearGradient id="ofBg" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#FFF8F3"/>
       <stop offset="50%" stop-color="#F5F0FF"/>
@@ -13,19 +14,97 @@
     <style>
       .of-flow { stroke-dasharray:8 6; animation:ofFlow 1.4s linear infinite; }
       @keyframes ofFlow { to { stroke-dashoffset:-28; } }
-      .of-glow { animation:ofGlow 3s ease-in-out infinite; }
-      @keyframes ofGlow { 0%,100%{opacity:.7} 50%{opacity:1} }
+      .of-glow { animation:ofGlow 3s ease-in-out infinite; transform-box:fill-box; transform-origin:center; }
+      .of-glow.g2{animation-delay:-1s}.of-glow.g3{animation-delay:-2s}
+      @keyframes ofGlow { 0%,100%{opacity:.85;transform:translateY(0)} 50%{opacity:1;transform:translateY(-4px)} }
+      .of-pulse{animation:ofPulse 2s ease-in-out infinite}
+      @keyframes ofPulse{0%,100%{opacity:1}50%{opacity:.45}}
     </style>
   </defs>
-  <rect width="640" height="320" rx="16" fill="url(#ofBg)" stroke="#CBD5E1"/>
-  <path class="of-flow" d="M108 160 H532" fill="none" stroke="url(#ofLine)" stroke-width="2.5"/>
-  <g font-family="Inter,Arial,sans-serif">
-    <g class="of-glow"><rect x="24" y="118" width="88" height="84" rx="12" fill="#FFFFFF" stroke="#6366F1" stroke-width="2"/><text x="68" y="148" text-anchor="middle" font-size="10" font-weight="700" fill="#4338CA">Spec</text><text x="68" y="166" text-anchor="middle" font-size="8" fill="#64748B">LLM draft</text><text x="68" y="182" text-anchor="middle" font-size="8" fill="#14B8A6">User approve</text></g>
-    <g class="of-glow"><rect x="136" y="118" width="88" height="84" rx="12" fill="#FFFFFF" stroke="#4A90E2"/><text x="180" y="148" text-anchor="middle" font-size="10" font-weight="700" fill="#2A5F9E">Plan</text><text x="180" y="166" text-anchor="middle" font-size="8" fill="#64748B">Tasks + tests</text><text x="180" y="182" text-anchor="middle" font-size="8" fill="#14B8A6">Approve</text></g>
-    <g class="of-glow"><rect x="248" y="118" width="88" height="84" rx="12" fill="#FFFFFF" stroke="#14B8A6"/><text x="292" y="148" text-anchor="middle" font-size="10" font-weight="700" fill="#0F766E">Implement</text><text x="292" y="166" text-anchor="middle" font-size="8" fill="#64748B">Code agent</text><text x="292" y="182" text-anchor="middle" font-size="8" fill="#64748B">Local workspace</text></g>
-    <g class="of-glow"><rect x="360" y="118" width="88" height="84" rx="12" fill="#FFFFFF" stroke="#F59E0B"/><text x="404" y="148" text-anchor="middle" font-size="10" font-weight="700" fill="#C2410C">Test loop</text><text x="404" y="166" text-anchor="middle" font-size="8" fill="#64748B">Subprocess</text><text x="404" y="182" text-anchor="middle" font-size="8" fill="#64748B">Debug agent</text></g>
-    <g class="of-glow"><rect x="472" y="118" width="88" height="84" rx="12" fill="#FFFFFF" stroke="#2A5F9E" stroke-width="2"/><text x="516" y="148" text-anchor="middle" font-size="10" font-weight="700" fill="#1E3A5F">Deploy</text><text x="516" y="166" text-anchor="middle" font-size="8" fill="#64748B">Confirm</text><text x="516" y="182" text-anchor="middle" font-size="8" fill="#14B8A6">Optional run</text></g>
+  <rect width="960" height="420" rx="16" fill="url(#ofBg)" stroke="#CBD5E1"/>
+
+  <text x="40" y="40" font-family="Space Grotesk,sans-serif" font-size="16" font-weight="800" fill="#1E3A5F">Gated SDLC workflow</text>
+  <text x="40" y="60" font-family="Inter,sans-serif" font-size="10" fill="#64748B">Human approvals at every critical transition · FSM-driven orchestration</text>
+  <rect x="720" y="24" width="88" height="28" rx="14" fill="#CCFBF1"/>
+  <circle cx="736" cy="38" r="5" fill="#14B8A6" class="of-pulse"/>
+  <text x="748" y="42" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#0F766E">FSM ACTIVE</text>
+
+  <path class="of-flow" d="M108 200 H852" fill="none" stroke="url(#ofLine)" stroke-width="3"/>
+  <polygon points="852,200 842,195 842,205" fill="#6366F1"/>
+
+  <g font-family="Inter,sans-serif">
+    <g class="of-glow" filter="url(#ofSh)">
+      <rect x="40" y="148" width="120" height="104" rx="14" fill="#FFFFFF" stroke="#6366F1" stroke-width="2"/>
+      <rect x="40" y="148" width="120" height="4" rx="14" fill="#6366F1"/>
+      <circle cx="68" cy="178" r="14" fill="#EEF2FF"/><text x="68" y="182" text-anchor="middle" font-size="12" fill="#4338CA">📋</text>
+      <text x="100" y="182" font-family="Space Grotesk,sans-serif" font-size="11" font-weight="800" fill="#4338CA">Spec</text>
+      <text x="56" y="206" font-size="9" fill="#64748B">LLM draft requirements</text>
+      <text x="56" y="222" font-size="9" fill="#64748B">Structured artifacts</text>
+      <rect x="56" y="232" width="88" height="20" rx="10" fill="#F0FDF4" stroke="#14B8A6"/><text x="100" y="246" text-anchor="middle" font-size="8" font-weight="600" fill="#0F766E">User approve</text>
+    </g>
+    <g class="of-glow g2" filter="url(#ofSh)">
+      <rect x="188" y="148" width="120" height="104" rx="14" fill="#FFFFFF" stroke="#4A90E2" stroke-width="2"/>
+      <rect x="188" y="148" width="120" height="4" rx="14" fill="#4A90E2"/>
+      <circle cx="216" cy="178" r="14" fill="#EFF6FF"/><text x="216" y="182" text-anchor="middle" font-size="12">🗺</text>
+      <text x="248" y="182" font-family="Space Grotesk,sans-serif" font-size="11" font-weight="800" fill="#2A5F9E">Plan</text>
+      <text x="204" y="206" font-size="9" fill="#64748B">Tasks · tests · deploy</text>
+      <text x="204" y="222" font-size="9" fill="#64748B">plan.json artifact</text>
+      <rect x="204" y="232" width="88" height="20" rx="10" fill="#EFF6FF" stroke="#4A90E2"/><text x="248" y="246" text-anchor="middle" font-size="8" font-weight="600" fill="#2A5F9E">Approve plan</text>
+    </g>
+    <g class="of-glow g3" filter="url(#ofSh)">
+      <rect x="336" y="148" width="120" height="104" rx="14" fill="#FFFFFF" stroke="#14B8A6" stroke-width="2"/>
+      <rect x="336" y="148" width="120" height="4" rx="14" fill="#14B8A6"/>
+      <circle cx="364" cy="178" r="14" fill="#F0FDF4"/><text x="364" y="182" text-anchor="middle" font-size="12">⚡</text>
+      <text x="396" y="182" font-family="Space Grotesk,sans-serif" font-size="11" font-weight="800" fill="#0F766E">Implement</text>
+      <text x="352" y="206" font-size="9" fill="#64748B">Code agent writes</text>
+      <text x="352" y="222" font-size="9" fill="#64748B">Local workspace</text>
+      <rect x="352" y="232" width="88" height="20" rx="10" fill="#F8FAFC" stroke="#CBD5E1"/><text x="396" y="246" text-anchor="middle" font-size="8" fill="#64748B">Auto-advance</text>
+    </g>
+    <g class="of-glow" filter="url(#ofSh)">
+      <rect x="484" y="148" width="120" height="104" rx="14" fill="#FFFFFF" stroke="#F59E0B" stroke-width="2"/>
+      <rect x="484" y="148" width="120" height="4" rx="14" fill="#F59E0B"/>
+      <circle cx="512" cy="178" r="14" fill="#FFFBEB"/><text x="512" y="182" text-anchor="middle" font-size="12">🔄</text>
+      <text x="544" y="182" font-family="Space Grotesk,sans-serif" font-size="11" font-weight="800" fill="#C2410C">Test loop</text>
+      <text x="500" y="206" font-size="9" fill="#64748B">Subprocess pytest</text>
+      <text x="500" y="222" font-size="9" fill="#64748B">Debug agent retries</text>
+      <rect x="500" y="232" width="88" height="20" rx="10" fill="#FFFBEB" stroke="#F59E0B"/><text x="544" y="246" text-anchor="middle" font-size="8" font-weight="600" fill="#C2410C">Up to 4 retries</text>
+    </g>
+    <g class="of-glow g2" filter="url(#ofSh)">
+      <rect x="632" y="148" width="120" height="104" rx="14" fill="#FFFFFF" stroke="#2A5F9E" stroke-width="2"/>
+      <rect x="632" y="148" width="120" height="4" rx="14" fill="#2A5F9E"/>
+      <circle cx="660" cy="178" r="14" fill="#EFF6FF"/><text x="660" y="182" text-anchor="middle" font-size="12">🚀</text>
+      <text x="692" y="182" font-family="Space Grotesk,sans-serif" font-size="11" font-weight="800" fill="#1E3A5F">Deploy</text>
+      <text x="648" y="206" font-size="9" fill="#64748B">Confirm commands</text>
+      <text x="648" y="222" font-size="9" fill="#64748B">From approved plan</text>
+      <rect x="648" y="232" width="88" height="20" rx="10" fill="#F0FDF4" stroke="#14B8A6"/><text x="692" y="246" text-anchor="middle" font-size="8" font-weight="600" fill="#0F766E">User confirm</text>
+    </g>
+    <g class="of-glow g3" filter="url(#ofSh)">
+      <rect x="780" y="148" width="120" height="104" rx="14" fill="#FFFFFF" stroke="#818CF8" stroke-width="2"/>
+      <rect x="780" y="148" width="120" height="4" rx="14" fill="#818CF8"/>
+      <circle cx="808" cy="178" r="14" fill="#EEF2FF"/><text x="808" y="182" text-anchor="middle" font-size="12">✓</text>
+      <text x="840" y="182" font-family="Space Grotesk,sans-serif" font-size="11" font-weight="800" fill="#4338CA">Finish</text>
+      <text x="796" y="206" font-size="9" fill="#64748B">Optional execution</text>
+      <text x="796" y="222" font-size="9" fill="#64748B">events.jsonl log</text>
+      <rect x="796" y="232" width="88" height="20" rx="10" fill="#EEF2FF" stroke="#818CF8"/><text x="840" y="246" text-anchor="middle" font-size="8" font-weight="600" fill="#4338CA">Run complete</text>
+    </g>
   </g>
-  <rect x="180" y="232" width="280" height="36" rx="18" fill="#FFFFFF" stroke="#6366F1" stroke-width="1.5"/>
-  <text x="320" y="255" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="10" font-weight="600" fill="#1E3A5F">Gated FSM | SSE events | FastAPI + React monorepo</text>
+
+  <!-- Bottom architecture strip -->
+  <rect x="40" y="290" width="880" height="100" rx="14" fill="#FFFFFF" stroke="#E2E8F0" filter="url(#ofSh)"/>
+  <text x="60" y="318" font-family="Space Grotesk,sans-serif" font-size="11" font-weight="700" fill="#1E3A5F">Monorepo stack</text>
+  <rect x="60" y="330" width="150" height="44" rx="8" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <text x="72" y="350" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#4338CA">FastAPI</text>
+  <text x="72" y="364" font-family="Inter,sans-serif" font-size="8" fill="#64748B">Orchestrator FSM · SSE</text>
+  <rect x="226" y="330" width="150" height="44" rx="8" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <text x="238" y="350" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#2A5F9E">React UI</text>
+  <text x="238" y="364" font-family="Inter,sans-serif" font-size="8" fill="#64748B">Approvals · run console</text>
+  <rect x="392" y="330" width="150" height="44" rx="8" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <text x="404" y="350" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#0F766E">Agents</text>
+  <text x="404" y="364" font-family="Inter,sans-serif" font-size="8" fill="#64748B">Spec · Plan · Code · Debug</text>
+  <rect x="558" y="330" width="150" height="44" rx="8" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <text x="570" y="350" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#C2410C">Subprocess</text>
+  <text x="570" y="364" font-family="Inter,sans-serif" font-size="8" fill="#64748B">pytest · deploy · timeouts</text>
+  <rect x="724" y="330" width="176" height="44" rx="8" fill="#EFF6FF" stroke="#4A90E2"/>
+  <text x="736" y="350" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#1E3A5F">Local DATA_DIR</text>
+  <text x="736" y="364" font-family="Inter,sans-serif" font-size="8" fill="#64748B">Runs · artifacts · events</text>
 </svg>

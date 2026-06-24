@@ -1,34 +1,105 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 340" role="img" aria-label="Orchestri platform capabilities">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 520" role="img" aria-label="Orchestri platform capabilities">
   <defs>
+    <filter id="ocapSh"><feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#4338CA" flood-opacity="0.1"/></filter>
     <linearGradient id="ocapBg" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#FFF8F3"/>
       <stop offset="100%" stop-color="#EFF6FF"/>
     </linearGradient>
+    <style>
+      .ocap-float{animation:ocapFloat 4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+      .ocap-float.f2{animation-delay:-1.3s}.ocap-float.f3{animation-delay:-2.6s}
+      @keyframes ocapFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+      .ocap-pulse{animation:ocapPulse 2s ease-in-out infinite}
+      @keyframes ocapPulse{0%,100%{opacity:1}50%{opacity:.4}}
+    </style>
   </defs>
-  <rect width="560" height="340" rx="16" fill="url(#ocapBg)" stroke="#CBD5E1"/>
-  <rect x="24" y="24" width="240" height="140" rx="12" fill="#FFFFFF" stroke="#6366F1" stroke-width="2"/>
-  <text x="44" y="52" font-family="Space Grotesk,Arial,sans-serif" font-size="13" font-weight="800" fill="#4338CA">Backend</text>
-  <text x="44" y="74" font-family="Inter,Arial,sans-serif" font-size="9" fill="#64748B">FastAPI | Orchestrator FSM</text>
-  <text x="44" y="92" font-family="Inter,Arial,sans-serif" font-size="9" fill="#64748B">Agents | Local DATA_DIR storage</text>
-  <text x="44" y="110" font-family="Inter,Arial,sans-serif" font-size="9" fill="#64748B">Subprocess test and deploy</text>
-  <text x="44" y="128" font-family="Inter,Arial,sans-serif" font-size="9" fill="#64748B">OpenAI / Azure OpenAI</text>
-  <rect x="296" y="24" width="240" height="140" rx="12" fill="#FFFFFF" stroke="#2A5F9E" stroke-width="2"/>
-  <text x="316" y="52" font-family="Space Grotesk,Arial,sans-serif" font-size="13" font-weight="800" fill="#1E3A5F">Frontend</text>
-  <text x="316" y="74" font-family="Inter,Arial,sans-serif" font-size="9" fill="#64748B">Vite + React + TypeScript</text>
-  <text x="316" y="92" font-family="Inter,Arial,sans-serif" font-size="9" fill="#64748B">SSE event stream + polling</text>
-  <text x="316" y="110" font-family="Inter,Arial,sans-serif" font-size="9" fill="#64748B">Run actions and approvals UI</text>
-  <text x="316" y="128" font-family="Inter,Arial,sans-serif" font-size="9" fill="#64748B">Local folder bridge picker</text>
-  <rect x="24" y="184" width="160" height="132" rx="12" fill="#FFFFFF" stroke="#14B8A6"/>
-  <text x="44" y="212" font-family="Inter,Arial,sans-serif" font-size="10" font-weight="700" fill="#0F766E">Desktop .exe</text>
-  <text x="44" y="232" font-family="Inter,Arial,sans-serif" font-size="8" fill="#64748B">Windows + macOS builds</text>
-  <text x="44" y="248" font-family="Inter,Arial,sans-serif" font-size="8" fill="#64748B">Localhost API + browser</text>
-  <rect x="200" y="184" width="160" height="132" rx="12" fill="#FFFFFF" stroke="#4A90E2"/>
-  <text x="220" y="212" font-family="Inter,Arial,sans-serif" font-size="10" font-weight="700" fill="#2A5F9E">Auth and VCS</text>
-  <text x="220" y="232" font-family="Inter,Arial,sans-serif" font-size="8" fill="#64748B">GitHub / Bitbucket OAuth</text>
-  <text x="220" y="248" font-family="Inter,Arial,sans-serif" font-size="8" fill="#64748B">Commit and push actions</text>
-  <rect x="376" y="184" width="160" height="132" rx="12" fill="#FFFFFF" stroke="#F59E0B"/>
-  <text x="396" y="212" font-family="Inter,Arial,sans-serif" font-size="10" font-weight="700" fill="#C2410C">Security</text>
-  <text x="396" y="232" font-family="Inter,Arial,sans-serif" font-size="8" fill="#64748B">ALLOWED_PROJECT_ROOTS</text>
-  <text x="396" y="248" font-family="Inter,Arial,sans-serif" font-size="8" fill="#64748B">Argv-only subprocess | timeouts</text>
+  <rect width="960" height="520" rx="16" fill="url(#ocapBg)" stroke="#CBD5E1"/>
+
+  <text x="40" y="42" font-family="Space Grotesk,sans-serif" font-size="16" font-weight="800" fill="#1E3A5F">Platform capabilities</text>
+  <text x="40" y="62" font-family="Inter,sans-serif" font-size="10" fill="#64748B">Monorepo · desktop builds · cloud-ready bridge</text>
+
+  <!-- Backend card -->
+  <g class="ocap-float" filter="url(#ocapSh)">
+    <rect x="40" y="84" width="430" height="200" rx="14" fill="#FFFFFF" stroke="#6366F1" stroke-width="2"/>
+    <rect x="40" y="84" width="430" height="4" rx="14" fill="#6366F1"/>
+    <circle cx="72" cy="118" r="18" fill="#EEF2FF"/><text x="72" y="123" text-anchor="middle" font-size="14">⚙</text>
+    <text x="100" y="116" font-family="Space Grotesk,sans-serif" font-size="14" font-weight="800" fill="#4338CA">Backend</text>
+    <text x="100" y="134" font-family="Inter,sans-serif" font-size="9" fill="#64748B">FastAPI orchestrator · FSM state machine</text>
+    <rect x="60" y="152" width="180" height="56" rx="8" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <text x="72" y="172" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="#64748B">ENDPOINTS</text>
+    <text x="72" y="188" font-family="monospace" font-size="8" fill="#4338CA">POST /runs · GET /events</text>
+    <text x="72" y="200" font-family="monospace" font-size="8" fill="#64748B">SSE stream · approve actions</text>
+    <rect x="252" y="152" width="200" height="56" rx="8" fill="#0F172A"/>
+    <text x="264" y="172" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="#94A3B8">events.jsonl</text>
+    <text x="264" y="188" font-family="monospace" font-size="7" fill="#14B8A6">14:03 code.agent | orders.py</text>
+    <text x="264" y="200" font-family="monospace" font-size="7" fill="#818CF8">14:04 subprocess | pytest -q</text>
+    <rect x="60" y="220" width="120" height="24" rx="6" fill="#F0FDF4" stroke="#14B8A6"/><text x="120" y="236" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" font-weight="600" fill="#0F766E">OpenAI / Azure</text>
+    <rect x="192" y="220" width="120" height="24" rx="6" fill="#EFF6FF" stroke="#4A90E2"/><text x="252" y="236" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" font-weight="600" fill="#2A5F9E">DATA_DIR storage</text>
+    <rect x="324" y="220" width="128" height="24" rx="6" fill="#FFFBEB" stroke="#F59E0B"/><text x="388" y="236" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" font-weight="600" fill="#C2410C">Argv-only subprocess</text>
+  </g>
+
+  <!-- Frontend card -->
+  <g class="ocap-float f2" filter="url(#ocapSh)">
+    <rect x="490" y="84" width="430" height="200" rx="14" fill="#FFFFFF" stroke="#2A5F9E" stroke-width="2"/>
+    <rect x="490" y="84" width="430" height="4" rx="14" fill="#2A5F9E"/>
+    <circle cx="522" cy="118" r="18" fill="#EFF6FF"/><text x="522" y="123" text-anchor="middle" font-size="14">🖥</text>
+    <text x="550" y="116" font-family="Space Grotesk,sans-serif" font-size="14" font-weight="800" fill="#1E3A5F">Frontend</text>
+    <text x="550" y="134" font-family="Inter,sans-serif" font-size="9" fill="#64748B">Vite + React + TypeScript run console</text>
+    <rect x="510" y="152" width="120" height="108" rx="8" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <text x="522" y="170" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="#64748B">NAV</text>
+    <rect x="522" y="178" width="96" height="18" rx="4" fill="#EFF6FF" stroke="#4A90E2"/><text x="530" y="190" font-family="Inter,sans-serif" font-size="7" fill="#2A5F9E">Workflow</text>
+    <text x="530" y="210" font-family="Inter,sans-serif" font-size="7" fill="#94A3B8">Events</text>
+    <text x="530" y="226" font-family="Inter,sans-serif" font-size="7" fill="#94A3B8">Artifacts</text>
+    <text x="530" y="242" font-family="Inter,sans-serif" font-size="7" fill="#94A3B8">Settings</text>
+    <rect x="642" y="152" width="258" height="108" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="654" y="170" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="#1E3A5F">Run console preview</text>
+    <rect x="654" y="180" width="232" height="20" rx="4" fill="#F0FDF4" stroke="#14B8A6"/><text x="662" y="194" font-family="Inter,sans-serif" font-size="7" fill="#0F766E">● Implementing · 62%</text>
+    <rect x="654" y="208" width="100" height="22" rx="5" fill="#2A5F9E"/><text x="704" y="223" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" font-weight="600" fill="#FFF">Approve</text>
+    <rect x="762" y="208" width="72" height="22" rx="5" fill="#FFF" stroke="#CBD5E1"/><text x="798" y="223" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" fill="#64748B">Revise</text>
+    <rect x="842" y="208" width="44" height="22" rx="5" fill="#14B8A6"/><text x="864" y="223" text-anchor="middle" font-family="Inter,sans-serif" font-size="7" font-weight="600" fill="#FFF">SSE</text>
+    <rect x="510" y="272" width="390" height="24" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/><text x="522" y="288" font-family="Inter,sans-serif" font-size="8" fill="#64748B">Local folder bridge · project picker · polling fallback</text>
+  </g>
+
+  <!-- Bottom row: Desktop, Auth, Security -->
+  <g class="ocap-float f3" filter="url(#ocapSh)">
+    <rect x="40" y="308" width="280" height="188" rx="14" fill="#FFFFFF" stroke="#14B8A6"/>
+    <rect x="40" y="308" width="280" height="4" rx="14" fill="#14B8A6"/>
+    <text x="60" y="340" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="800" fill="#0F766E">Desktop builds</text>
+    <text x="60" y="358" font-family="Inter,sans-serif" font-size="9" fill="#64748B">Orchestri.exe · Orchestri.app</text>
+    <rect x="60" y="372" width="240" height="48" rx="8" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <rect x="72" y="384" width="24" height="24" rx="4" fill="#2A5F9E"/><text x="84" y="400" text-anchor="middle" font-size="10">🪟</text>
+    <text x="104" y="396" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="#1E3A5F">localhost:8742</text>
+    <text x="104" y="410" font-family="Inter,sans-serif" font-size="8" fill="#64748B">%APPDATA% data dir</text>
+    <rect x="60" y="430" width="112" height="22" rx="6" fill="#F0FDF4" stroke="#14B8A6"/><text x="116" y="445" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#0F766E">Windows</text>
+    <rect x="180" y="430" width="112" height="22" rx="6" fill="#F0FDF4" stroke="#14B8A6"/><text x="236" y="445" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#0F766E">macOS</text>
+  </g>
+
+  <g class="ocap-float" filter="url(#ocapSh)">
+    <rect x="340" y="308" width="280" height="188" rx="14" fill="#FFFFFF" stroke="#4A90E2"/>
+    <rect x="340" y="308" width="280" height="4" rx="14" fill="#4A90E2"/>
+    <text x="360" y="340" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="800" fill="#2A5F9E">Auth &amp; VCS</text>
+    <text x="360" y="358" font-family="Inter,sans-serif" font-size="9" fill="#64748B">GitHub · Bitbucket OAuth</text>
+    <rect x="360" y="372" width="240" height="56" rx="8" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <circle cx="384" cy="400" r="14" fill="#1E293B"/><text x="384" y="404" text-anchor="middle" font-size="10" fill="#FFF">GH</text>
+    <text x="406" y="396" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="#1E3A5F">rasant-solutions/***</text>
+    <text x="406" y="412" font-family="Inter,sans-serif" font-size="8" fill="#64748B">main · last push 2m ago</text>
+    <rect x="360" y="438" width="116" height="26" rx="6" fill="#2A5F9E"/><text x="418" y="455" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" font-weight="600" fill="#FFF">Commit &amp; Push</text>
+    <rect x="484" y="438" width="116" height="26" rx="6" fill="#FFF" stroke="#CBD5E1"/><text x="542" y="455" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#64748B">Connect repo</text>
+  </g>
+
+  <g class="ocap-float f2" filter="url(#ocapSh)">
+    <rect x="640" y="308" width="280" height="188" rx="14" fill="#FFFFFF" stroke="#F59E0B"/>
+    <rect x="640" y="308" width="280" height="4" rx="14" fill="#F59E0B"/>
+    <text x="660" y="340" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="800" fill="#C2410C">Security</text>
+    <text x="660" y="358" font-family="Inter,sans-serif" font-size="9" fill="#64748B">Sandboxed local execution</text>
+    <rect x="660" y="372" width="240" height="28" rx="6" fill="#FFFBEB" stroke="#F59E0B"/>
+    <text x="672" y="390" font-family="monospace" font-size="8" fill="#92400E">ALLOWED_PROJECT_ROOTS</text>
+    <rect x="660" y="408" width="240" height="28" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <text x="672" y="426" font-family="Inter,sans-serif" font-size="8" fill="#64748B">Argv-only subprocess · no shell</text>
+    <rect x="660" y="444" width="116" height="26" rx="6" fill="#F0FDF4" stroke="#14B8A6"/>
+    <circle cx="674" cy="457" r="4" fill="#14B8A6" class="ocap-pulse"/>
+    <text x="684" y="461" font-family="Inter,sans-serif" font-size="8" font-weight="600" fill="#0F766E">Timeouts enforced</text>
+    <rect x="784" y="444" width="116" height="26" rx="6" fill="#EFF6FF" stroke="#4A90E2"/><text x="842" y="461" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" fill="#2A5F9E">Local only</text>
+  </g>
 </svg>

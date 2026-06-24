@@ -78,23 +78,9 @@
         <div class="absolute left-[2%] top-1/2 -translate-y-1/2 w-[min(480px,52%)] h-[min(400px,72%)] rounded-full pointer-events-none z-0 blur-[52px] bg-glow-orchestri-secondary" aria-hidden="true"></div>
 
         <div class="relative z-10 flex items-center justify-center order-last md:order-first">
-          <div class="relative w-full max-w-140 mx-auto">
-            <div class="absolute inset-[8%_4%] rounded-full bg-glow-orchestri-card blur-sm animate-[showcaseGlow_4s_ease-in-out_infinite] pointer-events-none"></div>
-            <div class="relative z-10 w-full mx-auto p-4.5 rounded-[18px] bg-cardSemi border border-borderDefault shadow-[var(--shadow-card)] transition-all duration-350">
-              <div class="relative z-10 grid grid-cols-1 gap-2.5">
-                <div class="bg-neutral-50 border border-borderDefault rounded-[14px] p-[10px_10px_8px] transition-all hover:border-card-hover-border-alt hover:shadow-md">
-                  <span class="block text-[9px] font-bold tracking-wider uppercase text-textSupporting mb-2 pl-0.5 font-display">Pipeline progress</span>
-                  <div class="overflow-hidden rounded-[10px] bg-section-white border border-borderDefault">
-                    <img src="../assets/images/orchestri-pipeline-progress.png" alt="Orchestri pipeline progress" class="w-full block" />
-                  </div>
-                </div>
-                <div class="bg-neutral-50 border border-borderDefault rounded-[14px] p-[10px_10px_8px] transition-all hover:border-card-hover-border-alt hover:shadow-md [animation-delay:0.8s]">
-                  <span class="block text-[9px] font-bold tracking-wider uppercase text-textSupporting mb-2 pl-0.5 font-display">Workflow console</span>
-                  <div class="overflow-hidden rounded-[10px] bg-section-white border border-borderDefault">
-                    <img src="../assets/images/orchestri-workflow-ui.png" alt="Orchestri workflow console" class="w-full block" />
-                  </div>
-                </div>
-              </div>
+          <div class="relative w-full max-w-full">
+            <div class="rounded-2xl overflow-hidden border border-borderDefault shadow-[var(--shadow-card)] bg-section-white transition-all duration-350 hover:shadow-[var(--shadow-orchestri)] hover:-translate-y-1 hover:scale-[1.01]">
+              <img src="../assets/svg/orchestri-dashboard.svg" alt="Orchestri pipeline progress and workflow console" class="w-full min-h-[280px] block" />
             </div>
           </div>
         </div>
