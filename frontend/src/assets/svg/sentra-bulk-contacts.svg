@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 320" role="img" aria-label="Sentra AI bulk contacts import illustration">
+  <defs>
+    <style>
+      .bc-dash{stroke-dasharray:8 5;animation:bcDash 1.2s linear infinite}
+      @keyframes bcDash{to{stroke-dashoffset:-26}}
+      .bc-float{animation:bcFloat 4s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+      @keyframes bcFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+    </style>
+  </defs>
+  <rect width="960" height="320" rx="16" fill="#F8FAFC"/>
+  <text x="24" y="32" font-family="Space Grotesk,sans-serif" font-size="15" font-weight="700" fill="#1E3A5F">Bulk Contact Import</text>
+  <text x="24" y="50" font-family="Inter,sans-serif" font-size="10" fill="#64748B">CSV upload with phone_number validation</text>
+
+  <g class="bc-float">
+    <rect x="24" y="68" width="380" height="128" rx="14" fill="#FFFFFF" stroke="#8FB9F4" stroke-width="1.5" stroke-dasharray="8 5" class="bc-dash"/>
+    <rect x="160" y="88" width="72" height="56" rx="10" fill="#EFF6FF"/>
+    <path d="M184 108h24M196 96v24" stroke="#4A90E2" stroke-width="2.5" stroke-linecap="round"/>
+    <text x="192" y="162" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#2A5F9E">Drop CSV here</text>
+    <text x="192" y="178" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#64748B">or click to browse</text>
+  </g>
+
+  <rect x="24" y="212" width="380" height="88" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <rect x="40" y="228" width="48" height="56" rx="8" fill="#ECFDF5" stroke="#34D399"/>
+  <text x="64" y="264" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="11" font-weight="700" fill="#047857">CSV</text>
+  <text x="104" y="244" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#1E3A5F">contacts_march.csv</text>
+  <text x="104" y="260" font-family="Inter,sans-serif" font-size="9" fill="#64748B">2,412 rows · 2.1 MB</text>
+  <text x="104" y="276" font-family="Inter,sans-serif" font-size="9" fill="#22C55E">✓ phone_number header valid</text>
+  <circle cx="372" cy="240" r="14" fill="#22C55E"/>
+  <path d="M366 240l4 4 8-8" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>
+
+  <rect x="428" y="68" width="508" height="232" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="448" y="92" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="700" fill="#1E3A5F">Preview · first 3 rows</text>
+  <rect x="448" y="104" width="468" height="28" rx="6" fill="#F1F5F9"/>
+  <text x="460" y="122" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#64748B">phone_number</text>
+  <text x="600" y="122" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#64748B">name</text>
+  <text x="760" y="122" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#64748B">campaign_tag</text>
+  <rect x="448" y="140" width="468" height="32" rx="6" fill="#FFFFFF" stroke="#F1F5F9"/>
+  <text x="460" y="160" font-family="Inter,sans-serif" font-size="10" fill="#1E3A5F">+92 300 ••• 1102</text>
+  <text x="600" y="160" font-family="Inter,sans-serif" font-size="10" fill="#64748B">Alex M.</text>
+  <text x="760" y="160" font-family="Inter,sans-serif" font-size="10" fill="#6B52B8">renewal-q2</text>
+  <rect x="448" y="176" width="468" height="32" rx="6" fill="#FFFFFF" stroke="#F1F5F9"/>
+  <text x="460" y="196" font-family="Inter,sans-serif" font-size="10" fill="#1E3A5F">+92 321 ••• 8844</text>
+  <text x="600" y="196" font-family="Inter,sans-serif" font-size="10" fill="#64748B">Sana T.</text>
+  <text x="760" y="196" font-family="Inter,sans-serif" font-size="10" fill="#6B52B8">renewal-q2</text>
+  <rect x="448" y="212" width="468" height="32" rx="6" fill="#FFFFFF" stroke="#F1F5F9"/>
+  <text x="460" y="232" font-family="Inter,sans-serif" font-size="10" fill="#1E3A5F">+92 333 ••• 2290</text>
+  <text x="600" y="232" font-family="Inter,sans-serif" font-size="10" fill="#64748B">Omar K.</text>
+  <text x="760" y="232" font-family="Inter,sans-serif" font-size="10" fill="#64748B">—</text>
+  <rect x="448" y="256" width="160" height="32" rx="8" fill="#4A90E2"/>
+  <text x="528" y="276" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="700" fill="#FFFFFF">Import 2,412 contacts</text>
+</svg>

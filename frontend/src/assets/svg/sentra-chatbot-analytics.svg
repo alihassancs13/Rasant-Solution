@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" role="img" aria-label="Sentra AI chatbot analytics illustration">
+  <defs>
+    <style>
+      .sa-in{opacity:0;animation:saIn .6s ease forwards}
+      .sa-in.d1{animation-delay:.1s}.sa-in.d2{animation-delay:.2s}
+      @keyframes saIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+    </style>
+  </defs>
+  <rect width="960" height="400" rx="16" fill="#F8FAFC"/>
+  <text x="24" y="32" font-family="Space Grotesk,sans-serif" font-size="15" font-weight="700" fill="#1E3A5F">Chatbot Analytics</text>
+  <text x="24" y="50" font-family="Inter,sans-serif" font-size="10" fill="#64748B">Token usage · embeddings · request volume</text>
+
+  <rect x="24" y="64" width="912" height="44" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="40" y="90" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="#64748B">Client</text>
+  <rect x="88" y="76" width="100" height="24" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/><text x="100" y="92" font-family="Inter,sans-serif" font-size="10" fill="#1E3A5F">Acme Corp</text>
+  <text x="220" y="90" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="#64748B">Period</text>
+  <rect x="268" y="76" width="88" height="24" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/><text x="280" y="92" font-family="Inter,sans-serif" font-size="10" fill="#1E3A5F">Last 30d</text>
+  <text x="380" y="90" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="#64748B">Group by</text>
+  <rect x="440" y="76" width="72" height="24" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/><text x="452" y="92" font-family="Inter,sans-serif" font-size="10" fill="#1E3A5F">Daily</text>
+  <rect x="800" y="76" width="120" height="24" rx="8" fill="#4A90E2"/><text x="860" y="92" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="#FFFFFF">Apply filters</text>
+
+  <g class="sa-in d1">
+    <rect x="24" y="124" width="210" height="88" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <rect x="24" y="124" width="210" height="3" rx="12" fill="#34D399"/>
+    <text x="40" y="148" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="#64748B">TOTAL TOKENS</text>
+    <text x="40" y="180" font-family="Space Grotesk,sans-serif" font-size="28" font-weight="800" fill="#1E3A5F">1.2M</text>
+    <text x="40" y="198" font-family="Inter,sans-serif" font-size="9" fill="#22C55E">↑ 8% vs prior</text>
+  </g>
+  <g class="sa-in d1">
+    <rect x="250" y="124" width="210" height="88" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <rect x="250" y="124" width="210" height="3" rx="12" fill="#F59E0B"/>
+    <text x="266" y="148" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="#64748B">EMBED TOKENS</text>
+    <text x="266" y="180" font-family="Space Grotesk,sans-serif" font-size="28" font-weight="800" fill="#1E3A5F">284K</text>
+    <text x="266" y="198" font-family="Inter,sans-serif" font-size="9" fill="#64748B">Documents indexed</text>
+  </g>
+  <g class="sa-in d1">
+    <rect x="476" y="124" width="210" height="88" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <rect x="476" y="124" width="210" height="3" rx="12" fill="#8B5CF6"/>
+    <text x="492" y="148" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="#64748B">QUERY TOKENS</text>
+    <text x="492" y="180" font-family="Space Grotesk,sans-serif" font-size="28" font-weight="800" fill="#1E3A5F">412K</text>
+    <text x="492" y="198" font-family="Inter,sans-serif" font-size="9" fill="#64748B">User prompts</text>
+  </g>
+  <g class="sa-in d1">
+    <rect x="702" y="124" width="234" height="88" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <rect x="702" y="124" width="234" height="3" rx="12" fill="#14B8A6"/>
+    <text x="718" y="148" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="#64748B">RESPONSE TOKENS</text>
+    <text x="718" y="180" font-family="Space Grotesk,sans-serif" font-size="28" font-weight="800" fill="#1E3A5F">504K</text>
+    <text x="718" y="198" font-family="Inter,sans-serif" font-size="9" fill="#64748B">AI completions</text>
+  </g>
+
+  <g class="sa-in d2">
+    <rect x="24" y="228" width="912" height="156" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="40" y="252" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="700" fill="#1E3A5F">Recent chat sessions</text>
+    <rect x="40" y="264" width="880" height="24" rx="6" fill="#F1F5F9"/>
+    <text x="52" y="280" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#64748B">USER</text>
+    <text x="200" y="280" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#64748B">CHANNEL</text>
+    <text x="360" y="280" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#64748B">TOKENS</text>
+    <text x="500" y="280" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#64748B">TOPIC</text>
+    <text x="720" y="280" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#64748B">TIME</text>
+    <text x="52" y="308" font-family="Inter,sans-serif" font-size="10" fill="#1E3A5F">Visitor #4821</text>
+    <text x="200" y="308" font-family="Inter,sans-serif" font-size="10" fill="#25D366">WhatsApp</text>
+    <text x="360" y="308" font-family="Inter,sans-serif" font-size="10" fill="#1E3A5F">2,840</text>
+    <text x="500" y="308" font-family="Inter,sans-serif" font-size="10" fill="#64748B">Pricing FAQ</text>
+    <text x="720" y="308" font-family="Inter,sans-serif" font-size="10" fill="#64748B">2 min ago</text>
+    <line x1="40" y1="318" x2="920" y2="318" stroke="#F1F5F9"/>
+    <text x="52" y="338" font-family="Inter,sans-serif" font-size="10" fill="#1E3A5F">Visitor #4819</text>
+    <text x="200" y="338" font-family="Inter,sans-serif" font-size="10" fill="#4A90E2">Web chat</text>
+    <text x="360" y="338" font-family="Inter,sans-serif" font-size="10" fill="#1E3A5F">1,120</text>
+    <text x="500" y="338" font-family="Inter,sans-serif" font-size="10" fill="#64748B">Order status</text>
+    <text x="720" y="338" font-family="Inter,sans-serif" font-size="10" fill="#64748B">8 min ago</text>
+    <line x1="40" y1="348" x2="920" y2="348" stroke="#F1F5F9"/>
+    <text x="52" y="368" font-family="Inter,sans-serif" font-size="10" fill="#1E3A5F">Visitor #4815</text>
+    <text x="200" y="368" font-family="Inter,sans-serif" font-size="10" fill="#1877F2">Messenger</text>
+    <text x="360" y="368" font-family="Inter,sans-serif" font-size="10" fill="#1E3A5F">3,410</text>
+    <text x="500" y="368" font-family="Inter,sans-serif" font-size="10" fill="#64748B">Returns policy</text>
+    <text x="720" y="368" font-family="Inter,sans-serif" font-size="10" fill="#64748B">14 min ago</text>
+  </g>
+</svg>

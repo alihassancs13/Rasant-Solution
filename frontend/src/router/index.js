@@ -10,10 +10,6 @@ import omnipost from "@/pages/omnipost.vue";
 const routes = [
   {
     path: "/",
-    redirect: "/home",
-  },
-  {
-    path: "/home",
     name: "Home",
     component: Home,
     meta: { title: "Rasant Solutions - Home" }

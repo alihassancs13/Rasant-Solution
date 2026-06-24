@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 480" role="img" aria-label="Sentra AI call scheduler illustration">
+  <defs>
+    <style>
+      .ss-pulse{animation:ssPulse 1.8s ease-in-out infinite}
+      @keyframes ssPulse{0%,100%{opacity:1}50%{opacity:.4}}
+    </style>
+  </defs>
+  <rect width="960" height="480" rx="16" fill="#F8FAFC"/>
+  <text x="24" y="36" font-family="Space Grotesk,sans-serif" font-size="16" font-weight="700" fill="#1E3A5F">Call Scheduler</text>
+  <text x="24" y="56" font-family="Inter,sans-serif" font-size="11" fill="#64748B">Q2 Renewal Outreach · auto-dial within window</text>
+
+  <rect x="24" y="76" width="440" height="196" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="40" y="100" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="700" fill="#1E3A5F">Calling window</text>
+  <text x="40" y="118" font-family="Inter,sans-serif" font-size="10" fill="#64748B">Mon – Sun · 09:00 – 19:00 PKT</text>
+  <text x="40" y="142" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="#64748B">DAYS</text>
+  <rect x="40" y="150" width="36" height="28" rx="6" fill="#EFF6FF" stroke="#8FB9F4"/><text x="58" y="169" text-anchor="middle" font-size="9" font-weight="700" fill="#2A5F9E">M</text>
+  <rect x="84" y="150" width="36" height="28" rx="6" fill="#EFF6FF" stroke="#8FB9F4"/><text x="102" y="169" text-anchor="middle" font-size="9" font-weight="700" fill="#2A5F9E">T</text>
+  <rect x="128" y="150" width="36" height="28" rx="6" fill="#EFF6FF" stroke="#8FB9F4"/><text x="146" y="169" text-anchor="middle" font-size="9" font-weight="700" fill="#2A5F9E">W</text>
+  <rect x="172" y="150" width="36" height="28" rx="6" fill="#EFF6FF" stroke="#8FB9F4"/><text x="190" y="169" text-anchor="middle" font-size="9" font-weight="700" fill="#2A5F9E">T</text>
+  <rect x="216" y="150" width="36" height="28" rx="6" fill="#EFF6FF" stroke="#8FB9F4"/><text x="234" y="169" text-anchor="middle" font-size="9" font-weight="700" fill="#2A5F9E">F</text>
+  <rect x="260" y="150" width="36" height="28" rx="6" fill="#F1F5F9" stroke="#E2E8F0"/><text x="278" y="169" text-anchor="middle" font-size="9" fill="#94A3B8">S</text>
+  <rect x="304" y="150" width="36" height="28" rx="6" fill="#F1F5F9" stroke="#E2E8F0"/><text x="322" y="169" text-anchor="middle" font-size="9" fill="#94A3B8">S</text>
+  <text x="40" y="200" font-family="Inter,sans-serif" font-size="9" fill="#64748B">Daily cap</text>
+  <text x="120" y="200" font-family="Space Grotesk,sans-serif" font-size="14" font-weight="700" fill="#1E3A5F">120 / day</text>
+  <text x="40" y="220" font-family="Inter,sans-serif" font-size="9" fill="#64748B">Today progress</text>
+  <rect x="120" y="212" width="280" height="10" rx="5" fill="#F1F5F9"/><rect x="120" y="212" width="168" height="10" rx="5" fill="#4A90E2"/>
+  <text x="412" y="220" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#2A5F9E">84 / 120</text>
+  <text x="40" y="252" font-family="Inter,sans-serif" font-size="9" fill="#64748B">Next dial in</text>
+  <text x="120" y="252" font-family="Space Grotesk,sans-serif" font-size="13" font-weight="700" fill="#14B8A6">00:00:42</text>
+
+  <rect x="488" y="76" width="448" height="196" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="504" y="100" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="700" fill="#1E3A5F">AI agent availability</text>
+  <g>
+    <circle cx="524" cy="132" r="14" fill="#6B52B8" opacity=".2"/><text x="524" y="136" text-anchor="middle" font-size="9" font-weight="700" fill="#6D28D9">N</text>
+    <text x="548" y="128" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#1E3A5F">Nova</text>
+    <text x="548" y="142" font-family="Inter,sans-serif" font-size="9" fill="#64748B">Sales script</text>
+    <rect x="820" y="118" width="44" height="22" rx="11" fill="#DCFCE7"/><circle cx="848" cy="129" r="7" fill="#FFFFFF"/>
+  </g>
+  <g>
+    <circle cx="524" cy="172" r="14" fill="#14B8A6" opacity=".2"/><text x="524" y="176" text-anchor="middle" font-size="9" font-weight="700" fill="#0F766E">A</text>
+    <text x="548" y="168" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#1E3A5F">Aria</text>
+    <text x="548" y="182" font-family="Inter,sans-serif" font-size="9" fill="#64748B">Service script</text>
+    <rect x="820" y="158" width="44" height="22" rx="11" fill="#DCFCE7"/><circle cx="848" cy="169" r="7" fill="#FFFFFF"/>
+  </g>
+  <g>
+    <circle cx="524" cy="212" r="14" fill="#94A3B8" opacity=".2"/><text x="524" y="216" text-anchor="middle" font-size="9" font-weight="700" fill="#64748B">K</text>
+    <text x="548" y="208" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#64748B">Kai</text>
+    <text x="548" y="222" font-family="Inter,sans-serif" font-size="9" fill="#64748B">Maintenance</text>
+    <rect x="820" y="198" width="44" height="22" rx="11" fill="#F1F5F9" stroke="#E2E8F0"/><circle cx="832" cy="209" r="7" fill="#94A3B8" opacity=".5"/>
+  </g>
+
+  <rect x="24" y="288" width="912" height="168" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="40" y="312" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="700" fill="#1E3A5F">Contact pool</text>
+  <rect x="40" y="328" width="120" height="56" rx="10" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <text x="52" y="348" font-family="Inter,sans-serif" font-size="9" fill="#64748B">Done</text>
+  <text x="52" y="372" font-family="Space Grotesk,sans-serif" font-size="22" font-weight="800" fill="#22C55E">1,680</text>
+  <rect x="176" y="328" width="120" height="56" rx="10" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <text x="188" y="348" font-family="Inter,sans-serif" font-size="9" fill="#64748B">Remaining</text>
+  <text x="188" y="372" font-family="Space Grotesk,sans-serif" font-size="22" font-weight="800" fill="#1E3A5F">720</text>
+  <rect x="312" y="328" width="120" height="56" rx="10" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <text x="324" y="348" font-family="Inter,sans-serif" font-size="9" fill="#64748B">In queue</text>
+  <text x="324" y="372" font-family="Space Grotesk,sans-serif" font-size="22" font-weight="800" fill="#4A90E2">12</text>
+  <rect x="448" y="328" width="120" height="56" rx="10" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <text x="460" y="348" font-family="Inter,sans-serif" font-size="9" fill="#64748B">Processing</text>
+  <text x="460" y="372" font-family="Space Grotesk,sans-serif" font-size="22" font-weight="800" fill="#6B52B8">3</text>
+  <rect x="584" y="328" width="120" height="56" rx="10" fill="#F8FAFC" stroke="#E2E8F0"/>
+  <text x="596" y="348" font-family="Inter,sans-serif" font-size="9" fill="#64748B">Blocked</text>
+  <text x="596" y="372" font-family="Space Grotesk,sans-serif" font-size="22" font-weight="800" fill="#94A3B8">8</text>
+  <text x="40" y="412" font-family="Inter,sans-serif" font-size="9" fill="#64748B">Pool completion</text>
+  <rect x="120" y="404" width="760" height="12" rx="6" fill="#F1F5F9"/><rect x="120" y="404" width="532" height="12" rx="6" fill="#4A90E2"/>
+  <text x="892" y="414" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#2A5F9E">70%</text>
+  <circle cx="900" cy="436" r="6" fill="#14B8A6" class="ss-pulse"/>
+  <text x="40" y="440" font-family="Inter,sans-serif" font-size="9" fill="#0F766E">Dialer running · next batch in 42s</text>
+</svg>

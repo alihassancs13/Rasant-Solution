@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 480" role="img" aria-label="Sentra AI call queue illustration">
+  <defs>
+    <style>
+      .sq-flow{stroke-dasharray:5 4;animation:sqFlow 1s linear infinite}
+      @keyframes sqFlow{to{stroke-dashoffset:-18}}
+      .sq-pulse{animation:sqPulse 1.8s ease-in-out infinite}
+      @keyframes sqPulse{0%,100%{opacity:1}50%{opacity:.45}}
+    </style>
+  </defs>
+  <rect width="960" height="480" rx="16" fill="#F8FAFC"/>
+  <text x="24" y="36" font-family="Space Grotesk,sans-serif" font-size="16" font-weight="700" fill="#1E3A5F">Call Queue</text>
+  <text x="24" y="56" font-family="Inter,sans-serif" font-size="11" fill="#64748B">4 waiting · skill-based routing enabled</text>
+  <rect x="24" y="68" width="52" height="22" rx="6" fill="#FEE2E2"/><text x="36" y="83" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#DC2626">High</text>
+  <rect x="84" y="68" width="64" height="22" rx="6" fill="#FEF3C7"/><text x="96" y="83" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#D97706">Medium</text>
+  <rect x="156" y="68" width="48" height="22" rx="6" fill="#DCFCE7"/><text x="168" y="83" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#16A34A">Low</text>
+  <rect x="760" y="24" width="176" height="36" rx="10" fill="#4A90E2"/>
+  <text x="848" y="47" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="700" fill="#FFFFFF">Auto-assign all</text>
+
+  <rect x="24" y="100" width="912" height="28" rx="6" fill="#F1F5F9"/>
+  <text x="72" y="118" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#64748B">PRIORITY</text>
+  <text x="200" y="118" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#64748B">CALLER</text>
+  <text x="400" y="118" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#64748B">SKILL</text>
+  <text x="560" y="118" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#64748B">WAIT</text>
+  <text x="720" y="118" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#64748B">ASSIGN TO</text>
+
+  <g>
+    <rect x="24" y="136" width="912" height="68" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <rect x="40" y="152" width="12" height="36" rx="4" fill="#EF4444"/>
+    <text x="64" y="168" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="#DC2626">URGENT</text>
+    <text x="200" y="164" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#1E3A5F">+92 3XX ••• 5512</text>
+    <text x="200" y="180" font-family="Inter,sans-serif" font-size="9" fill="#64748B">Billing dispute</text>
+    <rect x="400" y="158" width="100" height="24" rx="6" fill="#FFF7ED" stroke="#FDBA74"/>
+    <text x="450" y="174" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="#C2410C">Technical</text>
+    <text x="560" y="174" font-family="Space Grotesk,sans-serif" font-size="14" font-weight="700" fill="#EF4444">04:12</text>
+    <rect x="700" y="158" width="120" height="28" rx="8" fill="#EFF6FF" stroke="#8FB9F4"/>
+    <text x="760" y="177" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="#2A5F9E">Assign agent</text>
+    <line x1="840" y1="170" x2="920" y2="170" stroke="#4A90E2" stroke-width="1.5" stroke-dasharray="4 3" opacity=".4" class="sq-flow"/>
+  </g>
+  <g>
+    <rect x="24" y="216" width="912" height="68" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <rect x="40" y="232" width="12" height="36" rx="4" fill="#F59E0B"/>
+    <text x="64" y="248" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="#D97706">MEDIUM</text>
+    <text x="200" y="244" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#1E3A5F">+92 3XX ••• 8820</text>
+    <text x="200" y="260" font-family="Inter,sans-serif" font-size="9" fill="#64748B">Product inquiry</text>
+    <rect x="400" y="238" width="88" height="24" rx="6" fill="#F5F3FF" stroke="#C4B5FD"/>
+    <text x="444" y="254" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="#6D28D9">Sales</text>
+    <text x="560" y="254" font-family="Space Grotesk,sans-serif" font-size="14" font-weight="700" fill="#1E3A5F">02:08</text>
+    <rect x="700" y="238" width="120" height="28" rx="8" fill="#F5F3FF" stroke="#C4B5FD"/>
+    <text x="760" y="257" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="#6D28D9">Nova (AI)</text>
+  </g>
+  <g>
+    <rect x="24" y="296" width="912" height="68" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <rect x="40" y="312" width="12" height="36" rx="4" fill="#22C55E"/>
+    <text x="64" y="328" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="#16A34A">LOW</text>
+    <text x="200" y="324" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#1E3A5F">+92 3XX ••• 1044</text>
+    <text x="200" y="340" font-family="Inter,sans-serif" font-size="9" fill="#64748B">General FAQ</text>
+    <rect x="400" y="318" width="120" height="24" rx="6" fill="#ECFDF5" stroke="#34D399"/>
+    <text x="460" y="334" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="#047857">Support</text>
+    <text x="560" y="334" font-family="Space Grotesk,sans-serif" font-size="14" font-weight="700" fill="#1E3A5F">00:54</text>
+    <rect x="700" y="318" width="120" height="28" rx="8" fill="#ECFDF5" stroke="#34D399"/>
+    <text x="760" y="337" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="#047857">Aria (AI)</text>
+  </g>
+  <g opacity=".85">
+    <rect x="24" y="376" width="912" height="68" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <rect x="40" y="392" width="12" height="36" rx="4" fill="#94A3B8"/>
+    <text x="200" y="408" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#64748B">+92 3XX ••• 2290</text>
+    <text x="400" y="412" font-family="Inter,sans-serif" font-size="9" fill="#64748B">Support</text>
+    <text x="560" y="412" font-family="Space Grotesk,sans-serif" font-size="14" font-weight="700" fill="#94A3B8">00:18</text>
+    <circle cx="760" cy="410" r="6" fill="#14B8A6" class="sq-pulse"/>
+    <text x="776" y="414" font-family="Inter,sans-serif" font-size="10" fill="#0F766E">Routing…</text>
+  </g>
+</svg>
