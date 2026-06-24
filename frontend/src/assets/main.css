@@ -194,7 +194,7 @@
        ═══════════════════════════════════════════════════════════ */
     --color-neutral-50: #FFFFFF;
     --color-neutral-100: #F8FAFC;
-    --color-neutral-200: #F1F5F9;
+    --color-neutral-200: #eff5fb;
     --color-neutral-300: #E2E8F0;
     --color-neutral-400: #CBD5E1;
     --color-neutral-500: #94A3B8;
@@ -211,6 +211,7 @@
     --color-warning: #F59E0B;
     --color-error: #EF4444;
     --color-info: #4A90E2;
+    --color-iconDark: #1a212c;
 
     /* ═══════════════════════════════════════════════════════════
        FONTS
@@ -228,18 +229,60 @@
     --shadow-purple: 0 8px 24px rgba(107, 82, 184, 0.25);
     --shadow-dark: 0 8px 24px rgba(15, 23, 42, 0.2);
     --shadow-insetBlue: inset 0 0 15px rgba(74, 144, 226, 0.3);
+    --shadow-primary-dark: 0 16px 36px rgba(42, 95, 158, 0.2);
+    --shadow-card: 0 22px 56px rgba(15, 23, 42, 0.1);
+    --shadow-card-small: 0 12px 32px rgba(15, 23, 42, 0.07);
+    --shadow-card-hover: 0 10px 30px rgba(0, 0, 0, 0.08);
 
     /* ═══════════════════════════════════════════════════════════
        BORDER RADIUS
        ═══════════════════════════════════════════════════════════ */
     --radius-2xl: 2.5rem;
 
-
     /* ═══════════════════════════════════════════════════════════
        SECTION NUMBERS (01, 02, 03, etc.)
        ═══════════════════════════════════════════════════════════ */
     --color-sectionNumber: rgba(74, 144, 226, 0.10);  /* Default section number color */
     --color-sectionNumberHover: rgba(74, 144, 226, 0.20); /* Hover state */
+
+    /* ═══════════════════════════════════════════════════════════
+       NEW SENTRA-SPECIFIC TOKENS (purposeful names)
+       ═══════════════════════════════════════════════════════════ */
+
+    /* Mesh background colors */
+    --color-mesh-purple: #C9C4F8;
+    --color-mesh-teal: #2DD4BF;
+
+    /* Shadow colors */
+    --color-shadow-primary-dark: #2A5F9E;
+    --color-shadow-dark-neutral: #0F172A;
+
+    /* Glow gradients for each section */
+    --gradient-dashboard-glow: radial-gradient(circle, rgba(20,184,166,0.18) 0%, rgba(74,144,226,0.1) 42%, transparent 72%);
+    --gradient-live-glow: radial-gradient(circle, rgba(74,144,226,0.2) 0%, rgba(20,184,166,0.1) 42%, transparent 72%);
+    --gradient-queue-glow: radial-gradient(circle, rgba(74,144,226,0.16) 0%, rgba(20,184,166,0.08) 45%, transparent 72%);
+    --gradient-analytics-glow: radial-gradient(circle, rgba(74,144,226,0.2) 0%, rgba(20,184,166,0.1) 42%, transparent 72%);
+    --gradient-team-glow: radial-gradient(circle, rgba(20,184,166,0.18) 0%, rgba(74,144,226,0.1) 42%, transparent 72%);
+    --gradient-campaign-glow: radial-gradient(circle, rgba(74,144,226,0.2) 0%, rgba(20,184,166,0.1) 42%, transparent 72%);
+    --gradient-scheduler-glow: radial-gradient(circle, rgba(74,144,226,0.16) 0%, rgba(20,184,166,0.08) 45%, transparent 72%);
+
+    /* Bot-specific colors */
+    --color-bot-glow: rgba(45,212,191,0.2);
+    --color-bot-glow-strong: rgba(45,212,191,0.35);
+
+    /* Platform architecture */
+    --color-platform-shadow: 0 20px 60px rgba(42,95,158,0.1);
+
+    /* Card hover state */
+    --color-card-hover-border: rgba(74,144,226,0.3);
+    --color-card-hover-border-alt: rgba(74,144,226,0.28);
+
+    /* Icon containers */
+    --color-icon-container-bg: rgba(74,144,226,0.08);
+
+    /* Badge backgrounds */
+    --color-badge-white: rgba(255,255,255,0.8);
+    --color-badge-border: rgba(74,144,226,0.12);
 }
 
 :root {
@@ -279,6 +322,15 @@
     .bg-glowTeal             { background: var(--color-glowTeal); }
     .bg-glowPurple           { background: var(--color-glowPurple); }
 
+    /* Section-specific glows */
+    .bg-glow-dashboard       { background: var(--gradient-dashboard-glow); }
+    .bg-glow-live            { background: var(--gradient-live-glow); }
+    .bg-glow-queue           { background: var(--gradient-queue-glow); }
+    .bg-glow-analytics       { background: var(--gradient-analytics-glow); }
+    .bg-glow-team            { background: var(--gradient-team-glow); }
+    .bg-glow-campaign        { background: var(--gradient-campaign-glow); }
+    .bg-glow-scheduler       { background: var(--gradient-scheduler-glow); }
+
     /* Tags / badges */
     .tag-blue   { background-color: var(--color-tagBlueBg);   color: var(--color-tagBlueText);   }
     .tag-sky    { background-color: var(--color-tagSkyBg);    color: var(--color-tagSkyText);    }
@@ -315,6 +367,12 @@
     .section-number:hover {
         color: var(--color-sectionNumberHover);
     }
+
+    /* Section backgrounds */
+    .bg-section-white { background-color: var(--color-sectionWhite); }
+
+    /* Button text colors */
+    .text-button-hover { color: var(--color-buttonHover); }
 }
 
 /* Keyframe Animations */

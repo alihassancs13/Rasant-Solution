@@ -343,7 +343,7 @@
             :class="[
             'relative cursor-pointer px-5 py-2.5 rounded-full border text-sm font-semibold transition-all duration-300 font-primary',
             index === activeIndex
-              ? 'bg-buttonPrimaryHover border-buttonPrimaryBorder text-white shadow-orange scale-105'
+              ? 'bg-buttonBackground border-buttonPrimaryBorder text-white shadow-orange scale-105'
               : 'border-borderDefault bg-card text-textBody hover:border-buttonPrimaryBorder/40 hover:text-brandDark'
           ]"
         >
@@ -407,7 +407,7 @@
               class="w-full h-36 object-contain mb-5 transition-transform duration-500 ease-out group-hover:scale-110 animate-float"
           />
           <div :class="['w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform duration-300 ease-out', service.iconBg]">
-            <font-awesome-icon :icon="service.icon" :class="['text-3xl', service.iconColor]" />
+            <font-awesome-icon :icon="service.icon" :class="['text-3xl ', service.iconColor]" />
           </div>
           <h3 class="text-lg font-bold text-headingCard mb-2.5 font-display">{{ service.title }}</h3>
           <p class="text-sm text-textBody leading-relaxed mb-5 font-primary">{{ service.description }}</p>

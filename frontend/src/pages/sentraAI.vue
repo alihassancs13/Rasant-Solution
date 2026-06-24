@@ -57,11 +57,11 @@
         <!-- Right Visual -->
         <div class="relative z-30 flex justify-center py-1 mx-auto md:mr-0 md:ml-auto">
           <div class="relative w-[min(400px,80vw)] animate-[botEnter_0.9s_cubic-bezier(0.22,1,0.36,1)_both]">
-            <div class="absolute inset-[8%] rounded-full bg-[radial-gradient(circle,rgba(45,212,191,0.2)_0%,transparent_70%)] animate-[botGlow_3s_ease-in-out_infinite]"></div>
+            <div class="absolute inset-[8%] rounded-full bg-[radial-gradient(circle,var(--color-bot-glow)_0%,transparent_70%)] animate-[botGlow_3s_ease-in-out_infinite]"></div>
             <div class="absolute -inset-3.5 rounded-full border-4 border-dashed border-accent-1/35 animate-[botRingSpin_22s_linear_infinite]"></div>
             <div class="absolute -inset-5.5 rounded-full border-4 border-dashed border-accent-3/20 animate-[botRingSpin_30s_linear_infinite_reverse]"></div>
             <div class="relative w-full z-20 aspect-square max-w-sm mx-auto flex items-center justify-center overflow-visible">
-              <img src="../assets/svg/sentra-bot.svg" alt="Sentra AI call routing" class="w-full h-[450px] object-contain drop-shadow-[0_16px_36px_rgba(42,95,158,0.2)] relative z-10" />
+              <img src="../assets/svg/sentra-bot.svg" alt="Sentra AI call routing" class="w-full h-[450px] object-contain drop-shadow-[var(--shadow-primary-dark)] relative z-10" />
             </div>
           </div>
         </div>
@@ -72,7 +72,7 @@
     <section class="py-[72px] px-[5%] bg-gradient-secondary">
       <div class="max-w-[1320px] mx-auto">
         <div class="text-center max-w-[760px] mx-auto mb-9">
-          <span class="inline-block text-xs font-semibold uppercase tracking-[1.5px] text-textBrand bg-numberbackground px-4 py-2 rounded-full border border-primary-600/12 mb-4 font-primary">
+          <span class="inline-block text-xs font-semibold uppercase tracking-[1.5px] text-textBrand bg-badge-white px-4 py-2 rounded-full border border-badge-border mb-4 font-primary">
             Platform Architecture
           </span>
           <h2 class="font-display text-3xl md:text-4xl font-bold tracking-[-0.5px] mb-3 text-headingSection">
@@ -82,7 +82,7 @@
             Explore inbound voice, outbound campaigns, chatbots, live agent handoff, and supervisor analytics — orchestrated by one AI router.
           </p>
         </div>
-        <div class="rounded-2xl p-[14px] bg-white/90 border border-borderDefault shadow-[0_20px_60px_rgba(42,95,158,0.1)]">
+        <div class="rounded-2xl p-[14px] bg-white/90 border border-borderDefault shadow-[var(--color-platform-shadow)]">
           <img src="../assets/svg/sentra-platform.svg" alt="Sentra AI platform architecture"
                class="w-full block rounded-[14px]" />
         </div>
@@ -93,7 +93,7 @@
     <section class="py-20 px-[5%] bg-neutral-100">
       <div class="max-w-7xl mx-auto">
         <div class="text-center max-w-[760px] mx-auto mb-11">
-          <span class="inline-block text-xs font-semibold uppercase tracking-[1.5px] text-textBrand bg-numberbackground px-4 py-2 rounded-full border border-primary-600/12 mb-4 font-primary">
+          <span class="inline-block text-xs font-semibold uppercase tracking-[1.5px] text-textBrand bg-badge-white px-4 py-2 rounded-full border border-badge-border mb-4 font-primary">
             Platform Modules
           </span>
           <h2 class="font-display text-3xl md:text-4xl font-bold tracking-[-0.5px] mb-3 text-headingSection">
@@ -106,9 +106,9 @@
 
         <div class="grid grid-cols-2 md:grid-cols-4 max-w-[900px] mx-auto gap-[14px]">
           <router-link v-for="module in modules" :key="module.name" :to="module.link"
-                       class="flex flex-col items-center gap-2.5 p-[22px_14px] rounded-2xl bg-sectionWhite border border-borderDefault text-headingCard font-display text-[13px] font-bold transition-all duration-300 shadow-sm hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)] hover:border-activeBorder no-underline">
-            <div class="w-[42px] h-[42px] rounded-xl flex items-center justify-center text-lg text-secondary-700" style="background: rgba(74, 144, 226, 0.08);">
-              <i :class="module.icon " class="text-buttonHover" aria-hidden="true"></i>
+                       class="flex flex-col items-center gap-2.5 p-[22px_14px] rounded-2xl bg-section-white border border-borderDefault text-headingCard font-display text-[13px] font-bold transition-all duration-300 shadow-sm hover:-translate-y-1 hover:shadow-[var(--shadow-card-hover)] hover:border-card-hover-border no-underline">
+            <div class="w-[42px] h-[42px] rounded-xl flex items-center justify-center text-lg text-secondary-700" style="background: var(--color-icon-container-bg);">
+              <i :class="module.icon " class="text-button-hover" aria-hidden="true"></i>
             </div>
             <span>{{ module.name }}</span>
           </router-link>
@@ -116,18 +116,19 @@
       </div>
     </section>
 
-    <section id="dashboard" class="relative py-[72px] px-[5%] overflow-hidden scroll-mt-[96px] bg-white">
-      <div class="absolute w-[min(480px,52%)] h-[min(400px,72%)] rounded-2xl pointer-events-none z-0 blur-[52px] right-[2%] top-1/2 -translate-y-1/2 bg-[radial-gradient(circle,rgba(20,184,166,0.18)_0%,rgba(74,144,226,0.1)_42%,transparent_72%)]"></div>
+    <!-- Dashboard Section -->
+    <section id="dashboard" class="relative py-[72px] px-[5%] overflow-hidden scroll-mt-[96px] bg-section-white">
+      <div class="absolute w-[min(480px,52%)] h-[min(400px,72%)] rounded-2xl pointer-events-none z-0 blur-[52px] right-[2%] top-1/2 -translate-y-1/2 bg-glow-dashboard"></div>
 
       <div class="max-w-[1140px] mx-auto relative grid grid-cols-1 lg:grid-cols-[0.92fr_1.08fr] gap-[clamp(28px,5vw,56px)] items-center z-[2]">
         <div class="relative z-[2]">
-          <span class="block font-display text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] section-number pointer-events-none select-none">01</span>
-          <span class="inline-block text-xs font-semibold uppercase tracking-[1.5px] text-textBrand bg-numberbackground px-4 py-2 rounded-full border border-primary-600/12 mb-4 font-primary">Command Center</span>
+          <span class="block font-display text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] text-sectionNumber pointer-events-none select-none">01</span>
+          <span class="inline-block text-xs font-semibold uppercase tracking-[1.5px] text-textBrand bg-badge-white px-4 py-2 rounded-full border border-badge-border mb-4 font-primary">Command Center</span>
           <h2 class="font-display text-[clamp(24px,3vw,36px)] font-bold tracking-[-0.8px] leading-[1.15] text-headingSection mb-3">Real-time dashboard overview</h2>
           <p class="text-[15px] text-textBody leading-relaxed max-w-[480px] font-primary">A live snapshot of your entire operation — scheduled calls, queue depth, module usage, and activity trends that refresh automatically so supervisors always know what is happening right now.</p>
 
           <div class="mt-[22px] max-w-[480px] grid grid-cols-1 gap-4">
-            <div v-for="item in dashboardFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-borderDefault hover:border-activeBorder/30 transition-all duration-300">
+            <div v-for="item in dashboardFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-borderDefault hover:border-card-hover-border-alt transition-all duration-300">
               <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-primary-500/10 text-textBrand">
                 <i :class="item.icon" class="text-sm text-textBody" aria-hidden="true"></i>
               </span>
@@ -140,8 +141,8 @@
         </div>
         <div class="relative z-[1]">
           <div class="relative w-full">
-            <div class="absolute inset-[6%_2%] rounded-full bg-[radial-gradient(circle,rgba(74,144,226,0.16)_0%,rgba(20,184,166,0.08)_45%,transparent_72%)] blur-[10px] pointer-events-none"></div>
-            <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-borderDefault shadow-[0_22px_56px_rgba(15,23,42,0.1)] overflow-hidden">
+            <div class="absolute inset-[6%_2%] rounded-full bg-glow-queue blur-[10px] pointer-events-none"></div>
+            <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-borderDefault shadow-[var(--shadow-card)] overflow-hidden">
               <img src="@/assets/images/scheduled-overview.png" alt="Sentra AI scheduled calls overview dashboard"
                    class="w-full h-auto rounded-[10px]" />
             </div>
@@ -152,26 +153,26 @@
 
     <!-- Live Calls Section -->
     <section id="live-calls" class="relative py-[72px] px-[5%] overflow-hidden scroll-mt-[96px] bg-neutral-200">
-      <div class="absolute w-[min(480px,52%)] h-[min(400px,72%)] rounded-full pointer-events-none z-0 blur-[52px] left-[2%] top-1/2 -translate-y-1/2 bg-[radial-gradient(circle,rgba(74,144,226,0.2)_0%,rgba(20,184,166,0.1)_42%,transparent_72%)]"></div>
+      <div class="absolute w-[min(480px,52%)] h-[min(400px,72%)] rounded-full pointer-events-none z-0 blur-[52px] left-[2%] top-1/2 -translate-y-1/2 bg-glow-live"></div>
 
       <div class="max-w-[1140px] mx-auto relative grid grid-cols-1 lg:grid-cols-[1.08fr_0.92fr] gap-[clamp(28px,5vw,56px)] items-center z-[2]">
         <div class="relative z-[1] order-2 lg:order-1">
           <div class="relative w-full">
-            <div class="absolute inset-[6%_2%] rounded-full bg-[radial-gradient(circle,rgba(20,184,166,0.2)_0%,rgba(74,144,226,0.1)_45%,transparent_72%)] blur-[10px] pointer-events-none"></div>
-            <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-borderDefault shadow-[0_22px_56px_rgba(15,23,42,0.1)] overflow-hidden">
+            <div class="absolute inset-[6%_2%] rounded-full bg-glow-live blur-[10px] pointer-events-none"></div>
+            <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-borderDefault shadow-[var(--shadow-card)] overflow-hidden">
               <img src="@/assets/images/live-calls.png" alt="Sentra AI live calls table"
                    class="w-full h-auto rounded-[10px]" />
             </div>
           </div>
         </div>
         <div class="relative z-[2] order-1 lg:order-2">
-          <span class="block font-display text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] section-number pointer-events-none select-none">02</span>
-          <span class="inline-block text-xs font-semibold uppercase tracking-[1.5px] text-textBrand bg-numberbackground px-4 py-2 rounded-full border border-primary-600/12 mb-4 font-primary">Live Calls</span>
+          <span class="block font-display text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] text-sectionNumber pointer-events-none select-none">02</span>
+          <span class="inline-block text-xs font-semibold uppercase tracking-[1.5px] text-textBrand bg-badge-white px-4 py-2 rounded-full border border-badge-border mb-4 font-primary">Live Calls</span>
           <h2 class="font-display text-[clamp(24px,3vw,36px)] font-bold tracking-[-0.8px] leading-[1.15] text-headingSection mb-3">Monitor and manage active calls</h2>
           <p class="text-[15px] text-textBody leading-relaxed max-w-[480px] font-primary">Supervisors watch every active conversation in real time — who answered, which AI agent handled it, how long it ran, and whether a human agent has been assigned.</p>
 
           <div class="mt-[22px] max-w-[480px] grid grid-cols-1 gap-4">
-            <div v-for="item in liveCallFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-borderDefault hover:border-activeBorder/30 transition-all duration-300">
+            <div v-for="item in liveCallFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-borderDefault hover:border-card-hover-border-alt transition-all duration-300">
               <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-primary-500/10 text-textBrand">
                 <i :class="item.icon" class="text-sm text-textBody" aria-hidden="true"></i>
               </span>
@@ -186,18 +187,18 @@
     </section>
 
     <!-- Call Queue Section -->
-    <section id="call-queue" class="relative py-[72px] px-[5%] overflow-hidden scroll-mt-[96px] bg-white">
-      <div class="absolute w-[min(480px,52%)] h-[min(400px,72%)] rounded-full pointer-events-none z-0 blur-[52px] right-[2%] top-1/2 -translate-y-1/2 bg-[radial-gradient(circle,rgba(20,184,166,0.18)_0%,rgba(74,144,226,0.1)_42%,transparent_72%)]"></div>
+    <section id="call-queue" class="relative py-[72px] px-[5%] overflow-hidden scroll-mt-[96px] bg-section-white">
+      <div class="absolute w-[min(480px,52%)] h-[min(400px,72%)] rounded-full pointer-events-none z-0 blur-[52px] right-[2%] top-1/2 -translate-y-1/2 bg-glow-queue"></div>
 
       <div class="max-w-[1140px] mx-auto relative grid grid-cols-1 lg:grid-cols-[0.92fr_1.08fr] gap-[clamp(28px,5vw,56px)] items-center z-[2]">
         <div class="relative z-[2]">
-          <span class="block font-display text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] section-number pointer-events-none select-none">03</span>
-          <span class="inline-block text-xs font-semibold uppercase tracking-[1.5px] text-textBrand bg-numberbackground px-4 py-2 rounded-full border border-primary-600/12 mb-4 font-primary">Call Queue</span>
+          <span class="block font-display text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] text-sectionNumber pointer-events-none select-none">03</span>
+          <span class="inline-block text-xs font-semibold uppercase tracking-[1.5px] text-textBrand bg-badge-white px-4 py-2 rounded-full border border-badge-border mb-4 font-primary">Call Queue</span>
           <h2 class="font-display text-[clamp(24px,3vw,36px)] font-bold tracking-[-0.8px] leading-[1.15] text-headingSection mb-3">Intelligent call routing and queue management</h2>
           <p class="text-[15px] text-textBody leading-relaxed max-w-[480px] font-primary">Calls waiting for assignment are prioritized by urgency and skill requirement. Managers see wait times, required expertise, and which agents are available to take the next call.</p>
 
           <div class="mt-[22px] max-w-[480px] grid grid-cols-1 gap-4">
-            <div v-for="item in queueFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-borderDefault hover:border-activeBorder/30 transition-all duration-300">
+            <div v-for="item in queueFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-borderDefault hover:border-card-hover-border-alt transition-all duration-300">
               <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-primary-500/10 text-textBrand">
                 <i :class="item.icon" class="text-sm text-textBody" aria-hidden="true"></i>
               </span>
@@ -210,8 +211,8 @@
         </div>
         <div class="relative z-[1]">
           <div class="relative w-full">
-            <div class="absolute inset-[6%_2%] rounded-full bg-[radial-gradient(circle,rgba(74,144,226,0.16)_0%,rgba(20,184,166,0.08)_45%,transparent_72%)] blur-[10px] pointer-events-none"></div>
-            <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-borderDefault shadow-[0_22px_56px_rgba(15,23,42,0.1)] overflow-hidden">
+            <div class="absolute inset-[6%_2%] rounded-full bg-glow-queue blur-[10px] pointer-events-none"></div>
+            <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-borderDefault shadow-[var(--shadow-card)] overflow-hidden">
               <img src="@/assets/images/call-queue.png" alt="Sentra AI call queue"
                    class="w-full h-auto rounded-[10px]" />
             </div>
@@ -222,20 +223,20 @@
 
     <!-- Campaigns Section -->
     <section id="campaigns" class="relative py-[72px] px-[5%] overflow-hidden scroll-mt-[96px] bg-neutral-200">
-      <div class="absolute w-[min(480px,52%)] h-[min(400px,72%)] rounded-full pointer-events-none z-0 blur-[52px] left-[2%] top-1/2 -translate-y-1/2 bg-[radial-gradient(circle,rgba(74,144,226,0.2)_0%,rgba(20,184,166,0.1)_42%,transparent_72%)]"></div>
+      <div class="absolute w-[min(480px,52%)] h-[min(400px,72%)] rounded-full pointer-events-none z-0 blur-[52px] left-[2%] top-1/2 -translate-y-1/2 bg-glow-campaign"></div>
 
       <div class="max-w-[1140px] mx-auto relative grid grid-cols-1 lg:grid-cols-[1.08fr_0.92fr] gap-[clamp(28px,5vw,56px)] items-center z-[2]">
         <div class="relative z-[1] order-2 lg:order-1">
           <div class="flex flex-col gap-4">
             <div class="relative w-full">
-              <div class="absolute inset-[6%_2%] rounded-full bg-[radial-gradient(circle,rgba(20,184,166,0.2)_0%,rgba(74,144,226,0.1)_45%,transparent_72%)] blur-[10px] pointer-events-none"></div>
-              <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-borderDefault shadow-[0_22px_56px_rgba(15,23,42,0.1)] overflow-hidden">
+              <div class="absolute inset-[6%_2%] rounded-full bg-glow-campaign blur-[10px] pointer-events-none"></div>
+              <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-borderDefault shadow-[var(--shadow-card)] overflow-hidden">
                 <img src="@/assets/images/campaigns.png" alt="Sentra AI campaigns"
                      class="w-full h-auto rounded-[10px]" />
               </div>
             </div>
             <figure class="relative w-full">
-              <div class="relative z-[2] p-[8px] rounded-2xl bg-white/95 border border-borderDefault shadow-[0_12px_32px_rgba(15,23,42,0.07)] overflow-hidden">
+              <div class="relative z-[2] p-[8px] rounded-2xl bg-white/95 border border-borderDefault shadow-[var(--shadow-card-small)] overflow-hidden">
                 <img src="@/assets/images/bulk-contacts.png" alt="Sentra AI bulk contacts"
                      class="w-full h-auto rounded-[10px]" />
               </div>
@@ -244,13 +245,13 @@
           </div>
         </div>
         <div class="relative z-[2] order-1 lg:order-2">
-          <span class="block font-display text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] section-number pointer-events-none select-none">04</span>
-          <span class="inline-block text-xs font-semibold uppercase tracking-[1.5px] text-textBrand bg-numberbackground px-4 py-2 rounded-full border border-primary-600/12 mb-4 font-primary">Campaigns &amp; Contacts</span>
+          <span class="block font-display text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] text-sectionNumber pointer-events-none select-none">04</span>
+          <span class="inline-block text-xs font-semibold uppercase tracking-[1.5px] text-textBrand bg-badge-white px-4 py-2 rounded-full border border-badge-border mb-4 font-primary">Campaigns &amp; Contacts</span>
           <h2 class="font-display text-[clamp(24px,3vw,36px)] font-bold tracking-[-0.8px] leading-[1.15] text-headingSection mb-3">Launch and manage outbound campaigns</h2>
           <p class="text-[15px] text-textBody leading-relaxed max-w-[480px] font-primary">Create AI-driven Sales, Service, or custom campaigns — toggle them on or off, set start dates, and import thousands of contacts in one CSV upload with validation built in.</p>
 
           <div class="mt-[22px] max-w-[480px] grid grid-cols-1 gap-4">
-            <div v-for="item in campaignFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-borderDefault hover:border-activeBorder/30 transition-all duration-300">
+            <div v-for="item in campaignFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-borderDefault hover:border-card-hover-border-alt transition-all duration-300">
               <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-primary-500/10 text-textBrand">
                 <i :class="item.icon" class="text-sm text-textBody" aria-hidden="true"></i>
               </span>
@@ -265,18 +266,18 @@
     </section>
 
     <!-- Call Scheduler Section -->
-    <section id="scheduler" class="relative py-[72px] px-[5%] overflow-hidden scroll-mt-[96px] bg-white">
-      <div class="absolute w-[min(480px,52%)] h-[min(400px,72%)] rounded-full pointer-events-none z-0 blur-[52px] right-[2%] top-1/2 -translate-y-1/2 bg-[radial-gradient(circle,rgba(20,184,166,0.18)_0%,rgba(74,144,226,0.1)_42%,transparent_72%)]"></div>
+    <section id="scheduler" class="relative py-[72px] px-[5%] overflow-hidden scroll-mt-[96px] bg-section-white">
+      <div class="absolute w-[min(480px,52%)] h-[min(400px,72%)] rounded-full pointer-events-none z-0 blur-[52px] right-[2%] top-1/2 -translate-y-1/2 bg-glow-scheduler"></div>
 
       <div class="max-w-[1140px] mx-auto relative grid grid-cols-1 lg:grid-cols-[0.92fr_1.08fr] gap-[clamp(28px,5vw,56px)] items-center z-[2]">
         <div class="relative z-[2]">
-          <span class="block font-display text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] section-number pointer-events-none select-none">05</span>
-          <span class="inline-block text-xs font-semibold uppercase tracking-[1.5px] text-textBrand bg-numberbackground px-4 py-2 rounded-full border border-primary-600/12 mb-4 font-primary">Call Scheduler</span>
+          <span class="block font-display text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] text-sectionNumber pointer-events-none select-none">05</span>
+          <span class="inline-block text-xs font-semibold uppercase tracking-[1.5px] text-textBrand bg-badge-white px-4 py-2 rounded-full border border-badge-border mb-4 font-primary">Call Scheduler</span>
           <h2 class="font-display text-[clamp(24px,3vw,36px)] font-bold tracking-[-0.8px] leading-[1.15] text-headingSection mb-3">Automated dialing on your schedule</h2>
           <p class="text-[15px] text-textBody leading-relaxed max-w-[480px] font-primary">Per-campaign scheduling dials contacts automatically within your calling window. Monitor pool progress, daily limits, queue depth, and which AI agents are receiving calls.</p>
 
           <div class="mt-[22px] max-w-[480px] grid grid-cols-1 gap-4">
-            <div v-for="item in schedulerFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-borderDefault hover:border-activeBorder/30 transition-all duration-300">
+            <div v-for="item in schedulerFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-borderDefault hover:border-card-hover-border-alt transition-all duration-300">
               <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-primary-500/10 text-textBrand">
                 <i :class="item.icon" class="text-sm text-textBody" aria-hidden="true"></i>
               </span>
@@ -289,8 +290,8 @@
         </div>
         <div class="relative z-[1]">
           <div class="relative w-full">
-            <div class="absolute inset-[6%_2%] rounded-full bg-[radial-gradient(circle,rgba(74,144,226,0.16)_0%,rgba(20,184,166,0.08)_45%,transparent_72%)] blur-[10px] pointer-events-none"></div>
-            <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-borderDefault shadow-[0_22px_56px_rgba(15,23,42,0.1)] overflow-hidden">
+            <div class="absolute inset-[6%_2%] rounded-full bg-glow-scheduler blur-[10px] pointer-events-none"></div>
+            <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-borderDefault shadow-[var(--shadow-card)] overflow-hidden">
               <img src="@/assets/images/call-scheduler.png" alt="Sentra AI call scheduler"
                    class="w-full h-auto rounded-[10px]" />
             </div>
@@ -301,20 +302,20 @@
 
     <!-- Analytics Section -->
     <section id="analytics" class="relative py-[72px] px-[5%] overflow-hidden scroll-mt-[96px] bg-neutral-200">
-      <div class="absolute w-[min(480px,52%)] h-[min(400px,72%)] rounded-full pointer-events-none z-0 blur-[52px] left-[2%] top-1/2 -translate-y-1/2 bg-[radial-gradient(circle,rgba(74,144,226,0.2)_0%,rgba(20,184,166,0.1)_42%,transparent_72%)]"></div>
+      <div class="absolute w-[min(480px,52%)] h-[min(400px,72%)] rounded-full pointer-events-none z-0 blur-[52px] left-[2%] top-1/2 -translate-y-1/2 bg-glow-analytics"></div>
 
       <div class="max-w-[1140px] mx-auto relative grid grid-cols-1 lg:grid-cols-[1.08fr_0.92fr] gap-[clamp(28px,5vw,56px)] items-center z-[2]">
         <div class="relative z-[1] order-2 lg:order-1">
           <div class="flex flex-col gap-4">
             <div class="relative w-full">
-              <div class="absolute inset-[6%_2%] rounded-full bg-[radial-gradient(circle,rgba(20,184,166,0.2)_0%,rgba(74,144,226,0.1)_45%,transparent_72%)] blur-[10px] pointer-events-none"></div>
-              <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-borderDefault shadow-[0_22px_56px_rgba(15,23,42,0.1)] overflow-hidden">
+              <div class="absolute inset-[6%_2%] rounded-full bg-glow-analytics blur-[10px] pointer-events-none"></div>
+              <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-borderDefault shadow-[var(--shadow-card)] overflow-hidden">
                 <img src="@/assets/images/chatbot-analytics.png" alt="Sentra AI chatbot analytics"
                      class="w-full h-auto rounded-[10px]" />
               </div>
             </div>
             <figure class="relative w-full">
-              <div class="relative z-[2] p-[8px] rounded-2xl bg-white/95 border border-borderDefault shadow-[0_12px_32px_rgba(15,23,42,0.07)] overflow-hidden">
+              <div class="relative z-[2] p-[8px] rounded-2xl bg-white/95 border border-borderDefault shadow-[var(--shadow-card-small)] overflow-hidden">
                 <img src="@/assets/images/analytics-charts.png" alt="Sentra AI analytics charts"
                      class="w-full h-auto rounded-[10px]" />
               </div>
@@ -323,13 +324,13 @@
           </div>
         </div>
         <div class="relative z-[2] order-1 lg:order-2">
-          <span class="block font-display text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] section-number pointer-events-none select-none">06</span>
-          <span class="inline-block text-xs font-semibold uppercase tracking-[1.5px] text-textBrand bg-numberbackground px-4 py-2 rounded-full border border-primary-600/12 mb-4 font-primary">Analytics</span>
+          <span class="block font-display text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] text-sectionNumber pointer-events-none select-none">06</span>
+          <span class="inline-block text-xs font-semibold uppercase tracking-[1.5px] text-textBrand bg-badge-white px-4 py-2 rounded-full border border-badge-border mb-4 font-primary">Analytics</span>
           <h2 class="font-display text-[clamp(24px,3vw,36px)] font-bold tracking-[-0.8px] leading-[1.15] text-headingSection mb-3">Token usage, embeddings, and chat insights</h2>
           <p class="text-[15px] text-textBody leading-relaxed max-w-[480px] font-primary">Filter analytics by client, user, date range, and grouping period. Track total tokens, embedding usage, AI response volume, and request counts — with drill-down into chat history and per-user stats.</p>
 
           <div class="mt-[22px] max-w-[480px] grid grid-cols-1 gap-4">
-            <div v-for="item in analyticsFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-borderDefault hover:border-activeBorder/30 transition-all duration-300">
+            <div v-for="item in analyticsFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-borderDefault hover:border-card-hover-border-alt transition-all duration-300">
               <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-primary-500/10 text-textBrand">
                 <i :class="item.icon" class="text-sm text-textBody" aria-hidden="true"></i>
               </span>
@@ -344,18 +345,18 @@
     </section>
 
     <!-- Team Workspace Section -->
-    <section id="team" class="relative py-[72px] px-[5%] overflow-hidden scroll-mt-[96px] bg-white">
-      <div class="absolute w-[min(480px,52%)] h-[min(400px,72%)] rounded-full pointer-events-none z-0 blur-[52px] right-[2%] top-1/2 -translate-y-1/2 bg-[radial-gradient(circle,rgba(20,184,166,0.18)_0%,rgba(74,144,226,0.1)_42%,transparent_72%)]"></div>
+    <section id="team" class="relative py-[72px] px-[5%] overflow-hidden scroll-mt-[96px] bg-section-white">
+      <div class="absolute w-[min(480px,52%)] h-[min(400px,72%)] rounded-full pointer-events-none z-0 blur-[52px] right-[2%] top-1/2 -translate-y-1/2 bg-glow-team"></div>
 
       <div class="max-w-[1140px] mx-auto relative grid grid-cols-1 lg:grid-cols-[0.92fr_1.08fr] gap-[clamp(28px,5vw,56px)] items-center z-[2]">
         <div class="relative z-[2]">
-          <span class="block font-display text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] section-number pointer-events-none select-none">07</span>
-          <span class="inline-block text-xs font-semibold uppercase tracking-[1.5px] text-textBrand bg-numberbackground px-4 py-2 rounded-full border border-primary-600/12 mb-4 font-primary">Team Workspace</span>
+          <span class="block font-display text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] text-sectionNumber pointer-events-none select-none">07</span>
+          <span class="inline-block text-xs font-semibold uppercase tracking-[1.5px] text-textBrand bg-badge-white px-4 py-2 rounded-full border border-badge-border mb-4 font-primary">Team Workspace</span>
           <h2 class="font-display text-[clamp(24px,3vw,36px)] font-bold tracking-[-0.8px] leading-[1.15] text-headingSection mb-3">Agent availability and quick access</h2>
           <p class="text-[15px] text-textBody leading-relaxed max-w-[480px] font-primary">See who is online across your organization for call routing and transfers. Agent availability bars, quick-launch shortcuts into key modules, and high-level counts for contacts, campaigns, uploads, and tokens.</p>
 
           <div class="mt-[22px] max-w-[480px] grid grid-cols-1 gap-4">
-            <div v-for="item in teamFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-borderDefault hover:border-activeBorder/30 transition-all duration-300">
+            <div v-for="item in teamFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-borderDefault hover:border-card-hover-border-alt transition-all duration-300">
               <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-primary-500/10 text-textBrand">
                 <i :class="item.icon" class="text-sm text-textBody" aria-hidden="true"></i>
               </span>
@@ -368,8 +369,8 @@
         </div>
         <div class="relative z-[1]">
           <div class="relative w-full">
-            <div class="absolute inset-[6%_2%] rounded-full bg-[radial-gradient(circle,rgba(74,144,226,0.16)_0%,rgba(20,184,166,0.08)_45%,transparent_72%)] blur-[10px] pointer-events-none"></div>
-            <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-borderDefault shadow-[0_22px_56px_rgba(15,23,42,0.1)] overflow-hidden">
+            <div class="absolute inset-[6%_2%] rounded-full bg-glow-team blur-[10px] pointer-events-none"></div>
+            <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-borderDefault shadow-[var(--shadow-card)] overflow-hidden">
               <img src="@/assets/images/team-dashboard.png" alt="Sentra AI team workspace"
                    class="w-full h-auto rounded-[10px]" />
             </div>
@@ -382,7 +383,7 @@
     <section class="py-20 px-[5%] bg-neutral-200">
       <div class="max-w-7xl mx-auto">
         <div class="text-center mb-12">
-          <span class="inline-block text-xs font-semibold uppercase tracking-[1.5px] text-textBrand bg-numberbackground px-4 py-2 rounded-full border border-primary-600/12 mb-4 font-primary">
+          <span class="inline-block text-xs font-semibold uppercase tracking-[1.5px] text-textBrand bg-badge-white px-4 py-2 rounded-full border border-badge-border mb-4 font-primary">
             Capabilities
           </span>
           <h2 class="font-display text-3xl md:text-4xl font-bold tracking-[-0.5px] text-headingSection">
@@ -392,7 +393,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[18px] max-w-[1100px] mx-auto">
           <div v-for="benefit in benefits" :key="benefit.title"
-               class="bg-white border border-borderDefault rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(0,0,0,0.08)] hover:border-activeBorder/28">
+               class="bg-section-white border border-borderDefault rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-card-hover)] hover:border-card-hover-border">
             <h3 class="font-display text-base font-bold text-headingCard mb-2">{{ benefit.title }}</h3>
             <p class="text-sm text-textBody leading-relaxed font-primary">{{ benefit.description }}</p>
           </div>

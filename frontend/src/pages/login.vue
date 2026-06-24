@@ -3,28 +3,28 @@
 
     <div class="flex min-h-0 flex-1 overflow-hidden">
       <!-- Left panel -->
-      <aside class="relative hidden min-h-0 flex-[1.08] flex-col justify-between overflow-hidden border-r border-neutral-300/70 px-10 pt-8 pb-8 lg:px-12 lg:pt-10 lg:pb-10 xl:px-14 lg:flex">
+      <aside class="relative hidden min-h-0 flex-[1.08] flex-col justify-between overflow-hidden border-r border-borderDefault px-10 pt-8 pb-8 lg:px-12 lg:pt-10 lg:pb-10 xl:px-14 lg:flex">
 
         <div class="absolute inset-0 bg-gradient-primary" aria-hidden="true"></div>
 
         <!-- Animated grid -->
         <div
-            class="pointer-events-none absolute inset-0 animate-login-grid bg-[radial-gradient(circle,rgba(30,58,95,0.055)_1px,transparent_1px)] bg-[length:26px_26px]"
+            class="pointer-events-none absolute inset-0 animate-login-grid bg-[radial-gradient(circle,var(--color-primary-800)/0.055_1px,transparent_1px)] bg-[length:26px_26px]"
             aria-hidden="true"
         ></div>
 
         <!-- Floating orbs — bigger, more visible -->
-        <div class="pointer-events-none absolute -top-32 -left-24 h-[520px] w-[520px] animate-login-orb rounded-full bg-[radial-gradient(circle,#FFD5B4,transparent_65%)] opacity-60 blur-[72px]" aria-hidden="true"></div>
-        <div class="pointer-events-none absolute -right-12 -bottom-16 h-[440px] w-[440px] animate-login-orb rounded-full bg-[radial-gradient(circle,#C9C4F8,transparent_65%)] opacity-60 blur-[72px] [animation-direction:reverse] [animation-duration:18s]" aria-hidden="true"></div>
+        <div class="pointer-events-none absolute -top-32 -left-24 h-[520px] w-[520px] animate-login-orb rounded-full bg-[radial-gradient(circle,var(--color-secondary-100),transparent_65%)] opacity-60 blur-[72px]" aria-hidden="true"></div>
+        <div class="pointer-events-none absolute -right-12 -bottom-16 h-[440px] w-[440px] animate-login-orb rounded-full bg-[radial-gradient(circle,var(--color-mesh-purple),transparent_65%)] opacity-60 blur-[72px] [animation-direction:reverse] [animation-duration:18s]" aria-hidden="true"></div>
         <!-- Extra mid orb for depth -->
-        <div class="pointer-events-none absolute top-1/2 left-1/2 h-[280px] w-[280px] -translate-x-1/2 -translate-y-1/2 animate-login-orb rounded-full bg-[radial-gradient(circle,rgba(74,144,226,0.12),transparent_70%)] blur-[60px] [animation-duration:14s] [animation-delay:3s]" aria-hidden="true"></div>
+        <div class="pointer-events-none absolute top-1/2 left-1/2 h-[280px] w-[280px] -translate-x-1/2 -translate-y-1/2 animate-login-orb rounded-full bg-[radial-gradient(circle,var(--color-primary-500)/0.12,transparent_70%)] blur-[60px] [animation-duration:14s] [animation-delay:3s]" aria-hidden="true"></div>
 
         <!-- Animated scanline shimmer -->
-        <div class="pointer-events-none absolute inset-0 animate-scanline opacity-[0.03] bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(255,255,255,0.5)_2px,rgba(255,255,255,0.5)_4px)]" aria-hidden="true"></div>
+        <div class="pointer-events-none absolute inset-0 animate-scanline opacity-[0.03] bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,var(--color-section-white)/0.5_2px,var(--color-section-white)/0.5_4px)]" aria-hidden="true"></div>
 
         <div class="relative z-10 animate-login-fade-up">
           <!-- Live badge with pulsing ring -->
-          <div class="mb-5 inline-flex items-center gap-2 rounded-full border border-neutral-300 bg-white/85 px-3.5 py-1.5 text-[0.67rem] font-bold tracking-widest text-neutral-600 uppercase shadow-sm backdrop-blur-sm">
+          <div class="mb-5 inline-flex items-center gap-2 rounded-full border border-borderDefault bg-badgeSemi px-3.5 py-1.5 text-[0.67rem] font-bold tracking-widest text-textSupporting uppercase shadow-sm backdrop-blur-sm">
               <span class="relative flex h-2 w-2 shrink-0">
                 <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary-500 opacity-60"></span>
                 <span class="relative inline-flex h-2 w-2 rounded-full bg-primary-500"></span>
@@ -32,18 +32,18 @@
             Secure · Role-based · Always on
           </div>
 
-          <h1 class="mb-2.5 font-display text-[clamp(1.65rem,2.4vw,2.5rem)] leading-[1.12] font-bold tracking-tight text-primary-900">
+          <h1 class="mb-2.5 font-display text-[clamp(1.65rem,2.4vw,2.5rem)] leading-[1.12] font-bold tracking-tight text-headingMain">
             Everything you build,<br />
             <span class="text-gradient-primary relative inline-block after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-left after:scale-x-0 after:bg-gradient-to-r after:from-secondary-500 after:to-primary-500 after:animate-underline-grow">one place to manage.</span>
           </h1>
 
-          <p class="max-w-[380px] text-sm leading-relaxed text-neutral-700">
+          <p class="max-w-[380px] text-sm leading-relaxed text-textBody">
             Unified access to Sentra AI, Voice AI Agent, Chatbot dashboards and client billing — secured with role-based controls.
           </p>
         </div>
 
         <div class="relative z-10 flex min-h-0 flex-1 items-center justify-center py-4 animate-login-fade-up [animation-delay:80ms]">
-          <LoginVisual class="w-full max-w-[min(100%,540px)] min-h-[240px] max-h-[min(46vh,480px)] drop-shadow-[0_16px_48px_rgba(74,144,226,0.25)] transition-all duration-700 hover:drop-shadow-[0_24px_64px_rgba(74,144,226,0.35)] hover:-translate-y-1" />
+          <LoginVisual class="w-full max-w-[min(100%,540px)] min-h-[240px] max-h-[min(46vh,480px)] drop-shadow-[var(--shadow-blue)] transition-all duration-700 hover:drop-shadow-[0_24px_64px_rgba(74,144,226,0.35)] hover:-translate-y-1" />
         </div>
 
         <div class="relative z-10 flex flex-wrap gap-2 animate-login-fade-up [animation-delay:160ms]">
@@ -51,23 +51,23 @@
               v-for="(stat, i) in stats"
               :key="stat.label"
               :style="{ animationDelay: `${200 + i * 80}ms` }"
-              class="stat-card flex min-w-[88px] flex-col rounded-xl border border-neutral-300 bg-white/90 px-4 py-2.5 shadow-sm backdrop-blur-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_8px_24px_rgba(74,144,226,0.18)] hover:border-primary-200 animate-login-fade-up cursor-default"
+              class="stat-card flex min-w-[88px] flex-col rounded-xl border border-borderDefault bg-cardSemi px-4 py-2.5 shadow-sm backdrop-blur-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_8px_24px_rgba(74,144,226,0.18)] hover:border-primary-200 animate-login-fade-up cursor-default"
           >
-            <span class="font-display text-xl leading-none font-extrabold text-primary-900">{{ stat.value }}</span>
-            <span class="mt-0.5 text-[0.68rem] font-medium text-neutral-600">{{ stat.label }}</span>
+            <span class="font-display text-xl leading-none font-extrabold text-headingMain">{{ stat.value }}</span>
+            <span class="mt-0.5 text-[0.68rem] font-medium text-textSupporting">{{ stat.label }}</span>
           </div>
         </div>
       </aside>
 
       <!-- Right panel -->
-      <main class="relative flex min-h-0 flex-[0.92] items-center justify-center overflow-x-hidden overflow-y-auto bg-gradient-primary px-5 py-6 sm:px-8 lg:bg-white/80 lg:backdrop-blur-sm">
+      <main class="relative flex min-h-0 flex-[0.92] items-center justify-center overflow-x-hidden overflow-y-auto bg-gradient-primary px-5 py-6 sm:px-8 lg:bg-section-white/80 lg:backdrop-blur-sm">
 
         <!-- Animated concentric rings -->
         <div class="pointer-events-none absolute -top-48 -right-48 h-[580px] w-[580px] animate-login-ring rounded-full border border-primary-500/10" aria-hidden="true"></div>
         <div class="pointer-events-none absolute -top-28 -right-28 h-[380px] w-[380px] animate-login-ring rounded-full border border-primary-500/10 [animation-delay:2s]" aria-hidden="true"></div>
         <div class="pointer-events-none absolute -top-14 -right-14 h-[200px] w-[200px] animate-login-ring rounded-full border border-primary-500/8 [animation-delay:4s]" aria-hidden="true"></div>
 
-        <div class="pointer-events-none absolute -bottom-24 -left-20 h-[340px] w-[340px] rounded-full bg-[radial-gradient(circle,rgba(201,110,58,0.08)_0%,rgba(107,82,184,0.06)_50%,transparent_70%)] blur-2xl" aria-hidden="true"></div>
+        <div class="pointer-events-none absolute -bottom-24 -left-20 h-[340px] w-[340px] rounded-full bg-[radial-gradient(circle,var(--color-secondary-500)/0.08_0%,var(--color-accent-3)/0.06_50%,transparent_70%)] blur-2xl" aria-hidden="true"></div>
 
         <!-- Floating particles -->
         <div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
@@ -78,16 +78,16 @@
           <span class="particle absolute bottom-[40%] left-[5%] h-1 w-1 rounded-full bg-secondary-300/20 animate-float-2 [animation-delay:2.5s]"></span>
         </div>
 
-        <div class="relative z-10 w-full max-w-[400px] animate-login-card overflow-hidden rounded-2xl border border-neutral-300/80 bg-white p-6 shadow-blue sm:max-w-[420px] sm:p-7 [animation-delay:60ms] lg:max-w-[400px] transition-shadow duration-500 hover:shadow-[0_20px_60px_rgba(74,144,226,0.18)]">
+        <div class="relative z-10 w-full max-w-[400px] animate-login-card overflow-hidden rounded-2xl border border-borderDefault/80 bg-section-white p-6 shadow-blue sm:max-w-[420px] sm:p-7 lg:max-w-[400px] transition-shadow duration-500 hover:shadow-[0_20px_60px_rgba(74,144,226,0.18)] [animation-delay:60ms]">
 
           <!-- Animated top accent bar -->
           <div class="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-secondary-500 via-accent-4 to-primary-500 animate-gradient-shift" aria-hidden="true"></div>
 
           <!-- Corner glow -->
-          <div class="pointer-events-none absolute -top-12 -right-12 h-28 w-28 rounded-full bg-[radial-gradient(circle,rgba(74,144,226,0.10),transparent_70%)] blur-xl" aria-hidden="true"></div>
+          <div class="pointer-events-none absolute -top-12 -right-12 h-28 w-28 rounded-full bg-[radial-gradient(circle,var(--color-primary-500)/0.10,transparent_70%)] blur-xl" aria-hidden="true"></div>
 
           <div class="mb-4 flex justify-center lg:hidden">
-            <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-primary-900 to-primary-500 text-sm font-extrabold text-white shadow-lg shadow-primary-500/25 animate-logo-bounce">
+            <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-headingMain to-primary-500 text-sm font-extrabold text-white shadow-lg shadow-primary-500/25 animate-logo-bounce">
               RS
             </div>
           </div>
@@ -97,15 +97,15 @@
               <font-awesome-icon icon="fa-solid fa-shield-halved" class="text-[0.65rem] text-primary-500 animate-shield-pulse" />
               Secure Sign-In
             </div>
-            <h2 class="mt-3 font-display text-2xl font-bold text-primary-900 animate-login-fade-up [animation-delay:120ms]">Welcome back</h2>
-            <p class="mt-1 text-sm leading-relaxed text-neutral-600 animate-login-fade-up [animation-delay:180ms]">
+            <h2 class="mt-3 font-display text-2xl font-bold text-headingMain animate-login-fade-up [animation-delay:120ms]">Welcome back</h2>
+            <p class="mt-1 text-sm leading-relaxed text-textBody animate-login-fade-up [animation-delay:180ms]">
               Sign in to access your Rasant Solutions workspace.
             </p>
           </div>
 
           <div
               v-if="errorMessage"
-              class="mb-3 flex items-center gap-2 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-700 animate-shake"
+              class="mb-3 flex items-center gap-2 rounded-lg border border-error/20 bg-error/10 px-3 py-2 text-xs text-error animate-shake"
           >
             <font-awesome-icon icon="fa-solid fa-circle-exclamation" class="shrink-0 text-[0.7rem]" />
             {{ errorMessage }}
@@ -113,7 +113,7 @@
 
           <form @submit.prevent="handleLoginSubmit" novalidate class="space-y-4">
             <div class="animate-login-fade-up [animation-delay:220ms]">
-              <label for="username" class="mb-1.5 block text-[0.7rem] font-bold tracking-wider text-primary-900 uppercase">
+              <label for="username" class="mb-1.5 block text-[0.7rem] font-bold tracking-wider text-headingMain uppercase">
                 Username
               </label>
               <div class="relative group">
@@ -127,14 +127,14 @@
                     placeholder="Enter your username"
                     required
                     autocomplete="username"
-                    class="login-input w-full rounded-xl border border-neutral-300 bg-neutral-100 py-2.5 pr-3 pl-10 text-[0.9375rem] text-primary-900 outline-none transition-all duration-200 placeholder:text-neutral-500 focus:border-primary-500 focus:bg-white focus:ring-4 focus:ring-primary-500/12 focus:shadow-[0_0_0_4px_rgba(74,144,226,0.08),0_2px_8px_rgba(74,144,226,0.12)]"
+                    class="login-input w-full rounded-xl border border-borderDefault bg-neutral-100 py-2.5 pr-3 pl-10 text-[0.9375rem] text-headingMain outline-none transition-all duration-200 placeholder:text-textSupporting focus:border-primary-500 focus:bg-section-white focus:ring-4 focus:ring-primary-500/12 focus:shadow-[0_0_0_4px_rgba(74,144,226,0.08),0_2px_8px_rgba(74,144,226,0.12)]"
                 />
               </div>
             </div>
 
             <div class="animate-login-fade-up [animation-delay:280ms]">
               <div class="mb-1.5 flex items-center justify-between">
-                <label for="password" class="text-[0.7rem] font-bold tracking-wider text-primary-900 uppercase">
+                <label for="password" class="text-[0.7rem] font-bold tracking-wider text-headingMain uppercase">
                   Password
                 </label>
                 <a
@@ -155,7 +155,7 @@
                     placeholder="Enter your password"
                     required
                     autocomplete="current-password"
-                    class="login-input w-full rounded-xl border border-neutral-300 bg-neutral-100 py-2.5 pr-11 pl-10 text-[0.9375rem] text-primary-900 outline-none transition-all duration-200 placeholder:text-neutral-500 focus:border-primary-500 focus:bg-white focus:ring-4 focus:ring-primary-500/12 focus:shadow-[0_0_0_4px_rgba(74,144,226,0.08),0_2px_8px_rgba(74,144,226,0.12)]"
+                    class="login-input w-full rounded-xl border border-borderDefault bg-neutral-100 py-2.5 pr-11 pl-10 text-[0.9375rem] text-headingMain outline-none transition-all duration-200 placeholder:text-textSupporting focus:border-primary-500 focus:bg-section-white focus:ring-4 focus:ring-primary-500/12 focus:shadow-[0_0_0_4px_rgba(74,144,226,0.08),0_2px_8px_rgba(74,144,226,0.12)]"
                 />
                 <button
                     type="button"
@@ -172,7 +172,7 @@
               </div>
             </div>
 
-            <label class="inline-flex cursor-pointer items-center gap-2.5 text-sm text-neutral-600 select-none group animate-login-fade-up [animation-delay:320ms]">
+            <label class="inline-flex cursor-pointer items-center gap-2.5 text-sm text-textBody select-none group animate-login-fade-up [animation-delay:320ms]">
               <input v-model="rememberMe" type="checkbox" class="h-4 w-4 cursor-pointer accent-primary-500 transition-transform duration-150 group-hover:scale-110" />
               <span class="transition-colors duration-200 group-hover:text-primary-700">Remember me on this device</span>
             </label>
@@ -184,10 +184,10 @@
             </div>
           </form>
 
-          <div class="my-4 flex items-center gap-3 text-xs text-neutral-500 animate-login-fade-up [animation-delay:400ms]">
-            <span class="h-px flex-1 bg-gradient-to-r from-transparent to-neutral-300"></span>
+          <div class="my-4 flex items-center gap-3 text-xs text-textSupporting animate-login-fade-up [animation-delay:400ms]">
+            <span class="h-px flex-1 bg-gradient-to-r from-transparent to-borderDefault"></span>
             <span class="whitespace-nowrap font-medium tracking-wide">Rasant Solutions</span>
-            <span class="h-px flex-1 bg-gradient-to-l from-transparent to-neutral-300"></span>
+            <span class="h-px flex-1 bg-gradient-to-l from-transparent to-borderDefault"></span>
           </div>
 
           <div class="mb-4 grid grid-cols-3 gap-2 animate-login-fade-up [animation-delay:440ms]">
@@ -195,7 +195,7 @@
                 v-for="(badge, i) in securityBadges"
                 :key="badge.label"
                 :style="{ animationDelay: `${460 + i * 60}ms` }"
-                class="group flex flex-col items-center gap-1.5 rounded-xl border border-neutral-300 bg-neutral-100 px-2 py-2.5 text-center text-[0.68rem] font-medium text-neutral-600 transition-all duration-300 hover:-translate-y-1 hover:border-primary-200 hover:bg-white hover:shadow-[0_4px_16px_rgba(74,144,226,0.12)] cursor-default animate-login-fade-up"
+                class="group flex flex-col items-center gap-1.5 rounded-xl border border-borderDefault bg-neutral-100 px-2 py-2.5 text-center text-[0.68rem] font-medium text-textBody transition-all duration-300 hover:-translate-y-1 hover:border-primary-200 hover:bg-section-white hover:shadow-[0_4px_16px_rgba(74,144,226,0.12)] cursor-default animate-login-fade-up"
             >
                 <span :class="['flex h-7 w-7 items-center justify-center rounded-lg text-xs transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6', badge.iconClass]">
                   <font-awesome-icon :icon="badge.icon" />
@@ -205,13 +205,13 @@
           </div>
 
           <div class="space-y-1.5 text-center animate-login-fade-up [animation-delay:520ms]">
-            <p class="text-sm text-neutral-500">
+            <p class="text-sm text-textBody">
               Need access?
               <router-link to="/contact" class="font-semibold text-secondary-500 transition-all duration-200 hover:text-accent-4 hover:underline hover:underline-offset-2">
                 Contact sales →
               </router-link>
             </p>
-            <router-link to="/home" class="inline-block text-sm text-neutral-500 transition-all duration-200 hover:text-primary-900 hover:-translate-x-0.5">
+            <router-link to="/home" class="inline-block text-sm text-textBody transition-all duration-200 hover:text-headingMain hover:-translate-x-0.5">
               ← Back to website
             </router-link>
           </div>
@@ -324,7 +324,7 @@ const stats = [
 
 const securityBadges = [
   { label: 'SSL Encrypted', icon: 'fa-solid fa-lock', iconClass: 'bg-primary-50 text-primary-500' },
-  { label: 'SOC 2 Ready', icon: 'fa-solid fa-shield-halved', iconClass: 'bg-[#F5F3FF] text-accent-3' },
+  { label: 'SOC 2 Ready', icon: 'fa-solid fa-shield-halved', iconClass: 'bg-accent-3/10 text-accent-3' },
   { label: 'Role-based', icon: 'fa-solid fa-user-shield', iconClass: 'bg-secondary-50 text-secondary-500' },
 ];
 
