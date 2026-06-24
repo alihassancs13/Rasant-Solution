@@ -24,36 +24,34 @@
     </section>
 
     <!-- Main Content -->
-    <main class="max-w-5xl mx-auto px-6 pb-24">
+    <main class="max-w-5xl mx-auto px-4 sm:px-6 pb-24">
 
-      <!-- Jobs Section -->
       <div id="careersJobsSection" class="space-y-12 mt-8">
         <div class="text-left border-b border-borderDefault pb-6 transition-all duration-700 ease-out" :class="cardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'">
           <h2 class="font-display text-2xl sm:text-3xl font-bold text-headingMain mb-2">Open positions</h2>
           <p class="text-textBody text-sm sm:text-base">Explore roles at Rasant Solutions and apply directly below.</p>
         </div>
 
-        <!-- No Jobs Message + CTA -->
         <div
-            class="relative rounded-[24px] py-12 px-8 sm:px-12 overflow-hidden w-full transition-all duration-700 delay-150 ease-out bg-buttonBackground"
+            class="relative rounded-[24px] py-10 px-6 sm:py-12 sm:px-12 overflow-hidden w-full transition-all duration-700 delay-150 ease-out bg-buttonBackground"
             :class="cardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'"
         >
           <div class="absolute inset-0 opacity-50 pointer-events-none bg-[radial-gradient(circle_at_2px_2px,rgba(255,255,255,0.06)_1px,transparent_0)] [background-size:24px_24px]"></div>
 
           <div class="relative z-10">
-            <div class="flex items-center justify-between gap-7 flex-wrap">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
 
-              <div class="flex items-center gap-7 flex-wrap flex-1 min-w-[260px]">
-                <div class="shrink-0 w-20 h-20 rounded-2xl flex items-center justify-center border border-white/[0.18] bg-white/10">
-                  <i class="fa-solid fa-briefcase text-[26px] text-white" aria-hidden="true"></i>
+              <div class="flex flex-col sm:flex-row items-start sm:items-center gap-6 flex-1 min-w-0">
+                <div class="shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center border border-white/[0.18] bg-white/10">
+                  <i class="fa-solid fa-briefcase text-2xl sm:text-[26px] text-white" aria-hidden="true"></i>
                 </div>
 
-                <div class="flex-1 text-left">
-                  <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[10.5px] font-bold tracking-wide uppercase mb-3 bg-white text-secondary-600 border border-accent-1/25">
-                    <span class="w-1.5 h-1.5 rounded-full bg-secondary-600"></span>
-                    Currently fully staffed
-                  </span>
-                  <h3 class="font-display text-[22px] sm:text-2xl font-bold text-white mb-2">No open roles at the moment</h3>
+                <div class="flex-1 text-left min-w-0">
+              <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[10.5px] font-bold tracking-wide uppercase mb-3 bg-white text-secondary-600 border border-accent-1/25">
+                <span class="w-1.5 h-1.5 rounded-full bg-secondary-600"></span>
+                Currently fully staffed
+              </span>
+                  <h3 class="font-display text-xl sm:text-2xl font-bold text-white mb-2">No open roles at the moment</h3>
                   <p class="text-sm sm:text-[15px] leading-relaxed text-white/72 max-w-2xl font-primary">
                     Our team is operating at full strength right now — but talent demands change quickly.
                     Leave your CV with us below, and our recruitment team will reach out directly as soon as an opening aligns with your expertise.
@@ -61,11 +59,11 @@
                 </div>
               </div>
 
-              <div class="shrink-0 ml-auto lg:ml-0">
+              <div class="shrink-0 w-full lg:w-auto">
                 <button
                     type="button"
                     @click="openModal('')"
-                    class="inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl font-bold text-sm whitespace-nowrap transition-all duration-200 hover:scale-[1.03] active:scale-95 cursor-pointer bg-white text-secondary-600 hover:bg-secondary-50 shadow-[0_10px_24px_rgba(0,0,0,0.18)]"
+                    class="inline-flex items-center justify-center gap-2 w-full lg:w-auto px-7 py-3.5 rounded-xl font-bold text-sm whitespace-nowrap transition-all duration-200 hover:scale-[1.02] active:scale-95 cursor-pointer bg-white text-secondary-600 hover:bg-secondary-50 shadow-[0_10px_24px_rgba(0,0,0,0.18)]"
                 >
                   Submit your CV
                   <span aria-hidden="true">&rarr;</span>
@@ -74,37 +72,33 @@
 
             </div>
 
-            <div class="flex items-center gap-9 mt-8 pt-6 flex-wrap border-t border-white/[0.14]">
-              <div>
-                <div class="font-display text-xl font-bold text-white">48h</div>
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8 mt-8 pt-6 border-t border-white/[0.14]">
+              <div class="text-left">
+                <div class="font-display text-xl sm:text-2xl font-bold text-white">48h</div>
                 <div class="text-xs mt-0.5 text-white/55">avg. response</div>
               </div>
-              <div class="w-px h-[30px] bg-white/[0.14]"></div>
-              <div>
-                <div class="font-display text-xl font-bold text-white">5</div>
+              <div class="text-left">
+                <div class="font-display text-xl sm:text-2xl font-bold text-white">5</div>
                 <div class="text-xs mt-0.5 text-white/55">teams hiring soon</div>
               </div>
-              <div class="w-px h-[30px] bg-white/[0.14]"></div>
-              <div>
-                <div class="font-display text-xl font-bold text-white">100%</div>
+              <div class="text-left">
+                <div class="font-display text-xl sm:text-2xl font-bold text-white">100%</div>
                 <div class="text-xs mt-0.5 text-white/55">friendly environment</div>
               </div>
-              <div class="w-px h-[30px] bg-white/[0.14]"></div>
-              <div>
-                <div class="font-display text-xl font-bold text-white">10+</div>
+              <div class="text-left">
+                <div class="font-display text-xl sm:text-2xl font-bold text-white">10+</div>
                 <div class="text-xs mt-0.5 text-white/55">Active Projects</div>
               </div>
-              <div class="w-px h-[30px] bg-white/[0.14]"></div>
-              <div>
-                <div class="font-display text-xl font-bold text-white">Top 2%</div>
+              <div class="text-left col-span-2 md:col-span-1">
+                <div class="font-display text-xl sm:text-2xl font-bold text-white">Top 2%</div>
                 <div class="text-xs mt-0.5 text-white/55">talent network</div>
               </div>
             </div>
+
           </div>
         </div>
 
       </div>
-
     </main>
 
     <!-- Modal -->

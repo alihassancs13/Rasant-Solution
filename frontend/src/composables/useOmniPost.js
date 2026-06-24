@@ -17,7 +17,7 @@ export function useOmniPost() {
         { name: 'Approvals', icon: 'fas fa-clipboard-check', href: '#approval' },
         { name: 'Scheduler', icon: 'fas fa-calendar-check', href: '#scheduler' },
         { name: 'Bulk Upload', icon: 'fas fa-file-csv', href: '#bulk' },
-        { name: 'Team & Roles', icon: 'fas fa-accounts-gear', href: '#team' },
+        { name: 'Team & Roles', icon: 'fas fa-users-gear', href: '#team' },
         { name: 'Social Previews', icon: 'fab fa-facebook', href: '#social-feed' },
         { name: 'How It Works', icon: 'fas fa-route', href: '#how-it-works' }
     ]
@@ -55,7 +55,7 @@ export function useOmniPost() {
         { title: 'Approval Workflow', icon: 'fas fa-clipboard-check', description: 'Creators submit drafts; approvers review, approve, or reject with audit trail.' },
         { title: 'Smart Scheduler', icon: 'fas fa-calendar-check', description: 'Schedule approved posts and publish automatically when the time is right.' },
         { title: 'Bulk Upload', icon: 'fas fa-file-csv', description: 'Import CSV batches, generate at scale, and manage large campaigns efficiently.' },
-        { title: 'Team & Roles', icon: 'fas fa-accounts-gear', description: 'Owners manage accounts, roles, and connected social accounts in one place.' }
+        { title: 'Team & Roles', icon: 'fas fa-users-gear', description: 'Owners manage accounts, roles, and connected social accounts in one place.' }
     ]
 
     return {

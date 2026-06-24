@@ -31,9 +31,16 @@
         <div class="relative z-30 flex justify-center py-1 mx-auto md:mr-0 md:ml-auto order-2">
           <div class="relative w-[min(380px,80vw)] aspect-square flex items-center justify-center animate-[botEnter_0.9s_cubic-bezier(0.22,1,0.36,1)_both]">
             <div class="absolute inset-[15%] rounded-full bg-[radial-gradient(circle,rgba(45,212,191,0.2)_0%,transparent_70%)] animate-[botGlow_3s_ease-in-out_infinite]"></div>
-            <div class="absolute inset-[5%] rounded-full border-2 border-dashed border-accent-1/35 animate-[botRingSpin_22s_linear_infinite]"></div>
-            <div class="absolute inset-0 rounded-full border-2 border-dashed border-accent-3/20 animate-[botRingSpin_30s_linear_infinite_reverse]"></div>
-            <img src="../assets/svg/chatbot-messenger-bot.svg" alt="Chatbot Agent" class="relative z-10 w-[75%] h-[75%] object-contain drop-shadow-[0_16px_36px_rgba(42,95,158,0.2)]" />
+
+            <!-- Changed botRingSpin to spin so the rings animate and rotate properly -->
+            <div class="absolute inset-[5%] rounded-full border-2 border-dashed border-accent-1/35 animate-[spin_22s_linear_infinite]"></div>
+            <div class="absolute inset-0 rounded-full border-2 border-dashed border-accent-3/20 animate-[spin_30s_linear_infinite_reverse]"></div>
+
+            <!-- Main SVG graphics base -->
+            <img src="../assets/svg/chatbot-bot.svg" alt="Chatbot Agent" class="relative z-10 w-full h-full object-contain" />
+
+            <!-- Fixed Face: Made absolute, perfectly centered, and scaled down to fit the center circle -->
+            <img src="../assets/images/chatbot-face.png" alt="Chatbot face" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-[32%] object-contain rounded-full" />
           </div>
         </div>
       </div>
@@ -136,18 +143,22 @@
 
           <!-- Image — always second -->
           <div class="lg:col-span-6 flex justify-center order-2">
-            <div class="relative p-6 bg-neutral-50 rounded-2xl border border-borderDefault w-full max-w-md aspect-square flex items-center justify-center overflow-visible">
+            <!-- Removed bg-neutral-50, rounded-2xl, border, and border-borderDefault -->
+            <div class="relative p-6 w-full max-w-md aspect-square flex items-center justify-center overflow-visible">
+
               <div class="absolute inset-0">
                 <div class="orbit-1">
-                  <div class="absolute inset-[-10%] rounded-full border-4 border-dashed border-accent-3/60 scale-y-[0.85] -rotate-12 animate-[spin_30s_linear_infinite] pointer-events-none"></div>
+                  <div class="absolute inset-[-10%] rounded-full border-2 border-dashed border-accent-3/40 scale-y-[0.85] -rotate-12 animate-[spin_30s_linear_infinite] pointer-events-none"></div>
                 </div>
                 <div class="orbit-2">
-                  <div class="absolute inset-[-6%] rounded-full border-4 border-dashed border-accent-7/50 scale-x-[0.90] rotate-45 animate-[spin_20s_linear_infinite_reverse] pointer-events-none"></div>
+                  <div class="absolute inset-[-6%] rounded-full border-2 border-dashed border-accent-7/40 scale-x-[0.90] rotate-45 animate-[spin_20s_linear_infinite_reverse] pointer-events-none"></div>
                 </div>
               </div>
+
               <div class="relative w-80 h-100 mx-auto z-10 flex items-center justify-center">
                 <img src="../assets/svg/chatbot-messenger-bot.svg" alt="Chatbot with messages" class="w-full h-full object-contain drop-shadow-[var(--shadow-primary-dark)]" title="Chatbot agent messaging" />
               </div>
+
             </div>
           </div>
         </div>
@@ -223,10 +234,16 @@
 
           <!-- Image — mobile pe baad mein, lg pe left -->
           <div class="lg:col-span-6 flex justify-center order-2 lg:order-1">
-            <div class="relative p-6 bg-section-white rounded-2xl shadow-md w-full max-w-lg overflow-visible">
+            <!-- Removed bg-section-white, rounded-2xl, and shadow-md -->
+            <div class="relative p-6 w-full max-w-lg overflow-visible">
+
+              <!-- Changed border-4 to border-2, opacity to /25 for a dull look, and sent it to the back with z-0 -->
+              <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100%] h-[90%] rounded-3xl border-2 border-dashed border-accent-3/25 animate-[spin_35s_linear_infinite] z-0 pointer-events-none"></div>
+
               <img src="../assets/svg/chatbot-capabilities.svg" alt="Chatbot capabilities diagram" class="w-full h-auto block relative z-10" title="Chatbot capabilities and integrations" />
-              <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100%] h-[90%] rounded-3xl border-4 border-dashed border-accent-3/60 animate-[spin_35s_linear_infinite] z-10 pointer-events-none"></div>
+
               <img src="../assets/images/chatbot-face.png" alt="Chatbot face indicator" class="mt-3 rounded-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[20%] object-contain z-20" title="Chatbot center face view" />
+
             </div>
           </div>
 

@@ -587,22 +587,35 @@
     </section>
 
     <!-- CTA Section -->
-    <section class="py-20 px-4 sm:px-6 text-center bg-orange-700">
-      <div class="max-w-3xl mx-auto">
-        <h2 class="text-3xl sm:text-5xl font-display font-extrabold text-white mb-4">
-          Ready to ship social content faster?
-        </h2>
-        <p class="text-purple-100 text-lg mb-8 max-w-lg mx-auto">
-          Replace spreadsheets and scattered tools with one workspace for generation, approval, and publishing.
-        </p>
-        <div class="flex flex-wrap justify-center gap-4">
-          <router-link to="/contact?project=omnipost" class="inline-flex items-center px-8 py-4 bg-white border-slate-300 text-orange-700 hover:bg-orange-100 font-bold rounded-xl transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5">
+    <section class="p-6 md:p-12 max-w-7xl mx-auto">
+      <div class="bg-buttonBackground text-white p-8 md:p-12 rounded-3xl flex flex-col lg:flex-row lg:items-center justify-between gap-8 shadow-xl">
+
+        <!-- Left: Content Container matching Orchestri layout and colors -->
+        <div class="max-w-2xl text-left">
+          <h2 class="text-2xl md:text-3xl font-bold tracking-tight font-display mb-2 text-white">
+            Ready to ship social content faster?
+          </h2>
+          <p class="text-white/90 text-sm md:text-base leading-relaxed font-primary">
+            Replace spreadsheets and scattered tools with one workspace for generation, approval, and publishing.
+          </p>
+        </div>
+
+        <!-- Right: Button Container matching Orchestri spacing and sizing -->
+        <div class="flex gap-3 flex-wrap items-center">
+          <router-link
+              to="/contact?project=omnipost"
+              class="px-6 py-3.5 bg-white text-secondary-600 font-bold rounded-xl shadow-md transition-transform hover:bg-secondary-50 text-sm inline-flex items-center justify-center font-primary"
+          >
             Contact Sales
           </router-link>
-          <router-link to="/home#products" class="inline-flex items-center px-8 py-4 border-2 border-white/40 hover:border-white/70 text-white font-bold rounded-xl transition-all duration-300 hover:bg-white/10">
+          <router-link
+              to="/home#products"
+              class="px-6 py-3.5 border border-white/80 text-white font-semibold rounded-xl hover:bg-white/10 transition-colors text-sm inline-flex items-center justify-center font-primary"
+          >
             Explore All Products
           </router-link>
         </div>
+
       </div>
     </section>
 
