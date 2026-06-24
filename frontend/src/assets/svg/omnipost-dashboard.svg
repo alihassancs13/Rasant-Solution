@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 520" role="img" aria-label="OmniPost performance dashboard">
+  <defs>
+    <filter id="opdSh"><feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#7C3AED" flood-opacity="0.12"/></filter>
+    <linearGradient id="opdGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#7C3AED"/><stop offset="100%" stop-color="#EC4899"/></linearGradient>
+    <style>
+      .opd-pulse{animation:opdPulse 2s ease-in-out infinite}
+      @keyframes opdPulse{0%,100%{opacity:1}50%{opacity:.4}}
+      .opd-in{opacity:0;animation:opdIn .65s ease forwards}
+      .opd-in.d1{animation-delay:.1s}.opd-in.d2{animation-delay:.2s}
+      @keyframes opdIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+    </style>
+  </defs>
+  <rect width="960" height="520" rx="16" fill="#FAFAFE"/>
+  <rect x="0" y="0" width="72" height="520" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="36" y="28" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="800" fill="#7C3AED">OP</text>
+  <text x="20" y="56" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="#7C3AED">Dashboard</text>
+  <text x="20" y="76" font-family="Inter,sans-serif" font-size="8" fill="#94A3B8">Generator</text>
+  <text x="20" y="96" font-family="Inter,sans-serif" font-size="8" fill="#94A3B8">Approvals</text>
+  <text x="20" y="116" font-family="Inter,sans-serif" font-size="8" fill="#94A3B8">Scheduler</text>
+  <text x="20" y="136" font-family="Inter,sans-serif" font-size="8" fill="#94A3B8">Bulk</text>
+  <text x="20" y="156" font-family="Inter,sans-serif" font-size="8" fill="#94A3B8">Team</text>
+
+  <rect x="72" y="0" width="888" height="52" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="92" y="32" font-family="Space Grotesk,sans-serif" font-size="15" font-weight="700" fill="#312E81">Content Pipeline</text>
+  <rect x="780" y="14" width="72" height="24" rx="12" fill="#D1FAE5"/>
+  <circle cx="794" cy="26" r="5" fill="#10B981" class="opd-pulse"/>
+  <text x="806" y="30" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#059669">LIVE</text>
+  <text x="868" y="30" font-family="Inter,sans-serif" font-size="9" fill="#64748B">Updated 1m ago</text>
+
+  <g class="opd-in" filter="url(#opdSh)">
+    <rect x="92" y="68" width="178" height="88" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <rect x="92" y="68" width="178" height="3" rx="12" fill="#7C3AED"/>
+    <text x="108" y="92" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="#64748B">TOTAL POSTS</text>
+    <text x="108" y="128" font-family="Space Grotesk,sans-serif" font-size="30" font-weight="800" fill="#312E81">248</text>
+    <text x="108" y="146" font-family="Inter,sans-serif" font-size="9" fill="#22C55E">+ 18% this month</text>
+  </g>
+  <g class="opd-in" filter="url(#opdSh)">
+    <rect x="286" y="68" width="178" height="88" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <rect x="286" y="68" width="178" height="3" rx="12" fill="#6366F1"/>
+    <text x="302" y="92" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="#64748B">APPROVAL RATE</text>
+    <text x="302" y="128" font-family="Space Grotesk,sans-serif" font-size="30" font-weight="800" fill="#312E81">91%</text>
+    <text x="302" y="146" font-family="Inter,sans-serif" font-size="9" fill="#64748B">12 pending review</text>
+  </g>
+  <g class="opd-in d1" filter="url(#opdSh)">
+    <rect x="480" y="68" width="178" height="88" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <rect x="480" y="68" width="178" height="3" rx="12" fill="#EC4899"/>
+    <text x="496" y="92" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="#64748B">PUBLISH RATE</text>
+    <text x="496" y="128" font-family="Space Grotesk,sans-serif" font-size="30" font-weight="800" fill="#312E81">87%</text>
+    <text x="496" y="146" font-family="Inter,sans-serif" font-size="9" fill="#64748B">34 scheduled today</text>
+  </g>
+  <g class="opd-in d1" filter="url(#opdSh)">
+    <rect x="674" y="68" width="178" height="88" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <rect x="674" y="68" width="178" height="3" rx="12" fill="#F59E0B"/>
+    <text x="690" y="92" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="#64748B">NEEDS ATTENTION</text>
+    <text x="690" y="128" font-family="Space Grotesk,sans-serif" font-size="30" font-weight="800" fill="#DC2626">5</text>
+    <text x="690" y="146" font-family="Inter,sans-serif" font-size="9" fill="#F59E0B">3 drafts - 2 rejected</text>
+  </g>
+
+  <g class="opd-in d2" filter="url(#opdSh)">
+    <rect x="92" y="172" width="420" height="320" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="112" y="200" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="700" fill="#312E81">Pipeline distribution</text>
+    <text x="112" y="216" font-family="Inter,sans-serif" font-size="9" fill="#64748B">Draft - pending - approved - scheduled - published</text>
+    <rect x="112" y="240" width="72" height="220" rx="6" fill="#EDE9FE"/><text x="148" y="468" text-anchor="middle" font-size="8" fill="#64748B">Draft</text>
+    <rect x="196" y="280" width="72" height="180" rx="6" fill="#FEF3C7"/><text x="232" y="468" text-anchor="middle" font-size="8" fill="#64748B">Pending</text>
+    <rect x="280" y="260" width="72" height="200" rx="6" fill="#D1FAE5"/><text x="316" y="468" text-anchor="middle" font-size="8" fill="#64748B">Approved</text>
+    <rect x="364" y="300" width="72" height="160" rx="6" fill="#E0E7FF"/><text x="400" y="468" text-anchor="middle" font-size="8" fill="#64748B">Scheduled</text>
+    <text x="148" y="228" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#7C3AED">42</text>
+    <text x="232" y="268" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#D97706">12</text>
+    <text x="316" y="248" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#059669">68</text>
+    <text x="400" y="288" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#4F46E5">34</text>
+  </g>
+
+  <g class="opd-in d2" filter="url(#opdSh)">
+    <rect x="532" y="172" width="320" height="152" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="552" y="200" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="700" fill="#312E81">Platform mix</text>
+    <circle cx="620" cy="268" r="52" fill="none" stroke="#E2E8F0" stroke-width="16"/>
+    <circle cx="620" cy="268" r="52" fill="none" stroke="#1877F2" stroke-width="16" stroke-dasharray="98 230" transform="rotate(-90 620 268)"/>
+    <circle cx="620" cy="268" r="52" fill="none" stroke="#0A66C2" stroke-width="16" stroke-dasharray="72 256" stroke-dashoffset="-98" transform="rotate(-90 620 268)"/>
+    <circle cx="620" cy="268" r="52" fill="none" stroke="#1DA1F2" stroke-width="16" stroke-dasharray="58 270" stroke-dashoffset="-170" transform="rotate(-90 620 268)"/>
+    <text x="620" y="272" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="14" font-weight="800" fill="#312E81">248</text>
+    <rect x="700" y="228" width="8" height="8" rx="2" fill="#1877F2"/><text x="714" y="236" font-size="8" fill="#64748B">Facebook 42%</text>
+    <rect x="700" y="248" width="8" height="8" rx="2" fill="#0A66C2"/><text x="714" y="256" font-size="8" fill="#64748B">LinkedIn 31%</text>
+    <rect x="700" y="268" width="8" height="8" rx="2" fill="#1DA1F2"/><text x="714" y="276" font-size="8" fill="#64748B">Twitter 27%</text>
+  </g>
+
+  <g class="opd-in d2" filter="url(#opdSh)">
+    <rect x="532" y="340" width="320" height="152" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="552" y="368" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="700" fill="#312E81">Recent activity</text>
+    <rect x="552" y="382" width="280" height="28" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <circle cx="566" cy="396" r="6" fill="#10B981"/><text x="578" y="400" font-family="Inter,sans-serif" font-size="8" fill="#1E293B">Summer launch - approved by A. Khan</text>
+    <rect x="552" y="418" width="280" height="28" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <circle cx="566" cy="432" r="6" fill="#7C3AED"/><text x="578" y="436" font-family="Inter,sans-serif" font-size="8" fill="#1E293B">Product tips - scheduled 3:00 PM</text>
+    <rect x="552" y="454" width="280" height="28" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <circle cx="566" cy="468" r="6" fill="#F59E0B"/><text x="578" y="472" font-family="Inter,sans-serif" font-size="8" fill="#1E293B">Weekly roundup - pending review</text>
+  </g>
+</svg>

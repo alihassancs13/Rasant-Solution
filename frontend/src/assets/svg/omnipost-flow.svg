@@ -1,44 +1,58 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 200" role="img" aria-label="OmniPost idea to publish workflow">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 280" role="img" aria-label="OmniPost idea to publish workflow">
   <defs>
-    <linearGradient id="fGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#7C3AED"/>
-      <stop offset="100%" stop-color="#EC4899"/>
-    </linearGradient>
-    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
-      <path d="M0,0 L8,4 L0,8 Z" fill="#A78BFA"/>
-    </marker>
+    <filter id="opfSh"><feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#7C3AED" flood-opacity="0.12"/></filter>
+    <linearGradient id="opfGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#7C3AED"/><stop offset="100%" stop-color="#EC4899"/></linearGradient>
+    <style>
+      .opf-line{stroke-dasharray:8 6;animation:opfLine 1.4s linear infinite}
+      @keyframes opfLine{to{stroke-dashoffset:-28}}
+      .opf-glow{animation:opfGlow 3s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+      .opf-glow.g2{animation-delay:-1s}.opf-glow.g3{animation-delay:-2s}
+      @keyframes opfGlow{0%,100%{opacity:.9;transform:scale(1)}50%{opacity:1;transform:scale(1.03)}}
+    </style>
   </defs>
-  <rect width="640" height="200" rx="16" fill="#FAFAFE"/>
-  <g>
-    <circle cx="100" cy="88" r="36" fill="url(#fGrad)"/>
-    <text x="100" y="84" text-anchor="middle" font-family="Space Grotesk,Arial,sans-serif" font-size="18" font-weight="800" fill="white">1</text>
-    <text x="100" y="102" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="8" font-weight="700" fill="white">GENERATE</text>
-    <text x="100" y="148" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="10" font-weight="600" fill="#312E81">Generate or bulk-import</text>
-    <text x="100" y="162" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="10" fill="#64748B">post ideas</text>
+  <rect width="960" height="280" rx="16" fill="#FAFAFE"/>
+  <text x="40" y="36" font-family="Space Grotesk,sans-serif" font-size="14" font-weight="800" fill="#312E81">Idea -> publish in three steps</text>
+
+  <path class="opf-line" d="M200 120 H320" stroke="url(#opfGrad)" stroke-width="3" fill="none"/>
+  <path class="opf-line" d="M440 120 H560" stroke="url(#opfGrad)" stroke-width="3" fill="none"/>
+  <path class="opf-line" d="M680 120 H760" stroke="url(#opfGrad)" stroke-width="3" fill="none"/>
+
+  <g class="opf-glow" filter="url(#opfSh)">
+    <circle cx="120" cy="120" r="56" fill="url(#opfGrad)"/>
+    <text x="120" y="112" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="22" font-weight="800" fill="white">1</text>
+    <text x="120" y="132" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="white">GENERATE</text>
+    <text x="120" y="196" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#312E81">Generate or bulk-import</text>
+    <text x="120" y="212" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#64748B">AI copy  |  CSV batches</text>
+    <rect x="68" y="224" width="104" height="22" rx="11" fill="#EDE9FE"/><text x="120" y="239" text-anchor="middle" font-size="8" font-weight="600" fill="#7C3AED">AI + Bulk</text>
   </g>
-  <line x1="148" y1="88" x2="212" y2="88" stroke="#C4B5FD" stroke-width="2" marker-end="url(#arrow)"/>
-  <g>
-    <circle cx="260" cy="88" r="36" fill="white" stroke="#7C3AED" stroke-width="2.5"/>
-    <text x="260" y="84" text-anchor="middle" font-family="Space Grotesk,Arial,sans-serif" font-size="18" font-weight="800" fill="#7C3AED">2</text>
-    <text x="260" y="102" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="8" font-weight="700" fill="#7C3AED">APPROVE</text>
-    <text x="260" y="148" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="10" font-weight="600" fill="#312E81">Submit for team</text>
-    <text x="260" y="162" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="10" fill="#64748B">approval</text>
+
+  <g class="opf-glow g2" filter="url(#opfSh)">
+    <circle cx="380" cy="120" r="56" fill="white" stroke="#7C3AED" stroke-width="3"/>
+    <text x="380" y="112" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="22" font-weight="800" fill="#7C3AED">2</text>
+    <text x="380" y="132" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="#7C3AED">APPROVE</text>
+    <text x="380" y="196" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#312E81">Submit for approval</text>
+    <text x="380" y="212" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#64748B">Review  |  audit trail</text>
+    <rect x="328" y="224" width="104" height="22" rx="11" fill="#FEF3C7"/><text x="380" y="239" text-anchor="middle" font-size="8" font-weight="600" fill="#D97706">Human gate</text>
   </g>
-  <line x1="308" y1="88" x2="372" y2="88" stroke="#C4B5FD" stroke-width="2" marker-end="url(#arrow)"/>
-  <g>
-    <circle cx="420" cy="88" r="36" fill="white" stroke="#EC4899" stroke-width="2.5"/>
-    <text x="420" y="84" text-anchor="middle" font-family="Space Grotesk,Arial,sans-serif" font-size="18" font-weight="800" fill="#DB2777">3</text>
-    <text x="420" y="102" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="8" font-weight="700" fill="#DB2777">PUBLISH</text>
-    <text x="420" y="148" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="10" font-weight="600" fill="#312E81">Schedule or publish</text>
-    <text x="420" y="162" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="10" fill="#64748B">to social platforms</text>
+
+  <g class="opf-glow g3" filter="url(#opfSh)">
+    <circle cx="620" cy="120" r="56" fill="white" stroke="#EC4899" stroke-width="3"/>
+    <text x="620" y="112" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="22" font-weight="800" fill="#DB2777">3</text>
+    <text x="620" y="132" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="#DB2777">PUBLISH</text>
+    <text x="620" y="196" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="600" fill="#312E81">Schedule or publish</text>
+    <text x="620" y="212" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#64748B">Auto to social feeds</text>
+    <rect x="568" y="224" width="104" height="22" rx="11" fill="#FCE7F3"/><text x="620" y="239" text-anchor="middle" font-size="8" font-weight="600" fill="#DB2777">Timed go-live</text>
   </g>
-  <g transform="translate(500,52)">
-    <rect width="120" height="72" rx="10" fill="white" stroke="#E2E8F0"/>
-    <circle cx="24" cy="24" r="10" fill="#1877F2"/><text x="24" y="28" text-anchor="middle" font-size="10" font-weight="800" fill="white">f</text>
-    <circle cx="60" cy="24" r="10" fill="#1DA1F2"/><text x="60" y="28" text-anchor="middle" font-size="8" font-weight="800" fill="white">X</text>
-    <circle cx="96" cy="24" r="10" fill="#0A66C2"/><text x="96" y="28" text-anchor="middle" font-size="7" font-weight="800" fill="white">in</text>
-    <rect x="14" y="40" width="92" height="6" rx="3" fill="#EDE9FE"/>
-    <rect x="14" y="52" width="72" height="6" rx="3" fill="#EDE9FE"/>
+
+  <g filter="url(#opfSh)">
+    <rect x="760" y="64" width="180" height="112" rx="12" fill="white" stroke="#E2E8F0"/>
+    <text x="776" y="88" font-size="9" font-weight="700" fill="#64748B">LIVE ON</text>
+    <circle cx="792" cy="108" r="12" fill="#1877F2"/><text x="792" y="112" text-anchor="middle" font-size="10" font-weight="800" fill="white">f</text>
+    <text x="812" y="112" font-size="9" fill="#1E293B">Facebook</text>
+    <circle cx="792" cy="136" r="12" fill="#1DA1F2"/><text x="792" y="140" text-anchor="middle" font-size="8" font-weight="800" fill="white">X</text>
+    <text x="812" y="140" font-size="9" fill="#1E293B">Twitter</text>
+    <circle cx="792" cy="164" r="12" fill="#0A66C2"/><text x="792" y="168" text-anchor="middle" font-size="7" font-weight="800" fill="white">in</text>
+    <text x="812" y="168" font-size="9" fill="#1E293B">LinkedIn</text>
   </g>
 </svg>

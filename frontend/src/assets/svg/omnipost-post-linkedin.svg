@@ -1,25 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 360" role="img" aria-label="Sample LinkedIn post preview">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 420" role="img" aria-label="Sample LinkedIn post preview">
   <defs>
     <linearGradient id="liBar" x1="0%" y1="0%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="#0A66C2"/>
       <stop offset="100%" stop-color="#004182"/>
     </linearGradient>
+    <filter id="liSh"><feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0A66C2" flood-opacity="0.1"/></filter>
   </defs>
-  <rect width="280" height="360" rx="16" fill="white" stroke="#E2E8F0" stroke-width="1.5"/>
-  <circle cx="36" cy="36" r="18" fill="#0A66C2"/>
-  <text x="36" y="41" text-anchor="middle" font-family="Arial,sans-serif" font-size="12" font-weight="800" fill="white">R</text>
-  <text x="64" y="32" font-family="Inter,Arial,sans-serif" font-size="12" font-weight="700" fill="#1E293B">Rasant Solutions</text>
-  <text x="64" y="48" font-family="Inter,Arial,sans-serif" font-size="9" fill="#666666">12,450 followers | 1h</text>
-  <text x="20" y="78" font-family="Inter,Arial,sans-serif" font-size="11" fill="#1E293B">Teams lose hours switching between docs,</text>
-  <text x="20" y="94" font-family="Inter,Arial,sans-serif" font-size="11" fill="#1E293B">spreadsheets, and schedulers.</text>
-  <text x="20" y="118" font-family="Inter,Arial,sans-serif" font-size="11" fill="#1E293B">OmniPost brings generation, approvals,</text>
-  <text x="20" y="134" font-family="Inter,Arial,sans-serif" font-size="11" fill="#1E293B">and publishing into one workspace.</text>
-  <text x="20" y="158" font-family="Inter,Arial,sans-serif" font-size="11" fill="#0A66C2">#OmniPost #ContentOps #B2B</text>
-  <rect x="20" y="172" width="240" height="120" rx="8" fill="#F3F2EF" stroke="#E0E0E0"/>
-  <rect x="20" y="172" width="240" height="8" fill="url(#liBar)" rx="8"/>
-  <text x="140" y="238" text-anchor="middle" font-family="Space Grotesk,Arial,sans-serif" font-size="14" font-weight="800" fill="#0A66C2">OmniPost by Rasant</text>
-  <text x="20" y="314" font-family="Inter,Arial,sans-serif" font-size="11" fill="#666666">Like | Comment | Repost | Send</text>
-  <rect x="20" y="328" width="80" height="24" rx="12" fill="#0A66C2"/>
-  <text x="60" y="344" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="10" font-weight="700" fill="white">Follow</text>
+  <rect width="300" height="420" rx="16" fill="white" stroke="#E2E8F0" stroke-width="1.5" filter="url(#liSh)"/>
+  <circle cx="40" cy="40" r="20" fill="#0A66C2"/>
+  <text x="40" y="46" text-anchor="middle" font-family="Arial,sans-serif" font-size="14" font-weight="800" fill="white">R</text>
+  <text x="72" y="36" font-family="Inter,sans-serif" font-size="12" font-weight="700" fill="#1E293B">Rasant Solutions</text>
+  <text x="72" y="52" font-family="Inter,sans-serif" font-size="9" fill="#666666">12,450 followers  |  1h</text>
+  <text x="20" y="82" font-family="Inter,sans-serif" font-size="11" fill="#1E293B">Teams lose hours switching between docs,</text>
+  <text x="20" y="98" font-family="Inter,sans-serif" font-size="11" fill="#1E293B">spreadsheets, and schedulers.</text>
+  <text x="20" y="122" font-family="Inter,sans-serif" font-size="11" fill="#1E293B">OmniPost brings generation, approvals,</text>
+  <text x="20" y="138" font-family="Inter,sans-serif" font-size="11" fill="#1E293B">and publishing into one workspace. 🚀</text>
+  <text x="20" y="162" font-family="Inter,sans-serif" font-size="11" fill="#0A66C2">#OmniPost #ContentOps #B2B</text>
+  <rect x="20" y="176" width="260" height="140" rx="8" fill="#F3F2EF" stroke="#E0E0E0"/>
+  <rect x="20" y="176" width="260" height="8" fill="url(#liBar)" rx="8"/>
+  <text x="150" y="252" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="16" font-weight="800" fill="#0A66C2">OmniPost by Rasant</text>
+  <text x="150" y="272" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" fill="#64748B">Ship content faster &amp; smarter</text>
+  <text x="20" y="334" font-family="Inter,sans-serif" font-size="10" fill="#666666">👍 86  |  💬 12 reposts</text>
+  <text x="20" y="358" font-family="Inter,sans-serif" font-size="11" fill="#666666">Like  |  Comment  |  Repost  |  Send</text>
+  <rect x="20" y="374" width="80" height="26" rx="13" fill="#0A66C2"/>
+  <text x="60" y="392" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="white">Follow</text>
+  <rect x="108" y="374" width="100" height="26" rx="13" fill="#D1FAE5" stroke="#10B981"/>
+  <text x="158" y="392" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#059669">Approved OK</text>
 </svg>

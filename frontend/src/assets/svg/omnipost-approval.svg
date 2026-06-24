@@ -1,25 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 260" role="img" aria-label="OmniPost approval workflow">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 480" role="img" aria-label="OmniPost approval workflow">
   <defs>
-    <linearGradient id="apGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#7C3AED"/>
-      <stop offset="100%" stop-color="#6366F1"/>
-    </linearGradient>
+    <filter id="opaSh"><feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#7C3AED" flood-opacity="0.12"/></filter>
+    <linearGradient id="opaGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#7C3AED"/><stop offset="100%" stop-color="#6366F1"/></linearGradient>
+    <style>
+      .opa-flow{stroke-dasharray:6 4;animation:opaFlow 1.2s linear infinite}
+      @keyframes opaFlow{to{stroke-dashoffset:-20}}
+      .opa-pulse{animation:opaPulse 2s ease-in-out infinite}
+      @keyframes opaPulse{0%,100%{opacity:1}50%{opacity:.4}}
+    </style>
   </defs>
-  <rect width="400" height="260" rx="14" fill="#FAFAFE"/>
-  <rect x="24" y="24" width="352" height="48" rx="10" fill="white" stroke="#E2E8F0"/>
-  <text x="44" y="54" font-family="Inter,Arial,sans-serif" font-size="12" font-weight="700" fill="#312E81">Draft: Summer product launch</text>
-  <rect x="300" y="38" width="60" height="22" rx="11" fill="#FEF3C7"/>
-  <text x="330" y="53" text-anchor="middle" font-size="9" font-weight="700" fill="#D97706">Pending</text>
-  <path d="M200,72v28" stroke="#C4B5FD" stroke-width="2" stroke-dasharray="4 4"/>
-  <rect x="24" y="100" width="352" height="72" rx="10" fill="white" stroke="#7C3AED" stroke-width="1.5"/>
-  <text x="44" y="128" font-family="Inter,Arial,sans-serif" font-size="11" font-weight="700" fill="#1E293B">Approver review</text>
-  <text x="44" y="148" font-family="Inter,Arial,sans-serif" font-size="9" fill="#64748B">Quality check before anything goes live</text>
-  <rect x="44" y="158" width="52" height="22" rx="6" fill="#D1FAE5"/>
-  <text x="70" y="173" text-anchor="middle" font-size="9" font-weight="700" fill="#059669">Approve</text>
-  <rect x="104" y="158" width="48" height="22" rx="6" fill="#FEE2E2"/>
-  <text x="128" y="173" text-anchor="middle" font-size="9" font-weight="700" fill="#DC2626">Reject</text>
-  <path d="M200,172v28" stroke="#C4B5FD" stroke-width="2"/>
-  <rect x="24" y="200" width="352" height="44" rx="10" fill="url(#apGrad)"/>
-  <text x="200" y="228" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-size="11" font-weight="700" fill="white">Scheduled - audit trail saved</text>
+  <rect width="960" height="480" rx="16" fill="#FAFAFE"/>
+  <text x="40" y="40" font-family="Space Grotesk,sans-serif" font-size="16" font-weight="800" fill="#312E81">Approval workflow</text>
+  <text x="40" y="60" font-family="Inter,sans-serif" font-size="10" fill="#64748B">Quality control before anything goes live  |  full audit trail</text>
+  <rect x="780" y="24" width="120" height="28" rx="14" fill="#FEF3C7"/>
+  <text x="840" y="42" text-anchor="middle" font-size="9" font-weight="700" fill="#D97706">12 pending</text>
+
+  <g filter="url(#opaSh)">
+    <rect x="40" y="84" width="280" height="360" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="60" y="112" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="#64748B">PENDING QUEUE</text>
+    <rect x="56" y="124" width="248" height="72" rx="8" fill="#FEF3C7" stroke="#F59E0B" stroke-width="2"/>
+    <text x="68" y="148" font-size="10" font-weight="700" fill="#1E293B">Summer product launch</text>
+    <text x="68" y="164" font-size="8" fill="#64748B">By Sara M.  |  LinkedIn + Facebook</text>
+    <rect x="68" y="174" width="56" height="16" rx="8" fill="#FEF3C7" stroke="#D97706"/><text x="96" y="185" text-anchor="middle" font-size="7" font-weight="700" fill="#D97706">Pending</text>
+    <rect x="56" y="204" width="248" height="56" rx="8" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <text x="68" y="224" font-size="9" font-weight="600" fill="#1E293B">Weekly roundup #24</text>
+    <text x="68" y="240" font-size="8" fill="#64748B">By Nadia A.  |  Twitter</text>
+    <rect x="56" y="268" width="248" height="56" rx="8" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <text x="68" y="288" font-size="9" font-weight="600" fill="#1E293B">Product tips carousel</text>
+    <text x="68" y="304" font-size="8" fill="#64748B">By Sara M.  |  Instagram</text>
+    <text x="60" y="348" font-size="8" fill="#94A3B8">+ 9 more in queue</text>
+  </g>
+
+  <path class="opa-flow" d="M340 264 H400" stroke="#C4B5FD" stroke-width="2.5" fill="none"/>
+  <polygon points="400,264 392,260 392,268" fill="#A78BFA"/>
+
+  <g filter="url(#opaSh)">
+    <rect x="420" y="84" width="500" height="200" rx="14" fill="#FFFFFF" stroke="#7C3AED" stroke-width="2"/>
+    <rect x="420" y="84" width="500" height="4" rx="14" fill="#7C3AED"/>
+    <text x="440" y="116" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="700" fill="#312E81">Approver review</text>
+    <text x="440" y="134" font-family="Inter,sans-serif" font-size="9" fill="#64748B">Ahmed Khan  |  Approver role</text>
+    <rect x="440" y="148" width="460" height="80" rx="8" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <text x="452" y="168" font-size="9" fill="#1E293B">Teams lose hours switching between docs and schedulers.</text>
+    <text x="452" y="184" font-size="9" fill="#1E293B">OmniPost brings generation, approvals, and publishing into one workspace.</text>
+    <text x="452" y="204" font-size="9" fill="#7C3AED">#OmniPost #ContentOps #B2B</text>
+    <rect x="440" y="240" width="88" height="32" rx="8" fill="#D1FAE5" stroke="#10B981"/>
+    <text x="484" y="260" text-anchor="middle" font-size="10" font-weight="700" fill="#059669">Approve</text>
+    <rect x="540" y="240" width="80" height="32" rx="8" fill="#FEE2E2" stroke="#EF4444"/>
+    <text x="580" y="260" text-anchor="middle" font-size="10" font-weight="700" fill="#DC2626">Reject</text>
+    <rect x="632" y="240" width="100" height="32" rx="8" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="682" y="260" text-anchor="middle" font-size="9" fill="#64748B">Request changes</text>
+    <rect x="744" y="248" width="156" height="24" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <text x="756" y="264" font-size="8" fill="#94A3B8">Add revision comment...</text>
+  </g>
+
+  <path d="M670 284v40" stroke="#C4B5FD" stroke-width="2"/>
+  <polygon points="670,324 666,316 674,316" fill="#A78BFA"/>
+
+  <g filter="url(#opaSh)">
+    <rect x="420" y="324" width="500" height="120" rx="14" fill="url(#opaGrad)"/>
+    <circle cx="448" cy="384" r="8" fill="#FFFFFF" class="opa-pulse"/>
+    <text x="464" y="368" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="800" fill="#FFFFFF">Approved -> scheduled for Jun 18, 3:00 PM</text>
+    <text x="464" y="388" font-family="Inter,sans-serif" font-size="9" fill="#FFFFFF" opacity=".9">Audit trail saved  |  approved by Ahmed Khan at 2:14 PM</text>
+    <text x="464" y="408" font-family="Inter,sans-serif" font-size="8" fill="#FFFFFF" opacity=".75">Event: approve_post  |  post_id: op_8f2a  |  platforms: LinkedIn, Facebook</text>
+    <rect x="780" y="364" width="120" height="28" rx="8" fill="#FFFFFF" opacity=".2"/>
+    <text x="840" y="382" text-anchor="middle" font-size="9" font-weight="700" fill="#FFFFFF">View history</text>
+  </g>
 </svg>

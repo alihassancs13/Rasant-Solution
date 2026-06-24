@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 580" role="img" aria-label="OmniPost AI post generator and platform preview">
+  <defs>
+    <filter id="opgSh"><feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#7C3AED" flood-opacity="0.12"/></filter>
+    <linearGradient id="opgGrad" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#7C3AED"/><stop offset="100%" stop-color="#EC4899"/></linearGradient>
+    <style>
+      .opg-pulse{animation:opgPulse 2s ease-in-out infinite}
+      @keyframes opgPulse{0%,100%{opacity:1}50%{opacity:.4}}
+      .opg-sparkle{animation:opgSpark 1.5s ease-in-out infinite}
+      @keyframes opgSpark{0%,100%{opacity:.6}50%{opacity:1}}
+    </style>
+  </defs>
+  <rect width="960" height="580" rx="16" fill="#FAFAFE"/>
+
+  <!-- Generator panel -->
+  <g filter="url(#opgSh)">
+    <rect x="20" y="20" width="520" height="540" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <rect x="20" y="20" width="520" height="44" rx="14" fill="url(#opgGrad)"/>
+    <text x="40" y="48" font-family="Space Grotesk,sans-serif" font-size="13" font-weight="800" fill="#FFFFFF">AI Post Generator</text>
+    <text x="200" y="48" font-family="Inter,sans-serif" font-size="9" fill="#FFFFFF" opacity=".85">( Platform-tailored copy</text>
+    <rect x="420" y="32" width="100" height="22" rx="11" fill="#FFFFFF" opacity=".2"/>
+    <text x="470" y="47" text-anchor="middle" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="#FFFFFF">GPT-4o</text>
+
+    <text x="40" y="88" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#64748B">TOPIC</text>
+    <rect x="40" y="96" width="480" height="36" rx="8" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <text x="52" y="119" font-family="Inter,sans-serif" font-size="10" fill="#1E293B">Summer product launch - highlight AI scheduling</text>
+
+    <text x="40" y="152" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#64748B">PLATFORMS</text>
+    <rect x="40" y="160" width="88" height="28" rx="14" fill="#EFF6FF" stroke="#1DA1F2" stroke-width="2"/><text x="84" y="178" text-anchor="middle" font-size="9" font-weight="700" fill="#1DA1F2">Twitter</text>
+    <rect x="136" y="160" width="88" height="28" rx="14" fill="#EFF6FF" stroke="#1877F2" stroke-width="2"/><text x="180" y="178" text-anchor="middle" font-size="9" font-weight="700" fill="#1877F2">Facebook</text>
+    <rect x="232" y="160" width="88" height="28" rx="14" fill="#EFF6FF" stroke="#0A66C2" stroke-width="2"/><text x="276" y="178" text-anchor="middle" font-size="9" font-weight="700" fill="#0A66C2">LinkedIn</text>
+    <rect x="328" y="160" width="88" height="28" rx="14" fill="#F8FAFC" stroke="#CBD5E1"/><text x="372" y="178" text-anchor="middle" font-size="9" fill="#94A3B8">Instagram</text>
+
+    <text x="40" y="212" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#64748B">TONE</text>
+    <rect x="40" y="220" width="100" height="26" rx="6" fill="#EDE9FE" stroke="#7C3AED"/><text x="90" y="237" text-anchor="middle" font-size="9" font-weight="600" fill="#7C3AED">Professional</text>
+    <rect x="148" y="220" width="80" height="26" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/><text x="188" y="237" text-anchor="middle" font-size="9" fill="#64748B">Friendly</text>
+    <rect x="236" y="220" width="80" height="26" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/><text x="276" y="237" text-anchor="middle" font-size="9" fill="#64748B">Bold</text>
+
+    <text x="40" y="268" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#64748B">HASHTAGS</text>
+    <rect x="40" y="276" width="480" height="28" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <text x="52" y="294" font-family="Inter,sans-serif" font-size="9" fill="#7C3AED">#OmniPost #ContentOps #AI #SocialMedia</text>
+
+    <rect x="40" y="320" width="220" height="28" rx="6" fill="#F0FDF4" stroke="#10B981"/>
+    <circle cx="54" cy="334" r="6" fill="#10B981" class="opg-pulse"/>
+    <text x="66" y="338" font-family="Inter,sans-serif" font-size="9" font-weight="600" fill="#059669">Enable AI image generation</text>
+
+    <rect x="40" y="364" width="480" height="120" rx="8" fill="#0F172A"/>
+    <text x="52" y="384" font-family="Inter,sans-serif" font-size="8" font-weight="700" fill="#94A3B8">GENERATED COPY (LinkedIn)</text>
+    <text x="52" y="404" font-family="Inter,sans-serif" font-size="9" fill="#E2E8F0">Teams lose hours switching between docs and schedulers.</text>
+    <text x="52" y="420" font-family="Inter,sans-serif" font-size="9" fill="#E2E8F0">OmniPost brings generation, approvals, and publishing</text>
+    <text x="52" y="436" font-family="Inter,sans-serif" font-size="9" fill="#E2E8F0">into one workspace. Ship content faster. =-</text>
+    <text x="52" y="456" font-family="Inter,sans-serif" font-size="9" fill="#818CF8">#OmniPost #ContentOps #B2B</text>
+    <text x="52" y="472" font-family="Inter,sans-serif" font-size="8" fill="#64748B" class="opg-sparkle">( Generating image preview...</text>
+
+    <rect x="40" y="500" width="140" height="36" rx="8" fill="url(#opgGrad)"/>
+    <text x="110" y="523" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="#FFFFFF">Generate &amp; Review</text>
+    <rect x="192" y="500" width="120" height="36" rx="8" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="252" y="523" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="#64748B">Save draft</text>
+  </g>
+
+  <!-- LinkedIn preview panel -->
+  <g filter="url(#opgSh)">
+    <rect x="560" y="20" width="380" height="540" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="580" y="48" font-family="Space Grotesk,sans-serif" font-size="12" font-weight="700" fill="#312E81">Live preview</text>
+    <rect x="700" y="32" width="72" height="22" rx="11" fill="#EFF6FF" stroke="#0A66C2"/>
+    <text x="736" y="47" text-anchor="middle" font-size="8" font-weight="700" fill="#0A66C2">LinkedIn</text>
+
+    <rect x="580" y="68" width="340" height="472" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <circle cx="608" cy="96" r="16" fill="#0A66C2"/><text x="608" y="101" text-anchor="middle" font-size="11" font-weight="800" fill="#FFF">R</text>
+    <text x="632" y="92" font-family="Inter,sans-serif" font-size="11" font-weight="700" fill="#1E293B">Rasant Solutions</text>
+    <text x="632" y="108" font-family="Inter,sans-serif" font-size="8" fill="#666">12,450 followers - Just now</text>
+    <text x="596" y="136" font-family="Inter,sans-serif" font-size="10" fill="#1E293B">Teams lose hours switching between docs</text>
+    <text x="596" y="152" font-family="Inter,sans-serif" font-size="10" fill="#1E293B">and schedulers. OmniPost brings generation,</text>
+    <text x="596" y="168" font-family="Inter,sans-serif" font-size="10" fill="#1E293B">approvals, and publishing into one workspace.</text>
+    <text x="596" y="192" font-family="Inter,sans-serif" font-size="10" fill="#0A66C2">#OmniPost #ContentOps #B2B</text>
+    <rect x="596" y="208" width="308" height="140" rx="8" fill="url(#opgGrad)"/>
+    <text x="750" y="284" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="16" font-weight="800" fill="#FFFFFF">OmniPost by Rasant</text>
+    <text x="596" y="368" font-family="Inter,sans-serif" font-size="9" fill="#666">Like - Comment - Repost - Send</text>
+    <rect x="596" y="384" width="72" height="24" rx="12" fill="#0A66C2"/>
+    <text x="632" y="400" text-anchor="middle" font-size="9" font-weight="700" fill="#FFF">Follow</text>
+    <rect x="680" y="384" width="100" height="24" rx="12" fill="#D1FAE5"/>
+    <text x="730" y="400" text-anchor="middle" font-size="8" font-weight="700" fill="#059669">Ready to submit</text>
+  </g>
+</svg>

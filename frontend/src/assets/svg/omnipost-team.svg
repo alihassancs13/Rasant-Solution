@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 520" role="img" aria-label="OmniPost team accounts and roles management">
+  <defs>
+    <filter id="optSh"><feDropShadow dx="0" dy="6" stdDeviation="10" flood-color="#7C3AED" flood-opacity="0.12"/></filter>
+    <linearGradient id="optGrad" x1="0%" y1="0%" x2="100%" y2="0%"><stop offset="0%" stop-color="#7C3AED"/><stop offset="100%" stop-color="#6366F1"/></linearGradient>
+    <style>
+      .opt-pulse{animation:optPulse 2s ease-in-out infinite}
+      @keyframes optPulse{0%,100%{opacity:1}50%{opacity:.4}}
+    </style>
+  </defs>
+  <rect width="960" height="520" rx="16" fill="#FAFAFE"/>
+
+  <g filter="url(#optSh)">
+    <rect x="20" y="20" width="920" height="480" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <rect x="20" y="20" width="920" height="48" rx="14" fill="#312E81"/>
+    <text x="40" y="50" font-family="Space Grotesk,sans-serif" font-size="14" font-weight="800" fill="#FFFFFF">Team &amp; Accounts</text>
+    <text x="200" y="50" font-family="Inter,sans-serif" font-size="9" fill="#FFFFFF" opacity=".8">Rasant Solutions org</text>
+    <rect x="780" y="34" width="140" height="28" rx="8" fill="url(#optGrad)"/>
+    <text x="850" y="52" text-anchor="middle" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#FFFFFF">+ Add member</text>
+
+    <!-- Tabs -->
+    <rect x="40" y="84" width="72" height="28" rx="6" fill="#EDE9FE" stroke="#7C3AED"/>
+    <text x="76" y="102" text-anchor="middle" font-size="9" font-weight="700" fill="#7C3AED">Users</text>
+    <text x="140" y="102" font-size="9" fill="#94A3B8">Social accounts</text>
+    <text x="240" y="102" font-size="9" fill="#94A3B8">Billing</text>
+
+    <!-- Table header -->
+    <rect x="40" y="124" width="880" height="32" rx="6" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <text x="56" y="144" font-size="8" font-weight="700" fill="#64748B">NAME</text>
+    <text x="220" y="144" font-size="8" font-weight="700" fill="#64748B">EMAIL</text>
+    <text x="440" y="144" font-size="8" font-weight="700" fill="#64748B">ROLE</text>
+    <text x="580" y="144" font-size="8" font-weight="700" fill="#64748B">STATUS</text>
+    <text x="720" y="144" font-size="8" font-weight="700" fill="#64748B">ACTIONS</text>
+
+    <!-- Row 1 -->
+    <rect x="40" y="164" width="880" height="48" rx="6" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <circle cx="68" cy="188" r="14" fill="#EDE9FE"/><text x="68" y="192" text-anchor="middle" font-size="9" font-weight="800" fill="#7C3AED">S</text>
+    <text x="92" y="184" font-size="10" font-weight="600" fill="#1E293B">Sara Malik</text>
+    <text x="92" y="198" font-size="8" fill="#64748B">Creator</text>
+    <text x="220" y="192" font-size="9" fill="#64748B">sara.m@rasantsolutions.com</text>
+    <rect x="440" y="178" width="64" height="22" rx="11" fill="#EDE9FE"/><text x="472" y="193" text-anchor="middle" font-size="8" font-weight="600" fill="#7C3AED">Creator</text>
+    <rect x="580" y="178" width="56" height="22" rx="11" fill="#D1FAE5"/><text x="608" y="193" text-anchor="middle" font-size="8" font-weight="700" fill="#059669">Active</text>
+    <text x="720" y="192" font-size="9" fill="#7C3AED" font-weight="600">Edit - Disable</text>
+
+    <!-- Row 2 -->
+    <rect x="40" y="220" width="880" height="48" rx="6" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <circle cx="68" cy="244" r="14" fill="#FEF3C7"/><text x="68" y="248" text-anchor="middle" font-size="9" font-weight="800" fill="#D97706">A</text>
+    <text x="92" y="240" font-size="10" font-weight="600" fill="#1E293B">Ahmed Khan</text>
+    <text x="92" y="254" font-size="8" fill="#64748B">Approver</text>
+    <text x="220" y="248" font-size="9" fill="#64748B">ahmed.k@rasantsolutions.com</text>
+    <rect x="440" y="234" width="72" height="22" rx="11" fill="#FEF3C7"/><text x="476" y="249" text-anchor="middle" font-size="8" font-weight="600" fill="#D97706">Approver</text>
+    <rect x="580" y="234" width="56" height="22" rx="11" fill="#D1FAE5"/><text x="608" y="249" text-anchor="middle" font-size="8" font-weight="700" fill="#059669">Active</text>
+    <text x="720" y="248" font-size="9" fill="#7C3AED" font-weight="600">Edit - Disable</text>
+
+    <!-- Row 3 -->
+    <rect x="40" y="276" width="880" height="48" rx="6" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <circle cx="68" cy="300" r="14" fill="#DCFCE7"/><text x="68" y="304" text-anchor="middle" font-size="9" font-weight="800" fill="#16A34A">N</text>
+    <text x="92" y="296" font-size="10" font-weight="600" fill="#1E293B">Nadia Ali</text>
+    <text x="92" y="310" font-size="8" fill="#64748B">Scheduler</text>
+    <text x="220" y="304" font-size="9" fill="#64748B">nadia.a@rasantsolutions.com</text>
+    <rect x="440" y="290" width="76" height="22" rx="11" fill="#DCFCE7"/><text x="478" y="305" text-anchor="middle" font-size="8" font-weight="600" fill="#16A34A">Scheduler</text>
+    <rect x="580" y="290" width="56" height="22" rx="11" fill="#D1FAE5"/>
+    <circle cx="592" cy="301" r="4" fill="#10B981" class="opt-pulse"/>
+    <text x="608" y="305" font-size="8" font-weight="700" fill="#059669">Active</text>
+    <text x="720" y="304" font-size="9" fill="#7C3AED" font-weight="600">Edit - Disable</text>
+
+    <!-- Row 4 owner -->
+    <rect x="40" y="332" width="880" height="48" rx="6" fill="#F8FAFC" stroke="#7C3AED" stroke-width="1.5"/>
+    <circle cx="68" cy="356" r="14" fill="#E0E7FF"/><text x="68" y="360" text-anchor="middle" font-size="9" font-weight="800" fill="#4F46E5">R</text>
+    <text x="92" y="352" font-size="10" font-weight="600" fill="#1E293B">Rahat (You)</text>
+    <text x="92" y="366" font-size="8" fill="#64748B">Organization owner</text>
+    <text x="220" y="360" font-size="9" fill="#64748B">rahat@rasantsolutions.com</text>
+    <rect x="440" y="346" width="56" height="22" rx="11" fill="#E0E7FF"/><text x="468" y="361" text-anchor="middle" font-size="8" font-weight="600" fill="#4F46E5">Owner</text>
+    <rect x="580" y="346" width="56" height="22" rx="11" fill="#D1FAE5"/><text x="608" y="361" text-anchor="middle" font-size="8" font-weight="700" fill="#059669">Active</text>
+    <text x="720" y="360" font-size="9" fill="#94A3B8">-</text>
+
+    <!-- Social accounts strip -->
+    <rect x="40" y="396" width="880" height="88" rx="10" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <text x="56" y="420" font-size="9" font-weight="700" fill="#64748B">CONNECTED SOCIAL ACCOUNTS</text>
+    <rect x="56" y="432" width="200" height="40" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <circle cx="76" cy="452" r="12" fill="#1877F2"/><text x="76" y="456" text-anchor="middle" font-size="9" font-weight="800" fill="#FFF">f</text>
+    <text x="96" y="448" font-size="9" font-weight="600" fill="#1E293B">Facebook</text>
+    <text x="96" y="462" font-size="8" fill="#059669">Connected</text>
+    <rect x="272" y="432" width="200" height="40" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <circle cx="292" cy="452" r="12" fill="#0A66C2"/><text x="292" y="456" text-anchor="middle" font-size="7" font-weight="800" fill="#FFF">in</text>
+    <text x="312" y="448" font-size="9" font-weight="600" fill="#1E293B">LinkedIn</text>
+    <text x="312" y="462" font-size="8" fill="#059669">Connected</text>
+    <rect x="488" y="432" width="200" height="40" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <circle cx="508" cy="452" r="12" fill="#1DA1F2"/><text x="508" y="456" text-anchor="middle" font-size="8" font-weight="800" fill="#FFF">X</text>
+    <text x="528" y="448" font-size="9" font-weight="600" fill="#1E293B">Twitter / X</text>
+    <text x="528" y="462" font-size="8" fill="#059669">Connected</text>
+    <rect x="704" y="432" width="200" height="40" rx="8" fill="#FFFFFF" stroke="#CBD5E1" stroke-dasharray="4 3"/>
+    <text x="804" y="456" text-anchor="middle" font-size="9" fill="#94A3B8">+ Connect Instagram</text>
+  </g>
+</svg>

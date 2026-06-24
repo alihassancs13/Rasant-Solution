@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 280 380" role="img" aria-label="Sample Instagram post preview">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 420" role="img" aria-label="Sample Instagram post preview">
   <defs>
     <linearGradient id="igRing" x1="0%" y1="100%" x2="100%" y2="0%">
       <stop offset="0%" stop-color="#F58529"/>
@@ -10,16 +10,22 @@
       <stop offset="0%" stop-color="#6366F1"/>
       <stop offset="100%" stop-color="#A855F7"/>
     </linearGradient>
+    <filter id="igSh"><feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#7C3AED" flood-opacity="0.1"/></filter>
   </defs>
-  <rect width="280" height="380" rx="16" fill="white" stroke="#E2E8F0" stroke-width="1.5"/>
-  <circle cx="32" cy="32" r="14" fill="url(#igRing)"/>
-  <circle cx="32" cy="32" r="10" fill="white"/>
-  <circle cx="32" cy="32" r="6" fill="url(#igRing)"/>
-  <text x="56" y="36" font-family="Inter,Arial,sans-serif" font-size="12" font-weight="700" fill="#262626">rasantsolutions</text>
-  <rect x="0" y="56" width="280" height="280" fill="url(#igImg)"/>
-  <text x="140" y="190" text-anchor="middle" font-family="Space Grotesk,Arial,sans-serif" font-size="18" font-weight="800" fill="white">Create. Approve.</text>
-  <text x="140" y="214" text-anchor="middle" font-family="Space Grotesk,Arial,sans-serif" font-size="18" font-weight="800" fill="white">Publish.</text>
-  <text x="20" y="358" font-family="Inter,Arial,sans-serif" font-size="11" fill="#262626">Like  Comment  Share</text>
-  <text x="20" y="374" font-family="Inter,Arial,sans-serif" font-size="10" font-weight="700" fill="#262626">rasantsolutions</text>
-  <text x="120" y="374" font-family="Inter,Arial,sans-serif" font-size="10" fill="#262626">AI posts in seconds</text>
+  <rect width="300" height="420" rx="16" fill="white" stroke="#E2E8F0" stroke-width="1.5" filter="url(#igSh)"/>
+  <circle cx="36" cy="36" r="16" fill="url(#igRing)"/>
+  <circle cx="36" cy="36" r="12" fill="white"/>
+  <circle cx="36" cy="36" r="8" fill="url(#igRing)"/>
+  <text x="62" y="40" font-family="Inter,sans-serif" font-size="12" font-weight="700" fill="#262626">rasantsolutions</text>
+  <text x="240" y="40" font-size="14" fill="#262626">---</text>
+  <rect x="0" y="60" width="300" height="300" fill="url(#igImg)"/>
+  <text x="150" y="190" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="20" font-weight="800" fill="white">Create. Approve.</text>
+  <text x="150" y="218" text-anchor="middle" font-family="Space Grotesk,sans-serif" font-size="20" font-weight="800" fill="white">Publish.</text>
+  <text x="150" y="248" text-anchor="middle" font-family="Inter,sans-serif" font-size="10" fill="white" opacity=".9">Powered by OmniPost AI</text>
+  <text x="20" y="378" font-size="16" fill="#262626">♡</text>
+  <text x="48" y="378" font-size="14" fill="#262626">💬</text>
+  <text x="76" y="378" font-size="14" fill="#262626">↗</text>
+  <text x="260" y="378" font-size="14" fill="#262626">🔖</text>
+  <text x="20" y="398" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="#262626">1,284 likes</text>
+  <text x="20" y="414" font-family="Inter,sans-serif" font-size="10" fill="#262626"><tspan font-weight="700">rasantsolutions</tspan> AI posts in seconds ✨</text>
 </svg>
