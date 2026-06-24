@@ -156,7 +156,7 @@
           <div class="relative w-full">
             <div class="absolute inset-[6%_2%] rounded-full bg-glow-queue blur-[10px] pointer-events-none"></div>
             <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-borderDefault shadow-[var(--shadow-card)] overflow-hidden">
-              <img src="@/assets/images/scheduled-overview.png" alt="Sentra AI scheduled calls overview dashboard"
+              <img src="@/assets/svg/sentra-dashboard.svg" alt="Sentra AI scheduled calls overview dashboard"
                    class="w-full h-auto rounded-[10px]" />
             </div>
           </div>
@@ -173,7 +173,7 @@
           <div class="relative w-full">
             <div class="absolute inset-[6%_2%] rounded-full bg-glow-live blur-[10px] pointer-events-none"></div>
             <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-borderDefault shadow-[var(--shadow-card)] overflow-hidden">
-              <img src="@/assets/images/live-calls.png" alt="Sentra AI live calls table"
+              <img src="@/assets/svg/sentra-live-calls.svg" alt="Sentra AI live calls table"
                    class="w-full h-auto rounded-[10px]" />
             </div>
           </div>
@@ -226,7 +226,7 @@
           <div class="relative w-full">
             <div class="absolute inset-[6%_2%] rounded-full bg-glow-queue blur-[10px] pointer-events-none"></div>
             <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-borderDefault shadow-[var(--shadow-card)] overflow-hidden">
-              <img src="@/assets/images/call-queue.png" alt="Sentra AI call queue"
+              <img src="@/assets/svg/sentra-call-queue.svg" alt="Sentra AI call queue"
                    class="w-full h-auto rounded-[10px]" />
             </div>
           </div>
@@ -244,13 +244,13 @@
             <div class="relative w-full">
               <div class="absolute inset-[6%_2%] rounded-full bg-glow-campaign blur-[10px] pointer-events-none"></div>
               <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-borderDefault shadow-[var(--shadow-card)] overflow-hidden">
-                <img src="@/assets/images/campaigns.png" alt="Sentra AI campaigns"
+                <img src="@/assets/svg/sentra-campaigns.svg" alt="Sentra AI campaigns"
                      class="w-full h-auto rounded-[10px]" />
               </div>
             </div>
             <figure class="relative w-full">
               <div class="relative z-[2] p-[8px] rounded-2xl bg-white/95 border border-borderDefault shadow-[var(--shadow-card-small)] overflow-hidden">
-                <img src="@/assets/images/bulk-contacts.png" alt="Sentra AI bulk contacts"
+                <img src="@/assets/svg/sentra-bulk-contacts.svg" alt="Sentra AI bulk contacts"
                      class="w-full h-auto rounded-[10px]" />
               </div>
               <figcaption class="mt-2.5 text-xs text-textSupporting text-center font-primary">Bulk import contacts via CSV with optional campaign assignment.</figcaption>
@@ -305,7 +305,7 @@
           <div class="relative w-full">
             <div class="absolute inset-[6%_2%] rounded-full bg-glow-scheduler blur-[10px] pointer-events-none"></div>
             <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-borderDefault shadow-[var(--shadow-card)] overflow-hidden">
-              <img src="@/assets/images/call-scheduler.png" alt="Sentra AI call scheduler"
+              <img src="@/assets/svg/sentra-call-scheduler.svg" alt="Sentra AI call scheduler"
                    class="w-full h-auto rounded-[10px]" />
             </div>
           </div>
@@ -323,13 +323,13 @@
             <div class="relative w-full">
               <div class="absolute inset-[6%_2%] rounded-full bg-glow-analytics blur-[10px] pointer-events-none"></div>
               <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-borderDefault shadow-[var(--shadow-card)] overflow-hidden">
-                <img src="@/assets/images/chatbot-analytics.png" alt="Sentra AI chatbot analytics"
+                <img src="@/assets/svg/sentra-chatbot-analytics.svg" alt="Sentra AI chatbot analytics"
                      class="w-full h-auto rounded-[10px]" />
               </div>
             </div>
             <figure class="relative w-full">
               <div class="relative z-[2] p-[8px] rounded-2xl bg-white/95 border border-borderDefault shadow-[var(--shadow-card-small)] overflow-hidden">
-                <img src="@/assets/images/analytics-charts.png" alt="Sentra AI analytics charts"
+                <img src="@/assets/svg/sentra-analytics-charts.svg" alt="Sentra AI analytics charts"
                      class="w-full h-auto rounded-[10px]" />
               </div>
               <figcaption class="mt-2.5 text-xs text-textSupporting text-center font-primary">Token trends, distribution breakdown, and usage by module.</figcaption>
@@ -384,7 +384,7 @@
           <div class="relative w-full">
             <div class="absolute inset-[6%_2%] rounded-full bg-glow-team blur-[10px] pointer-events-none"></div>
             <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-borderDefault shadow-[var(--shadow-card)] overflow-hidden">
-              <img src="@/assets/images/team-dashboard.png" alt="Sentra AI team workspace"
+              <img src="@/assets/svg/sentra-team-workspace.svg" alt="Sentra AI team workspace"
                    class="w-full h-auto rounded-[10px]" />
             </div>
           </div>
