@@ -73,7 +73,7 @@
 
       <!-- Right cards -->
       <div
-          class="lg:col-span-7 grid grid-cols-1 md:grid-cols-3 gap-5 items-start relative transition-all duration-1000 ease-out delay-300"
+          class="lg:col-span-7 grid grid-cols-1 md:grid-cols-3 gap-5 items-start relative transition-all duration-1000 ease-out delay-300 hidden lg:grid"
           :class="heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-16'"
       >
         <!-- Card 1: Code example -->
@@ -488,17 +488,21 @@
           :class="visible.about ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-16'"
       >
         <div class="w-full rounded-[20px] overflow-hidden bg-sectionLight border border-borderDefault shadow-lg">
-          <img :src="aboutIllustration" alt="About Rasant Solutions" loading="lazy" decoding="async" class="w-full block" />
+          <img :src="aboutIllustration" alt="About Rasant Solutions" loading="lazy" decoding="async" class="w-full block max-h-[180px] lg:max-h-full object-contain p-3 lg:p-0" />
         </div>
-        <div class="absolute -bottom-5 -left-7 max-w-[200px] bg-card rounded-xl px-5 py-4 shadow-xl border border-borderDefault font-primary">
-          <div class="text-[10px] uppercase tracking-wide text-textSupporting mb-1">Avg. Delivery</div>
-          <div class="text-[22px] font-bold text-textBrand font-display">3 Weeks</div>
-          <div class="text-[11px] text-textSupporting mt-0.5">From design to launch</div>
+
+        <!-- Avg Delivery Badge -->
+        <div class="absolute -bottom-4 -left-2 lg:-bottom-5 lg:-left-7 max-w-[150px] lg:max-w-[200px] bg-card rounded-xl px-3 py-2.5 lg:px-5 lg:py-4 shadow-xl border border-borderDefault font-primary">
+          <div class="text-[9px] lg:text-[10px] uppercase tracking-wide text-textSupporting mb-1">Avg. Delivery</div>
+          <div class="text-[16px] lg:text-[22px] font-bold text-textBrand font-display">3 Weeks</div>
+          <div class="text-[10px] lg:text-[11px] text-textSupporting mt-0.5">From design to launch</div>
         </div>
-        <div class="absolute -top-5 -right-5 max-w-[200px] bg-card rounded-xl px-5 py-4 shadow-xl border border-borderDefault font-primary">
-          <div class="text-[10px] uppercase tracking-wide text-textSupporting mb-1">Client Retention</div>
-          <div class="text-[22px] font-bold text-Success font-display">94%</div>
-          <div class="text-[11px] text-textSupporting mt-0.5">Return for new projects</div>
+
+        <!-- Client Retention Badge -->
+        <div class="absolute -top-4 -right-2 lg:-top-5 lg:-right-5 max-w-[150px] lg:max-w-[200px] bg-card rounded-xl px-3 py-2.5 lg:px-5 lg:py-4 shadow-xl border border-borderDefault font-primary">
+          <div class="text-[9px] lg:text-[10px] uppercase tracking-wide text-textSupporting mb-1">Client Retention</div>
+          <div class="text-[16px] lg:text-[22px] font-bold text-Success font-display">94%</div>
+          <div class="text-[10px] lg:text-[11px] text-textSupporting mt-0.5">Return for new projects</div>
         </div>
       </div>
 
@@ -686,8 +690,7 @@ const techList = [
   { name: 'Docker',       icon: ['fab', 'docker'],        color: 'text-techDocker'   },
   { name: 'Google Cloud', icon: ['fab', 'google'],        color: 'text-techGoogle'   },
 ]
-// Precompute the doubled marquee list with stable keys once via computed(),
-// instead of re-spreading [...techList, ...techList] on every render.
+
 const techListLooped = computed(() =>
     [...techList, ...techList].map((tech, i) => ({ ...tech, key: `${tech.name}-${i}` }))
 )

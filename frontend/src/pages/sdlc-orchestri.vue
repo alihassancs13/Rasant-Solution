@@ -140,7 +140,7 @@
           <div class="relative z-10 flex items-center justify-center">
             <div class="relative w-[min(280px,80%)] md:w-[min(320px,88%)] mx-auto animate-[visualFloat_6s_ease-in-out_infinite]">
               <div class="absolute inset-5 rounded-full bg-[radial-gradient(circle,var(--color-bot-glow)_0%,transparent_68%)] animate-[voiceGlow_3.5s_ease-in-out_infinite]"></div>
-              <div class="absolute inset-[-8%] rounded-full border-2 border-dashed border-neutral-400/30 animate-[botRingSpin_24s_linear_infinite]"></div>
+              <div class="absolute inset-[-15%] rounded-full border-2 border-dashed border-neutral-400/32 animate-[botRingSpin_24s_linear_infinite]"></div>
               <div class="absolute inset-[-18%] rounded-full border-2 border-dashed border-accent-5/22 animate-[botRingSpin_30s_linear_infinite_reverse]"></div>
               <img src="../assets/svg/orchestri-agent-bot.svg" alt="Orchestri multi-agent workflow" class="w-full block relative z-10 drop-shadow-[var(--shadow-primary-dark)]" />
             </div>

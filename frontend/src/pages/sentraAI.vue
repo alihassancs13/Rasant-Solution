@@ -55,13 +55,26 @@
         </div>
 
         <!-- Right Visual -->
+
         <div class="relative z-30 flex justify-center py-1 mx-auto md:mr-0 md:ml-auto">
           <div class="relative w-[min(400px,80vw)] animate-[botEnter_0.9s_cubic-bezier(0.22,1,0.36,1)_both]">
-            <div class="absolute inset-[8%] rounded-full bg-[radial-gradient(circle,var(--color-bot-glow)_0%,transparent_70%)] animate-[botGlow_3s_ease-in-out_infinite]"></div>
-            <div class="absolute -inset-3.5 rounded-full border-4 border-dashed border-accent-1/35 animate-[botRingSpin_22s_linear_infinite]"></div>
-            <div class="absolute -inset-5.5 rounded-full border-4 border-dashed border-accent-3/20 animate-[botRingSpin_30s_linear_infinite_reverse]"></div>
+
+            <!-- Glow -->
+            <div class="absolute inset-[8%] rounded-full bg-[radial-gradient(circle,rgba(45,212,191,0.2)_0%,transparent_70%)] animate-[botGlow_3s_ease-in-out_infinite]"></div>
+
+            <!-- Ring 1 - Inner -->
+            <div class="absolute -inset-3.5 rounded-full border-2 border-dashed border-accent-1/35 animate-[botRingSpin_22s_linear_infinite]"></div>
+
+            <!-- Ring 2 - Outer -->
+            <div class="absolute -inset-5.5 rounded-full border-2 border-dashed border-accent-3/20 animate-[botRingSpin_30s_linear_infinite_reverse]"></div>
+
+            <!-- Bot image -->
             <div class="relative w-full z-20 aspect-square max-w-sm mx-auto flex items-center justify-center overflow-visible">
-              <img src="../assets/svg/sentra-bot.svg" alt="Sentra AI call routing" class="w-full h-[450px] object-contain drop-shadow-[var(--shadow-primary-dark)] relative z-10" />
+              <img
+                  src="../assets/svg/sentra-bot.svg"
+                  alt="Sentra AI call routing"
+                  class="w-full h-[450px] object-contain drop-shadow-[var(--shadow-primary-dark)] relative z-10"
+              />
             </div>
           </div>
         </div>
@@ -523,7 +536,6 @@ export default {
   }
 }
 </script>
-
 <style scoped>
 @keyframes meshShift {
   0% { transform: translate(0, 0) scale(1); opacity: 0.9; }

@@ -3,62 +3,49 @@
     <Navbar />
 
     <section class="relative pt-17 pb-0 overflow-hidden bg-gradient-to-b from-secondary-50 via-primary-50 to-neutral-100">
-      <!-- Background mesh using theme variables -->
       <div class="absolute inset-[-10%_-5%] pointer-events-none bg-[radial-gradient(circle_at_18%_20%,rgba(255,213,180,0.35)_0%,transparent_42%),radial-gradient(circle_at_82%_18%,rgba(201,196,248,0.32)_0%,transparent_40%),radial-gradient(circle_at_50%_80%,rgba(45,212,191,0.12)_0%,transparent_45%)] animate-[meshShift_10s_ease-in-out_infinite_alternate]"></div>
-
-      <!-- Orb backgrounds -->
       <div class="absolute rounded-full blur-[70px] pointer-events-none w-80 h-80 bg-secondary-100/45 -top-5 -left-20 animate-[orbDrift_14s_ease-in-out_infinite]"></div>
       <div class="absolute rounded-full blur-[70px] pointer-events-none w-70 h-70 bg-primary-300/35 top-15 -right-15 animate-[orbDrift_14s_ease-in-out_infinite] [animation-delay:-6s]"></div>
       <div class="absolute rounded-full blur-[70px] pointer-events-none w-50 h-50 bg-accent-1/22 bottom-[10%] left-[55%] animate-[orbDrift_14s_ease-in-out_infinite] [animation-delay:-3s]"></div>
 
-      <!-- Decorative side grids -->
-
-      <!-- Main content -->
       <div class="relative max-w-[1040px] mx-auto px-6 z-30 grid grid-cols-1 md:grid-cols-2 gap-8 items-center pt-8 pb-12">
-        <!-- Left text content -->
-        <div class="relative z-30 text-left max-w-[560px] mx-auto md:mx-0 mt-15">
+        <!-- Left text -->
+        <div class="relative z-30 text-left max-w-[560px] mx-auto md:mx-0 mt-15 order-1">
           <span class="inline-block uppercase tracking-wider text-[11px] font-bold text-accent-1 bg-accent-1/10 px-3 py-1 rounded-full mb-4 font-display">Chatbot Agent</span>
           <h1 class="font-display text-[clamp(28px,4vw,44px)] font-bold tracking-[-1px] leading-[1.15] mb-4 text-headingMain">
             Conversational AI for <br>
-            <em class="not-italic text-gradient-primary">
-              web, WhatsApp, and in-app chat
-            </em>
+            <em class="not-italic text-gradient-primary">web, WhatsApp, and in-app chat</em>
           </h1>
           <p class="text-[15px] text-textBody leading-relaxed mb-6 font-primary">
             Grounded chatbots that answer from your documents, handle support and sales conversations, and hand off to humans with full context - with token analytics built in.
           </p>
           <div class="flex justify-start gap-3 flex-wrap">
-            <ShineButton to="/contact" >Book a Chat Demo</ShineButton>
-            <button
-                @click="scrollToPricing"
-                type="button"
-                class="px-6 py-3 border border-borderDefault text-textBody font-semibold rounded-lg hover:bg-neutral-100 transition-colors text-sm cursor-pointer font-primary"
-            >
+            <ShineButton to="/contact">Book a Chat Demo</ShineButton>
+            <button @click="scrollToPricing" type="button" class="px-6 py-3 border border-borderDefault text-textBody font-semibold rounded-lg hover:bg-neutral-100 transition-colors text-sm cursor-pointer font-primary">
               View Pricing
             </button>
           </div>
         </div>
 
         <!-- Right bot image -->
-        <div class="relative z-30 flex justify-center py-1 mx-auto md:mr-0 md:ml-auto">
-          <div class="relative w-[min(280px,72vw)] animate-[botEnter_0.9s_cubic-bezier(0.22,1,0.36,1)_both]">
-            <div class="absolute inset-[8%] rounded-full bg-[radial-gradient(circle,var(--color-bot-glow)_0%,transparent_70%)] animate-[botGlow_3s_ease-in-out_infinite]"></div>
-            <div class="absolute -inset-3.5 rounded-full border-4 border-dashed border-accent-1/35 animate-[botRingSpin_22s_linear_infinite]"></div>
-            <div class="absolute -inset-5.5 rounded-full border-4 border-dashed border-accent-3/20 animate-[botRingSpin_30s_linear_infinite_reverse]"></div>
-            <div class="relative w-full z-20 aspect-square max-w-sm mx-auto">
-              <img src="../assets/svg/chatbot-bot.svg" alt="Chatbot agent" class="w-80 h-80 object-contain drop-shadow-[var(--shadow-primary-dark)] relative z-10" title="Chatbot Agent" />
-              <img src="../assets/images/chatbot-face.png" alt="Bot face" class="mt-11 rounded-full absolute top-[22%] left-1/2 -translate-x-1/2 w-[45%] object-contain z-30" title="Bot Face" />
-            </div>
+        <div class="relative z-30 flex justify-center py-1 mx-auto md:mr-0 md:ml-auto order-2">
+          <div class="relative w-[min(380px,80vw)] aspect-square flex items-center justify-center animate-[botEnter_0.9s_cubic-bezier(0.22,1,0.36,1)_both]">
+            <div class="absolute inset-[15%] rounded-full bg-[radial-gradient(circle,rgba(45,212,191,0.2)_0%,transparent_70%)] animate-[botGlow_3s_ease-in-out_infinite]"></div>
+            <div class="absolute inset-[5%] rounded-full border-2 border-dashed border-accent-1/35 animate-[botRingSpin_22s_linear_infinite]"></div>
+            <div class="absolute inset-0 rounded-full border-2 border-dashed border-accent-3/20 animate-[botRingSpin_30s_linear_infinite_reverse]"></div>
+            <img src="../assets/svg/chatbot-messenger-bot.svg" alt="Chatbot Agent" class="relative z-10 w-[75%] h-[75%] object-contain drop-shadow-[0_16px_36px_rgba(42,95,158,0.2)]" />
           </div>
         </div>
       </div>
     </section>
 
+    <!-- Section 01 — Conversation Flow -->
     <section class="py-20 lg:py-28 bg-section-white relative overflow-hidden">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
 
-          <div class="lg:col-span-5 space-y-4">
+          <!-- Text — always first -->
+          <div class="lg:col-span-5 space-y-4 order-1">
             <div class="font-display text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] text-sectionNumber pointer-events-none select-none">01</div>
             <span class="inline-block text-xs font-bold uppercase tracking-wider text-textBrand font-display">Conversation Flow</span>
             <h2 class="text-3xl sm:text-4xl font-extrabold text-headingSection font-display">From message to resolution in chat</h2>
@@ -67,26 +54,13 @@
             </p>
           </div>
 
-          <div class="lg:col-span-7">
+          <!-- Image — always second -->
+          <div class="lg:col-span-7 order-2">
             <div class="p-4 bg-section-white rounded-2xl border border-borderDefault shadow-[var(--shadow-primary-dark)] flex items-center justify-center relative">
-
-              <!-- Base Flow Diagram -->
-              <img
-                  src="../assets/svg/chatbot-flow.svg"
-                  alt="Chatbot flow diagram"
-                  class="w-full h-auto max-w-2xl"
-                  title="Chatbot conversation flow"
-              />
-
-              <!-- Chatbot Face Avatar Overlay -->
+              <img src="../assets/svg/chatbot-flow.svg" alt="Chatbot flow diagram" class="w-full h-auto max-w-2xl" title="Chatbot conversation flow" />
               <div class="absolute top-[32%] left-[34.8%] w-[6.5%] max-w-[44px] aspect-square flex items-center justify-center">
-                <img
-                    src="../assets/images/chatbot-face.png"
-                    alt="Chatbot agent face avatar"
-                    class="w-6 h-6 mr-12 mb-12 pt-0 object-contain rounded-full bg-gradient-to-b from-accent-1/30 to-accent-2/20 shadow-inner"
-                />
+                <img src="../assets/images/chatbot-face.png" alt="Chatbot agent face avatar" class="w-6 h-6 mr-12 mb-12 pt-0 object-contain rounded-full bg-gradient-to-b from-accent-1/30 to-accent-2/20 shadow-inner" />
               </div>
-
             </div>
           </div>
 
@@ -94,38 +68,19 @@
       </div>
     </section>
 
+    <!-- Section 02 — Live Analytics -->
     <section class="py-20 lg:py-28 bg-neutral-200 relative overflow-hidden">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center lg:direction-rtl">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
 
-          <div class="lg:col-span-7 lg:order-1">
-
-            <div class="bg-section-white p-6 rounded-2xl shadow-xl border border-borderDefault space-y-6 max-w-lg mx-auto">
-
-              <div class="w-full">
-                <img src="../assets/images/chatbot-analytics-tokens.png" alt="Token metrics and activity trends" class="w-full h-auto rounded-xl border border-borderDefault" />
-              </div>
-
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div class="p-2 border border-borderDefault rounded-xl bg-neutral-50/50">
-                  <img src="../assets/images/chatbot-token-distribution.png" alt="Token distribution pie chart" class="w-full h-auto" />
-                </div>
-                <div class="p-2 border border-borderDefault rounded-xl bg-neutral-50/50">
-                  <img src="../assets/images/chatbot-usage-overview.png" alt="Usage overview bar chart" class="w-full h-auto" />
-                </div>
-              </div>
-
-            </div>
-          </div>
-          <div class="lg:col-span-5 space-y-5 lg:order-2">
+          <!-- Text — mobile pe pehle, lg pe right -->
+          <div class="lg:col-span-5 space-y-5 order-1 lg:order-2">
             <div class="font-display text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] text-sectionNumber pointer-events-none select-none">02</div>
             <span class="inline-block text-xs font-bold uppercase tracking-wider text-textBrand font-display">Live Analytics</span>
             <h2 class="text-3xl sm:text-4xl font-extrabold text-headingSection font-display">Track tokens, requests, and usage</h2>
             <p class="text-textBody leading-relaxed font-primary">
               See embeddings, AI responses, and activity trends in one dashboard - from daily token burn to document coverage.
             </p>
-
-
             <div class="flex flex-wrap items-center gap-3 pt-2">
               <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-accent-1/10 border border-accent-1/30 text-accent-2 text-xs font-bold tracking-wider font-display">
                 <span class="h-2 w-2 rounded-full bg-accent-1 animate-pulse"></span>
@@ -139,15 +94,35 @@
             </div>
           </div>
 
+          <!-- Image — mobile pe baad mein, lg pe left -->
+          <div class="lg:col-span-7 order-2 lg:order-1">
+            <div class="bg-section-white p-6 rounded-2xl shadow-xl border border-borderDefault space-y-6 max-w-lg mx-auto">
+              <div class="w-full">
+                <img src="../assets/images/chatbot-analytics-tokens.png" alt="Token metrics and activity trends" class="w-full h-auto rounded-xl border border-borderDefault" />
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="p-2 border border-borderDefault rounded-xl bg-neutral-50/50">
+                  <img src="../assets/images/chatbot-token-distribution.png" alt="Token distribution pie chart" class="w-full h-auto" />
+                </div>
+                <div class="p-2 border border-borderDefault rounded-xl bg-neutral-50/50">
+                  <img src="../assets/images/chatbot-usage-overview.png" alt="Usage overview bar chart" class="w-full h-auto" />
+                </div>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
     </section>
 
+    <!-- Section 03 — Chat Workflows -->
     <section class="py-20 lg:py-28 bg-section-white relative overflow-hidden">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center mb-16">
-          <div class="lg:col-span-6 space-y-4">
+
+          <!-- Text — always first -->
+          <div class="lg:col-span-6 space-y-4 order-1">
             <div class="font-display text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] text-sectionNumber pointer-events-none select-none">03</div>
             <span class="inline-block text-xs font-bold uppercase tracking-wider text-textBrand font-display">Chat Workflows</span>
             <h2 class="text-3xl sm:text-4xl font-extrabold text-headingSection font-display">
@@ -159,9 +134,9 @@
             </p>
           </div>
 
-          <div class="lg:col-span-6 flex justify-center">
+          <!-- Image — always second -->
+          <div class="lg:col-span-6 flex justify-center order-2">
             <div class="relative p-6 bg-neutral-50 rounded-2xl border border-borderDefault w-full max-w-md aspect-square flex items-center justify-center overflow-visible">
-
               <div class="absolute inset-0">
                 <div class="orbit-1">
                   <div class="absolute inset-[-10%] rounded-full border-4 border-dashed border-accent-3/60 scale-y-[0.85] -rotate-12 animate-[spin_30s_linear_infinite] pointer-events-none"></div>
@@ -170,38 +145,23 @@
                   <div class="absolute inset-[-6%] rounded-full border-4 border-dashed border-accent-7/50 scale-x-[0.90] rotate-45 animate-[spin_20s_linear_infinite_reverse] pointer-events-none"></div>
                 </div>
               </div>
-
               <div class="relative w-80 h-100 mx-auto z-10 flex items-center justify-center">
-                <img
-                    src="../assets/svg/chatbot-messenger-bot.svg"
-                    alt="Chatbot with messages"
-                    class="w-full h-full object-contain drop-shadow-[var(--shadow-primary-dark)]"
-                    title="Chatbot agent messaging"
-                />
+                <img src="../assets/svg/chatbot-messenger-bot.svg" alt="Chatbot with messages" class="w-full h-full object-contain drop-shadow-[var(--shadow-primary-dark)]" title="Chatbot agent messaging" />
               </div>
-
             </div>
-
           </div>
         </div>
 
-        <!-- Updated 6 Cards -->
+        <!-- 6 Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-5xl mx-auto">
           <article v-for="(card, i) in chatbotCards" :key="i"
                    :class="[
               'group relative bg-cardSemi border border-borderDefault rounded-[14px] p-4 pl-4.5 shadow-[var(--shadow-card-small)] overflow-hidden',
               'transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.02]',
               'animate-[cardFloat_5s_ease-in-out_infinite] hover:[animation-play-state:paused]',
-              `hover:border-${card.color}/45 hover:shadow-[var(--shadow-card-hover)]`,
-              `before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:rounded-[16px_0_0_16px]`,
-              `after:absolute after:inset-0 after:pointer-events-none`
             ]"
-                   :style="{
-              animationDelay: card.delay,
-              '--card-accent': card.hex,
-              '--before-bg': card.hex
-            }">
-            <span :class="`relative z-10 inline-block text-[9px] font-extrabold tracking-wider uppercase mb-2 font-display`" :style="{ color: card.hex }">{{ card.tag }}</span>
+                   :style="{ animationDelay: card.delay }">
+            <span class="relative z-10 inline-block text-[9px] font-extrabold tracking-wider uppercase mb-2 font-display" :style="{ color: card.hex }">{{ card.tag }}</span>
             <h3 class="relative z-10 font-display text-sm font-bold mb-1.5 text-headingCard">{{ card.title }}</h3>
             <p class="relative z-10 text-[12.5px] text-textSupporting leading-normal font-primary">{{ card.desc }}</p>
             <div class="absolute left-0 top-0 bottom-0 w-1 rounded-[16px_0_0_16px]" :style="{ background: card.hex }"></div>
@@ -212,41 +172,19 @@
       </div>
     </section>
 
+    <!-- Section 04 — Capabilities -->
     <section class="py-20 lg:py-28 bg-neutral-200 relative overflow-hidden">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
 
-          <div class="lg:col-span-6 flex justify-center">
-            <div class="relative p-6 bg-section-white rounded-2xl shadow-md w-full max-w-lg overflow-visible">
-
-              <img
-                  src="../assets/svg/chatbot-capabilities.svg"
-                  alt="Chatbot capabilities diagram"
-                  class="w-full h-auto block relative z-10"
-                  title="Chatbot capabilities and integrations"
-              />
-
-              <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100%] h-[90%] rounded-3xl border-4 border-dashed border-accent-3/60 animate-[spin_35s_linear_infinite] z-10 pointer-events-none"></div>
-
-              <img
-                  src="../assets/images/chatbot-face.png"
-                  alt="Chatbot face indicator"
-                  class="mt-3 rounded-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[20%] object-contain z-20"
-                  title="Chatbot center face view"
-              />
-
-            </div>
-          </div>
-
-          <div class="lg:col-span-6 space-y-6">
+          <!-- Text — mobile pe pehle, lg pe right -->
+          <div class="lg:col-span-6 space-y-6 order-1 lg:order-2">
             <div class="font-display text-[clamp(76px,13vw,148px)] font-extrabold leading-[0.82] tracking-[-5px] text-sectionNumber pointer-events-none select-none">04</div>
             <span class="inline-block text-xs font-bold uppercase tracking-wider text-textBrand font-display">Capabilities</span>
             <h2 class="text-3xl sm:text-4xl font-extrabold text-headingSection font-display">Everything a chatbot agent needs</h2>
             <p class="text-textBody leading-relaxed mb-6 font-primary">
               Intent routing, human handoff, and CRM integrations - the full toolkit for production chat deployments.
             </p>
-
-
             <ul class="space-y-6">
               <li class="flex items-start gap-4">
                 <span class="flex-shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-xl bg-neutral-200 text-headingMain font-bold text-sm tracking-wide shadow-sm shadow-primary-500/20">
@@ -276,12 +214,19 @@
                 </div>
               </li>
             </ul>
-
-
             <div class="ml-20">
-            <span class="text-textSupporting font-primary">Need phone and voice automation? See our
-  <router-link to="/ai-agent" class="text-secondary-600 font-semibold underline">Voice AI Agent</router-link>.
-</span>
+              <span class="text-textSupporting font-primary">Need phone and voice automation? See our
+                <router-link to="/ai-agent" class="text-secondary-600 font-semibold underline">Voice AI Agent</router-link>.
+              </span>
+            </div>
+          </div>
+
+          <!-- Image — mobile pe baad mein, lg pe left -->
+          <div class="lg:col-span-6 flex justify-center order-2 lg:order-1">
+            <div class="relative p-6 bg-section-white rounded-2xl shadow-md w-full max-w-lg overflow-visible">
+              <img src="../assets/svg/chatbot-capabilities.svg" alt="Chatbot capabilities diagram" class="w-full h-auto block relative z-10" title="Chatbot capabilities and integrations" />
+              <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100%] h-[90%] rounded-3xl border-4 border-dashed border-accent-3/60 animate-[spin_35s_linear_infinite] z-10 pointer-events-none"></div>
+              <img src="../assets/images/chatbot-face.png" alt="Chatbot face indicator" class="mt-3 rounded-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[20%] object-contain z-20" title="Chatbot center face view" />
             </div>
           </div>
 
@@ -308,8 +253,7 @@
               <span class="inline-block bg-secondary-700 text-white text-xs font-bold uppercase tracking-wider px-4 py-1 rounded-full font-display">Most Popular</span>
             </div>
             <div class="mb-6" :class="plan.featured ? 'mt-2' : ''">
-              <span class="inline-block text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-3 font-display"
-                    :class="plan.badgeClass">{{ plan.name }}</span>
+              <span class="inline-block text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full mb-3 font-display" :class="plan.badgeClass">{{ plan.name }}</span>
               <div class="flex items-baseline gap-1">
                 <span class="text-4xl font-bold text-headingMain font-display">{{ plan.price }}</span>
                 <span v-if="plan.period" class="text-sm text-textSupporting font-primary">{{ plan.period }}</span>
@@ -324,8 +268,7 @@
                 <span>{{ feature.text }}</span>
               </li>
             </ul>
-            <a :href="plan.ctaLink" class="block w-full text-center px-6 py-3 font-semibold rounded-xl transition-colors text-sm font-primary"
-               :class="plan.ctaClass">
+            <a :href="plan.ctaLink" class="block w-full text-center px-6 py-3 font-semibold rounded-xl transition-colors text-sm font-primary" :class="plan.ctaClass">
               {{ plan.ctaText }}
             </a>
           </div>
@@ -333,9 +276,9 @@
       </div>
     </section>
 
+    <!-- CTA Section -->
     <section class="p-6 md:p-12 max-w-7xl mx-auto">
       <div class="relative bg-buttonBackground rounded-3xl p-8 md:p-12 shadow-xl overflow-hidden">
-
         <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
           <div class="lg:col-span-8 text-center lg:text-left space-y-3">
             <h2 class="text-3xl font-extrabold text-white font-display tracking-tight">Ready to deploy a chatbot?</h2>
@@ -344,18 +287,10 @@
             </p>
           </div>
           <div class="lg:col-span-4 flex flex-wrap justify-center lg:justify-end gap-3">
-            <button
-                @click="goToContact"
-                type="button"
-                class="px-6 py-3.5 bg-white text-secondary-600 font-bold rounded-xl shadow-md hover:bg-secondary-50 transition duration-200 cursor-pointer font-primary"
-            >
+            <button @click="goToContact" type="button" class="px-6 py-3.5 bg-white text-secondary-600 font-bold rounded-xl shadow-md hover:bg-secondary-50 transition duration-200 cursor-pointer font-primary">
               Contact Sales
             </button>
-            <button
-                @click="scrollToPricing"
-                type="button"
-                class="px-6 py-3.5 border border-white/40 text-white font-semibold rounded-xl hover:bg-white/10 transition duration-200 cursor-pointer font-primary"
-            >
+            <button @click="scrollToPricing" type="button" class="px-6 py-3.5 border border-white/40 text-white font-semibold rounded-xl hover:bg-white/10 transition duration-200 cursor-pointer font-primary">
               View Pricing
             </button>
           </div>
@@ -373,47 +308,8 @@ import Footer from '../components/footer.vue';
 import { useRouter } from 'vue-router';
 import ShineButton from "@/components/ShineButton.vue";
 
-// Initialize router
 const router = useRouter();
 
-// Define grid cells data - using theme variables
-const gridCellsLeft = [
-  { bgClass: 'bg-accent-3/20' },
-  { bgClass: 'bg-accent-4/20', delay: '-0.9s' },
-  { bgClass: 'bg-secondary-100/20', delay: '-1.8s' },
-  { bgClass: 'bg-accent-3/20', delay: '-2.7s' },
-  { bgClass: 'bg-secondary-100/20', delay: '-3.6s' },
-  { bgClass: 'bg-primary-500/20', delay: '-4.5s' },
-  { bgClass: 'bg-accent-3/20', delay: '-5.4s' },
-  { bgClass: 'bg-secondary-100/20', delay: '-6.3s' },
-  { bgClass: 'bg-accent-3/20' },
-  { bgClass: 'bg-secondary-100/20', delay: '-1.8s' },
-  { bgClass: 'bg-accent-4/20', delay: '-0.9s' },
-  { bgClass: 'bg-accent-3/20', delay: '-2.7s' },
-  { bgClass: 'bg-secondary-100/20', delay: '-3.6s' },
-  { bgClass: 'bg-primary-500/20', delay: '-4.5s' },
-  { bgClass: 'bg-secondary-100/20', delay: '-1.8s' },
-];
-
-const gridCellsRight = [
-  { bgClass: 'bg-accent-3/20' },
-  { bgClass: 'bg-accent-4/20', delay: '-0.9s' },
-  { bgClass: 'bg-secondary-100/20', delay: '-1.8s' },
-  { bgClass: 'bg-accent-3/20', delay: '-2.7s' },
-  { bgClass: 'bg-secondary-100/20', delay: '-3.6s' },
-  { bgClass: 'bg-primary-500/20', delay: '-4.5s' },
-  { bgClass: 'bg-accent-3/20', delay: '-5.4s' },
-  { bgClass: 'bg-secondary-100/20', delay: '-6.3s' },
-  { bgClass: 'bg-accent-3/20' },
-  { bgClass: 'bg-secondary-100/20', delay: '-1.8s' },
-  { bgClass: 'bg-accent-4/20', delay: '-0.9s' },
-  { bgClass: 'bg-accent-3/20', delay: '-2.7s' },
-  { bgClass: 'bg-secondary-100/20', delay: '-3.6s' },
-  { bgClass: 'bg-primary-500/20', delay: '-4.5s' },
-  { bgClass: 'bg-secondary-100/20', delay: '-1.8s' },
-];
-
-// Chatbot Cards Data
 const chatbotCards = [
   { tag: 'Use case', title: 'Customer support', desc: 'FAQ answers, order status, and ticket creation from chat.', hex: '#8B5CF6', delay: '0s' },
   { tag: 'Use case', title: 'Sales and leads', desc: 'Qualify visitors, capture leads, and route hot prospects.', hex: '#F59E0B', delay: '0.6s' },
@@ -423,16 +319,11 @@ const chatbotCards = [
   { tag: 'Control', title: 'Token analytics', desc: 'Track embeddings, prompts, and response usage over time.', hex: '#059669', delay: '1.5s' },
 ];
 
-// Pricing Plans
 const pricingPlans = [
   {
-    name: 'Starter',
-    badgeClass: 'text-accent-1 bg-accent-1/10',
-    price: '₨35,000',
-    period: '/ mo',
-    description: 'For small teams and startups',
-    featured: false,
-    checkColor: 'text-accent-1',
+    name: 'Starter', badgeClass: 'text-accent-1 bg-accent-1/10',
+    price: '₨35,000', period: '/ mo', description: 'For small teams and startups',
+    featured: false, checkColor: 'text-accent-1',
     features: [
       { text: '1 chatbot', included: true },
       { text: '500 chat sessions / mo', included: true },
@@ -440,18 +331,12 @@ const pricingPlans = [
       { text: 'Basic analytics', included: true },
       { text: 'Human handoff', included: true },
     ],
-    ctaText: 'Get Started',
-    ctaClass: 'bg-buttonBackground border border-borderDefault text-white hover:bg-buttonHover',
-    ctaLink: '/contact'
+    ctaText: 'Get Started', ctaClass: 'bg-buttonBackground border border-borderDefault text-white hover:bg-buttonHover', ctaLink: '/contact'
   },
   {
-    name: 'Business',
-    badgeClass: 'text-secondary-600 bg-secondary-50',
-    price: '₨95,000',
-    period: '/ mo',
-    description: 'For growing businesses',
-    featured: true,
-    checkColor: 'text-secondary-500',
+    name: 'Business', badgeClass: 'text-secondary-600 bg-secondary-50',
+    price: '₨95,000', period: '/ mo', description: 'For growing businesses',
+    featured: true, checkColor: 'text-secondary-500',
     features: [
       { text: '5 chatbots', included: true },
       { text: '5,000 chat sessions / mo', included: true },
@@ -459,18 +344,12 @@ const pricingPlans = [
       { text: 'Advanced analytics', included: true },
       { text: 'CRM integration', included: true },
     ],
-    ctaText: 'Get Started',
-    ctaClass: 'bg-buttonBackground text-white hover:bg-buttonHover shadow-md hover:shadow-lg',
-    ctaLink: '/contact'
+    ctaText: 'Get Started', ctaClass: 'bg-buttonBackground text-white hover:bg-buttonHover shadow-md hover:shadow-lg', ctaLink: '/contact'
   },
   {
-    name: 'Enterprise',
-    badgeClass: 'text-accent-3 bg-accent-3/10',
-    price: 'Custom',
-    period: '',
-    description: 'For large-scale operations',
-    featured: false,
-    checkColor: 'text-accent-3',
+    name: 'Enterprise', badgeClass: 'text-accent-3 bg-accent-3/10',
+    price: 'Custom', period: '', description: 'For large-scale operations',
+    featured: false, checkColor: 'text-accent-3',
     features: [
       { text: 'Unlimited chatbots', included: true },
       { text: 'Unlimited chat sessions', included: true },
@@ -478,37 +357,19 @@ const pricingPlans = [
       { text: 'Custom workflows', included: true },
       { text: 'Priority support', included: true },
     ],
-    ctaText: 'Contact Sales',
-    ctaClass: 'border border-borderDefault text-textBody hover:bg-neutral-100',
-    ctaLink: '/contact'
+    ctaText: 'Contact Sales', ctaClass: 'border border-borderDefault text-textBody hover:bg-neutral-100', ctaLink: '/contact'
   }
 ];
 
-// Methods
-const goToContact = () => {
-  router.push('/contact?project=chatbot');
-};
+const goToContact = () => router.push('/contact?project=chatbot');
 
 const scrollToPricing = () => {
   const pricingSection = document.getElementById('pricing');
-  if (pricingSection) {
-    pricingSection.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start'
-    });
-  }
+  if (pricingSection) pricingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
 </script>
 
 <style scoped>
-/* Custom typography styles */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700;800&display=swap');
-@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css');
-
-.font-space-grotesk {
-  font-family: 'Space Grotesk', sans-serif;
-}
-
 @keyframes orbit-1 {
   0%   { transform: translate(0, 0); }
   25%  { transform: translate(18px, -10px); }
@@ -528,24 +389,6 @@ const scrollToPricing = () => {
 .orbit-1 { position: absolute; inset: 0; animation: orbit-1 14s ease-in-out infinite; }
 .orbit-2 { position: absolute; inset: 0; animation: orbit-2 9s ease-in-out infinite; }
 
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@keyframes spin-reverse {
-  from { transform: rotate(360deg); }
-  to { transform: rotate(0deg); }
-}
-
-.animate-spin-slow {
-  animation: spin 22s linear infinite;
-}
-
-.animate-spin-reverse-slow {
-  animation: spin-reverse 30s linear infinite;
-}
-
 @keyframes meshShift {
   0% { transform: translate(0, 0) scale(1); opacity: 0.9; }
   100% { transform: translate(1.5%, -1%) scale(1.04); opacity: 1; }
@@ -554,11 +397,6 @@ const scrollToPricing = () => {
 @keyframes orbDrift {
   0%, 100% { transform: translate(0, 0); }
   50% { transform: translate(20px, -14px); }
-}
-
-@keyframes cellBreathe {
-  0%, 100% { opacity: 0.28; transform: scale(1); }
-  50% { opacity: 0.62; transform: scale(1.015); }
 }
 
 @keyframes botEnter {
@@ -580,12 +418,8 @@ const scrollToPricing = () => {
   50% { transform: translateY(-8px); }
 }
 
-@keyframes shine-loop {
-  0% { transform: translateX(-50%) skewX(-15deg); }
-  100% { transform: translateX(50%) skewX(-15deg); }
-}
-
-.animate-shine-loop {
-  animation: shine-loop 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 </style>

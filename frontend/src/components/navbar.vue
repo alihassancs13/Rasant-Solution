@@ -19,14 +19,14 @@
     <!-- ===== HEADER ===== -->
     <header
         id="navbar"
-        class="fixed top-0 left-0 right-0 h-20 flex items-center justify-between px-6 md:px-12 z-50 bg-white shadow-[0_4px_30px_rgba(15,23,42,0.08)]"
+        class="fixed top-0 left-0 right-0 h-16 md:h-20 flex items-center justify-between px-4 sm:px-6 md:px-8 lg:px-12 z-50 bg-white shadow-[0_4px_30px_rgba(15,23,42,0.08)]"
     >
       <!-- Logo -->
-      <router-link to="/home" class="flex items-center shrink-0 z-[2]" aria-label="Rasant Solutions home"  @click="handleLogoClick">
+      <router-link to="/home" class="flex items-center shrink-0 z-[2]" aria-label="Rasant Solutions home" @click="handleLogoClick">
         <img
             src="../assets/images/rasant-logo.png"
             alt="Rasant Solutions Logo"
-            class="h-[42px] w-auto transition-opacity duration-200 hover:opacity-86"
+            class="h-8 sm:h-10 md:h-[42px] w-auto transition-opacity duration-200 hover:opacity-86"
             decoding="async"
         />
       </router-link>
@@ -43,7 +43,7 @@
           >
             <button
                 type="button"
-                class="flex items-center gap-1.5 px-5 h-11 rounded-xl font-display font-bold text-[15px] tracking-[-0.2px] transition-all duration-200 border-0 cursor-pointer whitespace-nowrap"
+                class="flex items-center gap-1.5 px-3 lg:px-5 h-11 rounded-xl font-display font-bold text-[14px] lg:text-[15px] tracking-[-0.2px] transition-all duration-200 border-0 cursor-pointer whitespace-nowrap"
                 :class="activeDropdown === 'services' || $route.hash === '#services'
                 ? 'text-primary-500 bg-primary-500/12'
                 : 'text-primary-900 bg-transparent hover:text-primary-500 hover:bg-primary-500/7'"
@@ -116,7 +116,7 @@
           >
             <button
                 type="button"
-                class="flex items-center gap-1.5 px-5 h-11 rounded-xl font-display font-bold text-[15px] tracking-[-0.2px] transition-all duration-200 border-0 cursor-pointer whitespace-nowrap"
+                class="flex items-center gap-1.5 px-3 lg:px-5 h-11 rounded-xl font-display font-bold text-[14px] lg:text-[15px] tracking-[-0.2px] transition-all duration-200 border-0 cursor-pointer whitespace-nowrap"
                 :class="['/sentra', '/ai-agent', '/chatbot', '/orchestri', '/omnipost'].includes($route.path) || activeDropdown === 'projects'
                 ? 'text-primary-500 bg-primary-500/12'
                 : 'text-primary-900 bg-transparent hover:text-primary-500 hover:bg-primary-500/7'"
@@ -198,8 +198,6 @@
                     <span class="block h-full w-[82%] bg-gradient-to-r from-secondary-500 via-accent-4 to-primary-500 rounded"></span>
                   </div>
                 </router-link>
-
-
               </div>
             </Transition>
           </li>
@@ -209,7 +207,7 @@
             <router-link
                 to="/careers"
                 @click="closeMobileMenu"
-                class="flex items-center px-5 h-11 rounded-xl font-display font-bold text-[15px] tracking-[-0.2px] transition-all duration-200 no-underline"
+                class="flex items-center px-3 lg:px-5 h-11 rounded-xl font-display font-bold text-[14px] lg:text-[15px] tracking-[-0.2px] transition-all duration-200 no-underline"
                 :class="$route.path === '/careers' ? 'text-primary-500 bg-primary-500/12' : 'text-primary-900 hover:text-primary-500 hover:bg-primary-500/7'"
             >
               Careers
@@ -221,7 +219,7 @@
             <router-link
                 to="/contact"
                 @click="closeMobileMenu"
-                class="flex items-center px-5 h-11 rounded-xl font-display font-bold text-[15px] tracking-[-0.2px] transition-all duration-200 no-underline"
+                class="flex items-center px-3 lg:px-5 h-11 rounded-xl font-display font-bold text-[14px] lg:text-[15px] tracking-[-0.2px] transition-all duration-200 no-underline"
                 :class="$route.path === '/contact' ? 'text-primary-500 bg-primary-500/12' : 'text-primary-900 hover:text-primary-500 hover:bg-primary-500/7'"
             >
               Contact
@@ -231,16 +229,16 @@
       </div>
 
       <!-- ===== DESKTOP RIGHT BUTTONS ===== -->
-      <div class="hidden md:flex items-center gap-3 shrink-0 z-[2]">
+      <div class="hidden md:flex items-center gap-2 lg:gap-3 shrink-0 z-[2]">
         <router-link
             to="/login"
             @click="closeMobileMenu"
-            class="px-5 py-2.5 border border-neutral-300 text-[14px] font-display font-bold rounded-full text-primary-900 hover:border-primary-500 hover:text-primary-500 hover:bg-primary-500/5 transition-all duration-200 no-underline"
+            class="px-4 lg:px-5 py-2.5 border border-neutral-300 text-[13px] lg:text-[14px] font-display font-bold rounded-full text-primary-900 hover:border-primary-500 hover:text-primary-500 hover:bg-primary-500/5 transition-all duration-200 no-underline"
         >
           Login
         </router-link>
 
-        <ShineButton to="/contact" shape="pill" @click="closeMobileMenu">Get Quote</ShineButton>
+        <ShineButton to="/contact" shape="pill"  @click="closeMobileMenu">Get Quote</ShineButton>
       </div>
 
       <!-- ===== HAMBURGER ===== -->
@@ -271,7 +269,7 @@
     <!-- ===== MOBILE DRAWER ===== -->
     <nav
         class="fixed top-0 right-0 bottom-0 flex flex-col z-[1002] md:hidden overflow-hidden"
-        style="width: min(340px, 90vw); box-shadow: -16px 0 48px rgba(15,23,42,0.35); background: linear-gradient(165deg, #152a45 0%, #1E3A5F 28%, #2A5F9E 62%, #4A90E2 100%); transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s;"
+        style="width: min(320px, 88vw); box-shadow: -16px 0 48px rgba(15,23,42,0.35); background: linear-gradient(165deg, #152a45 0%, #1E3A5F 28%, #2A5F9E 62%, #4A90E2 100%); transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1), visibility 0s;"
         :style="isMobileMenuOpen ? 'transform: translateX(0); visibility: visible;' : 'transform: translateX(100%); visibility: hidden;'"
         :aria-hidden="!isMobileMenuOpen"
     >
@@ -279,29 +277,29 @@
       <div class="absolute inset-0 pointer-events-none" style="background: radial-gradient(circle at 90% 8%, rgba(255,213,180,0.22) 0%, transparent 42%), radial-gradient(circle at 10% 92%, rgba(143,185,244,0.2) 0%, transparent 45%);"></div>
 
       <!-- Drawer Head -->
-      <div class="relative z-[2] flex items-center justify-between gap-3 px-[18px] pb-3.5 border-b border-white/12 shrink-0" style="padding-top: max(18px, env(safe-area-inset-top));">
+      <div class="relative z-[2] flex items-center justify-between gap-3 px-4 pb-3.5 border-b border-white/12 shrink-0" style="padding-top: max(18px, env(safe-area-inset-top));">
         <div class="flex items-center gap-3 min-w-0">
-          <div class="w-[42px] h-[42px] rounded-xl flex items-center justify-center font-display font-extrabold text-[14px] text-primary-900 shrink-0" style="background: linear-gradient(135deg, #FFD5B4, #8FB9F4); box-shadow: 0 6px 16px rgba(0,0,0,0.2);">RS</div>
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center font-display font-extrabold text-[13px] text-primary-900 shrink-0" style="background: linear-gradient(135deg, #FFD5B4, #8FB9F4); box-shadow: 0 6px 16px rgba(0,0,0,0.2);">RS</div>
           <div>
-            <strong class="block font-display text-[15px] font-extrabold text-white">Rasant Solutions</strong>
-            <span class="block text-[11px] text-white/72 mt-0.5">Menu</span>
+            <strong class="block font-display text-[14px] font-extrabold text-white">Rasant Solutions</strong>
+            <span class="block text-[10px] text-white/72 mt-0.5">Menu</span>
           </div>
         </div>
         <button
             type="button"
             @click="closeMobileMenu"
-            class="w-11 h-11 rounded-full border border-white/28 bg-white/14 text-white text-[30px] leading-none flex items-center justify-center shrink-0 hover:bg-white/24 hover:scale-105 transition-all duration-200 cursor-pointer"
+            class="w-10 h-10 rounded-full border border-white/28 bg-white/14 text-white text-[28px] leading-none flex items-center justify-center shrink-0 hover:bg-white/24 hover:scale-105 transition-all duration-200 cursor-pointer"
             aria-label="Close menu"
         >×</button>
       </div>
 
       <!-- Drawer Body -->
-      <div class="relative z-[2] flex-1 overflow-y-auto px-4 py-3.5" style="-webkit-overflow-scrolling: touch;">
+      <div class="relative z-[2] flex-1 overflow-y-auto px-3 py-3" style="-webkit-overflow-scrolling: touch;">
         <!-- Services -->
         <button
             type="button"
             @click="activeDropdown = activeDropdown === 'services' ? null : 'services'"
-            class="flex items-center gap-3 text-white font-display font-bold text-[16px] p-3.5 mb-2 rounded-[14px] border border-white/10 bg-white/7 hover:bg-white/16 hover:translate-x-1 transition-all duration-200 w-full text-left"
+            class="flex items-center gap-3 text-white font-display font-bold text-[15px] p-3 mb-2 rounded-[14px] border border-white/10 bg-white/7 hover:bg-white/16 hover:translate-x-1 transition-all duration-200 w-full text-left"
         >
           <span class="w-8 h-8 rounded-[10px] bg-white/12 flex items-center justify-center shrink-0">
             <i class="fa-solid fa-code text-base"></i>
@@ -311,7 +309,7 @@
             <i class="fa-solid" :class="activeDropdown === 'services' ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
           </span>
         </button>
-        <div v-show="activeDropdown === 'services'" class="ml-3 mb-2.5 pl-3.5 border-l-2 border-white/20 py-1 transition-all duration-300">
+        <div v-show="activeDropdown === 'services'" class="ml-2 mb-2.5 pl-3 border-l-2 border-white/20 py-1 transition-all duration-300">
           <button @click="navigateToServicesSection('services')" class="block text-white/82 text-[13px] py-2 w-full text-left hover:text-white transition-colors duration-150 bg-transparent border-0 cursor-pointer">Custom Software</button>
           <button @click="navigateToServicesSection('services')" class="block text-white/82 text-[13px] py-2 w-full text-left hover:text-white transition-colors duration-150 bg-transparent border-0 cursor-pointer">Web &amp; Mobile</button>
           <button @click="navigateToServicesSection('services')" class="block text-white/82 text-[13px] py-2 w-full text-left hover:text-white transition-colors duration-150 bg-transparent border-0 cursor-pointer">Cloud &amp; DevOps</button>
@@ -321,7 +319,7 @@
         <button
             type="button"
             @click="activeDropdown = activeDropdown === 'projects' ? null : 'projects'"
-            class="flex items-center gap-3 text-white font-display font-bold text-[16px] p-3.5 mb-2 rounded-[14px] border border-white/10 bg-white/7 hover:bg-white/16 hover:translate-x-1 transition-all duration-200 w-full text-left"
+            class="flex items-center gap-3 text-white font-display font-bold text-[15px] p-3 mb-2 rounded-[14px] border border-white/10 bg-white/7 hover:bg-white/16 hover:translate-x-1 transition-all duration-200 w-full text-left"
         >
           <span class="w-8 h-8 rounded-[10px] bg-white/12 flex items-center justify-center shrink-0">
             <i class="fa-solid fa-rocket text-base"></i>
@@ -331,7 +329,7 @@
             <i class="fa-solid" :class="activeDropdown === 'projects' ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
           </span>
         </button>
-        <div v-show="activeDropdown === 'projects'" class="ml-3 mb-2.5 pl-3.5 border-l-2 border-white/20 py-1 transition-all duration-300">
+        <div v-show="activeDropdown === 'projects'" class="ml-2 mb-2.5 pl-3 border-l-2 border-white/20 py-1 transition-all duration-300">
           <router-link to="/sentra" @click="closeMobileMenu" class="block text-white/82 text-[13px] py-2 hover:text-white transition-colors no-underline">Sentra AI</router-link>
           <router-link to="/ai-agent" @click="closeMobileMenu" class="block text-white/82 text-[13px] py-2 hover:text-white transition-colors no-underline">AI Agent</router-link>
           <router-link to="/chatbot" @click="closeMobileMenu" class="block text-white/82 text-[13px] py-2 hover:text-white transition-colors no-underline">Chatbot</router-link>
@@ -343,7 +341,7 @@
         <router-link
             to="/careers"
             @click="closeMobileMenu"
-            class="flex items-center gap-3 text-white font-display font-bold text-[16px] p-3.5 mb-2 rounded-[14px] border border-white/10 bg-white/7 hover:bg-white/16 hover:translate-x-1 transition-all duration-200 no-underline"
+            class="flex items-center gap-3 text-white font-display font-bold text-[15px] p-3 mb-2 rounded-[14px] border border-white/10 bg-white/7 hover:bg-white/16 hover:translate-x-1 transition-all duration-200 no-underline"
         >
           <span class="w-8 h-8 rounded-[10px] bg-white/12 flex items-center justify-center shrink-0">
             <i class="fa-solid fa-briefcase text-base"></i>
@@ -355,7 +353,7 @@
         <router-link
             to="/contact"
             @click="closeMobileMenu"
-            class="flex items-center gap-3 text-white font-display font-bold text-[16px] p-3.5 mb-2 rounded-[14px] border border-white/10 bg-white/7 hover:bg-white/16 hover:translate-x-1 transition-all duration-200 no-underline"
+            class="flex items-center gap-3 text-white font-display font-bold text-[15px] p-3 mb-2 rounded-[14px] border border-white/10 bg-white/7 hover:bg-white/16 hover:translate-x-1 transition-all duration-200 no-underline"
         >
           <span class="w-8 h-8 rounded-[10px] bg-white/12 flex items-center justify-center shrink-0">
             <i class="fa-solid fa-envelope text-base"></i>
@@ -366,7 +364,7 @@
 
       <!-- Drawer Footer -->
       <div
-          class="relative z-[2] shrink-0 px-[18px] flex flex-col gap-2.5 border-t border-white/12"
+          class="relative z-[2] shrink-0 px-4 flex flex-col gap-2.5 border-t border-white/12"
           style="padding-top: 14px; padding-bottom: max(18px, env(safe-area-inset-bottom)); background: rgba(8,18,36,0.28);"
       >
         <router-link

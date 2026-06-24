@@ -1,6 +1,9 @@
 /* main.css */
 @import "tailwindcss";
-
+html, body {
+    overflow-x: hidden;
+    max-width: 100vw;
+}
 @theme {
     /* ═══════════════════════════════════════════════════════════
        ANIMATIONS
@@ -136,8 +139,8 @@
        BUTTONS
        ═══════════════════════════════════════════════════════════ */
     --color-buttonTextColor: #FFFFFF;
-    --color-buttonHover: #D45A1A;
-    --color-buttonBackground: #C2410C;
+    --color-buttonHover: #C2410C;
+    --color-buttonBackground: #D45A1A;
     --color-buttonPrimaryHover: #1D4ED8;
     --color-buttonPrimaryBorder: #9A3412;
 
@@ -196,7 +199,7 @@
     --color-neutral-100: #F8FAFC;
     --color-neutral-200: #eff5fb;
     --color-neutral-300: #E2E8F0;
-    --color-neutral-400: #CBD5E1;
+    --color-neutral-400: #7dace4;
     --color-neutral-500: #94A3B8;
     --color-neutral-600: #64748B;
     --color-neutral-700: #475569;
@@ -466,6 +469,19 @@
 
 @utility animate-login-ring {
     animation: loginRingPulse 10s ease-in-out infinite;
+}
+@keyframes botRingSpin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes botGlow {
+    0%, 100% { opacity: 0.65; }
+    50% { opacity: 1; }
+}
+
+@keyframes botEnter {
+    from { opacity: 0; transform: translateY(30px) scale(0.92); }
+    to { opacity: 1; transform: none; }
 }
 
 /* Global Styles */

@@ -59,8 +59,8 @@
         <div class="relative z-30 flex justify-center py-1 mx-auto md:mr-0 md:ml-auto">
           <div class="relative w-[min(400px,80vw)] animate-[botEnter_0.9s_cubic-bezier(0.22,1,0.36,1)_both]">
             <div class="absolute inset-[8%] rounded-full bg-[radial-gradient(circle,var(--color-bot-glow)_0%,transparent_70%)] animate-[botGlow_3s_ease-in-out_infinite]"></div>
-            <div class="absolute -inset-3.5 rounded-full border-4 border-dashed border-accent-1/35 animate-[botRingSpin_22s_linear_infinite]"></div>
-            <div class="absolute -inset-5.5 rounded-full border-4 border-dashed border-accent-3/20 animate-[botRingSpin_30s_linear_infinite_reverse]"></div>
+            <div class="absolute -inset-3.5 rounded-full border-3 border-dashed border-accent-1/25 animate-[botRingSpin_22s_linear_infinite]"></div>
+            <div class="absolute -inset-5.5 rounded-full border-3 border-dashed border-accent-3/15 animate-[botRingSpin_30s_linear_infinite_reverse]"></div>
             <div class="relative w-full z-20 aspect-square max-w-sm mx-auto flex items-center justify-center overflow-visible">
               <img src="../assets/svg/ai-agent-bot.svg" alt="AI voice agent robot" class="w-full h-[450px] object-contain drop-shadow-[var(--shadow-primary-dark)] relative z-10" title="Voice AI Agent" />
             </div>
@@ -169,9 +169,9 @@
 
               <div class="absolute inset-5 rounded-full bg-[radial-gradient(circle,var(--color-bot-glow)_0%,transparent_68%)]"></div>
 
-              <div class="absolute inset-[-8%] rounded-full border-4 border-dashed border-neutral-400/30 animate-[spin_24s_linear_infinite]"></div>
+              <div class="absolute inset-[-20%] rounded-full border-3 border-dashed border-neutral-400/50 animate-[spin_24s_linear_infinite]"></div>
 
-              <div class="absolute inset-[-18%] rounded-full border-4 border-dashed border-primary-400/20 animate-[spin_30s_linear_infinite_reverse]"></div>
+              <div class="absolute inset-[-12%] rounded-full border-3 border-dashed border-primary-400/20 animate-[spin_30s_linear_infinite_reverse]"></div>
 
               <img
                   src="../assets/svg/ai-agent-phone-bot.svg"
