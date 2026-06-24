@@ -49,9 +49,9 @@
               <span class="relative z-10">Open OmniPost Portal</span>
               <div class="absolute inset-0 w-1/2 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 pointer-events-none animate-shine-loop"></div>
             </button>
-            <button @click="goToContact" class="px-6 py-3 border border-slate-300 text-slate-700 font-semibold rounded-lg hover:bg-slate-50 transition-colors text-sm cursor-pointer">
+            <router-link to="/contact?project=omnipost" class="inline-flex items-center px-8 py-4 bg-white-100 border border-slate-400 text-slate-700 hover:bg-slate-50 font-bold rounded-xl transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5">
               Contact Sales
-            </button>
+            </router-link>
           </div>
         </div>
 
@@ -85,7 +85,7 @@
       <div class="max-w-6xl mx-auto">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
-            <span class="inline-block text-sm font-semibold text-accent-neutral-900 bg-purple-50 px-4 py-1.5 rounded-full mb-4">
+            <span class="inline-block text-sm font-semibold text-indigo-600  px-4 py-1.5 rounded-full mb-4">
               Collaboration
             </span>
             <h2 class="text-3xl sm:text-4xl font-display font-extrabold text-slate-900 mb-4">
@@ -116,7 +116,7 @@
             </div>
 
             <!-- Feature List -->
-            <ul class="space-y-4 max-w-lg">
+            <ul class="space-y-8 max-w-lg">
               <li class="flex gap-3">
                 <span class="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-100 accent-neutral-900 flex items-center justify-center text-sm">
                   <i class="fas fa-pen-nib text-accent-neutral-900"></i>
@@ -157,7 +157,7 @@
     <!-- Platform Modules -->
     <section class="py-16 px-4 sm:px-6 bg-slate-50">
       <div class="max-w-4xl mx-auto text-center mb-12">
-        <span class="inline-block text-sm font-semibold text-accent-neutral-900 bg-purple-50 px-4 py-1.5 rounded-full mb-4">
+        <span class="inline-block text-sm font-semibold text-indigo-600 bg-purple-50 px-4 py-1.5 rounded-full mb-4">
           Platform
         </span>
         <h2 class="text-3xl sm:text-4xl font-display font-extrabold text-slate-900 mb-4">
@@ -170,9 +170,9 @@
 
       <div class="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-3">
         <a v-for="module in modules" :key="module.name" :href="module.href"
-           class="flex flex-col items-center gap-2 p-5 bg-white border border-slate-200 rounded-2xl hover:shadow-lg hover:-translate-y-1 transition-all duration-300 hover:border-purple-300">
-          <span class="w-10 h-10 rounded-xl bg-purple-100 Everything you need from idea to publish flex items-center justify-center text-lg">
-            <i :class="module.icon"></i>
+           class="flex flex-col items-center gap-2 p-5 bg-white border border-slate-200 rounded-xl hover:shadow-lg hover:-translate-y-1 transition-all duration-300 hover:border-purple-300">
+          <span class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center text-lg">
+            <i :class="module.icon" class="text-accent-neutral-900"></i>
           </span>
           <span class="font-display font-bold text-sm text-slate-900">{{ module.name }}</span>
         </a>
@@ -185,7 +185,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
             <span class="text-7xl font-display font-extrabold text-purple-200/50 block mb-2 select-none">01</span>
-            <span class="inline-block text-sm font-semibold text-accent-neutral-900 bg-purple-50 px-4 py-1.5 rounded-full mb-4">
+            <span class="inline-block text-sm font-semibold text-indigo-600 bg-purple-50 px-4 py-1.5 rounded-full mb-4">
               Performance Dashboard
             </span>
             <h2 class="text-3xl sm:text-4xl font-display font-extrabold text-slate-900 mb-4">
@@ -194,7 +194,7 @@
             <p class="text-slate-600 text-lg leading-relaxed mb-6">
               Track total posts, approval rates, publish rates, and items needing attention. See pipeline distribution and platform mix across Facebook, Twitter, and LinkedIn at a glance.
             </p>
-            <ul class="space-y-4">
+            <ul class="space-y-8">
               <li class="flex gap-3">
                 <span class="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-100 text-accent-neutral-900 flex items-center justify-center">
                   <i class="fas fa-chart-simple"></i>
@@ -241,7 +241,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div class="lg:order-2">
             <span class="text-7xl font-display font-extrabold text-purple-200/50 block mb-2 select-none">02</span>
-            <span class="inline-block text-sm font-semibold text-accent-neutral-900 bg-purple-50 px-4 py-1.5 rounded-full mb-4">
+            <span class="inline-block text-sm font-semibold text-indigo-600 bg-purple-50 px-4 py-1.5 rounded-full mb-4">
               AI Post Generator
             </span>
             <h2 class="text-3xl sm:text-4xl font-display font-extrabold text-slate-900 mb-4">
@@ -250,7 +250,7 @@
             <p class="text-slate-600 text-lg leading-relaxed mb-6">
               Create platform-tailored copy and hashtags for Twitter, LinkedIn, and Facebook. Pick a tone, add optional context, enable AI image generation, and move to review in one flow.
             </p>
-            <ul class="space-y-4">
+            <ul class="space-y-8">
               <li class="flex gap-3">
                 <span class="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-100 text-accent-neutral-900 flex items-center justify-center">
                   <i class="fab fa-x-twitter"></i>
@@ -299,7 +299,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
             <span class="text-7xl font-display font-extrabold text-purple-200/50 block mb-2 select-none">03</span>
-            <span class="inline-block text-sm font-semibold text-accent-neutral-900 bg-purple-50 px-4 py-1.5 rounded-full mb-4">
+            <span class="inline-block text-sm font-semibold text-indigo-600 bg-purple-50 px-4 py-1.5 rounded-full mb-4">
               Approval Workflow
             </span>
             <h2 class="text-3xl sm:text-4xl font-display font-extrabold text-slate-900 mb-4">
@@ -308,7 +308,7 @@
             <p class="text-slate-600 text-lg leading-relaxed mb-6">
               Creators submit drafts; approvers review, approve, or reject with a clear audit trail. Nothing publishes until your team signs off.
             </p>
-            <ul class="space-y-4">
+            <ul class="space-y-8">
               <li class="flex gap-3">
                 <span class="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-100 text-accent-neutral-900 flex items-center justify-center">
                   <i class="fas fa-hourglass-half"></i>
@@ -352,7 +352,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div class="lg:order-2">
             <span class="text-7xl font-display font-extrabold text-purple-200/50 block mb-2 select-none">04</span>
-            <span class="inline-block text-sm font-semibold text-accent-neutral-900 bg-purple-50 px-4 py-1.5 rounded-full mb-4">
+            <span class="inline-block text-sm font-semibold text-indigo-600 bg-purple-50 px-4 py-1.5 rounded-full mb-4">
               Smart Scheduler
             </span>
             <h2 class="text-3xl sm:text-4xl font-display font-extrabold text-slate-900 mb-4">
@@ -361,7 +361,7 @@
             <p class="text-slate-600 text-lg leading-relaxed mb-6">
               Schedule approved posts and publish automatically to your connected social accounts. Schedulers keep the calendar full while approvers keep quality high.
             </p>
-            <ul class="space-y-4">
+            <ul class="space-y-8">
               <li class="flex gap-3">
                 <span class="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-100 text-accent-neutral-900 flex items-center justify-center">
                   <i class="fas fa-clock"></i>
@@ -405,7 +405,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
             <span class="text-7xl font-display font-extrabold text-purple-200/50 block mb-2 select-none">05</span>
-            <span class="inline-block text-sm font-semibold text-accent-neutral-900 bg-purple-50 px-4 py-1.5 rounded-full mb-4">
+            <span class="inline-block text-sm font-semibold text-indigo-600 bg-purple-50 px-4 py-1.5 rounded-full mb-4">
               Bulk Upload
             </span>
             <h2 class="text-3xl sm:text-4xl font-display font-extrabold text-slate-900 mb-4">
@@ -414,7 +414,7 @@
             <p class="text-slate-600 text-lg leading-relaxed mb-6">
               Import CSV batches, generate content at scale, and manage large campaigns efficiently. Optional campaign assignment keeps bulk imports organized.
             </p>
-            <ul class="space-y-4">
+            <ul class="space-y-8">
               <li class="flex gap-3">
                 <span class="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-100 text-accent-neutral-900 flex items-center justify-center">
                   <i class="fas fa-upload"></i>
@@ -458,7 +458,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div class="lg:order-2">
             <span class="text-7xl font-display font-extrabold text-purple-200/50 block mb-2 select-none">06</span>
-            <span class="inline-block text-sm font-semibold text-accent-neutral-900 bg-purple-50 px-4 py-1.5 rounded-full mb-4">
+            <span class="inline-block text-sm font-semibold text-indigo-600 bg-purple-50 px-4 py-1.5 rounded-full mb-4">
               Team &amp; Roles
             </span>
             <h2 class="text-3xl sm:text-4xl font-display font-extrabold text-slate-900 mb-4">
@@ -467,7 +467,7 @@
             <p class="text-slate-600 text-lg leading-relaxed mb-6">
               Organization owners create users, assign Creator or Approver roles, and manage connected social accounts — with active status and per-user actions.
             </p>
-            <ul class="space-y-4">
+            <ul class="space-y-8">
               <li class="flex gap-3">
                 <span class="flex-shrink-0 w-10 h-10 rounded-lg bg-purple-100 text-accent-neutral-900 flex items-center justify-center">
                   <i class="fas fa-user-plus"></i>
@@ -510,7 +510,7 @@
     <!-- Social Previews -->
     <section id="social-feed" class="py-16 px-4 sm:px-6 bg-gradient-to-b from-slate-50 to-purple-50">
       <div class="max-w-4xl mx-auto text-center mb-12">
-        <span class="inline-block text-sm font-semibold text-accent-neutral-900 bg-purple-50 px-4 py-1.5 rounded-full mb-4">
+        <span class="inline-block text-sm font-semibold text-indigo-600 bg-purple-50 px-4 py-1.5 rounded-full mb-4">
           Social Previews
         </span>
         <h2 class="text-3xl sm:text-4xl font-display font-extrabold text-slate-900 mb-4">
@@ -536,7 +536,7 @@
     <!-- How It Works -->
     <section id="how-it-works" class="py-16 px-4 sm:px-6 bg-slate-50 scroll-mt-24">
       <div class="max-w-4xl mx-auto text-center mb-12">
-        <span class="inline-block text-sm font-semibold text-accent-neutral-900 bg-purple-50 px-4 py-1.5 rounded-full mb-4">
+        <span class="inline-block text-sm font-semibold text-indigo-600 bg-purple-50 px-4 py-1.5 rounded-full mb-4">
           How It Works
         </span>
         <h2 class="text-3xl sm:text-4xl font-display font-extrabold text-slate-900 mb-4">
@@ -553,7 +553,7 @@
 
       <div class="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div v-for="(step, index) in steps" :key="index"
-             class="bg-white border border-slate-200 rounded-2xl p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 hover:border-purple-300">
+             class="bg-white border border-slate-200 rounded-xl p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 hover:border-purple-300">
           <span class="w-11 h-11 rounded-xl bg-purple-100 text-accent-neutral-900 flex items-center justify-center font-display font-extrabold text-lg mb-3">
             {{ index + 1 }}
           </span>
@@ -566,7 +566,7 @@
     <!-- Capabilities -->
     <section class="py-16 px-4 sm:px-6 bg-white">
       <div class="max-w-4xl mx-auto text-center mb-12">
-        <span class="inline-block text-sm font-semibold text-accent-neutral-900 bg-purple-50 px-4 py-1.5 rounded-full mb-4">
+        <span class="inline-block text-sm font-semibold text-indigo-600 bg-purple-50 px-4 py-1.5 rounded-full mb-4">
           Capabilities
         </span>
         <h2 class="text-3xl sm:text-4xl font-display font-extrabold text-slate-900">
@@ -576,7 +576,7 @@
 
       <div class="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div v-for="capability in capabilities" :key="capability.title"
-             class="bg-white border border-slate-200 rounded-2xl p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 hover:border-purple-300">
+             class="bg-white border border-slate-200 rounded-xl p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 hover:border-purple-300">
           <span class="w-11 h-11 rounded-xl bg-purple-100 text-accent-neutral-900 flex items-center justify-center text-lg mb-3">
             <i :class="capability.icon"></i>
           </span>
@@ -596,12 +596,12 @@
           Replace spreadsheets and scattered tools with one workspace for generation, approval, and publishing.
         </p>
         <div class="flex flex-wrap justify-center gap-4">
-          <a href="contact.html?project=omnipost" class="inline-flex items-center px-8 py-4 bg-white text-purple-600 hover:bg-purple-50 font-bold rounded-xl shadow-lg shadow-purple-500/30 transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5">
+          <router-link to="/contact?project=omnipost" class="inline-flex items-center px-8 py-4 bg-white border-slate-300 text-orange-700 hover:bg-orange-100 font-bold rounded-xl transition-all duration-300 hover:shadow-xl hover:-translate-y-0.5">
             Contact Sales
-          </a>
-          <a href="home.html#products" class="inline-flex items-center px-8 py-4 border-2 border-white/40 hover:border-white/70 text-white font-bold rounded-xl transition-all duration-300 hover:-translate-y-0.5">
+          </router-link>
+          <router-link to="/home#products" class="inline-flex items-center px-8 py-4 border-2 border-white/40 hover:border-white/70 text-white font-bold rounded-xl transition-all duration-300 hover:bg-white/10">
             Explore All Products
-          </a>
+          </router-link>
         </div>
       </div>
     </section>
@@ -624,6 +624,7 @@ export default {
     Footer
   },
   setup() {
+    const router = useRouter()
     const {
       modules,
       platforms,
@@ -634,11 +635,11 @@ export default {
 
     // Navigation methods using Vue Router
     const goToLogin = () => {
-      this.$router.push('/login')
+      router.push('/login')
     }
 
     const goToContact = () => {
-      this.$router.push('/contact?project=omnipost')
+      router.push('/contact?project=omnipost')
     }
 
     return {

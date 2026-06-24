@@ -740,7 +740,7 @@ const services = [
   },
   {
     title: 'Web & Mobile Applications',
-    description: 'Beautiful, high-performance web and mobile apps using React, Flutter, and Next.js. Pixel-perfect UI that users love to interact with.',
+    description: 'Beautiful, high-performance web and mobile apps using React, Flutter, and Next.js. Pixel-perfect UI that accounts love to interact with.',
     illustration: serviceWebMobileSvg,
     icon: ['fas', 'mobile-screen-button'],
     iconBg: 'bg-tagSkyBg',
@@ -770,7 +770,7 @@ const services = [
 
 const steps = [
   { number: '01', title: 'Discovery',      description: 'We deep-dive into your business goals, user needs, and technical requirements to map the full scope.',             circleClass: 'step-1', ringClass: 'ring-step-1' },
-  { number: '02', title: 'Design',         description: 'UI/UX wireframes and prototypes that are validated with real users before a single line of code is written.',     circleClass: 'step-2', ringClass: 'ring-step-2' },
+  { number: '02', title: 'Design',         description: 'UI/UX wireframes and prototypes that are validated with real accounts before a single line of code is written.',     circleClass: 'step-2', ringClass: 'ring-step-2' },
   { number: '03', title: 'Build',          description: 'Agile sprints with continuous delivery. You see progress every two weeks — no black-box development.',            circleClass: 'step-3', ringClass: 'ring-step-3' },
   { number: '04', title: 'Launch & Scale', description: 'Rigorous QA, zero-downtime deployment, and ongoing support to keep your product growing.',                        circleClass: 'step-4', ringClass: 'ring-step-4' },
 ]
@@ -968,7 +968,7 @@ onUnmounted(() => {
   animation: float 3.5s ease-in-out infinite;
 }
 
-/* Respect users who prefer reduced motion */
+/* Respect accounts who prefer reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .animate-marquee,
   .animate-float,

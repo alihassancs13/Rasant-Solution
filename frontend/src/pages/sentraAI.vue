@@ -464,7 +464,7 @@ export default {
         { name: 'Campaigns', icon: 'fas fa-rocket', link: '#campaigns' },
         { name: 'Call Scheduler', icon: 'fas fa-calendar-days', link: '#scheduler' },
         { name: 'Analytics', icon: 'fas fa-chart-line', link: '#analytics' },
-        { name: 'Team Workspace', icon: 'fas fa-users', link: '#team' },
+        { name: 'Team Workspace', icon: 'fas fa-accounts', link: '#team' },
         { name: 'Contacts', icon: 'fas fa-address-book', link: '#campaigns' }
       ],
       dashboardFeatures: [
@@ -480,7 +480,7 @@ export default {
       queueFeatures: [
         { icon: 'fas fa-flag', title: 'Priority routing', description: 'High, medium, and low priority badges with color-coded urgency.' },
         { icon: 'fas fa-screwdriver-wrench', title: 'Skill-based matching', description: 'Route to Sales, Technical Support, or Customer Support automatically.' },
-        { icon: 'fas fa-users-gear', title: 'Auto assign all', description: 'Bulk-assign waiting calls to the next available skilled agents.' }
+        { icon: 'fas fa-accounts-gear', title: 'Auto assign all', description: 'Bulk-assign waiting calls to the next available skilled agents.' }
       ],
       campaignFeatures: [
         { icon: 'fas fa-toggle-on', title: 'Campaign lifecycle', description: 'Full create, edit, delete, and on/off control for every workflow.' },

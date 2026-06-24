@@ -398,7 +398,7 @@ const gridCellsRight = [
 const chatbotCards = [
   { tag: 'Use case', title: 'Customer support', desc: 'FAQ answers, order status, and ticket creation from chat.', hex: '#8B5CF6', delay: '0s' },
   { tag: 'Use case', title: 'Sales and leads', desc: 'Qualify visitors, capture leads, and route hot prospects.', hex: '#F59E0B', delay: '0.6s' },
-  { tag: 'Use case', title: 'Onboarding', desc: 'Guide new users through setup with step-by-step chat flows.', hex: '#EC4899', delay: '1.2s' },
+  { tag: 'Use case', title: 'Onboarding', desc: 'Guide new accounts through setup with step-by-step chat flows.', hex: '#EC4899', delay: '1.2s' },
   { tag: 'Control', title: 'Document RAG', desc: 'Upload docs, embed knowledge, and answer from your data.', hex: '#0D9488', delay: '0.3s' },
   { tag: 'Control', title: 'Live handoff', desc: 'Escalate to a human agent with full chat transcript.', hex: '#2563EB', delay: '0.9s' },
   { tag: 'Control', title: 'Token analytics', desc: 'Track embeddings, prompts, and response usage over time.', hex: '#059669', delay: '1.5s' },

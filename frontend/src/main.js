@@ -12,7 +12,9 @@ app.mixin({
         window.scrollTo({ top: 0, behavior: 'smooth' })
     }
 })
-
+router.afterEach((to) => {
+    document.title = to.meta.title || 'Rasant Solutions';
+});
 app.component('font-awesome-icon', FontAwesomeIcon)
 app.use(router)
 app.mount('#app')
