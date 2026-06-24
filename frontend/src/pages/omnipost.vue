@@ -56,24 +56,39 @@
         </div>
 
         <!-- Right Visual -->
-        <div class="relative z-30 flex justify-center py-1 mx-auto md:mr-0 md:ml-auto mt-5">
-          <div class="relative w-[min(350px,85vw)] animate-[botEnter_0.9s_cubic-bezier(0.22,1,0.36,1)_both]">
+        <div class="relative z-30 flex justify-center py-1 mx-auto md:mr-0 md:ml-auto mt-5 w-full">
+          <!-- Cleaned wrapper box with fluid constraints -->
+          <div class="relative w-full max-w-[350px] mx-auto animate-[botEnter_0.9s_cubic-bezier(0.22,1,0.36,1)_both]">
+
+            <!-- Glow Backdrop -->
             <div class="absolute inset-[8%] rounded-full bg-[radial-gradient(circle,rgba(168,85,247,0.2)_0%,transparent_70%)] animate-[botGlow_3s_ease-in-out_infinite]"></div>
-            <div class="absolute -inset-3.5 rounded-full border-2 border-dashed border-[rgba(139,92,246,0.35)] animate-[botRingSpin_22s_linear_infinite]"></div>
-            <div class="absolute -inset-5.5 rounded-full border-2 border-dashed border-[rgba(236,72,153,0.22)] animate-[botRingSpin_30s_linear_infinite_reverse]"></div>
+
+            <!-- Orbit Rings: Fixed animation hook names to native 'spin' so they move -->
+            <div class="absolute -inset-3.5 rounded-full border-2 border-dashed border-[rgba(139,92,246,0.35)] animate-[spin_22s_linear_infinite]"></div>
+            <div class="absolute -inset-5.5 rounded-full border-2 border-dashed border-[rgba(236,72,153,0.22)] animate-[spin_30s_linear_infinite_reverse]"></div>
+
             <div class="relative w-full z-20 aspect-square max-w-sm mx-auto">
-              <!-- Floating Posts -->
+              <!-- Floating Posts Container: Safely contained inside the parent bounds -->
               <div class="absolute inset-0 pointer-events-none z-20">
-                <div class="absolute top-0 -left-10 w-20 sm:w-24 animate-[float_5s_ease-in-out_infinite]">
+
+                <!-- Instagram - Dynamic percentage positioning prevents crossing the left boundary -->
+                <div class="absolute top-0 left-[2%] w-[22%] sm:w-[25%] animate-[float_5s_ease-in-out_infinite]">
                   <img src="../assets/svg/omnipost-post-instagram.svg" alt="Instagram" class="w-full rounded-xl shadow-lg"/>
                 </div>
-                <div class="absolute bottom-10 -right-10 w-20 sm:w-24 animate-[float_5s_ease-in-out_infinite] [animation-delay:-1.6s]">
+
+                <!-- Facebook - Safely bounded on the bottom right edge -->
+                <div class="absolute bottom-[10%] right-[2%] w-[22%] sm:w-[25%] animate-[float_5s_ease-in-out_infinite] [animation-delay:-1.6s]">
                   <img src="../assets/svg/omnipost-post-facebook.svg" alt="Facebook" class="w-full rounded-xl shadow-lg"/>
                 </div>
-                <div class="absolute top-1/3 -right-14 w-20 sm:w-24 animate-[float_5s_ease-in-out_infinite] [animation-delay:-3.2s]">
+
+                <!-- LinkedIn - Safely bounded on the upper right edge -->
+                <div class="absolute top-[30%] right-[0%] w-[22%] sm:w-[25%] animate-[float_5s_ease-in-out_infinite] [animation-delay:-3.2s]">
                   <img src="../assets/svg/omnipost-post-linkedin.svg" alt="LinkedIn" class="w-full rounded-xl shadow-lg"/>
                 </div>
+
               </div>
+
+              <!-- Central Hero Image -->
               <img src="../assets/svg/omnipost-hero.svg" alt="OmniPost" class="relative z-10 w-full drop-shadow-2xl"/>
             </div>
           </div>
