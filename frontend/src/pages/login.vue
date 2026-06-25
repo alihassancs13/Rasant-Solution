@@ -13,10 +13,9 @@
             aria-hidden="true"
         ></div>
 
-        <!-- Floating orbs — bigger, more visible -->
+        <!-- Floating orbs -->
         <div class="pointer-events-none absolute -top-32 -left-24 h-[520px] w-[520px] animate-login-orb rounded-full bg-[radial-gradient(circle,var(--color-secondary-100),transparent_65%)] opacity-60 blur-[72px]" aria-hidden="true"></div>
         <div class="pointer-events-none absolute -right-12 -bottom-16 h-[440px] w-[440px] animate-login-orb rounded-full bg-[radial-gradient(circle,var(--color-mesh-purple),transparent_65%)] opacity-60 blur-[72px] [animation-direction:reverse] [animation-duration:18s]" aria-hidden="true"></div>
-        <!-- Extra mid orb for depth -->
         <div class="pointer-events-none absolute top-1/2 left-1/2 h-[280px] w-[280px] -translate-x-1/2 -translate-y-1/2 animate-login-orb rounded-full bg-[radial-gradient(circle,var(--color-primary-500)/0.12,transparent_70%)] blur-[60px] [animation-duration:14s] [animation-delay:3s]" aria-hidden="true"></div>
 
         <!-- Animated scanline shimmer -->
@@ -114,17 +113,17 @@
           <form @submit.prevent="handleLoginSubmit" novalidate class="space-y-4">
             <div class="animate-login-fade-up [animation-delay:220ms]">
               <label for="username" class="mb-1.5 block text-[0.7rem] font-bold tracking-wider text-headingMain uppercase">
-                Username
+                Email or Username
               </label>
               <div class="relative group">
                   <span class="pointer-events-none absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-sm text-primary-500 transition-transform duration-200 group-focus-within:scale-110">
                     <font-awesome-icon icon="fa-solid fa-user" />
                   </span>
                 <input
-                    id="username"
-                    v-model="username"
+                    id="emailOrusername"
+                    v-model="emailOrUsername"
                     type="text"
-                    placeholder="Enter your username"
+                    placeholder="Enter your email or  username"
                     required
                     autocomplete="username"
                     class="login-input w-full rounded-xl border border-borderDefault bg-neutral-100 py-2.5 pr-3 pl-10 text-[0.9375rem] text-headingMain outline-none transition-all duration-200 placeholder:text-textSupporting focus:border-primary-500 focus:bg-section-white focus:ring-4 focus:ring-primary-500/12 focus:shadow-[0_0_0_4px_rgba(74,144,226,0.08),0_2px_8px_rgba(74,144,226,0.12)]"
@@ -178,8 +177,15 @@
             </label>
 
             <div class="animate-login-fade-up [animation-delay:360ms]">
-              <ShineButton type="submit" size="md" shape="xl" class="w-full! transition-transform duration-150 active:scale-[0.98]">
-                Sign In
+              <ShineButton
+                  type="submit"
+                  size="md"
+                  shape="xl"
+                  class="w-full! transition-transform duration-150 active:scale-[0.98]"
+                  :disabled="isLoading"
+              >
+                <span v-if="isLoading">Signing in...</span>
+                <span v-else>Sign In</span>
               </ShineButton>
             </div>
           </form>
@@ -314,7 +320,6 @@
 import ShineButton from '../components/ShineButton.vue';
 import { useLogin } from '../composables/useLogin';
 import LoginVisual from "@/components/LoginVisual.vue";
-import Navbar from "@/components/navbar.vue";
 
 const stats = [
   { value: '99%', label: 'Uptime SLA' },
@@ -329,11 +334,12 @@ const securityBadges = [
 ];
 
 const {
-  username,
+  emailOrUsername,
   password,
   rememberMe,
   isPasswordVisible,
   errorMessage,
+  isLoading,
   togglePasswordVisibility,
   handleLoginSubmit,
 } = useLogin();

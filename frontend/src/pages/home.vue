@@ -786,7 +786,7 @@ const aboutFeatures = [
 ]
 
 const testimonials = [
-  { name: 'Ahmed Khan',      role: 'Operations Head, Sentra AI Client',  initials: 'AK', avatarBg: 'bg-avatarTestimonial1', quote: 'Sentra AI transformed our call center — wait times dropped 60% and our agents handle twice the volume. The IVR and AI routing just works.',            link: '/pricing?project=sentra', linkText: 'View Sentra AI pricing' },
+  { name: 'Ahmed Khan',      role: 'Operations Head, Sentra AI Client',  initials: 'AK', avatarBg: 'bg-avatarTestimonial1', quote: 'Sentra AI transformed our call center — wait times dropped 60% and our agents handle twice the volume. The IVR and AI routing just works.',            link: '/sentra', linkText: 'View Sentra AI pricing' },
   { name: 'Sara Rashid',     role: 'CEO, FinTech Startup',               initials: 'SR', avatarBg: 'bg-avatarTestimonial2', quote: 'Our AI agents now handle invoice processing and customer follow-ups autonomously. Rasant built a system that saves us 20+ hours every week.',        link: '/ai-agent',               linkText: 'Explore AI Agent'       },
   { name: 'Michael Jensen',  role: 'Support Director, E-Commerce Brand', initials: 'MJ', avatarBg: 'bg-avatarTestimonial3', quote: 'The chatbot handles 80% of our support tickets on WhatsApp and web. Live handoff to agents is seamless — our CSAT scores went up immediately.',    link: '/chatbot',                linkText: 'Explore Chatbot Agent'  },
 ]
