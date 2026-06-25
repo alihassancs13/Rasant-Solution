@@ -247,8 +247,10 @@ const isDragging = ref(false)
 const fileName = ref('No file chosen')
 const fileUploaded = ref(false)
 const fileInput = ref(null)
-
 const cardsVisible = ref(false)
+
+// renamed from "scrollY" to avoid any clash with window.scrollY
+const savedScrollPos = ref(0)
 
 onMounted(() => {
   requestAnimationFrame(() => {
@@ -267,15 +269,33 @@ const formData = reactive({
 
 const openModal = (defaultPosition = '') => {
   formData.position = defaultPosition
+
+  // remember exact scroll position before locking the body
+  savedScrollPos.value = window.scrollY
+
   isModalOpen.value = true
   submitSuccess.value = false
+
+  // lock body scroll WITHOUT letting it jump to top
+  document.body.style.position = 'fixed'
+  document.body.style.top = `-${savedScrollPos.value}px`
+  document.body.style.left = '0'
+  document.body.style.right = '0'
+  document.body.style.width = '100%'
 }
 
 const closeModal = () => {
   isModalOpen.value = false
   resetForm()
-}
 
+  // unlock body and restore exact scroll position
+  document.body.style.position = ''
+  document.body.style.top = ''
+  document.body.style.left = ''
+  document.body.style.right = ''
+  document.body.style.width = ''
+  window.scrollTo(0, savedScrollPos.value)
+}
 const triggerFileSelect = () => {
   fileInput.value?.click()
 }

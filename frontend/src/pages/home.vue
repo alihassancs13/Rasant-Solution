@@ -385,7 +385,7 @@
           <p class="text-textBody leading-relaxed font-primary">
             From idea to deployment — we handle every layer of your digital product.
           </p>
-          <ShineButton to="/services" variant="outline" size="sm" class="mt-4">
+          <ShineButton @click="scrollToServices" variant="outline" size="sm" class="mt-4">
             All Services
           </ShineButton>
         </div>
@@ -842,12 +842,10 @@ function resumeAuto() {
 }
 
 const scrollToServices = () => {
-  const section = document.getElementById('services');
-  if (section) {
-    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    return true;
-  }
-  return false;
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
 };
 
 // ─── Lifecycle ────────────────────────────────────────────────────────────────
