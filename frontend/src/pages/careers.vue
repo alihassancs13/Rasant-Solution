@@ -123,7 +123,7 @@
           <div class="relative w-full max-w-lg bg-section-white rounded-xl shadow-2xl border border-borderDefault overflow-hidden flex flex-col max-h-[90vh]">
 
             <!-- Modal Header -->
-            <div class="p-6 border-b border-borderDefault flex items-start justify-between" style="background: linear-gradient(135deg, var(--color-primary-50) 0%, var(--color-accent-1)/10 55%, var(--color-section-white) 100%);">
+            <div class="p-6 border-b border-borderDefault flex items-start justify-between bg-gradient-to-br from-primary-50 via-accent-1/10 to-section-white">
               <div class="space-y-1">
                 <span class="inline-block px-2.5 py-0.5 rounded bg-accent-1/10 text-accent-2 text-[10px] font-bold uppercase tracking-wider">Join our team</span>
                 <h3 id="cvModalTitle" class="font-display text-xl font-bold text-headingMain">Submit Your CV</h3>
@@ -217,13 +217,15 @@
                 </div>
 
                 <!-- Modal Footer -->
-                <div class="p-4 border-t border-borderDefault flex items-center justify-end" style="background: linear-gradient(180deg, var(--color-section-white) 0%, var(--color-neutral-100) 100%);">
+                <div class="p-4 border-t border-borderDefault flex items-center justify-end bg-gradient-to-b from-section-white to-neutral-100">
+                  <p v-if="submitError" class="text-xs text-error text-center mb-2">{{ submitError }}</p>
                   <button type="submit"
-                          class="w-full inline-flex items-center justify-center gap-1.5 px-5 py-2.5 bg-primary-500 hover:bg-primary-600 text-white font-semibold text-sm rounded-xl transition-all duration-200 shadow-lg shadow-primary-500/30 hover:scale-[1.01] active:scale-[0.99] relative overflow-hidden group cursor-pointer">
-                    <span class="relative z-10">Submit application</span>
+                          :disabled="isSubmitting"
+                          class="w-full inline-flex items-center justify-center gap-1.5 px-5 py-2.5 bg-primary-500 hover:bg-primary-600 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-sm rounded-xl transition-all duration-200 shadow-lg shadow-primary-500/30 hover:scale-[1.01] active:scale-[0.99] relative overflow-hidden group cursor-pointer">
+                    <span class="relative z-10">{{ isSubmitting ? 'Submitting...' : 'Submit application' }}</span>
                     <span aria-hidden="true" class="relative z-10 transition-transform duration-200 group-hover:translate-x-1">&rarr;</span>
                     <div class="absolute inset-0 top-0 w-1/3 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none animate-[shineLoop_0.98s_ease-in-out_infinite_alternate]"></div>
-                  </button>
+                  </button>>
                 </div>
               </form>
             </Transition>
@@ -237,111 +239,19 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted } from 'vue'
-import Navbar from '@/components/navbar.vue'
-import Footer from '@/components/footer.vue'
+import { useCareers } from '@/composables/useCareers.js'
+import Navbar from "@/components/navbar.vue";
+import Footer from "../components/footer.vue";
 
-const isModalOpen = ref(false)
-const submitSuccess = ref(false)
-const isDragging = ref(false)
-const fileName = ref('No file chosen')
-const fileUploaded = ref(false)
-const fileInput = ref(null)
-const cardsVisible = ref(false)
-
-// renamed from "scrollY" to avoid any clash with window.scrollY
-const savedScrollPos = ref(0)
-
-onMounted(() => {
-  requestAnimationFrame(() => {
-    cardsVisible.value = true
-  })
-})
-
-const formData = reactive({
-  name: '',
-  email: '',
-  contact: '',
-  position: '',
-  coverLetter: '',
-  file: null
-})
-
-const openModal = (defaultPosition = '') => {
-  formData.position = defaultPosition
-
-  // remember exact scroll position before locking the body
-  savedScrollPos.value = window.scrollY
-
-  isModalOpen.value = true
-  submitSuccess.value = false
-
-  // lock body scroll WITHOUT letting it jump to top
-  document.body.style.position = 'fixed'
-  document.body.style.top = `-${savedScrollPos.value}px`
-  document.body.style.left = '0'
-  document.body.style.right = '0'
-  document.body.style.width = '100%'
-}
-
-const closeModal = () => {
-  isModalOpen.value = false
-  resetForm()
-
-  // unlock body and restore exact scroll position
-  document.body.style.position = ''
-  document.body.style.top = ''
-  document.body.style.left = ''
-  document.body.style.right = ''
-  document.body.style.width = ''
-  window.scrollTo(0, savedScrollPos.value)
-}
-const triggerFileSelect = () => {
-  fileInput.value?.click()
-}
-
-const processUploadedFile = (uploadedFile) => {
-  if (uploadedFile) {
-    if (uploadedFile.size > 5 * 1024 * 1024) {
-      alert('File size exceeds 5MB limit.')
-      return
-    }
-    formData.file = uploadedFile
-    fileName.value = uploadedFile.name
-    fileUploaded.value = true
-  }
-}
-
-const handleFileSelect = (event) => {
-  const selectedFile = event.target.files[0]
-  processUploadedFile(selectedFile)
-}
-
-const handleFileDrop = (event) => {
-  isDragging.value = false
-  const droppedFile = event.dataTransfer.files[0]
-  processUploadedFile(droppedFile)
-}
-
-const handleSubmit = () => {
-  if (!formData.file) {
-    alert('Please upload your CV before submitting.')
-    return
-  }
-  submitSuccess.value = true
-}
-
-const resetForm = () => {
-  formData.name = ''
-  formData.email = ''
-  formData.contact = ''
-  formData.position = ''
-  formData.coverLetter = ''
-  formData.file = null
-  fileName.value = 'No file chosen'
-  fileUploaded.value = false
-  if (fileInput.value) fileInput.value.value = ''
-}
+const {
+  isModalOpen, submitSuccess, isDragging,
+  fileName, fileUploaded, fileInput,
+  cardsVisible, isSubmitting, submitError,
+  formData,
+  openModal, closeModal,
+  triggerFileSelect, handleFileSelect, handleFileDrop,
+  handleSubmit, resetForm,
+} = useCareers()
 </script>
 
 <style scoped>

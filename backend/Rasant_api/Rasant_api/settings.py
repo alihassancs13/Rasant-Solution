@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     'accounts',
+    'contact_message',
+    'cv_management'
 ]
 
 MIDDLEWARE = [
@@ -62,7 +64,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'Rasant_api.urls'
+ROOT_URLCONF = 'Rasant_api.Rasant_api.urls'
 
 TEMPLATES = [
     {
@@ -87,7 +89,7 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
 }
-WSGI_APPLICATION = 'Rasant_api.wsgi.application'
+WSGI_APPLICATION = 'Rasant_api.Rasant_api.wsgi.application'
 
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWED_ORIGINS = [
