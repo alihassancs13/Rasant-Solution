@@ -6,6 +6,7 @@ import Home from "../pages/home.vue";
 import Chatbot from "../pages/chatbot.vue";
 import sentraAI from "../pages/sentraAI.vue";
 import omnipost from "@/pages/omnipost.vue";
+import Dashboard from "../pages/Dashboard.vue";
 
 const routes = [
   {
@@ -93,6 +94,9 @@ const routes = [
       requiresAuth: false  // Public page (or true if you want to protect it)
     }
   },
+  {
+    path: '/dashboard',
+    component: () => import('@/pages/Dashboard.vue') }
 ];
 
 const router = createRouter({
