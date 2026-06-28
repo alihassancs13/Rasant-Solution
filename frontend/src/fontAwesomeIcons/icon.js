@@ -33,6 +33,7 @@ import {
   faDownload,
   faTrash,
   faBriefcase,
+  faUserShield
 } from '@fortawesome/free-solid-svg-icons'
 
 import {
@@ -106,4 +107,5 @@ library.add(
     faDownload,
     faTrash,
     faBriefcase,
+    faUserShield
 )

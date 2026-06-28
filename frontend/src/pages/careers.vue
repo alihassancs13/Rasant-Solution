@@ -4,19 +4,16 @@
 
     <!-- Hero Section -->
     <section class="relative overflow-hidden px-6 py-20 text-center bg-secondary-50 mt-5">
-      <div class="absolute inset-0 opacity-70 mix-blend-multiply pointer-events-none bg-[radial-gradient(circle_at_top_right,rgba(244,63,94,0.09),transparent_45%),radial-gradient(circle_at_bottom_left,rgba(59,130,246,0.1),transparent_50%),radial-gradient(circle_at_top_left,rgba(219,39,119,0.06),transparent_40%),radial-gradient(circle_at_bottom_right,var(--color-neutral-100),transparent_60%)]" aria-hidden="true"></div>
-
+      <div class="absolute inset-0 pointer-events-none bg-[linear-gradient(120deg,#fdf1e7_0%,#f7e9ec_30%,#eee9f2_55%,#e7eaf5_80%)]" aria-hidden="true"></div>
       <div class="relative z-10 max-w-3xl mx-auto">
-        <span class="inline-flex items-center gap-2 px-3 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase bg-neutral-400/10 text-secondary-600 border border-borderDefault mb-5">
-          <span class="w-1.5 h-1.5 rounded-full bg-accent-1 animate-pulse"></span>
-          Careers
-        </span>
-
+    <span class="inline-flex items-center gap-2 px-3 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase bg-neutral-400/10 text-secondary-600 border border-borderDefault mb-5">
+      <span class="w-1.5 h-1.5 rounded-full bg-accent-1 animate-pulse"></span>
+      Careers
+    </span>
         <h1 class="font-display text-4xl sm:text-5xl font-extrabold text-headingMain leading-tight">
           Build the future<br />
           <em class="not-italic text-secondary-600">with us</em>
         </h1>
-
         <p class="mt-4 text-textBody text-base sm:text-lg font-primary">
           Join Rasant Solutions — innovation, growth, and meaningful work <br> across AI products and custom software.
         </p>
@@ -24,37 +21,47 @@
     </section>
 
     <!-- Main Content -->
-    <main class="max-w-5xl mx-auto px-4 sm:px-6 pb-24">
+    <main class="max-w-8xl mx-auto px-4 sm:px-6 pb-24">
 
-      <div id="careersJobsSection" class="space-y-12 mt-8">
-        <div class="text-left border-b border-borderDefault pb-6 transition-all duration-700 ease-out" :class="cardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'">
-          <h2 class="font-display text-2xl sm:text-3xl font-bold text-headingMain mb-2">Open positions</h2>
-          <p class="text-textBody text-sm sm:text-base">Explore roles at Rasant Solutions and apply directly below.</p>
-        </div>
+      <div id="careersJobsSection" class="mt-6">
 
         <div
-            class="relative rounded-[24px] py-10 px-6 sm:py-12 sm:px-12 overflow-hidden w-full transition-all duration-700 delay-150 ease-out bg-buttonBackground"
+            class="relative rounded-[28px] py-12 px-6 sm:py-14 sm:px-14 overflow-hidden w-full transition-all duration-700 ease-out bg-buttonBackground shadow-[0_20px_60px_-15px_rgba(194,65,12,0.35)]"
             :class="cardsVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-3'"
         >
           <div class="absolute inset-0 opacity-50 pointer-events-none bg-[radial-gradient(circle_at_2px_2px,rgba(255,255,255,0.06)_1px,transparent_0)] [background-size:24px_24px]"></div>
+          <div class="absolute -top-24 -right-24 w-72 h-72 rounded-full bg-white/[0.06] pointer-events-none blur-2xl" aria-hidden="true"></div>
 
           <div class="relative z-10">
-            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-8">
 
-              <div class="flex flex-col sm:flex-row items-start sm:items-center gap-6 flex-1 min-w-0">
-                <div class="shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center border border-white/[0.18] bg-white/10">
-                  <i class="fa-solid fa-briefcase text-2xl sm:text-[26px] text-white" aria-hidden="true"></i>
+            <div class="flex flex-col sm:flex-row sm:items-baseline sm:justify-start sm:gap-20 pb-3 mb-5 border-b border-white/[0.14]">
+              <div class="flex items-center shrink-0">
+                <h2 class="font-display text-3xl sm:text-4xl font-extrabold text-white leading-tight tracking-tight">
+                  Open positions
+                </h2>
+              </div>
+              <p class="text-sm sm:text-base text-white/70 font-primary sm:text-left mt-1 sm:mt-0">
+                Explore roles at <span class="font-semibold text-white">Rasant Solutions</span> and apply directly below. Find your next career move with us. Ready to shape the future of AI?
+              </p>
+            </div>
+
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-10">
+
+              <div class="flex flex-col sm:flex-row items-start sm:items-center gap-7 flex-1 min-w-0">
+                <div class="shrink-0 w-20 h-20 sm:w-24 sm:h-24 rounded-3xl flex items-center justify-center border border-white/[0.18] bg-white/10 shadow-[0_8px_20px_rgba(0,0,0,0.15)]">
+                  <i class="fa-solid fa-briefcase text-3xl text-white" aria-hidden="true"></i>
                 </div>
 
                 <div class="flex-1 text-left min-w-0">
-              <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[10.5px] font-bold tracking-wide uppercase mb-3 bg-white text-secondary-600 border border-accent-1/25">
-                <span class="w-1.5 h-1.5 rounded-full bg-secondary-600"></span>
-                Currently fully staffed
-              </span>
-                  <h3 class="font-display text-xl sm:text-2xl font-bold text-white mb-2">No open roles at the moment</h3>
-                  <p class="text-sm sm:text-[15px] leading-relaxed text-white/72 max-w-2xl font-primary">
-                    Our team is operating at full strength right now — but talent demands change quickly.
-                    Leave your CV with us below, and our recruitment team will reach out directly as soon as an opening aligns with your expertise.
+                  <div class="flex flex-wrap items-center gap-3 mb-3">
+                    <h3 class="font-display text-2xl sm:text-[28px] font-bold text-white">No open roles at the moment</h3>
+                    <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[10.5px] font-bold tracking-wide uppercase bg-white text-secondary-600 border border-accent-1/25">
+                      <span class="w-1.5 h-1.5 rounded-full bg-secondary-600"></span>
+                      Currently fully staffed
+                    </span>
+                  </div>
+                  <p class="text-[15px] sm:text-base leading-relaxed text-white/75 max-w-2xl font-primary">
+                    Our team is operating at full strength right now, but great talent always finds room. Send us your CV and our recruitment team will reach out personally the moment a role matches your skills.
                   </p>
                 </div>
               </div>
@@ -63,7 +70,7 @@
                 <button
                     type="button"
                     @click="openModal('')"
-                    class="inline-flex items-center justify-center gap-2 w-full lg:w-auto px-7 py-3.5 rounded-xl font-bold text-sm whitespace-nowrap transition-all duration-200 hover:scale-[1.02] active:scale-95 cursor-pointer bg-white text-secondary-600 hover:bg-secondary-50 shadow-[0_10px_24px_rgba(0,0,0,0.18)]"
+                    class="inline-flex items-center justify-center gap-2 w-full lg:w-auto px-8 py-4 rounded-xl font-bold text-sm whitespace-nowrap transition-all duration-200 hover:scale-[1.02] active:scale-95 cursor-pointer bg-white text-secondary-600 hover:bg-secondary-50 shadow-[0_10px_24px_rgba(0,0,0,0.18)]"
                 >
                   Submit your CV
                   <span aria-hidden="true">&rarr;</span>
@@ -72,26 +79,26 @@
 
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8 mt-8 pt-6 border-t border-white/[0.14]">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 sm:gap-8 mt-10 pt-7 border-t border-white/[0.14]">
               <div class="text-left">
-                <div class="font-display text-xl sm:text-2xl font-bold text-white">48h</div>
-                <div class="text-xs mt-0.5 text-white/55">avg. response</div>
+                <div class="font-display text-2xl sm:text-3xl font-bold text-white">48h</div>
+                <div class="text-xs mt-1 text-white/55">avg. response</div>
               </div>
               <div class="text-left">
-                <div class="font-display text-xl sm:text-2xl font-bold text-white">5</div>
-                <div class="text-xs mt-0.5 text-white/55">teams hiring soon</div>
+                <div class="font-display text-2xl sm:text-3xl font-bold text-white">5</div>
+                <div class="text-xs mt-1 text-white/55">teams hiring soon</div>
               </div>
               <div class="text-left">
-                <div class="font-display text-xl sm:text-2xl font-bold text-white">100%</div>
-                <div class="text-xs mt-0.5 text-white/55">friendly environment</div>
+                <div class="font-display text-2xl sm:text-3xl font-bold text-white">100%</div>
+                <div class="text-xs mt-1 text-white/55">friendly environment</div>
               </div>
               <div class="text-left">
-                <div class="font-display text-xl sm:text-2xl font-bold text-white">10+</div>
-                <div class="text-xs mt-0.5 text-white/55">Active Projects</div>
+                <div class="font-display text-2xl sm:text-3xl font-bold text-white">10+</div>
+                <div class="text-xs mt-1 text-white/55">Active Projects</div>
               </div>
               <div class="text-left col-span-2 md:col-span-1">
-                <div class="font-display text-xl sm:text-2xl font-bold text-white">Top 2%</div>
-                <div class="text-xs mt-0.5 text-white/55">talent network</div>
+                <div class="font-display text-2xl sm:text-3xl font-bold text-white">Top 2%</div>
+                <div class="text-xs mt-1 text-white/55">talent network</div>
               </div>
             </div>
 
@@ -240,7 +247,7 @@
 
 <script setup>
 import { useCareers } from '@/composables/useCareers.js'
-import Navbar from "@/components/navbar.vue";
+import Navbar from "../components/navbar.vue";
 import Footer from "../components/footer.vue";
 
 const {

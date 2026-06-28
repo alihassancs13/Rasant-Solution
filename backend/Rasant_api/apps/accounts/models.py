@@ -11,7 +11,7 @@ class Role(models.Model):
         return self.name or ''
 
 class User(AbstractUser):
-    email = models.EmailField(max_length=255, blank=True, null=True)
+    email = models.EmailField(max_length=255,unique=True, blank=True, null=True,)
     role = models.ForeignKey(
         Role,
         on_delete=models.SET_NULL,

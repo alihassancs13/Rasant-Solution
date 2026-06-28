@@ -1,15 +1,14 @@
 <template>
   <div class="min-h-screen bg-section-white font-primary text-headingMain antialiased selection:bg-primary-500/20">
     <Navbar />
-
+    <!-- Hero Section -->
     <section class="relative overflow-hidden px-6 py-20 text-center bg-secondary-50 mt-5">
-      <div class="absolute inset-0 opacity-70 mix-blend-multiply pointer-events-none bg-[radial-gradient(circle_at_top_right,rgba(244,63,94,0.09),transparent_45%),radial-gradient(circle_at_bottom_left,rgba(59,130,246,0.1),transparent_50%),radial-gradient(circle_at_top_left,rgba(219,39,119,0.06),transparent_40%),radial-gradient(circle_at_bottom_right,var(--color-neutral-100),transparent_60%)]" aria-hidden="true"></div>
-
+      <div class="absolute inset-0 pointer-events-none bg-[linear-gradient(120deg,#fdf1e7_0%,#f7e9ec_30%,#eee9f2_55%,#e7eaf5_80%)]" aria-hidden="true"></div>
       <div class="relative z-10 max-w-3xl mx-auto">
-        <span class="inline-flex items-center gap-2 px-3 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase bg-neutral-400/10 text-secondary-700 border border-borderDefault mb-5 font-display">
-          <span class="w-1.5 h-1.5 rounded-full bg-accent-1 animate-pulse"></span>
-          CONTACT
-        </span>
+    <span class="inline-flex items-center gap-2 px-3 py-0.5 rounded-full text-[11px] font-bold tracking-wider uppercase bg-neutral-400/10 text-secondary-700 border border-borderDefault mb-5 font-display">
+      <span class="w-1.5 h-1.5 rounded-full bg-accent-1 animate-pulse"></span>
+      CONTACT
+    </span>
         <h1 class="font-display text-4xl sm:text-5xl font-bold text-headingMain leading-tight">
           Let's start your<br />
           <em class="not-italic text-secondary-700">next project</em>

@@ -10,6 +10,8 @@ from django.contrib.auth import authenticate
 from .models import User
 from .serializer import LoginSerializer, UserSerializer
 # Create your views here.
+# views.py - Updated with specific error messages
+
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login_user(request):
@@ -27,11 +29,32 @@ def login_user(request):
     username = serializer.validated_data.get('username')
     password = serializer.validated_data['password']
 
-    # 2. Try to get user by email OR username
+    # Determine what type of login attempt this is
+    is_email_login = email is not None
+    is_username_login = username is not None
+
+    # Try to get user by email OR username
     try:
-        if email:
+        if is_email_login:
+            # Check if email exists in database
+            if not User.objects.filter(email=email).exists():
+                return Response({
+                    "status": False,
+                    "message": f"Email '{email}' not found in our system",
+                    "error_type": "email_not_found"  # Optional: for frontend handling
+                }, status=status.HTTP_404_NOT_FOUND)
+
             user = User.objects.get(email=email)
-        elif username:
+
+        elif is_username_login:
+            # Check if username exists in database
+            if not User.objects.filter(username=username).exists():
+                return Response({
+                    "status": False,
+                    "message": f"Username '{username}' not found in our system",
+                    "error_type": "username_not_found"  # Optional: for frontend handling
+                }, status=status.HTTP_404_NOT_FOUND)
+
             user = User.objects.get(username=username)
         else:
             return Response({
@@ -40,22 +63,24 @@ def login_user(request):
             }, status=status.HTTP_400_BAD_REQUEST)
 
     except User.DoesNotExist:
+        # This is a fallback, should rarely happen
         return Response({
             "status": False,
             "message": "User not found with provided credentials"
         }, status=status.HTTP_404_NOT_FOUND)
 
-    # 3. Check password
+    # Check password
     if not user.check_password(password):
         return Response({
             "status": False,
-            "message": "Invalid password"
+            "message": "Incorrect password. Please try again.",
+            "error_type": "incorrect_password"  # Optional: for frontend handling
         }, status=status.HTTP_401_UNAUTHORIZED)
 
-    # 5. Generate JWT tokens
+    # Generate JWT tokens
     refresh = RefreshToken.for_user(user)
 
-    # 6. Serialize user data
+    # Serialize user data
     user_data = UserSerializer(user).data
 
     return Response({

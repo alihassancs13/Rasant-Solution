@@ -10,6 +10,7 @@ export const useLoginStore = defineStore('login', {
         isAuthenticated: !!sessionStorage.getItem('accessToken'),
         isLoading: false,
         error: null,
+        errorType: null,
     }),
 
     getters: {
@@ -26,13 +27,11 @@ export const useLoginStore = defineStore('login', {
             this.isAuthenticated = true;
             sessionStorage.setItem('accessToken', accessToken);
             sessionStorage.setItem('refreshToken', refreshToken);
-            console.log(' Tokens stored');
         },
 
         setUser(user) {
             this.user = user;
             sessionStorage.setItem('user', JSON.stringify(user));
-            console.log('👤 User stored:', user?.username || user?.email);
         },
 
         clearTokens() {
@@ -41,15 +40,16 @@ export const useLoginStore = defineStore('login', {
             this.user = null;
             this.isAuthenticated = false;
             this.error = null;
+            this.errorType = null;
             sessionStorage.removeItem('accessToken');
             sessionStorage.removeItem('refreshToken');
             sessionStorage.removeItem('user');
-            console.log('🗑 Tokens cleared');
         },
 
         async login(credentials) {
             this.isLoading = true;
             this.error = null;
+            this.errorType = null;
 
             try {
                 const response = await authAPI.login(credentials);
@@ -66,18 +66,53 @@ export const useLoginStore = defineStore('login', {
                 }
             } catch (error) {
                 let errorMessage = 'An unexpected error occurred';
+                let errorType = null;
+
                 if (error.response) {
-                    const status = error.response.status;
-                    if (status === 401) errorMessage = 'Invalid credentials. Please check your email or  username and password.';
-                    else if (status === 404) errorMessage = 'User not found. Please check your email or username.';
-                    else if (status === 400) errorMessage = error.response.data?.message || 'Invalid request.';
-                    else if (status === 500) errorMessage = 'Server error. Please try again later.';
-                    else errorMessage = error.response.data?.message || `Error ${status}: Please try again.`;
+                    // Get the error type from backend if available
+                    errorType = error.response.data?.error_type;
+
+                    // Get the specific error message from backend
+                    const backendMessage = error.response.data?.message;
+
+                    if (backendMessage) {
+                        // Use the specific backend error message
+                        errorMessage = backendMessage;
+                    } else {
+                        // Fallback messages
+                        const status = error.response.status;
+                        if (status === 401) {
+                            errorMessage = 'Incorrect password. Please try again.';
+                            errorType = 'incorrect_password';
+                        } else if (status === 404) {
+                            // Determine if it's email or username from the request
+                            const hasEmail = credentials.email !== undefined;
+                            const hasUsername = credentials.username !== undefined;
+
+                            if (hasEmail) {
+                                errorMessage = `Email '${credentials.email}' not found in our system`;
+                                errorType = 'email_not_found';
+                            } else if (hasUsername) {
+                                errorMessage = `Username '${credentials.username}' not found in our system`;
+                                errorType = 'username_not_found';
+                            } else {
+                                errorMessage = 'User not found. Please check your credentials.';
+                            }
+                        } else if (status === 400) {
+                            errorMessage = error.response.data?.message || 'Invalid request. Please check your input.';
+                        } else if (status === 500) {
+                            errorMessage = 'Server error. Please try again later.';
+                        } else {
+                            errorMessage = error.response.data?.message || `Error ${status}: Please try again.`;
+                        }
+                    }
                 } else if (error.request) {
                     errorMessage = 'Network error. Please check your connection.';
                 }
+
                 this.error = errorMessage;
-                return { success: false, error: errorMessage };
+                this.errorType = errorType;
+                return { success: false, error: errorMessage, errorType };
             } finally {
                 this.isLoading = false;
             }
@@ -125,7 +160,6 @@ export const useLoginStore = defineStore('login', {
             return roleMap[role] || '/home';
         },
 
-        // Helper methods
         hasRole(role) {
             return this.getUserRole?.toLowerCase() === role.toLowerCase();
         },
