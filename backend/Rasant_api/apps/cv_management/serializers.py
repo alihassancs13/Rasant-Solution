@@ -12,6 +12,6 @@ class CVSubmissionSerializer(serializers.ModelSerializer):
                          'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
         if value.content_type not in allowed_types:
             raise serializers.ValidationError("Only PDF, DOC, DOCX files are allowed.")
-        if value.size > 5 * 1024 * 1024:  # 5MB limit
-            raise serializers.ValidationError("File size must not exceed 5MB.")
+        if value.size > 10 * 1024 * 1024:  # 10MB limit
+            raise serializers.ValidationError("File size must not exceed 10MB.")
         return value
