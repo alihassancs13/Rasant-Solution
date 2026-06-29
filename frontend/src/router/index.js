@@ -95,6 +95,12 @@ const routes = [
     }
   },
   {
+    path: "/admin/overview",
+    name: "AdminOverview",
+    component: () => import("../admin/overview.vue"), // Points straight to your sidebar + welcome layout file
+    meta: { title: "Admin Overview - Rasant Solutions", requiresAuth: true }
+  },
+  {
     path: '/dashboard',
     component: () => import('@/pages/Dashboard.vue') }
 ];

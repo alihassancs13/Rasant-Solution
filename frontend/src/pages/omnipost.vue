@@ -45,7 +45,7 @@
           </h1>
           <p class="text-[15px] text-slate-500 leading-relaxed mb-6">OmniPost helps teams generate posts, run approvals, connect platforms, and publish on schedule — without switching between spreadsheets, docs, and scheduling tools.</p>
           <div class="flex justify-start gap-3 flex-wrap">
-            <button @click="goToLogin"  class="relative overflow-hidden cursor-pointer px-6 py-3.5 bg-orange-700 hover:bg-orange-800 text-base font-semibold text-white rounded-xl transition-all duration-200 shadow-[0_4px_14px_rgba(147,51,234,0.4)] hover:shadow-[0_6px_20px_rgba(147,51,234,0.6)] active:scale-[0.98] group inline-flex items-center justify-center">
+            <button @click="goToLogin"  class="relative overflow-hidden cursor-pointer px-6 py-3.5 bg-buttonBackground hover:bg-buttonHover text-buttonTextColor font-semibold border:buttonPrimaryBorder rounded-xl transition-all duration-200 shadow-[0_4px_14px_rgba(147,51,234,0.4)] hover:shadow-[0_6px_20px_rgba(147,51,234,0.6)] active:scale-[0.98] group inline-flex items-center justify-center">
               <span class="relative z-10">Open OmniPost Portal</span>
               <div class="absolute inset-0 w-1/2 bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 pointer-events-none animate-shine-loop"></div>
             </button>
@@ -186,7 +186,7 @@
       <div class="max-w-4xl mx-auto grid grid-cols-2 sm:grid-cols-4 gap-3">
         <a v-for="module in modules" :key="module.name" :href="module.href"
            class="flex flex-col items-center gap-2 p-5 bg-white border border-slate-200 rounded-xl hover:shadow-lg hover:-translate-y-1 transition-all duration-300 hover:border-purple-300">
-          <span class="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center text-lg">
+          <span class="w-10 h-10 rounded-xl bg-purple-100 text-indigo-600 flex items-center justify-center text-lg">
             <i :class="module.icon" class="text-accent-neutral-900"></i>
           </span>
           <span class="font-display font-bold text-sm text-slate-900">{{ module.name }}</span>
@@ -592,7 +592,7 @@
       <div class="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div v-for="capability in capabilities" :key="capability.title"
              class="bg-white border border-slate-200 rounded-xl p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 hover:border-purple-300">
-          <span class="w-11 h-11 rounded-xl bg-purple-100 text-accent-neutral-900 flex items-center justify-center text-lg mb-3">
+          <span class="w-11 h-11 rounded-xl bg-purple-100 text-indigo-600 flex items-center justify-center text-lg mb-3">
             <i :class="capability.icon"></i>
           </span>
           <h3 class="font-display font-bold text-slate-900 mb-2">{{ capability.title }}</h3>
@@ -619,7 +619,7 @@
         <div class="flex gap-3 flex-wrap items-center">
           <router-link
               to="/contact?project=omnipost"
-              class="px-6 py-3.5 bg-white text-secondary-600 font-bold rounded-xl shadow-md transition-transform hover:bg-secondary-50 text-sm inline-flex items-center justify-center font-primary"
+              class="px-6 py-3.5 bg-buttonTextColor text-buttonBackground font-bold rounded-xl shadow-md transition-transform hover:bg-secondary-50 text-sm inline-flex items-center justify-center font-primary"
           >
             Contact Sales
           </router-link>

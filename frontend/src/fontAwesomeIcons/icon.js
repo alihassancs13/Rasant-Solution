@@ -2,6 +2,7 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 import {
   faChevronLeft,
   faChevronRight,
+  faChevronDown,
   faArrowRight,
   faRocket,
   faHandshake,
@@ -33,7 +34,13 @@ import {
   faDownload,
   faTrash,
   faBriefcase,
-  faUserShield
+  faUserShield,
+  faHouse,
+  faUsers,
+  faRobot,
+  // ===== ADD THESE FOR THE RESPONSIBLE SIDEBAR TO WORK =====
+  faBars,
+  faXmark
 } from '@fortawesome/free-solid-svg-icons'
 
 import {
@@ -49,12 +56,14 @@ import {
   faAws,
   faDocker,
   faGoogle,
+  faJira
 } from '@fortawesome/free-brands-svg-icons'
 
 library.add(
     // Chevrons & arrows
     faChevronLeft,
     faChevronRight,
+    faChevronDown,
     faArrowRight,
     faArrowLeft,
 
@@ -68,6 +77,12 @@ library.add(
     faServer,
     faGear,
     faVideo,
+    faHouse,
+    faUsers,
+    faRobot,
+    // ===== ADD THESE IN THE LIBRARY ARRAY =====
+    faBars,
+    faXmark,
 
     // Mobile
     faMobileScreen,
@@ -101,6 +116,7 @@ library.add(
     faAws,
     faDocker,
     faGoogle,
+    faJira,
     faArrowRotateRight,
     faMagnifyingGlass,
     faFileLines,

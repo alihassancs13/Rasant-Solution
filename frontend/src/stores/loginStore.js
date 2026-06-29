@@ -150,7 +150,7 @@ export const useLoginStore = defineStore('login', {
         redirectBasedOnRole() {
             const role = this.getUserRole?.toLowerCase() || 'client';
             const roleMap = {
-                'admin': '/home',
+                'admin': '/admin/overview',
                 'superuser': '/home',
                 'employee': '/home',
                 'staff': '/home',

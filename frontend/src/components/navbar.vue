@@ -229,8 +229,22 @@
       </div>
 
       <!-- ===== DESKTOP RIGHT BUTTONS ===== -->
+      <!-- ===== DESKTOP RIGHT BUTTONS ===== -->
       <div class="hidden md:flex items-center gap-2 lg:gap-3 shrink-0 z-[2]">
+
+        <!-- If Logged In: Show Dashboard Button -->
         <router-link
+            v-if="isLoggedIn"
+            to="/admin/overview"
+            @click="closeMobileMenu"
+            class="px-4 lg:px-5 py-2.5 border border-primary-500 bg-primary-500/5 text-[13px] lg:text-[14px] font-display font-bold rounded-full text-primary-500 hover:bg-primary-500/10 transition-all duration-200 no-underline"
+        >
+          Dashboard
+        </router-link>
+
+        <!-- If Not Logged In: Show Login Button -->
+        <router-link
+            v-else
             to="/login"
             @click="closeMobileMenu"
             class="px-4 lg:px-5 py-2.5 border border-neutral-300 text-[13px] lg:text-[14px] font-display font-bold rounded-full text-primary-900 hover:border-primary-500 hover:text-primary-500 hover:bg-primary-500/5 transition-all duration-200 no-underline"
@@ -238,7 +252,7 @@
           Login
         </router-link>
 
-        <ShineButton to="/contact" shape="pill"  @click="closeMobileMenu">Get Quote</ShineButton>
+        <ShineButton to="/contact" shape="pill" @click="closeMobileMenu">Get Quote</ShineButton>
       </div>
 
       <!-- ===== HAMBURGER ===== -->
@@ -365,15 +379,28 @@
       <!-- Drawer Footer -->
       <div
           class="relative z-[2] shrink-0 px-4 flex flex-col gap-2.5 border-t border-white/12"
-          style="padding-top: 14px; padding-bottom: max(18px, env(safe-area-inset-bottom)); background: rgba(8,18,36,0.28);"
+          style="padding-top: 14px; padding-bottom: max(18px, env(safe-area-inset-top)); background: rgba(8,18,36,0.28);"
       >
+        <!-- If Logged In: Show Mobile Dashboard Button -->
         <router-link
+            v-if="isLoggedIn"
+            to="/overview"
+            @click="closeMobileMenu"
+            class="w-full text-center py-3.5 rounded-xl font-display font-bold text-[14px] text-white no-underline transition-all duration-200 bg-primary-600 hover:bg-primary-500"
+        >
+          Dashboard
+        </router-link>
+
+        <!-- If Not Logged In: Show Mobile Login Button -->
+        <router-link
+            v-else
             to="/login"
             @click="closeMobileMenu"
             class="w-full text-center py-3.5 rounded-xl font-display font-bold text-[14px] text-white no-underline transition-all duration-200 bg-secondary-900 hover:bg-secondary-800"
         >
           Login
         </router-link>
+
         <router-link
             to="/contact"
             @click="closeMobileMenu"
@@ -388,12 +415,20 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import ShineButton from '@/components/ShineButton.vue';
+// 1. Import your login store
+import { useLoginStore } from '../stores/loginStore.js';
 
 const router = useRouter();
 const route = useRoute();
+
+// 2. Initialize the store instance
+const loginStore = useLoginStore();
+
+// 3. Keep a clean reactive reference to your auth status
+const isLoggedIn = computed(() => loginStore.isAuthenticated);
 
 const activeDropdown = ref(null);
 const isMobileMenuOpen = ref(false);
@@ -402,6 +437,7 @@ const isScrolled = ref(false);
 const handleScroll = () => {
   isScrolled.value = window.scrollY > 60;
 };
+
 const handleLogoClick = (event) => {
   const currentPath = router.currentRoute.value.path;
   if (currentPath === '/' || currentPath === '/home') {
@@ -409,6 +445,7 @@ const handleLogoClick = (event) => {
     window.location.reload();
   }
 };
+
 onMounted(() => {
   window.addEventListener('scroll', handleScroll, { passive: true });
   handleScroll();
