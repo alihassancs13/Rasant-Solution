@@ -90,10 +90,10 @@ export const useLoginStore = defineStore('login', {
                             const hasUsername = credentials.username !== undefined;
 
                             if (hasEmail) {
-                                errorMessage = `Email '${credentials.email}' not found in our system`;
+                                errorMessage = `Email '${credentials.email}' not found`;
                                 errorType = 'email_not_found';
                             } else if (hasUsername) {
-                                errorMessage = `Username '${credentials.username}' not found in our system`;
+                                errorMessage = `Invalid Username '${credentials.username}' `;
                                 errorType = 'username_not_found';
                             } else {
                                 errorMessage = 'User not found. Please check your credentials.';

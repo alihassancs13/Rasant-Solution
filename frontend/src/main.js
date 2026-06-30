@@ -4,6 +4,8 @@ import { createPinia } from 'pinia';
 import router from './router/index.js'
 import './assets/main.css'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import Toast from 'vue-toastification';
+import 'vue-toastification/dist/index.css';
 import './fontAwesomeIcons/icon.js'
 
 const app = createApp(App)
@@ -18,5 +20,6 @@ router.afterEach((to) => {
 });
 app.component('font-awesome-icon', FontAwesomeIcon)
 app.use(pinia);
-app.use(router)
+app.use(router);
+app.use(Toast);
 app.mount('#app')

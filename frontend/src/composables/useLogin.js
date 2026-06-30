@@ -2,17 +2,17 @@
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useLoginStore } from '../stores/loginStore';
+import { useToast } from 'vue-toastification'; // or your preferred toast library
 
 export function useLogin() {
     const router = useRouter();
     const loginStore = useLoginStore();
+    const toast = useToast(); // Initialize toast
 
     const emailOrUsername = ref('');
     const password = ref('');
     const rememberMe = ref(false);
     const isPasswordVisible = ref(false);
-    const errorMessage = ref('');
-    const successMessage = ref('');
     const isLoading = ref(false);
 
     // For field-specific error highlighting
@@ -41,9 +41,7 @@ export function useLogin() {
     };
 
     const handleLoginSubmit = async () => {
-        // Clear previous messages and errors
-        errorMessage.value = '';
-        successMessage.value = '';
+        // Clear previous field errors
         fieldErrors.value = { emailOrUsername: false, password: false };
 
         // Trim inputs
@@ -52,7 +50,7 @@ export function useLogin() {
 
         // Check 1: Both fields are filled
         if (!trimmedInput && !trimmedPassword) {
-            errorMessage.value = 'Please fill in both fields.';
+            toast.error('Please fill in both fields.');
             fieldErrors.value.emailOrUsername = true;
             fieldErrors.value.password = true;
             return;
@@ -60,14 +58,14 @@ export function useLogin() {
 
         // Check 2: Email/Username field is empty
         if (!trimmedInput) {
-            errorMessage.value = 'Please enter your email or username.';
+            toast.error('Please enter your email or username.');
             fieldErrors.value.emailOrUsername = true;
             return;
         }
 
         // Check 3: Password field is empty
         if (!trimmedPassword) {
-            errorMessage.value = 'Please enter your password.';
+            toast.error('Please enter your password.');
             fieldErrors.value.password = true;
             return;
         }
@@ -77,7 +75,7 @@ export function useLogin() {
 
         // If input contains @ but is not a valid email, show error and stop
         if (trimmedInput.includes('@') && !isEmail) {
-            errorMessage.value = 'Please enter a valid email address (e.g., user@example.com).';
+            toast.error('Please enter a valid email address (e.g., user@example.com).');
             fieldErrors.value.emailOrUsername = true;
             return;
         }
@@ -105,7 +103,7 @@ export function useLogin() {
             const result = await loginStore.login(credentials);
 
             if (result.success) {
-                successMessage.value = 'Login successful! Redirecting...';
+                toast.success('Login successful! Redirecting...');
                 console.log('Login successful!');
 
                 // Handle remember me
@@ -121,11 +119,38 @@ export function useLogin() {
                     router.replace(redirectPath);
                 }, 1000);
             } else {
-                // Display the specific error message from backend
-                errorMessage.value = result.error || 'Login failed. Please try again.';
+                // Display the specific error message from backend as toast
+                let errorMsg = result.error || 'Login failed. Please try again.';
+
+                // Customize error messages
+                const errorType = result.errorType || loginStore.errorType;
+
+                // Override specific error messages
+                if (errorType === 'email_not_found') {
+                    errorMsg = 'Invalid email address.';
+                } else if (errorType === 'username_not_found') {
+                    errorMsg = 'Invalid username.';
+                } else if (errorType === 'incorrect_password') {
+                    errorMsg = 'Invalid password. Please try again.';
+                } else {
+                    // Check error message content and customize
+                    const errorLower = errorMsg.toLowerCase();
+                    if (errorLower.includes('email not found') || errorLower.includes('email_not_found')) {
+                        errorMsg = 'Invalid email address.';
+                    } else if (errorLower.includes('username not found') || errorLower.includes('username_not_found')) {
+                        errorMsg = 'Invalid username.';
+                    } else if (errorLower.includes('invalid email')) {
+                        errorMsg = 'Invalid email address.';
+                    } else if (errorLower.includes('invalid username')) {
+                        errorMsg = 'Invalid username.';
+                    } else if (errorLower.includes('password') || errorLower.includes('incorrect')) {
+                        errorMsg = 'Invalid password. Please try again.';
+                    }
+                }
+
+                toast.error(errorMsg);
 
                 // Highlight the specific field based on error type
-                const errorType = result.errorType || loginStore.errorType;
                 if (errorType === 'email_not_found') {
                     fieldErrors.value.emailOrUsername = true;
                 } else if (errorType === 'username_not_found') {
@@ -134,9 +159,9 @@ export function useLogin() {
                     fieldErrors.value.password = true;
                 } else {
                     // Check error message content to determine which field to highlight
-                    const errorLower = errorMessage.value.toLowerCase();
+                    const errorLower = errorMsg.toLowerCase();
                     if (errorLower.includes('email') || errorLower.includes('username') ||
-                        errorLower.includes('not found') || errorLower.includes('invalid email')) {
+                        errorLower.includes('invalid email') || errorLower.includes('invalid username')) {
                         fieldErrors.value.emailOrUsername = true;
                     } else if (errorLower.includes('password') || errorLower.includes('incorrect')) {
                         fieldErrors.value.password = true;
@@ -147,7 +172,7 @@ export function useLogin() {
             }
         } catch (error) {
             console.error('Unexpected error:', error);
-            errorMessage.value = 'An unexpected error occurred. Please try again.';
+            toast.error('An unexpected error occurred. Please try again.');
         } finally {
             isLoading.value = false;
         }
@@ -155,6 +180,7 @@ export function useLogin() {
 
     const logout = async () => {
         await loginStore.logout();
+        toast.info('Logged out successfully');
         router.push('/login');
     };
 
@@ -166,8 +192,6 @@ export function useLogin() {
         password,
         rememberMe,
         isPasswordVisible,
-        errorMessage,
-        successMessage,
         isLoading,
         fieldErrors,
         togglePasswordVisibility,

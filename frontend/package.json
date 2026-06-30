@@ -21,7 +21,8 @@
     "axios": "^1.18.1",
     "pinia": "^3.0.4",
     "vue": "beta",
-    "vue-router": "^5.1.0"
+    "vue-router": "^5.1.0",
+    "vue-toastification": "^2.0.0-rc.5"
   },
   "devDependencies": {
     "@tsconfig/node24": "^24.0.4",

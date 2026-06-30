@@ -14,6 +14,7 @@ import {
   faMobileScreenButton,
   faCloud,
   faShieldHalved,
+  faUserShield,
   faUser,
   faLock,
   faEye,
@@ -102,6 +103,7 @@ library.add(
 
     // Auth
     faShieldHalved,
+    faUserShield,
     faUser,
     faLock,
     faEye,
