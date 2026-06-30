@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 480" role="img" aria-label="WordPress and CMS">
+  <defs>
+    <linearGradient id="wphBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F0FDFA"/>
+      <stop offset="100%" stop-color="#EFF6FF"/>
+    </linearGradient>
+    <linearGradient id="wphBar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#21759B"/>
+      <stop offset="100%" stop-color="#4A90E2"/>
+    </linearGradient>
+    <filter id="wphSh"><feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#21759B" flood-opacity="0.12"/></filter>
+    <style>
+      .wph-pulse{animation:wphPulse 2s ease-in-out infinite}
+      @keyframes wphPulse{0%,100%{opacity:1}50%{opacity:.4}}
+    </style>
+  </defs>
+  <rect width="720" height="480" rx="16" fill="url(#wphBg)"/>
+  <text x="40" y="40" font-family="Space Grotesk,sans-serif" font-size="16" font-weight="800" fill="#1E3A5F">WordPress and CMS</text>
+  <text x="40" y="60" font-family="Inter,sans-serif" font-size="10" fill="#64748B">WordPress | custom themes | HTML | Tailwind</text>
+
+  <g filter="url(#wphSh)">
+    <rect x="80" y="90" width="400" height="260" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <rect x="80" y="90" width="400" height="36" rx="14" fill="#21759B"/>
+    <text x="100" y="114" font-size="11" font-weight="700" fill="#FFFFFF">WordPress Dashboard</text>
+    <rect x="100" y="140" width="120" height="80" rx="8" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <text x="112" y="162" font-size="9" font-weight="700" fill="#64748B">Pages</text>
+    <text x="112" y="180" font-size="8" fill="#94A3B8">Home</text>
+    <text x="112" y="196" font-size="8" fill="#94A3B8">Services</text>
+    <text x="112" y="212" font-size="8" fill="#94A3B8">Contact</text>
+    <rect x="232" y="140" width="228" height="180" rx="8" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <text x="248" y="162" font-size="9" font-weight="700" fill="#64748B">Edit page</text>
+    <rect x="248" y="172" width="196" height="10" rx="4" fill="#E2E8F0"/>
+    <rect x="248" y="190" width="160" height="8" rx="4" fill="#E2E8F0"/>
+    <rect x="248" y="206" width="140" height="8" rx="4" fill="#E2E8F0"/>
+    <rect x="248" y="230" width="72" height="24" rx="6" fill="#21759B"/>
+    <text x="284" y="246" text-anchor="middle" font-size="8" font-weight="600" fill="#FFF">Publish</text>
+    <rect x="100" y="232" width="120" height="88" rx="8" fill="#FFFBEB" stroke="#FDE68A"/>
+    <text x="112" y="254" font-size="9" font-weight="700" fill="#92400E">Plugins</text>
+    <text x="112" y="272" font-size="8" fill="#B45309">Forms</text>
+    <text x="112" y="288" font-size="8" fill="#B45309">SEO</text>
+    <text x="112" y="304" font-size="8" fill="#B45309">Analytics</text>
+  </g>
+
+  <g filter="url(#wphSh)">
+    <rect x="520" y="120" width="160" height="200" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="540" y="148" font-size="9" font-weight="700" fill="#64748B">LIVE PREVIEW</text>
+    <rect x="540" y="158" width="120" height="72" rx="6" fill="url(#wphBar)" opacity=".15"/>
+    <text x="600" y="200" text-anchor="middle" font-size="10" font-weight="800" fill="#21759B">Your brand</text>
+    <rect x="540" y="242" width="120" height="8" rx="4" fill="#E2E8F0"/>
+    <rect x="540" y="256" width="96" height="8" rx="4" fill="#E2E8F0"/>
+    <rect x="540" y="278" width="72" height="22" rx="6" fill="#14B8A6"/>
+    <text x="576" y="293" text-anchor="middle" font-size="8" font-weight="700" fill="#FFF">Contact</text>
+  </g>
+
+  <rect x="40" y="380" width="640" height="72" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="56" y="408" font-size="9" font-weight="700" fill="#64748B">STACK</text>
+  <rect x="56" y="418" width="80" height="24" rx="6" fill="#EFF6FF"/><text x="96" y="434" text-anchor="middle" font-size="8" fill="#21759B">WordPress</text>
+  <rect x="144" y="418" width="72" height="24" rx="6" fill="#F0FDF4"/><text x="180" y="434" text-anchor="middle" font-size="8" fill="#059669">HTML</text>
+  <rect x="224" y="418" width="72" height="24" rx="6" fill="#ECFEFF"/><text x="260" y="434" text-anchor="middle" font-size="8" fill="#0284C7">Tailwind</text>
+  <rect x="304" y="418" width="88" height="24" rx="6" fill="#EDE9FE"/><text x="348" y="434" text-anchor="middle" font-size="8" fill="#4338CA">Integrations</text>
+  <circle cx="640" cy="430" r="8" fill="#14B8A6" class="wph-pulse"/>
+  <text x="656" y="434" font-size="9" fill="#059669">Easy to update</text>
+</svg>

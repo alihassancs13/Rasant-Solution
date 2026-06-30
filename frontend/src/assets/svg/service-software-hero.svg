@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 480" role="img" aria-label="Custom software development">
+  <defs>
+    <linearGradient id="sshBg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFF8F3"/>
+      <stop offset="100%" stop-color="#EFF6FF"/>
+    </linearGradient>
+    <linearGradient id="sshBar" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#4A90E2"/>
+      <stop offset="100%" stop-color="#2A5F9E"/>
+    </linearGradient>
+    <filter id="sshSh"><feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#2A5F9E" flood-opacity="0.12"/></filter>
+    <style>
+      .ssh-pulse{animation:sshPulse 2s ease-in-out infinite}
+      @keyframes sshPulse{0%,100%{opacity:1}50%{opacity:.4}}
+      .ssh-flow{stroke-dasharray:6 4;animation:sshFlow 1.2s linear infinite}
+      @keyframes sshFlow{to{stroke-dashoffset:-20}}
+    </style>
+  </defs>
+  <rect width="720" height="480" rx="16" fill="url(#sshBg)"/>
+  <text x="40" y="40" font-family="Space Grotesk,sans-serif" font-size="16" font-weight="800" fill="#1E3A5F">Custom software studio</text>
+  <text x="40" y="60" font-family="Inter,sans-serif" font-size="10" fill="#64748B">Java | Grails | Python | APIs</text>
+
+  <g filter="url(#sshSh)">
+    <rect x="40" y="80" width="400" height="280" rx="14" fill="#0F172A"/>
+    <rect x="40" y="80" width="400" height="32" rx="14" fill="#1E293B"/>
+    <circle cx="60" cy="96" r="6" fill="#EF4444"/><circle cx="80" cy="96" r="6" fill="#F59E0B"/><circle cx="100" cy="96" r="6" fill="#22C55E"/>
+    <text x="120" y="100" font-family="monospace" font-size="9" fill="#94A3B8">OrderService.java</text>
+    <text x="56" y="132" font-family="monospace" font-size="9" fill="#818CF8">public Order createOrder(Request req) {</text>
+    <text x="56" y="148" font-family="monospace" font-size="9" fill="#E2E8F0">  var id = repository.save(req);</text>
+    <text x="56" y="164" font-family="monospace" font-size="9" fill="#14B8A6">  eventBus.publish("order.created");</text>
+    <text x="56" y="180" font-family="monospace" font-size="9" fill="#E2E8F0">  return Order.pending(id);</text>
+    <rect x="56" y="200" width="120" height="22" rx="6" fill="#1E293B" stroke="#334155"/>
+    <text x="64" y="215" font-family="monospace" font-size="8" fill="#22C55E">+142 -18 lines</text>
+    <rect x="56" y="236" width="360" height="8" rx="4" fill="#1E293B"/>
+    <rect x="56" y="236" width="260" height="8" rx="4" fill="url(#sshBar)"/>
+    <text x="56" y="262" font-family="Inter,sans-serif" font-size="9" fill="#94A3B8">Build pipeline | tests passing</text>
+  </g>
+
+  <g filter="url(#sshSh)">
+    <rect x="460" y="80" width="220" height="130" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="480" y="108" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#64748B">SERVICES</text>
+    <rect x="480" y="118" width="180" height="28" rx="6" fill="#EFF6FF" stroke="#4A90E2"/>
+    <text x="492" y="136" font-size="9" fill="#2A5F9E">Auth API</text>
+    <rect x="480" y="152" width="180" height="28" rx="6" fill="#F0FDF4" stroke="#14B8A6"/>
+    <text x="492" y="170" font-size="9" fill="#0F766E">Orders API</text>
+    <rect x="480" y="186" width="180" height="28" rx="6" fill="#F8FAFC" stroke="#CBD5E1"/>
+    <text x="492" y="204" font-size="9" fill="#64748B">Reporting worker</text>
+  </g>
+
+  <g filter="url(#sshSh)">
+    <rect x="460" y="226" width="220" height="134" rx="14" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="480" y="254" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#64748B">METRICS</text>
+    <text x="480" y="284" font-family="Space Grotesk,sans-serif" font-size="28" font-weight="800" fill="#1E3A5F">99.9%</text>
+    <text x="480" y="304" font-size="9" fill="#64748B">uptime SLA</text>
+    <circle cx="620" cy="290" r="40" fill="none" stroke="#E2E8F0" stroke-width="10"/>
+    <circle cx="620" cy="290" r="40" fill="none" stroke="#4A90E2" stroke-width="10" stroke-dasharray="200 60" transform="rotate(-90 620 290)" class="ssh-pulse"/>
+  </g>
+
+  <path class="ssh-flow" d="M440 180 H460" stroke="#4A90E2" stroke-width="2"/>
+  <rect x="40" y="380" width="640" height="72" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+  <text x="56" y="408" font-size="9" font-weight="700" fill="#64748B">DELIVERY</text>
+  <text x="56" y="428" font-size="10" fill="#1E293B">Discovery | Architecture | Build | Launch | Support</text>
+  <circle cx="640" cy="416" r="8" fill="#14B8A6" class="ssh-pulse"/>
+  <text x="656" y="420" font-size="9" fill="#059669">Sprint active</text>
+</svg>
