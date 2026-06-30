@@ -237,7 +237,7 @@
                 Contact sales →
               </router-link>
             </p>
-            <router-link to="/home" class="inline-block text-sm text-textBody transition-all duration-200 hover:text-headingMain hover:-translate-x-0.5">
+            <router-link to="/" class="inline-block text-sm text-textBody transition-all duration-200 hover:text-headingMain hover:-translate-x-0.5">
               ← Back to website
             </router-link>
           </div>

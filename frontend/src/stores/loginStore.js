@@ -151,13 +151,13 @@ export const useLoginStore = defineStore('login', {
             const role = this.getUserRole?.toLowerCase() || 'client';
             const roleMap = {
                 'admin': '/admin/overview',
-                'superuser': '/home',
-                'employee': '/home',
-                'staff': '/home',
-                'client': '/home',
-                'user': '/home',
+                'superuser': '/',
+                'employee': '/',
+                'staff': '/',
+                'client': '/',
+                'user': '/',
             };
-            return roleMap[role] || '/home';
+            return roleMap[role] || '/';
         },
 
         hasRole(role) {
