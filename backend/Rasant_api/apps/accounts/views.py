@@ -1,4 +1,3 @@
-
 # Create your views here.
 from django.shortcuts import render
 from rest_framework.decorators import api_view, permission_classes
@@ -7,10 +6,8 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
-from .models import User
+from .models import User, Module
 from .serializer import LoginSerializer, UserSerializer
-# Create your views here.
-# views.py - Updated with specific error messages
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -41,7 +38,7 @@ def login_user(request):
                 return Response({
                     "status": False,
                     "message": f"Email '{email}' not found in our system",
-                    "error_type": "email_not_found"  # Optional: for frontend handling
+                    "error_type": "email_not_found"
                 }, status=status.HTTP_404_NOT_FOUND)
 
             user = User.objects.get(email=email)
@@ -52,7 +49,7 @@ def login_user(request):
                 return Response({
                     "status": False,
                     "message": f"Username '{username}' not found in our system",
-                    "error_type": "username_not_found"  # Optional: for frontend handling
+                    "error_type": "username_not_found"
                 }, status=status.HTTP_404_NOT_FOUND)
 
             user = User.objects.get(username=username)
@@ -63,7 +60,6 @@ def login_user(request):
             }, status=status.HTTP_400_BAD_REQUEST)
 
     except User.DoesNotExist:
-        # This is a fallback, should rarely happen
         return Response({
             "status": False,
             "message": "User not found with provided credentials"
@@ -74,7 +70,7 @@ def login_user(request):
         return Response({
             "status": False,
             "message": "Incorrect password. Please try again.",
-            "error_type": "incorrect_password"  # Optional: for frontend handling
+            "error_type": "incorrect_password"
         }, status=status.HTTP_401_UNAUTHORIZED)
 
     # Generate JWT tokens
@@ -83,12 +79,67 @@ def login_user(request):
     # Serialize user data
     user_data = UserSerializer(user).data
 
+    # Get modules for the user's role
+    modules = Module.objects.filter(role=user.role).values('id', 'name', 'icon') if user.role else []
+
+    #  FIXED INDENTATION HERE
+    modules_list = []
+    for module in modules:
+        modules_list.append({
+            'id': module['id'],
+            'name': module['name'],
+            'icon': module.get('icon', '')  # Use .get() to avoid KeyError
+        })
+
     return Response({
         "status": True,
         "message": "Login successful",
         "data": {
             "access_token": str(refresh.access_token),
             "refresh_token": str(refresh),
-            "user": user_data
+            "user": user_data,
+            "modules": modules_list  # Add modules list here
         }
     }, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user_modules(request):
+    """
+    Get all modules for the logged-in user based on their role
+    """
+    user = request.user
+
+    # ADD THIS: Debug logging
+    print(f"User: {user.username}, Role: {user.role}")
+
+    # Check if user has a role
+    if not user.role:
+        return Response({
+            "status": True,
+            "message": "No role assigned",
+            "data": {
+                "modules": []
+            }
+        })
+
+    # Get modules for user's role
+    modules = Module.objects.filter(role=user.role).values('id', 'name', 'icon')
+
+    # CHANGE THIS: Convert to list of dicts
+    modules_list = []
+    for module in modules:
+        modules_list.append({
+            'id': module['id'],
+            'name': module['name'],
+            'icon': module.get('icon', '')
+        })
+
+    return Response({
+        "status": True,
+        "message": "Modules fetched successfully",
+        "data": {
+            "modules": modules_list  # Send as list
+        }
+    })

@@ -41,3 +41,18 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+
+class Module(models.Model):
+    name = models.CharField(max_length=255,unique=True)
+    icon = models.CharField(max_length=50, blank=True, null=True)
+    role = models.ForeignKey(
+        'Role',
+        on_delete=models.CASCADE,
+        related_name='modules'
+    )
+
+    class Meta:
+        db_table = 'modules'
+
+    def __str__(self):
+        return self.name

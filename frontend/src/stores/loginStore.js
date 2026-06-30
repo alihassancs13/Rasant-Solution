@@ -1,6 +1,6 @@
 // stores/loginStore.js
 import { defineStore } from 'pinia';
-import { authAPI } from '../services/api';
+import { authAPI } from '../services/loginApi.js';
 
 export const useLoginStore = defineStore('login', {
     state: () => ({
