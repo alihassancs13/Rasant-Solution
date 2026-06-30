@@ -34,7 +34,7 @@ import {
   faDownload,
   faTrash,
   faBriefcase,
-  faUserShield,
+  faTriangleExclamation,
   faHouse,
   faUsers,
   faRobot,
@@ -123,5 +123,5 @@ library.add(
     faDownload,
     faTrash,
     faBriefcase,
-    faUserShield
+    faTriangleExclamation
 )

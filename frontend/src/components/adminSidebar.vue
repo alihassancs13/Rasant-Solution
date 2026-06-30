@@ -88,7 +88,7 @@
                 <div v-show="isEmployeesOpen" class="mt-0.5 ml-6 pl-4 border-l border-gray-300 space-y-0.5">
                   <router-link to="/admin/employees/dashboard" @click="isSidebarOpen = false" class="block px-4 py-1.5 text-sm text-gray-500 hover:bg-[#E2ECF9] hover:text-[#1B55E2] rounded-lg transition-all" exact-active-class="bg-white/80 text-[#1B55E2] font-semibold shadow-xs">Dashboard</router-link>
                   <router-link to="/admin/employees/attendance" @click="isSidebarOpen = false" class="block px-4 py-1.5 text-sm text-gray-500 hover:bg-[#E2ECF9] hover:text-[#1B55E2] rounded-lg transition-all" exact-active-class="bg-white/80 text-[#1B55E2] font-semibold shadow-xs">Attendance</router-link>
-                  <router-link to="/admin/employees/careers" @click="isSidebarOpen = false" class="block px-4 py-1.5 text-sm text-gray-500 hover:bg-[#E2ECF9] hover:text-[#1B55E2] rounded-lg transition-all" exact-active-class="bg-white/80 text-[#1B55E2] font-semibold shadow-xs">Careers</router-link>
+                  <router-link to="/admin/career" @click="isSidebarOpen = false" class="block px-4 py-1.5 text-sm text-gray-500 hover:bg-[#E2ECF9] hover:text-[#1B55E2] rounded-lg transition-all" exact-active-class="bg-white/80 text-[#1B55E2] font-semibold shadow-xs">Careers</router-link>
                   <router-link tabIndex="-1" to="/admin/employees/salaries" @click="isSidebarOpen = false" class="block px-4 py-1.5 text-sm text-gray-500 hover:bg-[#E2ECF9] hover:text-[#1B55E2] rounded-lg transition-all" exact-active-class="bg-white/80 text-[#1B55E2] font-semibold shadow-xs">Salaries</router-link>
                 </div>
               </div>

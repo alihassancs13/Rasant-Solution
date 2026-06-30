@@ -25,5 +25,4 @@ urlpatterns = [
     path('api/', include('contact_message.urls')),
     path('api/cv_management/', include('cv_management.urls')),
 ]
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

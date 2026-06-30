@@ -27,7 +27,10 @@ export function useDashboard() {
     async function deleteMessage(id) {
         if (!confirm('Delete this message?')) return
         try {
-            await fetch(`${API_BASE}/api/contact/${id}/`)
+            const res = await fetch(`${API_BASE}/api/contact/${id}/`, {
+                method: 'DELETE',
+            })
+            if (!res.ok) throw new Error(`Server error: ${res.status}`)
             messages.value = messages.value.filter(m => m.id !== id)
         } catch {
             alert('Could not delete message.')
@@ -67,7 +70,10 @@ export function useDashboard() {
     async function deleteCV(id) {
         if (!confirm('Delete this CV submission?')) return
         try {
-            await fetch(`${API_BASE}/api/cv_management/submit-cv/${id}/`)
+            const res = await fetch(`${API_BASE}/api/cv_management/cv/${id}/`, {
+                method: 'DELETE',
+            })
+            if (!res.ok) throw new Error(`Server error: ${res.status}`)
             cvSubmissions.value = cvSubmissions.value.filter(c => c.id !== id)
         } catch {
             alert('Could not delete CV submission.')
@@ -83,6 +89,33 @@ export function useDashboard() {
             c.desired_position.toLowerCase().includes(q),
         )
     })
+
+    // ✅ Robust view — blob ki tarah fetch karke naye tab mein render karta hai
+    // Server ke Content-Disposition header pe depend nahi karta — kabhi download trigger nahi hoga
+    async function viewCV(cv) {
+        // Tab pehle hi khol do (synchronously, click ke andar) — warna popup blocker rok dega
+        const newTab = window.open('', '_blank')
+
+        try {
+            const fileUrl = `${API_BASE}/api/cv_management/cv/${cv.id}/download/`
+            const res = await fetch(fileUrl)
+            if (!res.ok) throw new Error(`Server error: ${res.status}`)
+
+            const blob    = await res.blob()
+            const blobUrl = URL.createObjectURL(blob)
+
+            if (newTab) {
+                newTab.location.href = blobUrl
+            }
+
+            // Memory cleanup — tab band hone ke baad blob URL revoke kar do
+            setTimeout(() => URL.revokeObjectURL(blobUrl), 60_000)
+
+        } catch (err) {
+            if (newTab) newTab.close()
+            alert('Could not open CV file.')
+        }
+    }
 
     // ─── Helpers ─────────────────────────────────────────────────
     function formatDate(iso) {
@@ -109,7 +142,7 @@ export function useDashboard() {
         fetchMessages, deleteMessage, filtered,
         // cv
         cvSubmissions, cvLoading, cvError, cvSearchQuery,
-        fetchCVSubmissions, deleteCV, filteredCVs,
+        fetchCVSubmissions, deleteCV, filteredCVs, viewCV,
         // helpers
         formatDate, initials,
         // shared
