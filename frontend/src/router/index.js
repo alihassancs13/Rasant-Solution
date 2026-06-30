@@ -97,8 +97,8 @@ const routes = [
     meta: { title: "Admin Overview - Rasant Solutions", requiresAuth: true }
   },
   {
-    path: '/dashboard',
-    component: () => import('@/pages/Dashboard.vue') }
+    path: '/admin/career',
+    component: () => import('../admin/career.vue') }
 ];
 
 const router = createRouter({

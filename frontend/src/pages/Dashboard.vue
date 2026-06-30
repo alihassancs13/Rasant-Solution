@@ -6,7 +6,7 @@ const {
   fetchMessages, deleteMessage, filtered,
   cvSubmissions, cvLoading, cvError, cvSearchQuery,
   fetchCVSubmissions, deleteCV, filteredCVs,
-  formatDate, initials, API_BASE,
+  formatDate, initials, API_BASE, viewCV,
 } = useDashboard()
 </script>
 
@@ -213,14 +213,13 @@ const {
 
           <!-- Actions -->
           <div class="flex gap-2 border-t border-gray-100 pt-3 mt-auto">
-            <a
-                :href="`${API_BASE}${cv.cv_file}`"
-                target="_blank"
-                class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100 hover:bg-blue-100 transition-colors no-underline"
+            <button
+                @click="viewCV(cv)"
+                class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100 hover:bg-blue-100 transition-colors cursor-pointer"
             >
-              <font-awesome-icon :icon="['fas', 'download']" />
-              Download CV
-            </a>
+              <font-awesome-icon :icon="['fas', 'eye']" />
+              View CV
+            </button>
             <button
                 @click="deleteCV(cv.id)"
                 class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-medium bg-red-50 text-red-600 border border-red-100 hover:bg-red-100 transition-colors cursor-pointer"
