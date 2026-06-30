@@ -1,9 +1,9 @@
-// services/api.js
+// services/loginApi.js
 import axios from 'axios';
 import { BASE_URL, API_ENDPOINTS } from './baseUrl.js';
 import { useLoginStore } from '../stores/loginStore.js';
 
-const api = axios.create({
+const loginApi = axios.create({
     baseURL: BASE_URL,
     headers: {
         'Content-Type': 'application/json',
@@ -11,7 +11,7 @@ const api = axios.create({
 });
 
 // Request interceptor to add token
-api.interceptors.request.use(
+loginApi.interceptors.request.use(
     (config) => {
         // Get token from sessionStorage
         const token = sessionStorage.getItem('accessToken');  // Changed
@@ -24,7 +24,7 @@ api.interceptors.request.use(
 );
 
 // Response interceptor for token refresh
-api.interceptors.response.use(
+loginApi.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config;
@@ -36,7 +36,7 @@ api.interceptors.response.use(
 
             if (refreshToken) {
                 try {
-                    const response = await api.post(API_ENDPOINTS.REFRESH_TOKEN, {
+                    const response = await loginApi.post(API_ENDPOINTS.REFRESH_TOKEN, {
                         refresh: refreshToken,
                     });
 
@@ -44,7 +44,7 @@ api.interceptors.response.use(
                     sessionStorage.setItem('accessToken', newAccessToken);  // Changed
 
                     originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-                    return api(originalRequest);
+                    return loginApi(originalRequest);
                 } catch (refreshError) {
                     // Refresh failed - logout
                     sessionStorage.removeItem('accessToken');  // Changed
@@ -61,11 +61,11 @@ api.interceptors.response.use(
 
 // Auth API calls
 export const authAPI = {
-    login: (credentials) => api.post(API_ENDPOINTS.LOGIN, credentials),
-    refreshToken: (refreshToken) => api.post(API_ENDPOINTS.REFRESH_TOKEN, { refresh: refreshToken }),
-    logout: (refreshToken) => api.post(API_ENDPOINTS.LOGOUT, { refresh: refreshToken }),
-    getProfile: () => api.get(API_ENDPOINTS.USER_PROFILE),
-    changePassword: (data) => api.post(API_ENDPOINTS.CHANGE_PASSWORD, data),
+    login: (credentials) => loginApi.post(API_ENDPOINTS.LOGIN, credentials),
+    refreshToken: (refreshToken) => loginApi.post(API_ENDPOINTS.REFRESH_TOKEN, { refresh: refreshToken }),
+    logout: (refreshToken) => loginApi.post(API_ENDPOINTS.LOGOUT, { refresh: refreshToken }),
+    getProfile: () => loginApi.get(API_ENDPOINTS.USER_PROFILE),
+    changePassword: (data) => loginApi.post(API_ENDPOINTS.CHANGE_PASSWORD, data),
 };
 
-export default api;
+export default loginApi;
