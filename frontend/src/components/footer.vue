@@ -23,23 +23,18 @@
         </h4>
         <ul class="space-y-2.5">
           <li>
-            <router-link to="/#services" class="text-sm text-neutral-700 hover:text-primary-600 hover:translate-x-1 transition-all duration-200 inline-block font-primary">
+            <router-link to="/services/custom-software" class="text-sm text-neutral-700 hover:text-primary-600 hover:translate-x-1 transition-all duration-200 inline-block font-primary">
               Custom Software
             </router-link>
           </li>
           <li>
-            <router-link to="/#services" class="text-sm text-neutral-700 hover:text-primary-600 hover:translate-x-1 transition-all duration-200 inline-block font-primary">
-              Web Development
+            <router-link to="/services/web-applications" class="text-sm text-neutral-700 hover:text-primary-600 hover:translate-x-1 transition-all duration-200 inline-block font-primary">
+              Web Applications
             </router-link>
           </li>
           <li>
-            <router-link to="/#services" class="text-sm text-neutral-700 hover:text-primary-600 hover:translate-x-1 transition-all duration-200 inline-block font-primary">
-              Mobile Apps
-            </router-link>
-          </li>
-          <li>
-            <router-link to="/#services" class="text-sm text-neutral-700 hover:text-primary-600 hover:translate-x-1 transition-all duration-200 inline-block font-primary">
-              Cloud &amp; DevOps
+            <router-link to="/services/wordpress-cms" class="text-sm text-neutral-700 hover:text-primary-600 hover:translate-x-1 transition-all duration-200 inline-block font-primary">
+              WordPress &amp; CMS
             </router-link>
           </li>
         </ul>

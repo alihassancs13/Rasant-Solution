@@ -98,7 +98,16 @@ const routes = [
   },
   {
     path: '/admin/career',
-    component: () => import('../admin/career.vue') }
+    component: () => import('../admin/career.vue') },
+  {
+    path: '/services/:slug',
+    name: 'ServiceDetail',
+    component: () => import('../pages/ServiceDetail.vue'),
+    meta: {
+      title: 'Services - Rasant Solutions',
+      requiresAuth: false,
+    },
+  },
 ];
 
 const router = createRouter({
@@ -117,7 +126,7 @@ router.beforeEach((to, from, next) => {
   // If trying to access login page but already authenticated
   if (to.path === '/login' && isAuthenticated) {
     // Redirect to home page
-    next('/home');
+    next('/');
     return;
   }
 

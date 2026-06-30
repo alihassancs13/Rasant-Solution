@@ -38,6 +38,11 @@ import {
   faHouse,
   faUsers,
   faRobot,
+  faSeedling,
+  faWind,
+  faDesktop,
+  faClock,
+  faMedal,
   // ===== ADD THESE FOR THE RESPONSIBLE SIDEBAR TO WORK =====
   faBars,
   faXmark
@@ -56,7 +61,12 @@ import {
   faAws,
   faDocker,
   faGoogle,
-  faJira
+  faJira,
+  faVuejs,
+  faJava,
+  faHtml5,
+  faCss3Alt,
+  faWordpress,
 } from '@fortawesome/free-brands-svg-icons'
 
 library.add(
@@ -80,6 +90,8 @@ library.add(
     faHouse,
     faUsers,
     faRobot,
+    faClock,
+    faMedal,
     // ===== ADD THESE IN THE LIBRARY ARRAY =====
     faBars,
     faXmark,
@@ -117,6 +129,14 @@ library.add(
     faDocker,
     faGoogle,
     faJira,
+    faVuejs,
+    faJava,
+    faHtml5,
+    faCss3Alt,
+    faWordpress,
+    faSeedling,
+    faWind,
+    faDesktop,
     faArrowRotateRight,
     faMagnifyingGlass,
     faFileLines,

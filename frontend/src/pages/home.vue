@@ -34,7 +34,7 @@
         </h1>
 
         <p class="text-lg text-textBody font-medium max-w-xl leading-relaxed font-primary">
-          Rasant Solutions engineers bold digital products — from cloud-native platforms to AI-powered apps — built to launch fast and scale without limits.
+          Rasant Solutions builds custom software with Java, Grails, Python, Vue.js, React, and WordPress — shipped fast and built to last.
         </p>
 
         <div class="flex flex-wrap gap-4 pt-4">
@@ -77,42 +77,57 @@
           :class="heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-16'"
       >
         <!-- Card 1: Code example -->
-        <div class="md:col-span-2 bg-card rounded-xl shadow-blue border border-borderDefault flex flex-col h-44 max-w-md overflow-hidden">
+        <div
+            class="md:col-span-2 bg-card rounded-xl shadow-blue border border-borderDefault flex flex-col h-44 max-w-md overflow-hidden transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-insetBlue hover:border-accent-1/30"
+            :class="heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
+            style="transition-delay: 80ms"
+        >
           <div class="flex items-center justify-between px-4 py-2 border-b border-borderDefault bg-cardHeader">
             <div class="flex space-x-1.5">
               <span class="w-2.5 h-2.5 rounded-full bg-Error"></span>
               <span class="w-2.5 h-2.5 rounded-full bg-Warning"></span>
               <span class="w-2.5 h-2.5 rounded-full bg-Success"></span>
             </div>
-            <span class="text-[11px] text-textSupporting font-mono">rasant — build.ts</span>
+            <span class="text-[11px] text-textSupporting font-mono">rasant — build.py</span>
             <div class="w-10"></div>
           </div>
           <div class="p-3.5 font-mono text-[11px] leading-relaxed text-textBody flex-1 flex flex-col justify-between">
             <div>
-              <p><span class="text-codeKeyword font-semibold">const</span> app = <span class="text-codeKeyword">await</span> <span class="text-codeFunction">rasant.build</span>({</p>
-              <p class="pl-4">stack: [<span class="text-codeString">"React"</span>, <span class="text-codeString">"Node"</span>, <span class="text-codeString">"AWS"</span>],</p>
-              <p class="pl-4">deploy: <span class="text-codeString">"production"</span></p>
-              <p>});<br /><span class="blinking-cursor"></span></p>
+              <p><span class="text-codeKeyword font-semibold">app</span> = <span class="text-codeFunction">rasant.build</span>(</p>
+              <p class="pl-4">stack=[<span class="text-codeString">"Python"</span>, <span class="text-codeString">"Vue"</span>, <span class="text-codeString">"React"</span>],</p>
+              <p class="pl-4">backend=<span class="text-codeString">"Java / Grails"</span>, cms=<span class="text-codeString">"WordPress"</span></p>
+              <p>)<br /><span class="blinking-cursor"></span></p>
             </div>
             <div class="pt-2.5 border-t border-borderDefault flex items-center text-[10px] text-textSupporting font-semibold">
-              <span class="text-Success mr-1.5">✓</span> Deployed &nbsp;•&nbsp; 0 downtime &nbsp;•&nbsp; 99% uptime
+              <span class="text-Success mr-1.5">&#10003;</span> Deployed &nbsp;&#8226;&nbsp; 0 downtime &nbsp;&#8226;&nbsp; 99% uptime
             </div>
           </div>
         </div>
 
         <!-- Card 2: Deployed -->
-        <div class="bg-card rounded-xl shadow-blue border border-borderDefault p-6 flex flex-col items-center justify-center text-center h-44 md:h-auto md:row-span-2 self-stretch">
-          <div class="w-14 h-14 rounded-full bg-SuccessLight flex items-center justify-center border-4 border-accent-1/20 mb-3">
-            <svg class="w-6 h-6 text-accent-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-            </svg>
+        <div
+            class="bg-card rounded-xl shadow-blue border border-borderDefault p-6 flex flex-col items-center justify-center text-center h-44 md:h-auto md:row-span-2 self-stretch transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-insetBlue hover:border-accent-1/30"
+            :class="heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
+            style="transition-delay: 160ms"
+        >
+          <div class="relative w-14 h-14 mb-3">
+            <span class="absolute inset-0 rounded-full bg-SuccessLight animate-[ringPulse_2.4s_ease-out_infinite]"></span>
+            <div class="relative w-14 h-14 rounded-full bg-SuccessLight flex items-center justify-center border-4 border-accent-1/20">
+              <svg class="w-6 h-6 text-accent-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+              </svg>
+            </div>
           </div>
           <h3 class="font-bold text-headingCard text-sm font-primary">Deployed</h3>
-          <p class="text-[11px] text-textSupporting mt-0.5 font-primary">Production • 0 downtime</p>
+          <p class="text-[11px] text-textSupporting mt-0.5 font-primary">Production &#8226; 0 downtime</p>
         </div>
 
         <!-- Card 3: Uptime -->
-        <div class="bg-card rounded-xl shadow-blue border border-borderDefault p-5 flex flex-col justify-between h-36">
+        <div
+            class="bg-card rounded-xl shadow-blue border border-borderDefault p-5 flex flex-col justify-between h-36 transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-insetBlue hover:border-accent-1/30"
+            :class="heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
+            style="transition-delay: 240ms"
+        >
           <div>
             <div class="text-3xl font-bold text-textBrand tracking-tight font-display">{{ uptimeCounter }}%</div>
             <div class="text-[10px] font-bold text-textSupporting tracking-wider uppercase mt-1 font-primary">Uptime SLA</div>
@@ -126,29 +141,105 @@
         </div>
 
         <!-- Card 4: Tech Stack -->
-        <div class="bg-card rounded-xl shadow-blue border border-borderDefault p-5 flex flex-col justify-between h-36">
+        <div
+            class="bg-card rounded-xl shadow-blue border border-borderDefault p-4 flex flex-col justify-between h-44 overflow-hidden transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-insetBlue hover:border-accent-1/30"
+            :class="heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
+            style="transition-delay: 320ms"
+        >
           <span class="text-[10px] font-bold text-textSupporting tracking-wider uppercase font-primary">Tech Stack</span>
           <div class="grid grid-cols-2 gap-1.5">
             <span
-                v-for="tech in techStack"
-                :key="tech"
-                class="text-[11px] font-semibold bg-techItem border border-borderDefault rounded-lg py-1.5 px-1 text-center text-textBody font-primary"
+                v-for="(tech, i) in techStack"
+                :key="tech.name"
+                :style="{ animationDelay: (i * 70) + 'ms' }"
+                class="tech-chip flex items-center justify-center gap-1 text-[9.5px] font-semibold border rounded-lg py-1 px-1 text-textBody font-primary transition-all duration-200 hover:-translate-y-0.5 hover:shadow-blue hover:text-textBrand cursor-default"
+                :class="tech.chipClass"
             >
-              {{ tech }}
+              <font-awesome-icon :icon="tech.icon" :class="['text-[9px] shrink-0', tech.color]" />
+              {{ tech.name }}
             </span>
           </div>
         </div>
 
         <!-- Card 5: Faster Delivery -->
-        <div class="md:col-span-3 bg-card rounded-xl shadow-blue border border-borderDefault p-4 flex items-center justify-between space-x-6">
-          <div class="flex-1 h-10 flex items-end relative overflow-hidden">
-            <svg class="w-full h-full text-blobPrimary" viewBox="0 0 300 50" preserveAspectRatio="none">
-              <path d="M0 45 C 50 43, 80 30, 120 32 C 160 34, 200 15, 250 18 L 300 5 L 300 50 L 0 50 Z" fill="currentColor"/>
-              <path d="M0 45 C 50 43, 80 30, 120 32 C 160 34, 200 15, 250 18 L 300 5" fill="none" stroke="currentColor" stroke-width="2.5"/>
+        <div
+            class="md:col-span-3 bg-card rounded-xl shadow-blue border border-borderDefault p-4 flex items-center justify-between space-x-6 transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-insetBlue hover:border-accent-1/30"
+            :class="heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
+            style="transition-delay: 400ms"
+        >
+          <div class="flex-1 h-12 flex items-end relative overflow-hidden rounded-lg bg-[#4A90E2]/[0.04] px-1">
+            <svg class="w-full h-full" viewBox="0 0 300 50" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="heroLineGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#14B8A6"/>
+                  <stop offset="45%" stop-color="#4A90E2"/>
+                  <stop offset="100%" stop-color="#F97316"/>
+                </linearGradient>
+                <linearGradient id="heroFillGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#4A90E2" stop-opacity="0.35"/>
+                  <stop offset="100%" stop-color="#4A90E2" stop-opacity="0.02"/>
+                </linearGradient>
+                <clipPath id="heroChartClip">
+                  <rect x="0" y="0" :width="300 * deliveryProgress / 100" height="50"/>
+                </clipPath>
+              </defs>
+              <g opacity="0.2">
+                <line x1="0" y1="12" x2="300" y2="12" stroke="#4A90E2" stroke-width="0.5" stroke-dasharray="4 6"/>
+                <line x1="0" y1="25" x2="300" y2="25" stroke="#4A90E2" stroke-width="0.5" stroke-dasharray="4 6"/>
+                <line x1="0" y1="38" x2="300" y2="38" stroke="#4A90E2" stroke-width="0.5" stroke-dasharray="4 6"/>
+              </g>
+              <g clip-path="url(#heroChartClip)">
+                <path
+                    d="M0 45 C 50 43, 80 30, 120 32 C 160 34, 200 15, 250 18 L 300 5 L 300 50 L 0 50 Z"
+                    fill="url(#heroFillGrad)"
+                />
+                <path
+                    ref="chartLineRef"
+                    d="M0 45 C 50 43, 80 30, 120 32 C 160 34, 200 15, 250 18 L 300 5"
+                    fill="none"
+                    stroke="url(#heroLineGrad)"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    :stroke-dasharray="chartPathLength"
+                    :stroke-dashoffset="chartDashOffset"
+                />
+              </g>
+              <circle
+                  v-if="deliveryProgress > 2"
+                  :cx="chartDot.x"
+                  :cy="chartDot.y"
+                  r="4"
+                  fill="#F97316"
+                  class="hero-chart-dot"
+              />
+              <circle
+                  v-if="deliveryProgress > 2"
+                  :cx="chartDot.x"
+                  :cy="chartDot.y"
+                  r="7"
+                  fill="#F97316"
+                  opacity="0.25"
+                  class="hero-chart-dot-ring"
+              />
             </svg>
           </div>
-          <div class="text-right shrink-0">
-            <div class="text-2xl font-bold text-metricWarn font-display">3x</div>
+          <div class="text-right shrink-0 min-w-[72px]">
+            <div class="flex items-center justify-end gap-1">
+              <svg
+                  class="w-3.5 h-3.5 text-Success transition-opacity duration-300"
+                  :class="deliveryProgress >= 99 ? 'opacity-100' : 'opacity-0'"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  aria-hidden="true"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19V5m0 0l-4 4m4-4l4 4"/>
+              </svg>
+              <div class="text-2xl font-bold font-display bg-gradient-to-r from-secondary-500 via-primary-500 to-accent-1 bg-clip-text text-transparent">
+                {{ deliveryDisplay }}x
+              </div>
+            </div>
             <div class="text-[11px] font-medium text-textSupporting mt-0.5 font-primary">Faster delivery</div>
           </div>
         </div>
@@ -355,7 +446,7 @@
         </div>
         <div class="md:max-w-sm">
           <p class="text-textBody leading-relaxed font-primary">
-            From idea to deployment — we handle every layer of your digital product.
+            From Java and Python backends to Vue/React frontends and WordPress sites — we handle every layer.
           </p>
           <ShineButton @click="scrollToTop" variant="outline" size="sm" class="mt-4">
             All Services
@@ -633,7 +724,57 @@ function observeSection(el, key) {
 
 const heroLoaded = ref(false)
 const uptimeCounter = ref(0)
+const deliveryProgress = ref(0)
+const deliveryDisplay = ref(0)
+const chartPathLength = ref(320)
+const chartDot = ref({ x: 0, y: 45 })
+const chartLineRef = ref(null)
 let uptimeTimer = null
+
+const chartDashOffset = computed(() =>
+    chartPathLength.value * (1 - deliveryProgress.value / 100)
+)
+
+function syncChartDot() {
+  const path = chartLineRef.value
+  if (!path) return
+  const len = path.getTotalLength()
+  if (len > 0) chartPathLength.value = len
+  const pt = path.getPointAtLength(len * deliveryProgress.value / 100)
+  chartDot.value = { x: pt.x, y: pt.y }
+}
+
+function animateHeroMetrics() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    uptimeCounter.value = 99
+    deliveryProgress.value = 99
+    deliveryDisplay.value = 3
+    syncChartDot()
+    return
+  }
+
+  const target = 99
+  const duration = 1800
+  const stepCount = 60
+  const increment = target / stepCount
+  const interval = duration / stepCount
+  let current = 0
+  uptimeTimer = setInterval(() => {
+    current += increment
+    const progress = Math.min(current, target)
+    uptimeCounter.value = Math.floor(progress)
+    deliveryProgress.value = progress
+    deliveryDisplay.value = Math.min(3, Math.max(1, Math.round((progress / target) * 3)))
+    syncChartDot()
+    if (progress >= target) {
+      uptimeCounter.value = target
+      deliveryProgress.value = target
+      deliveryDisplay.value = 3
+      syncChartDot()
+      clearInterval(uptimeTimer)
+    }
+  }, interval)
+}
 
 const activeIndex = ref(0)
 const exitingIndex = ref(null)
@@ -643,21 +784,32 @@ const SLIDE_DURATION = 6000
 const lineVisible = ref(false)
 let autoPaused = false
 
-const techStack = ['React', 'Node.js', 'AWS', 'Flutter']
+const techStack = [
+  { name: 'Python',   icon: ['fab', 'python'],   color: 'text-[#3776AB]', chipClass: 'bg-[#EFF6FF] border-[#3776AB]/25' },
+  { name: 'Vue.js',   icon: ['fab', 'vuejs'],    color: 'text-[#42B883]', chipClass: 'bg-[#ECFDF5] border-[#42B883]/25' },
+  { name: 'React',    icon: ['fab', 'react'],    color: 'text-[#61DAFB]', chipClass: 'bg-[#EFF6FF] border-[#61DAFB]/30' },
+  { name: 'Java',     icon: ['fab', 'java'],     color: 'text-[#E76F00]', chipClass: 'bg-[#FFF7ED] border-[#E76F00]/25' },
+  { name: 'Grails',   icon: ['fas', 'seedling'], color: 'text-[#8E6CF0]', chipClass: 'bg-[#F5F3FF] border-[#8E6CF0]/25' },
+  { name: 'HTML',     icon: ['fab', 'html5'],    color: 'text-[#E34F26]', chipClass: 'bg-[#FFF1F2] border-[#E34F26]/25' },
+  { name: 'CSS',      icon: ['fab', 'css3-alt'], color: 'text-[#1572B6]', chipClass: 'bg-[#EFF6FF] border-[#1572B6]/25' },
+  { name: 'Tailwind', icon: ['fas', 'wind'], color: 'text-[#38BDF8]', chipClass: 'bg-[#ECFEFF] border-[#38BDF8]/25' },
+  { name: 'WordPress', icon: ['fab', 'wordpress'], color: 'text-[#21759B]', chipClass: 'bg-[#EFF6FF] border-[#21759B]/25' },
+]
 
 const words = ['Intelligent', 'Scalable', 'Beautiful', 'Future-Ready']
 const currentWordIndex = ref(0)
 let rotateInterval = null
 
 const techList = [
-  { name: 'Flutter',      icon: ['fas', 'mobile-screen'], color: 'text-techFlutter'  },
-  { name: 'Next.js',      icon: ['fas', 'server'],        color: 'text-techNextjs'   },
-  { name: 'React',        icon: ['fab', 'react'],         color: 'text-techReact'    },
-  { name: 'Node.js',      icon: ['fab', 'node-js'],       color: 'text-techNode'     },
-  { name: 'Python',       icon: ['fab', 'python'],        color: 'text-techPython'   },
-  { name: 'AWS',          icon: ['fab', 'aws'],           color: 'text-techAws'      },
-  { name: 'Docker',       icon: ['fab', 'docker'],        color: 'text-techDocker'   },
-  { name: 'Google Cloud', icon: ['fab', 'google'],        color: 'text-techGoogle'   },
+  { name: 'Python',   icon: ['fab', 'python'],     color: 'text-[#3776AB]' },
+  { name: 'Vue.js',   icon: ['fab', 'vuejs'],       color: 'text-[#42B883]' },
+  { name: 'React',    icon: ['fab', 'react'],       color: 'text-[#61DAFB]' },
+  { name: 'Java',     icon: ['fab', 'java'],        color: 'text-[#E76F00]' },
+  { name: 'Grails',   icon: ['fas', 'seedling'],    color: 'text-[#8E6CF0]' },
+  { name: 'HTML',     icon: ['fab', 'html5'],       color: 'text-[#E34F26]' },
+  { name: 'CSS',      icon: ['fab', 'css3-alt'],    color: 'text-[#1572B6]' },
+  { name: 'Tailwind', icon: ['fas', 'wind'],    color: 'text-[#38BDF8]' },
+  { name: 'WordPress', icon: ['fab', 'wordpress'], color: 'text-[#21759B]' },
 ]
 
 const techListLooped = computed(() =>
@@ -698,44 +850,44 @@ const products = [
 const services = [
   {
     title: 'Custom Software Development',
-    description: 'Tailor-made applications engineered to your exact workflows. Scalable, secure, and built to last — not off-the-shelf compromises.',
+    description: 'Tailor-made backends and business apps in Java, Grails, and Python. Scalable APIs and integrations built for your workflows — not off-the-shelf compromises.',
     illustration: serviceSoftwareSvg,
     icon: ['fas', 'code'],
     iconBg: 'bg-tagBlueBg',
     iconColor: 'text-iconDark',
-    link: '/home',
+    link: '/services/custom-software',
     tags: [
-      { label: 'Enterprise Apps', class: 'tag-blue'  },
-      { label: 'AI Integration',  class: 'tag-amber' },
-      { label: 'APIs',            class: 'tag-teal'  },
+      { label: 'Java / Grails', class: 'tag-blue'  },
+      { label: 'Python',        class: 'tag-teal'  },
+      { label: 'APIs',          class: 'tag-amber' },
     ],
   },
   {
-    title: 'Web & Mobile Applications',
-    description: 'Beautiful, high-performance web and mobile apps using React, Flutter, and Next.js. Pixel-perfect UI that accounts love to interact with.',
+    title: 'Web Applications',
+    description: 'Responsive web apps and admin portals with Vue.js, React, Tailwind CSS, and semantic HTML. Polished UI that loads fast and works on every device.',
     illustration: serviceWebMobileSvg,
-    icon: ['fas', 'mobile-screen-button'],
+    icon: ['fas', 'desktop'],
     iconBg: 'bg-tagSkyBg',
     iconColor: 'text-iconDark',
-    link: '/home',
+    link: '/services/web-applications',
     tags: [
-      { label: 'React / Next.js', class: 'tag-blue'   },
-      { label: 'Flutter',         class: 'tag-purple' },
-      { label: 'PWA',             class: 'tag-teal'   },
+      { label: 'Vue.js / React', class: 'tag-blue'   },
+      { label: 'Tailwind',       class: 'tag-purple' },
+      { label: 'HTML / CSS',     class: 'tag-teal'   },
     ],
   },
   {
-    title: 'Cloud Solutions & DevOps',
-    description: 'Architect, migrate and manage cloud infrastructure that scales with your growth. CI/CD pipelines, container orchestration, 99.9% uptime guaranteed.',
+    title: 'WordPress & CMS',
+    description: 'WordPress websites, custom themes, and CMS integrations. Content sites your team can update easily — built with HTML and Tailwind for a sharp look.',
     illustration: serviceCloudSvg,
-    icon: ['fas', 'cloud'],
+    icon: ['fab', 'wordpress'],
     iconBg: 'bg-tagTealBg',
     iconColor: 'text-iconDark',
-    link: '/home',
+    link: '/services/wordpress-cms',
     tags: [
-      { label: 'AWS / GCP',  class: 'tag-teal'  },
-      { label: 'Kubernetes', class: 'tag-blue'  },
-      { label: 'CI/CD',      class: 'tag-amber' },
+      { label: 'WordPress',      class: 'tag-teal'  },
+      { label: 'Custom Themes',  class: 'tag-blue'  },
+      { label: 'Integrations',   class: 'tag-amber' },
     ],
   },
 ]
@@ -748,7 +900,7 @@ const steps = [
 ]
 
 const aboutFeatures = [
-  { title: 'Expert Engineering Team',     description: 'Senior full-stack engineers with deep domain expertise across fintech, logistics, healthcare, and e-commerce.',           dotColor: 'bg-statusActive',  delayClass: '' },
+  { title: 'Expert Engineering Team',     description: 'Senior engineers across Java, Grails, Python, Vue.js, React, and WordPress — with deep experience in fintech, logistics, and e-commerce.', dotColor: 'bg-statusActive',  delayClass: '' },
   { title: 'Transparent Communication',   description: "Weekly demos, real-time project tracking, and a dedicated project manager. You're never in the dark.",                    dotColor: 'bg-step2Border',   delayClass: '[animation-delay:-0.6s]' },
   { title: 'Scalable Architecture',       description: 'We build for tomorrow, not just today. Clean, documented code that grows with your business without rewrites.',           dotColor: 'bg-statusSuccess', delayClass: '[animation-delay:-1.2s]' },
   { title: 'Post-Launch Support',         description: 'We stay with you after go-live. Maintenance, performance tuning, and feature additions on demand.',                       dotColor: 'bg-statusWarning', delayClass: '[animation-delay:-1.8s]' },
@@ -760,25 +912,11 @@ const testimonials = [
   { name: 'Michael Jensen',  role: 'Support Director, E-Commerce Brand', initials: 'MJ', avatarBg: 'bg-avatarTestimonial3', quote: 'The chatbot handles 80% of our support tickets on WhatsApp and web. Live handoff to agents is seamless — our CSAT scores went up immediately.',    link: '/chatbot',                linkText: 'Explore Chatbot Agent'  },
 ]
 
-const handleServiceClick = (service, navigate) => {
-  const currentPath = route.path
-  if (currentPath === '/home' || currentPath === '/') {
+const handleServiceClick = (_service, navigate) => {
+  navigate()
+  nextTick(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' })
-  } else {
-    navigate()
-    nextTick(() => {
-      const checkAndScroll = setInterval(() => {
-        if (document.querySelector('#app')) {
-          clearInterval(checkAndScroll)
-          window.scrollTo({ top: 0, behavior: 'smooth' })
-        }
-      }, 50)
-      setTimeout(() => {
-        clearInterval(checkAndScroll)
-        window.scrollTo({ top: 0, behavior: 'smooth' })
-      }, 2000)
-    })
-  }
+  })
 }
 
 const scrollToTop = () => {
@@ -822,23 +960,10 @@ function resumeAuto() {
 onMounted(() => {
   setTimeout(() => {
     heroLoaded.value = true
-    setTimeout(() => {
-      const target = 99
-      const duration = 1800
-      const stepCount = 60
-      const increment = target / stepCount
-      const interval = duration / stepCount
-      let current = 0
-      uptimeTimer = setInterval(() => {
-        current += increment
-        if (current >= target) {
-          uptimeCounter.value = target
-          clearInterval(uptimeTimer)
-        } else {
-          uptimeCounter.value = Math.floor(current)
-        }
-      }, interval)
-    }, 400)
+    nextTick(() => {
+      syncChartDot()
+      setTimeout(animateHeroMetrics, 400)
+    })
   }, 100)
 
   rotateInterval = setInterval(() => {
@@ -906,6 +1031,18 @@ onUnmounted(() => {
   from, to { background-color: transparent }
   50%       { background-color: var(--color-codeFunction) }
 }
+.hero-chart-dot {
+  filter: drop-shadow(0 0 4px rgba(249, 115, 22, 0.6));
+}
+.hero-chart-dot-ring {
+  animation: chartDotPulse 2s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes chartDotPulse {
+  0%, 100% { opacity: 0.15; transform: scale(1); }
+  50%      { opacity: 0.4; transform: scale(1.35); }
+}
 .fade-enter-active, .fade-leave-active { transition: opacity 0.35s ease, transform 0.35s ease; }
 .fade-enter-from  { opacity: 0; transform: translateY(10px);  }
 .fade-leave-to    { opacity: 0; transform: translateY(-10px); }
@@ -932,7 +1069,10 @@ onUnmounted(() => {
   .animate-marquee,
   .animate-float,
   .animate-pulse,
-  [class*="animate-\[ringPulse"] {
+  [class*="animate-\[ringPulse"],
+  .hero-chart-dot-ring,
+  .blinking-cursor,
+  .tech-chip {
     animation: none !important;
   }
   * {

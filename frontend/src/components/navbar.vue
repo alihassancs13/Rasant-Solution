@@ -22,7 +22,7 @@
         class="fixed top-0 left-0 right-0 h-16 md:h-20 flex items-center justify-between px-4 sm:px-6 md:px-8 lg:px-12 z-50 bg-white shadow-[0_4px_30px_rgba(15,23,42,0.08)]"
     >
       <!-- Logo -->
-      <router-link to="/home" class="flex items-center shrink-0 z-[2]" aria-label="Rasant Solutions home" @click="handleLogoClick">
+      <router-link to="/" class="flex items-center shrink-0 z-[2]" aria-label="Rasant Solutions home" @click="handleLogoClick">
         <img
             src="../assets/images/rasant-logo.png"
             alt="Rasant Solutions Logo"
@@ -71,7 +71,7 @@
                     </div>
                     <div class="flex-1">
                       <h4 class="text-[14px] font-display font-bold text-primary-900 mb-[3px] m-0">Custom Software</h4>
-                      <p class="text-[12px] text-neutral-500 m-0 leading-[1.45]">Enterprise apps, APIs &amp; AI integration</p>
+                      <p class="text-[12px] text-neutral-500 m-0 leading-[1.45]">Java, Grails, Python &amp; APIs</p>
                     </div>
                     <span class="text-primary-500 font-bold opacity-0 -translate-x-3 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-300 mt-2.5">→</span>
                   </button>
@@ -81,11 +81,11 @@
                       class="flex items-start gap-3 p-3 rounded-xl hover:bg-neutral-100 hover:translate-x-1 group/item transition-all duration-200 w-full text-left relative overflow-hidden"
                   >
                     <div class="w-10 h-10 rounded-[10px] bg-accent-7/10 flex items-center justify-center text-[18px] shrink-0">
-                      <i class="fa-solid fa-mobile-screen-button text-accent-7"></i>
+                      <i class="fa-solid fa-desktop text-accent-7"></i>
                     </div>
                     <div class="flex-1">
-                      <h4 class="text-[14px] font-display font-bold text-primary-900 mb-[3px] m-0">Web &amp; Mobile</h4>
-                      <p class="text-[12px] text-neutral-500 m-0 leading-[1.45]">React, Flutter &amp; Next.js products</p>
+                      <h4 class="text-[14px] font-display font-bold text-primary-900 mb-[3px] m-0">Web Applications</h4>
+                      <p class="text-[12px] text-neutral-500 m-0 leading-[1.45]">Vue.js, React, Tailwind &amp; HTML</p>
                     </div>
                     <span class="text-primary-500 font-bold opacity-0 -translate-x-3 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-300 mt-2.5">→</span>
                   </button>
@@ -95,11 +95,11 @@
                       class="flex items-start gap-3 p-3 rounded-xl hover:bg-neutral-100 hover:translate-x-1 group/item transition-all duration-200 w-full text-left relative overflow-hidden"
                   >
                     <div class="w-10 h-10 rounded-[10px] bg-primary-400/10 flex items-center justify-center text-[18px] shrink-0">
-                      <i class="fa-solid fa-cloud text-primary-400"></i>
+                      <i class="fa-brands fa-wordpress text-primary-400"></i>
                     </div>
                     <div class="flex-1">
-                      <h4 class="text-[14px] font-display font-bold text-primary-900 mb-[3px] m-0">Cloud &amp; DevOps</h4>
-                      <p class="text-[12px] text-neutral-500 m-0 leading-[1.45]">AWS, Kubernetes &amp; CI/CD pipelines</p>
+                      <h4 class="text-[14px] font-display font-bold text-primary-900 mb-[3px] m-0">WordPress &amp; CMS</h4>
+                      <p class="text-[12px] text-neutral-500 m-0 leading-[1.45]">Sites, themes &amp; integrations</p>
                     </div>
                     <span class="text-primary-500 font-bold opacity-0 -translate-x-3 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-300 mt-2.5">→</span>
                   </button>
@@ -325,8 +325,8 @@
         </button>
         <div v-show="activeDropdown === 'services'" class="ml-2 mb-2.5 pl-3 border-l-2 border-white/20 py-1 transition-all duration-300">
           <button @click="navigateToServicesSection('services')" class="block text-white/82 text-[13px] py-2 w-full text-left hover:text-white transition-colors duration-150 bg-transparent border-0 cursor-pointer">Custom Software</button>
-          <button @click="navigateToServicesSection('services')" class="block text-white/82 text-[13px] py-2 w-full text-left hover:text-white transition-colors duration-150 bg-transparent border-0 cursor-pointer">Web &amp; Mobile</button>
-          <button @click="navigateToServicesSection('services')" class="block text-white/82 text-[13px] py-2 w-full text-left hover:text-white transition-colors duration-150 bg-transparent border-0 cursor-pointer">Cloud &amp; DevOps</button>
+          <button @click="navigateToServicesSection('services')" class="block text-white/82 text-[13px] py-2 w-full text-left hover:text-white transition-colors duration-150 bg-transparent border-0 cursor-pointer">Web Applications</button>
+          <button @click="navigateToServicesSection('services')" class="block text-white/82 text-[13px] py-2 w-full text-left hover:text-white transition-colors duration-150 bg-transparent border-0 cursor-pointer">WordPress &amp; CMS</button>
         </div>
 
         <!-- Projects -->
