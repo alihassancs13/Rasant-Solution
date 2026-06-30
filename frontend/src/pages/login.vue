@@ -13,10 +13,9 @@
             aria-hidden="true"
         ></div>
 
-        <!-- Floating orbs — bigger, more visible -->
+        <!-- Floating orbs -->
         <div class="pointer-events-none absolute -top-32 -left-24 h-[520px] w-[520px] animate-login-orb rounded-full bg-[radial-gradient(circle,var(--color-secondary-100),transparent_65%)] opacity-60 blur-[72px]" aria-hidden="true"></div>
         <div class="pointer-events-none absolute -right-12 -bottom-16 h-[440px] w-[440px] animate-login-orb rounded-full bg-[radial-gradient(circle,var(--color-mesh-purple),transparent_65%)] opacity-60 blur-[72px] [animation-direction:reverse] [animation-duration:18s]" aria-hidden="true"></div>
-        <!-- Extra mid orb for depth -->
         <div class="pointer-events-none absolute top-1/2 left-1/2 h-[280px] w-[280px] -translate-x-1/2 -translate-y-1/2 animate-login-orb rounded-full bg-[radial-gradient(circle,var(--color-primary-500)/0.12,transparent_70%)] blur-[60px] [animation-duration:14s] [animation-delay:3s]" aria-hidden="true"></div>
 
         <!-- Animated scanline shimmer -->
@@ -103,32 +102,40 @@
             </p>
           </div>
 
+          <!-- Error message display with better styling -->
+          <!-- Error message display -->
           <div
               v-if="errorMessage"
-              class="mb-3 flex items-center gap-2 rounded-lg border border-error/20 bg-error/10 px-3 py-2 text-xs text-error animate-shake"
+              class="mb-3 rounded-lg border border-error/20 bg-error/10 px-3 py-2 text-xs text-error"
           >
-            <font-awesome-icon icon="fa-solid fa-circle-exclamation" class="shrink-0 text-[0.7rem]" />
             {{ errorMessage }}
           </div>
 
           <form @submit.prevent="handleLoginSubmit" novalidate class="space-y-4">
             <div class="animate-login-fade-up [animation-delay:220ms]">
               <label for="username" class="mb-1.5 block text-[0.7rem] font-bold tracking-wider text-headingMain uppercase">
-                Username
+                Email or Username
               </label>
               <div class="relative group">
-                  <span class="pointer-events-none absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-sm text-primary-500 transition-transform duration-200 group-focus-within:scale-110">
-                    <font-awesome-icon icon="fa-solid fa-user" />
-                  </span>
+                <span class="pointer-events-none absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-sm text-primary-500 transition-transform duration-200 group-focus-within:scale-110">
+                  <font-awesome-icon icon="fa-solid fa-user" />
+                </span>
                 <input
-                    id="username"
-                    v-model="username"
+                    id="emailOrusername"
+                    v-model="emailOrUsername"
                     type="text"
-                    placeholder="Enter your username"
+                    placeholder="Enter your email or username"
                     required
                     autocomplete="username"
-                    class="login-input w-full rounded-xl border border-borderDefault bg-neutral-100 py-2.5 pr-3 pl-10 text-[0.9375rem] text-headingMain outline-none transition-all duration-200 placeholder:text-textSupporting focus:border-primary-500 focus:bg-section-white focus:ring-4 focus:ring-primary-500/12 focus:shadow-[0_0_0_4px_rgba(74,144,226,0.08),0_2px_8px_rgba(74,144,226,0.12)]"
+                    :class="[
+                    'login-input w-full rounded-xl border border-borderDefault bg-neutral-100 py-2.5 pr-3 pl-10 text-[0.9375rem] text-headingMain outline-none transition-all duration-200 placeholder:text-textSupporting focus:border-primary-500 focus:bg-section-white focus:ring-4 focus:ring-primary-500/12 focus:shadow-[0_0_0_4px_rgba(74,144,226,0.08),0_2px_8px_rgba(74,144,226,0.12)]',
+                    fieldErrors.emailOrUsername ? 'border-error ring-2 ring-error/20 bg-error/5' : ''
+                  ]"
+                    @focus="fieldErrors.emailOrUsername = false; errorMessage = ''"
+                    @input="fieldErrors.emailOrUsername = false; errorMessage = ''"
                 />
+
+
               </div>
             </div>
 
@@ -145,9 +152,9 @@
                 </a>
               </div>
               <div class="relative group">
-                  <span class="pointer-events-none absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-sm text-primary-500 transition-transform duration-200 group-focus-within:scale-110">
-                    <font-awesome-icon icon="fa-solid fa-lock" />
-                  </span>
+                <span class="pointer-events-none absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-sm text-primary-500 transition-transform duration-200 group-focus-within:scale-110">
+                  <font-awesome-icon icon="fa-solid fa-lock" />
+                </span>
                 <input
                     id="password"
                     v-model="password"
@@ -155,7 +162,12 @@
                     placeholder="Enter your password"
                     required
                     autocomplete="current-password"
-                    class="login-input w-full rounded-xl border border-borderDefault bg-neutral-100 py-2.5 pr-11 pl-10 text-[0.9375rem] text-headingMain outline-none transition-all duration-200 placeholder:text-textSupporting focus:border-primary-500 focus:bg-section-white focus:ring-4 focus:ring-primary-500/12 focus:shadow-[0_0_0_4px_rgba(74,144,226,0.08),0_2px_8px_rgba(74,144,226,0.12)]"
+                    :class="[
+                    'login-input w-full rounded-xl border border-borderDefault bg-neutral-100 py-2.5 pr-11 pl-10 text-[0.9375rem] text-headingMain outline-none transition-all duration-200 placeholder:text-textSupporting focus:border-primary-500 focus:bg-section-white focus:ring-4 focus:ring-primary-500/12 focus:shadow-[0_0_0_4px_rgba(74,144,226,0.08),0_2px_8px_rgba(74,144,226,0.12)]',
+                    fieldErrors.password ? 'border-error ring-2 ring-error/20 bg-error/5' : ''
+                  ]"
+                    @focus="fieldErrors.password = false; errorMessage = ''"
+                    @input="fieldErrors.password = false; errorMessage = ''"
                 />
                 <button
                     type="button"
@@ -169,6 +181,7 @@
                       :class="isPasswordVisible ? 'scale-90' : 'scale-100'"
                   />
                 </button>
+
               </div>
             </div>
 
@@ -178,8 +191,18 @@
             </label>
 
             <div class="animate-login-fade-up [animation-delay:360ms]">
-              <ShineButton type="submit" size="md" shape="xl" class="w-full! transition-transform duration-150 active:scale-[0.98]">
-                Sign In
+              <ShineButton
+                  type="submit"
+                  size="md"
+                  shape="xl"
+                  class="w-full! transition-transform duration-150 active:scale-[0.98]"
+                  :disabled="isLoading"
+              >
+                <span v-if="isLoading">
+                  <font-awesome-icon icon="fa-solid fa-spinner" class="mr-2 animate-spin" />
+                  Signing in...
+                </span>
+                <span v-else>Sign In</span>
               </ShineButton>
             </div>
           </form>
@@ -197,9 +220,12 @@
                 :style="{ animationDelay: `${460 + i * 60}ms` }"
                 class="group flex flex-col items-center gap-1.5 rounded-xl border border-borderDefault bg-neutral-100 px-2 py-2.5 text-center text-[0.68rem] font-medium text-textBody transition-all duration-300 hover:-translate-y-1 hover:border-primary-200 hover:bg-section-white hover:shadow-[0_4px_16px_rgba(74,144,226,0.12)] cursor-default animate-login-fade-up"
             >
-                <span :class="['flex h-7 w-7 items-center justify-center rounded-lg text-xs transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6', badge.iconClass]">
-                  <font-awesome-icon :icon="badge.icon" />
-                </span>
+              <div
+                  class="flex h-8 w-8 items-center justify-center rounded-lg text-sm transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6"
+                  :style="{ backgroundColor: badge.bgColor, color: badge.color }"
+              >
+                <font-awesome-icon :icon="badge.icon" class="text-inherit" />
+              </div>
               <span>{{ badge.label }}</span>
             </div>
           </div>
@@ -314,7 +340,6 @@
 import ShineButton from '../components/ShineButton.vue';
 import { useLogin } from '../composables/useLogin';
 import LoginVisual from "@/components/LoginVisual.vue";
-import Navbar from "@/components/navbar.vue";
 
 const stats = [
   { value: '99%', label: 'Uptime SLA' },
@@ -323,18 +348,39 @@ const stats = [
 ];
 
 const securityBadges = [
-  { label: 'SSL Encrypted', icon: 'fa-solid fa-lock', iconClass: 'bg-primary-50 text-primary-500' },
-  { label: 'SOC 2 Ready', icon: 'fa-solid fa-shield-halved', iconClass: 'bg-accent-3/10 text-accent-3' },
-  { label: 'Role-based', icon: 'fa-solid fa-user-shield', iconClass: 'bg-secondary-50 text-secondary-500' },
+  {
+    label: 'SSL Encrypted',
+    icon: 'fa-solid fa-lock',
+    color: '#3b82f6', // primary blue
+    bgColor: 'rgba(59, 130, 246, 0.1)'
+  },
+  {
+    label: 'SOC 2 Ready',
+    icon: 'fa-solid fa-shield-halved',
+    color: '#a855f7', // accent purple
+    bgColor: 'rgba(168, 85, 247, 0.1)'
+  },
+  {
+    label: 'Role-based',
+    icon: 'fa-solid fa-user-shield',
+    color: '#c2410c', // Your current orange/brown color
+    bgColor: 'rgba(194, 65, 12, 0.1)' // matching 10% tint background
+  },
 ];
 
+// Whitelist safely so Tailwind forces these classes into production:
+const safelist = ['bg-primary-50', 'text-primary-500', 'bg-accent-3/10', 'text-accent-3', 'bg-secondary-50', 'text-secondary-500'];
+// Destructure with fieldErrors from useLogin
 const {
-  username,
+  emailOrUsername,
   password,
   rememberMe,
   isPasswordVisible,
   errorMessage,
+  isLoading,
+  fieldErrors,
   togglePasswordVisibility,
   handleLoginSubmit,
 } = useLogin();
+
 </script>

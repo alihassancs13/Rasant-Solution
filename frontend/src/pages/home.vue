@@ -332,35 +332,7 @@
         </button>
       </div>
 
-      <div class="flex flex-wrap justify-center gap-2 mt-6" role="tablist" aria-label="Product slides">
-        <button
-            v-for="(product, index) in products"
-            :key="product.title"
-            type="button"
-            role="tab"
-            :aria-selected="index === activeIndex"
-            @click="selectTab(index)"
-            :class="[
-            'relative cursor-pointer px-5 py-2.5 rounded-full border text-sm font-semibold transition-all duration-300 font-primary',
-            index === activeIndex
-              ? 'bg-buttonBackground border-buttonPrimaryBorder text-white shadow-orange scale-105'
-              : 'border-borderDefault bg-card text-textBody hover:border-buttonPrimaryBorder/40 hover:text-brandDark'
-          ]"
-        >
-          {{ product.title }}
-          <span
-              v-if="index === activeIndex"
-              class="absolute -inset-1 rounded-full border-2 border-buttonPrimaryBorder animate-[ringPulse_2.5s_ease-out_infinite] pointer-events-none"
-          ></span>
-        </button>
-      </div>
 
-      <div class="h-[3px] bg-blobPrimary rounded-full mt-4 overflow-hidden">
-        <span
-            :class="['block h-full rounded-full bg-gradientProgress', progressActive ? 'w-full' : 'w-0']"
-            :style="{ transition: progressActive ? `width ${SLIDE_DURATION}ms linear` : 'none' }"
-        ></span>
-      </div>
     </div>
   </section>
 
@@ -385,7 +357,7 @@
           <p class="text-textBody leading-relaxed font-primary">
             From idea to deployment — we handle every layer of your digital product.
           </p>
-          <ShineButton to="/services" variant="outline" size="sm" class="mt-4">
+          <ShineButton @click="scrollToTop" variant="outline" size="sm" class="mt-4">
             All Services
           </ShineButton>
         </div>
@@ -404,7 +376,7 @@
               :alt="service.title"
               loading="lazy"
               decoding="async"
-              class="w-full h-36 object-contain mb-5 transition-transform duration-500 ease-out group-hover:scale-110 animate-float"
+              class="w-full h-36 object-contain mb-5 transition-transform duration-500  "
           />
           <div :class="['w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform duration-300 ease-out', service.iconBg]">
             <font-awesome-icon :icon="service.icon" :class="['text-3xl ', service.iconColor]" />
@@ -420,12 +392,19 @@
               {{ tag.label }}
             </span>
           </div>
+          <!-- RouterLink with custom navigation -->
           <RouterLink
               :to="service.link"
-              class="inline-flex items-center gap-2 text-sm font-bold text-textBrand group-hover:gap-3 transition-all duration-200 font-primary"
+              custom
+              v-slot="{ navigate }"
           >
-            Explore Service
-            <font-awesome-icon :icon="['fas', 'arrow-right']" class="text-xs transition-transform duration-200 group-hover:translate-x-1" />
+            <a
+                @click="handleServiceClick(service, navigate)"
+                class="inline-flex items-center gap-2 text-sm font-bold text-textBrand group-hover:gap-3 transition-all duration-200 font-primary cursor-pointer"
+            >
+              Explore Service
+              <font-awesome-icon :icon="['fas', 'arrow-right']" class="text-xs transition-transform duration-200 group-hover:translate-x-1" />
+            </a>
           </RouterLink>
         </div>
       </div>
@@ -526,7 +505,8 @@
               :class="visible.about ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'"
               :style="{ transitionDelay: visible.about ? `${300 + i * 100}ms` : '0ms' }"
           >
-            <span :class="['w-2.5 h-2.5 rounded-full mt-1.5 shrink-0 animate-pulse', feature.dotColor, feature.delayClass]"></span>
+            <span
+                :class="['w-2.5 h-2.5 rounded-full mt-1.5 shrink-0 animate-pulse', feature.dotColor, feature.delayClass]"></span>
             <div>
               <h4 class="text-sm font-semibold text-headingCard mb-1 font-display">{{ feature.title }}</h4>
               <p class="text-[13px] text-textBody leading-relaxed font-primary">{{ feature.description }}</p>
@@ -603,12 +583,13 @@
 
   <Footer />
 </template>
+
 <script setup>
 import Navbar from '@/components/Navbar.vue'
 import Footer from '@/components/footer.vue'
 import sentraPlatformSvg from '@/assets/svg/sentra-platform.svg'
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
-import { RouterLink } from 'vue-router'
+import { RouterLink, useRouter, useRoute } from 'vue-router'
 import sentraBotSvg from '@/assets/svg/sentra-bot.svg'
 import aiAgentSvg from '@/assets/svg/ai-agent-phone-bot.svg'
 import chatbotSvg from '@/assets/svg/chatbot-messenger-bot.svg'
@@ -618,22 +599,20 @@ import serviceWebMobileSvg from '@/assets/svg/service-webmobile.svg'
 import serviceCloudSvg from '@/assets/svg/service-cloud.svg'
 import aboutIllustration from '@/assets/svg/hero-illustration.svg'
 import ShineButton from "@/components/ShineButton.vue";
-import {useLogin} from "@/composables/useLogin.js";
 
-// ─── Scroll animation refs & state ───────────────────────────────────────────
-const statsRef       = ref(null)
+const router = useRouter()
+const route = useRoute()
+
 const techRef        = ref(null)
 const platformRef    = ref(null)
 const productsRef    = ref(null)
 const servicesRef    = ref(null)
 const aboutRef       = ref(null)
 const testimonialsRef= ref(null)
-const pricingRef     = ref(null)
 const processSection = ref(null)
 
 const visible = ref({
   hero:         true,
-  stats:        false,
   tech:         false,
   platform:     false,
   products:     false,
@@ -641,11 +620,8 @@ const visible = ref({
   process:      false,
   about:        false,
   testimonials: false,
-  pricing:      false,
 })
 
-// Single shared observer reused across all sections (instead of one
-// IntersectionObserver instance per section).
 let sectionObserver = null
 const refKeyMap = new Map()
 
@@ -655,15 +631,12 @@ function observeSection(el, key) {
   sectionObserver.observe(el)
 }
 
-// ─── Hero load animation ──────────────────────────────────────────────────────
 const heroLoaded = ref(false)
 const uptimeCounter = ref(0)
 let uptimeTimer = null
 
-// ─── Carousel / word rotation state ──────────────────────────────────────────
 const activeIndex = ref(0)
 const exitingIndex = ref(null)
-const progressActive = ref(false)
 let autoTimer = null
 let exitTimer = null
 const SLIDE_DURATION = 6000
@@ -676,10 +649,6 @@ const words = ['Intelligent', 'Scalable', 'Beautiful', 'Future-Ready']
 const currentWordIndex = ref(0)
 let rotateInterval = null
 
-// ─── Data ─────────────────────────────────────────────────────────────────────
-// Brand-fixed tech icon colors live as their own CSS variables
-// (--color-techFlutter, --color-techReact, etc.) rather than inline hex,
-// so they're defined once and reusable anywhere else in the app.
 const techList = [
   { name: 'Flutter',      icon: ['fas', 'mobile-screen'], color: 'text-techFlutter'  },
   { name: 'Next.js',      icon: ['fas', 'server'],        color: 'text-techNextjs'   },
@@ -734,7 +703,7 @@ const services = [
     icon: ['fas', 'code'],
     iconBg: 'bg-tagBlueBg',
     iconColor: 'text-iconDark',
-    link: '/services/custom-software',
+    link: '/home',
     tags: [
       { label: 'Enterprise Apps', class: 'tag-blue'  },
       { label: 'AI Integration',  class: 'tag-amber' },
@@ -748,7 +717,7 @@ const services = [
     icon: ['fas', 'mobile-screen-button'],
     iconBg: 'bg-tagSkyBg',
     iconColor: 'text-iconDark',
-    link: '/services/web-mobile',
+    link: '/home',
     tags: [
       { label: 'React / Next.js', class: 'tag-blue'   },
       { label: 'Flutter',         class: 'tag-purple' },
@@ -762,7 +731,7 @@ const services = [
     icon: ['fas', 'cloud'],
     iconBg: 'bg-tagTealBg',
     iconColor: 'text-iconDark',
-    link: '/services/cloud-devops',
+    link: '/home',
     tags: [
       { label: 'AWS / GCP',  class: 'tag-teal'  },
       { label: 'Kubernetes', class: 'tag-blue'  },
@@ -786,19 +755,36 @@ const aboutFeatures = [
 ]
 
 const testimonials = [
-  { name: 'Ahmed Khan',      role: 'Operations Head, Sentra AI Client',  initials: 'AK', avatarBg: 'bg-avatarTestimonial1', quote: 'Sentra AI transformed our call center — wait times dropped 60% and our agents handle twice the volume. The IVR and AI routing just works.',            link: '/pricing?project=sentra', linkText: 'View Sentra AI pricing' },
+  { name: 'Ahmed Khan',      role: 'Operations Head, Sentra AI Client',  initials: 'AK', avatarBg: 'bg-avatarTestimonial1', quote: 'Sentra AI transformed our call center — wait times dropped 60% and our agents handle twice the volume. The IVR and AI routing just works.',            link: '/sentra', linkText: 'View Sentra AI pricing' },
   { name: 'Sara Rashid',     role: 'CEO, FinTech Startup',               initials: 'SR', avatarBg: 'bg-avatarTestimonial2', quote: 'Our AI agents now handle invoice processing and customer follow-ups autonomously. Rasant built a system that saves us 20+ hours every week.',        link: '/ai-agent',               linkText: 'Explore AI Agent'       },
   { name: 'Michael Jensen',  role: 'Support Director, E-Commerce Brand', initials: 'MJ', avatarBg: 'bg-avatarTestimonial3', quote: 'The chatbot handles 80% of our support tickets on WhatsApp and web. Live handoff to agents is seamless — our CSAT scores went up immediately.',    link: '/chatbot',                linkText: 'Explore Chatbot Agent'  },
 ]
 
-const ctaPills = [
-  { label: 'Sentra AI',  class: 'pill-blue'   },
-  { label: 'AI Agent',   class: 'pill-teal'   },
-  { label: 'Chatbot',    class: 'pill-purple' },
-  { label: 'Orchestri',  class: 'pill-amber'  },
-]
+const handleServiceClick = (service, navigate) => {
+  const currentPath = route.path
+  if (currentPath === '/home' || currentPath === '/') {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  } else {
+    navigate()
+    nextTick(() => {
+      const checkAndScroll = setInterval(() => {
+        if (document.querySelector('#app')) {
+          clearInterval(checkAndScroll)
+          window.scrollTo({ top: 0, behavior: 'smooth' })
+        }
+      }, 50)
+      setTimeout(() => {
+        clearInterval(checkAndScroll)
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+      }, 2000)
+    })
+  }
+}
 
-// ─── Carousel logic ───────────────────────────────────────────────────────────
+const scrollToTop = () => {
+  window.scrollTo({ top: 0, behavior: 'smooth' })
+}
+
 function slideStateClasses(index) {
   if (index === activeIndex.value)   return 'lg:opacity-100 lg:visible lg:translate-x-0 lg:scale-100 lg:pointer-events-auto lg:z-20'
   if (index === exitingIndex.value)  return 'lg:opacity-0 lg:invisible lg:-translate-x-7 lg:scale-[0.985] lg:z-10'
@@ -811,18 +797,11 @@ function setActive(newIndex) {
   activeIndex.value = newIndex
   clearTimeout(exitTimer)
   exitTimer = setTimeout(() => { exitingIndex.value = null }, 550)
-  restartProgress()
   restartAuto()
 }
 
-function next()            { setActive((activeIndex.value + 1) % products.length) }
-function prev()            { setActive((activeIndex.value - 1 + products.length) % products.length) }
-function selectTab(index)  { setActive(index) }
-
-function restartProgress() {
-  progressActive.value = false
-  nextTick(() => { progressActive.value = true })
-}
+function next() { setActive((activeIndex.value + 1) % products.length) }
+function prev() { setActive((activeIndex.value - 1 + products.length) % products.length) }
 
 function restartAuto() {
   if (autoPaused) return
@@ -830,29 +809,17 @@ function restartAuto() {
   autoTimer = setInterval(next, SLIDE_DURATION)
 }
 
-// Pause the auto-rotating carousel while the user hovers it so it doesn't
-// jump to the next slide while they're mid-read.
 function pauseAuto() {
   autoPaused = true
   clearInterval(autoTimer)
 }
+
 function resumeAuto() {
   autoPaused = false
   restartAuto()
 }
 
-const scrollToServices = () => {
-  const section = document.getElementById('services');
-  if (section) {
-    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    return true;
-  }
-  return false;
-};
-
-// ─── Lifecycle ────────────────────────────────────────────────────────────────
 onMounted(() => {
-  // Hero animation
   setTimeout(() => {
     heroLoaded.value = true
     setTimeout(() => {
@@ -874,12 +841,10 @@ onMounted(() => {
     }, 400)
   }, 100)
 
-  // Word rotation
   rotateInterval = setInterval(() => {
     currentWordIndex.value = (currentWordIndex.value + 1) % words.length
   }, 2200)
 
-  // One shared IntersectionObserver for all sections instead of one per section.
   sectionObserver = new IntersectionObserver((entries) => {
     entries.forEach((entry) => {
       if (entry.isIntersecting) {
@@ -891,7 +856,6 @@ onMounted(() => {
     })
   }, { threshold: 0.12 })
 
-  observeSection(statsRef.value, 'stats')
   observeSection(techRef.value, 'tech')
   observeSection(platformRef.value, 'platform')
   observeSection(productsRef.value, 'products')
@@ -899,9 +863,7 @@ onMounted(() => {
   observeSection(processSection.value, 'process')
   observeSection(aboutRef.value, 'about')
   observeSection(testimonialsRef.value, 'testimonials')
-  observeSection(pricingRef.value, 'pricing')
 
-  // Process line observer (separate, one-shot)
   const processObserver = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -915,12 +877,7 @@ onMounted(() => {
     processObserver.observe(processSection.value)
   }
 
-  // Carousel auto-play
-  restartProgress()
   autoTimer = setInterval(next, SLIDE_DURATION)
-
-  // Expose scrollToServices to window for navbar
-  window.scrollToServices = scrollToServices;
 
   onUnmounted(() => processObserver.disconnect())
 })
@@ -932,7 +889,6 @@ onUnmounted(() => {
   clearTimeout(exitTimer)
   if (sectionObserver) sectionObserver.disconnect()
   refKeyMap.clear()
-  delete window.scrollToServices;
 })
 </script>
 

@@ -120,8 +120,8 @@
         <div class="grid grid-cols-2 md:grid-cols-4 max-w-[900px] mx-auto gap-[14px]">
           <router-link v-for="module in modules" :key="module.name" :to="module.link"
                        class="flex flex-col items-center gap-2.5 p-[22px_14px] rounded-2xl bg-section-white border border-borderDefault text-headingCard font-display text-[13px] font-bold transition-all duration-300 shadow-sm hover:-translate-y-1 hover:shadow-[var(--shadow-card-hover)] hover:border-card-hover-border no-underline">
-            <div class="w-[42px] h-[42px] rounded-xl flex items-center justify-center text-lg text-secondary-700" style="background: var(--color-icon-container-bg);">
-              <i :class="module.icon " class="text-button-hover" aria-hidden="true"></i>
+            <div class="w-[42px] h-[42px] rounded-xl flex items-center justify-center text-lg " style="background: var(--color-icon-container-bg);">
+              <i :class="module.icon " class="text-button-hover  " aria-hidden="true"></i>
             </div>
             <span>{{ module.name }}</span>
           </router-link>
@@ -460,7 +460,7 @@ export default {
         { name: 'Campaigns', icon: 'fas fa-rocket', link: '#campaigns' },
         { name: 'Call Scheduler', icon: 'fas fa-calendar-days', link: '#scheduler' },
         { name: 'Analytics', icon: 'fas fa-chart-line', link: '#analytics' },
-        { name: 'Team Workspace', icon: 'fas fa-accounts', link: '#team' },
+        { name: 'Team Workspace', icon: 'fas fa-users', link: '#team' },
         { name: 'Contacts', icon: 'fas fa-address-book', link: '#campaigns' }
       ],
       dashboardFeatures: [

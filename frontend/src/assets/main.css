@@ -149,6 +149,8 @@ html, body {
        ═══════════════════════════════════════════════════════════ */
     --color-blobPrimary: rgba(74, 144, 226, 0.08);
     --color-orbPrimary: rgba(74, 144, 226, 0.08);
+    --color-statusSuccess: #698fbd;
+    --color-statusWarning: #ef3333;
 
     /* ═══════════════════════════════════════════════════════════
        PRIMARY COLORS — Blue
