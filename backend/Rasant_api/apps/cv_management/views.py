@@ -7,7 +7,7 @@ from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django.db.models import Q
 from datetime import date
-from .serializers import CVSubmissionSerializer
+from .serializers import CVSubmissionSerializer, JobOpeningSerializer
 from .models import CVSubmission
 
 class CVSubmissionView(APIView):
@@ -52,3 +52,20 @@ class CVDownloadView(APIView):
         response = HttpResponse(bytes(cv.cv_file), content_type=cv.cv_file_type)
         response['Content-Disposition'] = f'attachment; filename="{cv.cv_file_name}"'
         return response
+
+class JobCreateView(APIView):
+    permission_classes = [AllowAny]
+    def post(self, request):
+        serializer = JobOpeningSerializer(data=request.data)
+        if serializer.is_valid():
+            job_opening = serializer.save()
+            return Response({
+                'status': 'success',
+                'message': 'Job opening created successfully.',
+                'data': JobOpeningSerializer(job_opening).data
+            }, status=status.HTTP_201_CREATED)
+        return Response({
+            'status': 'error',
+            'message': 'Failed to create job opening.',
+            'errors': serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)

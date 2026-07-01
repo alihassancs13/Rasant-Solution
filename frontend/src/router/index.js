@@ -98,7 +98,13 @@ const routes = [
   },
   {
     path: '/admin/career',
-    component: () => import('../admin/career.vue') },
+    component: () => import('../admin/employeeCareer.vue') },
+  {
+    path: '/admin/inquiries',
+    component: () => import('../admin/inquires.vue'),
+    meta: { title: "Admin Inquiries - Rasant Solutions", requiresAuth: true }
+  },
+
   {
     path: '/services/:slug',
     name: 'ServiceDetail',

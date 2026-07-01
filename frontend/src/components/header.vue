@@ -7,7 +7,7 @@
       </div>
       <div class="min-w-0">
         <p class="text-[11px] font-semibold text-slate-500 tracking-wide uppercase truncate">
-          {{ greeting }}, {{ userName }}
+          {{ greeting }}, {{ displayName }}
         </p>
         <div class="flex items-center gap-2">
           <h1 class="text-lg font-bold text-slate-900 truncate">{{ pageTitle }}</h1>
@@ -60,8 +60,8 @@
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 
 const props = defineProps({
-  userName: { type: String, required: true },
-  role: { type: String, required: true }, // 'admin' | 'employee' | 'client'
+  userName: { type: String, default: '' },
+  role: { type: String, default: '' }, // 'admin' | 'employee' | 'client'
   notificationCount: { type: Number, default: 0 },
   // Optional: separate name for the small circular avatar on the right
   // (in the reference design this shows the logged-in user's initials, e.g. "SA")
@@ -94,12 +94,18 @@ const subtitle = computed(() => roleConfig[props.role]?.subtitle || '')
 const roleLabel = computed(() => roleConfig[props.role]?.label || '')
 const roleBadgeClasses = computed(() => roleConfig[props.role]?.badgeClasses || 'bg-slate-100 text-slate-700')
 
+// Defensive: never trust incoming name values — props can arrive as
+// undefined/null/empty for a brief moment (e.g. while user data is loading),
+// or a parent may simply forget to pass them.
 function getInitials(name) {
-  const parts = name.trim().split(/\s+/)
+  if (!name || typeof name !== 'string') return '??'
+  const parts = name.trim().split(/\s+/).filter(Boolean)
+  if (parts.length === 0) return '??'
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
   return (parts[0][0] + parts[1][0]).toUpperCase()
 }
 
+const displayName = computed(() => props.userName?.trim() || 'User')
 const initials = computed(() => getInitials(props.userName))
 const userInitials = computed(() => getInitials(props.accountName || props.userName))
 

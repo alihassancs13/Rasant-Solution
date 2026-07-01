@@ -44,6 +44,7 @@ import {
   faDesktop,
   faClock,
   faMedal,
+  faPlay,
   // ===== ADD THESE FOR THE RESPONSIBLE SIDEBAR TO WORK =====
   faBars,
   faXmark,
@@ -162,5 +163,7 @@ library.add(
     faClipboardList,
     faPlus,
     faArrowUpRightFromSquare,
-    faBell
+    faBell,
+    faPlay
+
 )

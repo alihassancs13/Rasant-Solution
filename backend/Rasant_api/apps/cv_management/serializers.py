@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CVSubmission
+from .models import CVSubmission , JobType, JobOpening
 
 ALLOWED_TYPES = [
     'application/pdf',
@@ -38,3 +38,29 @@ class CVSubmissionSerializer(serializers.ModelSerializer):
         validated_data['cv_file_size'] = uploaded_file.size
 
         return CVSubmission.objects.create(**validated_data)
+
+class JobTypeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JobType
+        fields = ['id', 'name']
+
+class JobOpeningSerializer(serializers.ModelSerializer):
+    job_type_name = serializers.CharField(source='job_type.name', read_only=True)
+
+    class Meta:
+        model = JobOpening
+        fields = [
+            'id',
+            'job_title',
+            'job_type',
+            'job_type_name',
+            'department',
+            'location',
+            'salary_range',
+            'description',
+            'requirements',
+            'is_published',
+            'created_at',
+            'updated_at',
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at']

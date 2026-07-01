@@ -2,6 +2,9 @@ import { reactive, ref, onMounted } from 'vue'
 import { cvAPI } from '@/services/cvApi.js'
 
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+const ALLOWED_FILE_TYPES = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
+const ALLOWED_EXTENSIONS = ['.pdf', '.doc', '.docx']
+const MAX_FILE_SIZE = 5 * 1024 * 1024
 
 export function useCareers() {
     const isModalOpen    = ref(false)
@@ -25,6 +28,21 @@ export function useCareers() {
     const formErrors = reactive({
         name: '', email: '', contact: '', position: '', file: '',
     })
+
+    // ── Toasts (inline, no separate file) ──────────────────────────────
+    const toasts = reactive([])
+    let toastIdCounter = 0
+
+    const removeToast = (id) => {
+        const idx = toasts.findIndex(t => t.id === id)
+        if (idx !== -1) toasts.splice(idx, 1)
+    }
+
+    const pushToast = (type, message, duration = 4500) => {
+        const id = ++toastIdCounter
+        toasts.push({ id, type, message })
+        if (duration > 0) setTimeout(() => removeToast(id), duration)
+    }
 
     onMounted(() => {
         requestAnimationFrame(() => { cardsVisible.value = true })
@@ -84,15 +102,36 @@ export function useCareers() {
     // ── File handling ────────────────────────────────────────────────────
     const triggerFileSelect = () => fileInput.value?.click()
 
+    const getFileExtension = (name) => {
+        const idx = name.lastIndexOf('.')
+        return idx === -1 ? '' : name.slice(idx).toLowerCase()
+    }
+
     const processUploadedFile = (file) => {
         if (!file) return
 
-        if (file.size > 5 * 1024 * 1024) {
-            formErrors.file    = 'File size must not exceed 5MB.'
+        const ext = getFileExtension(file.name)
+        const isValidType = ALLOWED_FILE_TYPES.includes(file.type) || ALLOWED_EXTENSIONS.includes(ext)
+
+        if (!isValidType) {
+            const msg = 'Only PDF, DOC, or DOCX files are allowed.'
+            formErrors.file    = msg
             formData.file      = null
             fileName.value     = 'No file chosen'
             fileUploaded.value = false
             if (fileInput.value) fileInput.value.value = ''
+            pushToast('error', msg)
+            return
+        }
+
+        if (file.size > MAX_FILE_SIZE) {
+            const msg = 'File size must not exceed 5MB.'
+            formErrors.file    = msg
+            formData.file      = null
+            fileName.value     = 'No file chosen'
+            fileUploaded.value = false
+            if (fileInput.value) fileInput.value.value = ''
+            pushToast('error', msg)
             return
         }
 
@@ -105,9 +144,30 @@ export function useCareers() {
     const handleFileSelect = (e) => processUploadedFile(e.target.files[0])
     const handleFileDrop   = (e) => { isDragging.value = false; processUploadedFile(e.dataTransfer.files[0]) }
 
+    // ── Error helpers ────────────────────────────────────────────────────
+    // Only treat backend response as usable JSON if it's a plain object.
+    // Anything else (HTML error pages, plain strings, arrays, null) is unsafe
+    // to display directly — we fall back to a clean, generic message instead.
+    const isPlainObject = (val) =>
+        typeof val === 'object' && val !== null && !Array.isArray(val)
+
+    const looksLikeHtml = (val) =>
+        typeof val === 'string' && /<\/?[a-z][\s\S]*>/i.test(val.trim().slice(0, 100))
+
+    const genericMessageForStatus = (status) => {
+        if (!status) return 'Network error. Please check your connection and try again.'
+        if (status === 404) return 'We couldn\u2019t reach the submission service. Please try again later.'
+        if (status >= 500) return 'Something went wrong on our end. Please try again shortly.'
+        if (status >= 400) return 'We couldn\u2019t process your request. Please check your details and try again.'
+        return 'Something went wrong. Please try again.'
+    }
+
     // ── Submit ───────────────────────────────────────────────────────────
     const handleSubmit = async () => {
-        if (!validateAll()) return
+        if (!validateAll()) {
+            pushToast('warning', 'Please fill in all required fields correctly.')
+            return
+        }
 
         isSubmitting.value = true
         submitError.value  = ''
@@ -124,22 +184,52 @@ export function useCareers() {
             await cvAPI.submitCV(payload)
 
             submitSuccess.value = true
-            startCountdown()  // ← countdown shuru
+            pushToast('success', 'Your CV has been submitted successfully!')
+            startCountdown()
 
         } catch (err) {
-            const data   = err.response?.data
-            const status = err.response?.status
+            const data   = err?.response?.data
+            const status = err?.response?.status
 
+            // No response at all → real network failure
             if (!data) {
-                submitError.value = 'Network error. Please check your connection and try again.'
+                const msg = genericMessageForStatus(status)
+                submitError.value = msg
+                pushToast('error', msg)
+                console.error('CV submission network error:', err)
                 return
             }
 
+            // Response exists but isn't usable JSON (HTML error page, plain
+            // string, etc.) — never render this raw, always show a clean message.
+            if (!isPlainObject(data) || looksLikeHtml(JSON.stringify(data))) {
+                const msg = genericMessageForStatus(status)
+                submitError.value = msg
+                pushToast('error', msg)
+                console.error('CV submission returned a non-JSON response:', { status, data })
+                return
+            }
+
+            // Rate limited
             if (status === 429) {
-                submitError.value = data.error || 'You have already submitted a CV today. Please try again tomorrow.'
+                const msg = typeof data.error === 'string' && data.error.trim()
+                    ? data.error
+                    : 'You have already submitted a CV today. Please try again tomorrow.'
+                submitError.value = msg
+                pushToast('warning', msg)
                 return
             }
 
+            // Server error (5xx)
+            if (status >= 500) {
+                const msg = genericMessageForStatus(status)
+                submitError.value = msg
+                pushToast('error', msg)
+                console.error('CV submission server error:', err)
+                return
+            }
+
+            // Field-level validation errors from backend
             const fieldMap = {
                 full_name:        'name',
                 email:            'email',
@@ -150,17 +240,25 @@ export function useCareers() {
             let hasFieldError = false
 
             for (const [backendKey, frontendKey] of Object.entries(fieldMap)) {
-                if (data[backendKey]) {
-                    formErrors[frontendKey] = [data[backendKey]].flat().join(' ')
-                    hasFieldError = true
+                const fieldMsg = data[backendKey]
+                if (fieldMsg && (typeof fieldMsg === 'string' || Array.isArray(fieldMsg))) {
+                    const cleanMsg = [fieldMsg].flat().filter(v => typeof v === 'string').join(' ').trim()
+                    if (cleanMsg) {
+                        formErrors[frontendKey] = cleanMsg
+                        hasFieldError = true
+                    }
                 }
             }
 
-            if (!hasFieldError) {
-                submitError.value =
-                    data.error || data.detail ||
-                    Object.values(data).flat().join(' ') ||
-                    'Something went wrong. Please try again.'
+            if (hasFieldError) {
+                pushToast('error', 'Please check the highlighted fields and try again.')
+            } else {
+                const fallback = typeof data.error === 'string' ? data.error
+                    : typeof data.detail === 'string' ? data.detail
+                        : ''
+                const msg = fallback.trim() || genericMessageForStatus(status)
+                submitError.value = msg
+                pushToast('error', msg)
             }
         } finally {
             isSubmitting.value = false
@@ -182,6 +280,7 @@ export function useCareers() {
         fileName, fileUploaded, fileInput,
         cardsVisible, isSubmitting, submitError,
         formData, formErrors, countdown,
+        toasts, removeToast,
         openModal, closeModal,
         triggerFileSelect, handleFileSelect, handleFileDrop,
         handleSubmit, resetForm, onEmailInput,

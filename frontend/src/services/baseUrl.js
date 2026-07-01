@@ -1,4 +1,4 @@
-// services/base.js
+// services/baseUrl.js
 export const BASE_URL = 'http://192.168.18.21:8000';
 
 export const API_ENDPOINTS = {
@@ -9,6 +9,6 @@ export const API_ENDPOINTS = {
     USER_PROFILE: '/api/accounts/profile/',
     CHANGE_PASSWORD: '/api/accounts/change-password/',
     USER_MODULES: '/api/accounts/get_user_modules/',
-
     CONTACT: '/api/contact/',
+    CV_SUBMIT: '/api/cv_management/submit-cv/',
 };

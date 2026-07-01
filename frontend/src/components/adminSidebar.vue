@@ -1,13 +1,14 @@
+<!-- AdminSidebar.vue -->
 <template>
   <div>
     <!-- Mobile menu button -->
-    <div class="md:hidden fixed top-0 left-0 p-3 z-50">
+    <div class="md:hidden fixed top-3 left-3 z-50">
       <button
           @click="isSidebarOpen = true"
-          class="p-2.5 rounded-xl bg-blue-400 text-white shadow-md hover:bg-[#1546B8] transition-colors focus:outline-none cursor-pointer"
+          class="w-10 h-10 flex items-center justify-center rounded-xl bg-blue-500 text-white shadow-lg hover:bg-[#1546B8] transition-colors focus:outline-none cursor-pointer"
           aria-label="Open Sidebar"
       >
-        <font-awesome-icon icon="fa-solid fa-bars" class="text-xl" />
+        <font-awesome-icon icon="fa-solid fa-bars" class="text-lg" />
       </button>
     </div>
 
@@ -27,7 +28,7 @@
 
         <!-- Logo -->
         <div class="flex items-center justify-between mb-6 px-2">
-          <router-link to="/home" @click="isSidebarOpen = false" class="cursor-pointer transition-opacity hover:opacity-90 mx-auto md:mx-0">
+          <router-link to="/" @click="isSidebarOpen = false" class="cursor-pointer transition-opacity hover:opacity-90 mx-auto md:mx-0">
             <img src="../assets/images/rasant-logo.png" alt="Rasant Solutions" class="h-11 object-contain" />
           </router-link>
           <button

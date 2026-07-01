@@ -71,38 +71,7 @@
         <div class="animate-reveal-right relative bg-section-white border border-borderDefault rounded-2xl shadow-lg p-5 sm:p-7 lg:p-9 overflow-hidden" style="animation-delay: 0.1s;">
           <div class="absolute top-0 left-0 right-0 h-1 bg-secondary-600"></div>
 
-          <!-- ✅ Success Message with Animation -->
-          <transition
-              enter-active-class="transition-all duration-300 ease-out"
-              enter-from-class="opacity-0 -translate-y-2 scale-95"
-              enter-to-class="opacity-100 translate-y-0 scale-100"
-              leave-active-class="transition-all duration-300 ease-in"
-              leave-from-class="opacity-100 translate-y-0 scale-100"
-              leave-to-class="opacity-0 -translate-y-2 scale-95"
-          >
-            <div v-if="success" class="flex items-center gap-2 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl text-sm mb-4 font-primary">
-              <font-awesome-icon :icon="['fas', 'circle-check']" class="text-green-600" />
-              Message sent! Our team will get back to you within 24 hours.
-            </div>
-          </transition>
-
-          <!-- ✅ Error Message with Animation -->
-          <transition
-              enter-active-class="transition-all duration-300 ease-out"
-              enter-from-class="opacity-0 -translate-y-2 scale-95"
-              enter-to-class="opacity-100 translate-y-0 scale-100"
-              leave-active-class="transition-all duration-300 ease-in"
-              leave-from-class="opacity-100 translate-y-0 scale-100"
-              leave-to-class="opacity-0 -translate-y-2 scale-95"
-          >
-            <div v-if="error" class="flex items-center gap-2 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm mb-4 font-primary">
-              <font-awesome-icon :icon="['fas', 'circle-exclamation']" class="text-red-600" />
-              {{ error }}
-            </div>
-          </transition>
-
-          <!-- ✅ Form with corrected submit -->
-          <form class="flex flex-col gap-4" novalidate  @submit.prevent="handleSubmit">
+          <form class="flex flex-col gap-4" novalidate @submit.prevent="handleSubmit">
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <!-- Full Name -->
@@ -146,7 +115,6 @@
               <p v-if="formErrors.message" class="text-xs text-red-500 mt-1">{{ formErrors.message }}</p>
             </div>
 
-            <!-- ✅ Fixed ShineButton with correct type -->
             <ShineButton
                 type="submit"
                 size="lg"
@@ -166,14 +134,62 @@
         <div class="animate-reveal flex items-center gap-4 bg-section-white border border-borderDefault rounded-2xl shadow-sm px-4 sm:px-6 py-4 sm:py-5" style="animation-delay: 0.3s;">
           <font-awesome-icon :icon="['fas', 'video']" class="text-headingMain text-xl" />
           <p class="text-sm text-textBody leading-relaxed font-primary">
-            <strong class="text-headingMain font-display">Remote-first, globally delivered.</strong>
-            We work with clients across 20+ countries. Schedule a video call at a time that works for you — no office visit required.
+            <strong class="text-headingMain font-display">Globally delivered.</strong>
+            We partner with clients across 20+ countries worldwide with proven expertise. Delivering reliable solutions to your business needs.
           </p>
         </div>
       </div>
     </div>
 
     <Footer />
+
+    <!-- Toast notifications -->
+    <div class="fixed top-4 right-4 z-[100] flex flex-col gap-2 w-[calc(100%-2rem)] max-w-sm" aria-live="polite" aria-atomic="true">
+      <TransitionGroup
+          enter-active-class="transition-all duration-300 ease-out"
+          enter-from-class="opacity-0 translate-x-6"
+          enter-to-class="opacity-100 translate-x-0"
+          leave-active-class="transition-all duration-200 ease-in absolute"
+          leave-from-class="opacity-100 translate-x-0"
+          leave-to-class="opacity-0 translate-x-6"
+          move-class="transition-transform duration-200"
+      >
+        <div
+            v-for="t in toasts"
+            :key="t.id"
+            role="alert"
+            :class="[
+              'relative flex items-start gap-3 px-4 py-3 rounded-xl shadow-lg border text-sm backdrop-blur-sm',
+              t.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                : t.type === 'error' ? 'bg-red-50 border-red-200 text-red-800'
+                : t.type === 'warning' ? 'bg-amber-50 border-amber-200 text-amber-800'
+                : 'bg-primary-50 border-primary-200 text-primary-800',
+            ]"
+        >
+          <font-awesome-icon
+              :icon="t.type === 'success' ? ['fas', 'circle-check']
+                : t.type === 'error' ? ['fas', 'circle-exclamation']
+                : t.type === 'warning' ? ['fas', 'triangle-exclamation']
+                : ['fas', 'circle-info']"
+              :class="[
+                t.type === 'success' ? 'text-emerald-600'
+                  : t.type === 'error' ? 'text-red-600'
+                  : t.type === 'warning' ? 'text-amber-600'
+                  : 'text-primary-600',
+                'text-base mt-0.5 shrink-0',
+              ]"
+          />
+          <p class="flex-1 leading-snug">{{ t.message }}</p>
+          <button
+              type="button"
+              @click="removeToast(t.id)"
+              class="shrink-0 text-lg leading-none opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
+              aria-label="Dismiss notification"
+          >&times;</button>
+        </div>
+      </TransitionGroup>
+    </div>
+
   </div>
 </template>
 
@@ -183,7 +199,7 @@ import ShineButton from '@/components/ShineButton.vue'
 import Navbar from "@/components/navbar.vue"
 import Footer from "../components/footer.vue"
 
-const { form, formErrors, loading, error, success, handleSubmit, onEmailInput } = useContact()
+const { form, formErrors, loading, toasts, removeToast, handleSubmit, onEmailInput } = useContact()
 </script>
 
 <style scoped>

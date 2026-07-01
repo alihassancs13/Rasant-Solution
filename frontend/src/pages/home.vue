@@ -44,9 +44,11 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
             </svg>
           </ShineButton>
-          <ShineButton to="/#products" variant="outline" size="xl">
+          <ShineButton @click="scrollToProducts" variant="outline" size="xl">
+            <font-awesome-icon :icon="['fas', 'play']" class="text-sm transition-transform duration-200 group-hover:translate-x-1" />
             See Our Work
           </ShineButton>
+
         </div>
 
         <!-- Trust section -->
@@ -784,6 +786,12 @@ const SLIDE_DURATION = 6000
 const lineVisible = ref(false)
 let autoPaused = false
 
+const scrollToProducts = () => {
+  const el = document.getElementById('products')
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+}
 const techStack = [
   { name: 'Python',   icon: ['fab', 'python'],   color: 'text-[#3776AB]', chipClass: 'bg-[#EFF6FF] border-[#3776AB]/25' },
   { name: 'Vue.js',   icon: ['fab', 'vuejs'],    color: 'text-[#42B883]', chipClass: 'bg-[#ECFDF5] border-[#42B883]/25' },

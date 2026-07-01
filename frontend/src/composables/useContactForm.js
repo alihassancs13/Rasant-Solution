@@ -1,16 +1,11 @@
-import { ref, nextTick } from 'vue'
+import { ref, reactive, nextTick } from 'vue'
 import { contactAPI } from '@/services/contactApi.js'
 
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 const PHONE_REGEX = /^[0-9+\-\s()]{7,15}$/
 
-const SUCCESS_DURATION = 4000 // 4 seconds — visible long enough to read
-const ERROR_DURATION = 5000   // 5 seconds
-
 export function useContact() {
     const loading = ref(false)
-    const error   = ref(null)
-    const success = ref(false)
 
     const form = ref({
         full_name: '',
@@ -26,8 +21,21 @@ export function useContact() {
         message:   '',
     })
 
-    let successTimer = null
-    let errorTimer = null
+    // ── Toasts (inline, no separate file) ──────────────────────────────
+    const toasts = reactive([])
+    let toastIdCounter = 0
+
+    const removeToast = (id) => {
+        const idx = toasts.findIndex(t => t.id === id)
+        if (idx !== -1) toasts.splice(idx, 1)
+    }
+
+    const pushToast = (type, message, duration = 4500) => {
+        const id = ++toastIdCounter
+        toasts.push({ id, type, message })
+        if (duration > 0) setTimeout(() => removeToast(id), duration)
+    }
+
     let savedScrollY = 0
 
     // ── Validation ──────────────────────────────────────────────────────
@@ -56,23 +64,22 @@ export function useContact() {
         return !Object.values(formErrors.value).some(Boolean)
     }
 
-    // ── Messages ─────────────────────────────────────────────────────
-    const showSuccess = () => {
-        if (successTimer) clearTimeout(successTimer)
-        success.value = true
-        successTimer = setTimeout(() => {
-            success.value = false
-            successTimer = null
-        }, SUCCESS_DURATION)
-    }
+    // ── Error helpers ────────────────────────────────────────────────────
+    // Only treat backend response as usable JSON if it's a plain object.
+    // Anything else (HTML error pages, plain strings, arrays, null) is unsafe
+    // to display directly — fall back to a clean, generic message instead.
+    const isPlainObject = (val) =>
+        typeof val === 'object' && val !== null && !Array.isArray(val)
 
-    const showError = (msg) => {
-        if (errorTimer) clearTimeout(errorTimer)
-        error.value = msg
-        errorTimer = setTimeout(() => {
-            error.value = null
-            errorTimer = null
-        }, ERROR_DURATION)
+    const looksLikeHtml = (val) =>
+        typeof val === 'string' && /<\/?[a-z][\s\S]*>/i.test(val.trim().slice(0, 100))
+
+    const genericMessageForStatus = (status) => {
+        if (!status) return 'Network error. Please check your connection and try again.'
+        if (status === 404) return 'We couldn\u2019t reach the messaging service. Please try again later.'
+        if (status >= 500) return 'Server error. Please try again in a few minutes.'
+        if (status >= 400) return 'We couldn\u2019t process your request. Please check your details and try again.'
+        return 'Something went wrong. Please try again.'
     }
 
     // ── Body scroll lock — prevents ANY scroll movement (incl. keyboard
@@ -122,15 +129,8 @@ export function useContact() {
 
         lockBodyScroll()
 
-        // Clear any previous timers
-        if (successTimer) { clearTimeout(successTimer); successTimer = null }
-        if (errorTimer)   { clearTimeout(errorTimer);   errorTimer = null }
-
-        success.value = false
-        error.value = null
-
         if (!validateAll()) {
-            showError('Please fill all required fields correctly.')
+            pushToast('warning', 'Please fill all required fields correctly.')
             await nextTick()
             unlockBodyScroll()
             return
@@ -145,42 +145,61 @@ export function useContact() {
             form.value = { full_name: '', email: '', phone: '', message: '' }
             Object.keys(formErrors.value).forEach(k => formErrors.value[k] = '')
 
-            showSuccess()
+            pushToast('success', 'Message sent! Our team will get back to you within 24 hours.')
 
         } catch (err) {
-            console.log('DEBUG - error response data:', err.response?.data)
-            const data   = err.response?.data
-            const status = err.response?.status
+            const data   = err?.response?.data
+            const status = err?.response?.status
 
+            // No response at all → real network failure
             if (!err.response) {
-                // network error / no response from server (timeout, offline, CORS, server down)
-                showError('Network error. Please check your connection and try again.')
-            } else if (status === 429) {
-                showError('Too many requests. Please wait a moment and try again.')
-            } else if (status >= 500) {
-                showError('Server error. Please try again in a few minutes.')
-            } else if (data && typeof data === 'object') {
+                pushToast('error', genericMessageForStatus(status))
+                console.error('Contact form network error:', err)
+            }
+                // Response exists but isn't usable JSON (HTML error page, plain
+            // string, etc.) — never render this raw, always show a clean message.
+            else if (!isPlainObject(data) || looksLikeHtml(JSON.stringify(data))) {
+                pushToast('error', genericMessageForStatus(status))
+                console.error('Contact form returned a non-JSON response:', { status, data })
+            }
+            else if (status === 429) {
+                const msg = typeof data.error === 'string' && data.error.trim()
+                    ? data.error
+                    : 'Too many requests. Please wait a moment and try again.'
+                pushToast('warning', msg)
+            }
+            else if (status >= 500) {
+                pushToast('error', genericMessageForStatus(status))
+                console.error('Contact form server error:', err)
+            }
+            else {
                 // DRF field errors → map to formErrors
                 const fieldMap = { full_name: 'full_name', email: 'email', phone: 'phone', message: 'message' }
                 let hasFieldError = false
 
                 for (const [backendKey, frontendKey] of Object.entries(fieldMap)) {
-                    if (data[backendKey]) {
-                        formErrors.value[frontendKey] = [data[backendKey]].flat().join(' ')
-                        hasFieldError = true
+                    const fieldMsg = data[backendKey]
+                    if (fieldMsg && (typeof fieldMsg === 'string' || Array.isArray(fieldMsg))) {
+                        const cleanMsg = [fieldMsg].flat().filter(v => typeof v === 'string').join(' ').trim()
+                        if (cleanMsg) {
+                            formErrors.value[frontendKey] = cleanMsg
+                            hasFieldError = true
+                        }
                     }
                 }
 
-                if (!hasFieldError) {
-                    const msg = data.error || data.detail || Object.values(data).flat().join(' ')
-                    showError(msg || 'Something went wrong. Please try again.')
+                if (hasFieldError) {
+                    pushToast('error', 'Please check the highlighted fields and try again.')
+                } else {
+                    const fallback = typeof data.error === 'string' ? data.error
+                        : typeof data.detail === 'string' ? data.detail
+                            : ''
+                    pushToast('error', fallback.trim() || genericMessageForStatus(status))
                 }
-            } else {
-                showError('Something went wrong. Please try again.')
             }
         } finally {
             loading.value = false
-            // wait for DOM (success/error box, label reset) to settle, then unlock
+            // wait for DOM (label reset) to settle, then unlock
             await nextTick()
             unlockBodyScroll()
         }
@@ -190,8 +209,8 @@ export function useContact() {
         form,
         formErrors,
         loading,
-        error,
-        success,
+        toasts,
+        removeToast,
         handleSubmit,
         onEmailInput,
     }

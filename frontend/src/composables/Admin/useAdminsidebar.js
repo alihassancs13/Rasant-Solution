@@ -42,20 +42,30 @@ export function useAdminSidebar() {
     // Organize modules by section
     const companyModules = computed(() => {
         const companyNames = ['Overview', 'Inbox', 'Employees', 'Inquiries', 'Jira'];
-        const allModules = modules.value.filter(m => companyNames.includes(m.name));
+        const allModules = modules.value.filter(m => companyNames.includes(m.name.trim()));
 
-        // Handle Employees with children
-        const employees = allModules.find(m => m.name === 'Employees');
+        // Find Employees module
+        const employees = allModules.find(m => m.name.trim() === 'Employees');
+
         if (employees) {
-            const children = modules.value.filter(m =>
-                m.name.startsWith('Employees ') && m.name !== 'Employees'
-            );
+            // Treat these modules as Employees children
+            const children = modules.value.filter(m => {
+                const name = m.name.trim();
+                return ['Dashboard', 'Attendance', 'Careers', 'Salaries'].includes(name);
+            });
+
             if (children.length) {
-                return allModules.filter(m => m.name !== 'Employees').concat([
-                    { ...employees, children }
-                ]);
+                return allModules
+                    .filter(m => m.name.trim() !== 'Employees')
+                    .concat([
+                        {
+                            ...employees,
+                            children
+                        }
+                    ]);
             }
         }
+
         return allModules;
     });
 
@@ -75,6 +85,8 @@ export function useAdminSidebar() {
 
     // Get route for a module
     const getModuleRoute = (moduleName) => {
+        moduleName = moduleName.trim();
+
         const routeMap = {
             'Overview': '/admin/overview',
             'Inbox': '/admin/inbox',
@@ -91,6 +103,7 @@ export function useAdminSidebar() {
             'Orchestri': '/admin/projects/orchestri',
             'Manage Profile': '/admin/profile'
         };
+
         return routeMap[moduleName] || `/admin/${moduleName.toLowerCase().replace(/ /g, '-')}`;
     };
 

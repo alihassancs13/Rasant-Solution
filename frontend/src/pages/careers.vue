@@ -488,24 +488,6 @@
                 </div>
 
                 <div class="p-4 border-t border-borderDefault flex flex-col gap-3 bg-gradient-to-b from-card to-neutral-100 shrink-0">
-
-                  <Transition
-                      enter-active-class="transition-all duration-200 ease-out"
-                      enter-from-class="opacity-0 -translate-y-1"
-                      enter-to-class="opacity-100 translate-y-0"
-                      leave-active-class="transition-all duration-150 ease-in"
-                      leave-from-class="opacity-100 translate-y-0"
-                      leave-to-class="opacity-0 -translate-y-1"
-                  >
-                    <div
-                        v-if="submitError"
-                        class="flex items-start gap-2 px-3 py-2.5 rounded-lg bg-error/8 border border-error/20"
-                    >
-                      <i class="fa-solid fa-triangle-exclamation text-error text-xs mt-0.5 shrink-0"></i>
-                      <p class="text-[12px] text-error leading-snug">{{ submitError }}</p>
-                    </div>
-                  </Transition>
-
                   <button
                       type="submit"
                       :disabled="isSubmitting"
@@ -532,6 +514,48 @@
     </Transition>
 
     <Footer />
+    <div class="fixed top-4 right-4 z-[100] flex flex-col gap-2 w-[calc(100%-2rem)] max-w-sm" aria-live="polite" aria-atomic="true">
+      <TransitionGroup
+          enter-active-class="transition-all duration-300 ease-out"
+          enter-from-class="opacity-0 translate-x-6"
+          enter-to-class="opacity-100 translate-x-0"
+          leave-active-class="transition-all duration-200 ease-in absolute"
+          leave-from-class="opacity-100 translate-x-0"
+          leave-to-class="opacity-0 translate-x-6"
+          move-class="transition-transform duration-200"
+      >
+        <div
+            v-for="t in toasts"
+            :key="t.id"
+            role="alert"
+            :class="[
+              'relative flex items-start gap-3 px-4 py-3 rounded-xl shadow-lg border text-sm backdrop-blur-sm',
+              t.type === 'success' ? 'bg-emerald-50 border-emerald-200 text-emerald-800'
+                : t.type === 'error' ? 'bg-red-50 border-red-200 text-red-800'
+                : t.type === 'warning' ? 'bg-amber-50 border-amber-200 text-amber-800'
+                : 'bg-primary-50 border-primary-200 text-primary-800',
+            ]"
+        >
+          <i
+              :class="[
+                t.type === 'success' ? 'fa-solid fa-circle-check text-emerald-600'
+                  : t.type === 'error' ? 'fa-solid fa-circle-exclamation text-red-600'
+                  : t.type === 'warning' ? 'fa-solid fa-triangle-exclamation text-amber-600'
+                  : 'fa-solid fa-circle-info text-primary-600',
+                'text-base mt-0.5 shrink-0',
+              ]"
+              aria-hidden="true"
+          ></i>
+          <p class="flex-1 leading-snug">{{ t.message }}</p>
+          <button
+              type="button"
+              @click="removeToast(t.id)"
+              class="shrink-0 text-lg leading-none opacity-60 hover:opacity-100 transition-opacity cursor-pointer"
+              aria-label="Dismiss notification"
+          >&times;</button>
+        </div>
+      </TransitionGroup>
+    </div>
   </div>
 </template>
 
@@ -547,6 +571,7 @@ const {
   fileName, fileUploaded, fileInput,
   isSubmitting, submitError,
   formData, formErrors,
+  toasts, removeToast,
   openModal, closeModal,
   triggerFileSelect, handleFileSelect, handleFileDrop,
   handleSubmit, onEmailInput,
