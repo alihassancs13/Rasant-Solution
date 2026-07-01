@@ -107,11 +107,58 @@ export function useAdminSidebar() {
         return routeMap[moduleName] || `/admin/${moduleName.toLowerCase().replace(/ /g, '-')}`;
     };
 
-    // Check if a module is active
+    // Check if a module is active - FIXED VERSION
     const isActive = (moduleName, currentPath) => {
         const path = currentPath.toLowerCase();
-        const modulePath = getModuleRoute(moduleName).toLowerCase();
-        return path === modulePath || path.startsWith(modulePath + '/');
+        const trimmedName = moduleName.trim();
+
+        // Get the route for this module
+        const modulePath = getModuleRoute(trimmedName).toLowerCase();
+
+        // Exact match or starts with path (for nested routes)
+        if (path === modulePath || path.startsWith(modulePath + '/')) {
+            return true;
+        }
+
+        // Special case: When "Dashboard" is clicked under Employees
+        // The URL will be /admin/employees/dashboard
+        // We want both "Employees" and "Dashboard" to be highlighted
+        if (trimmedName === 'Employees' && path === '/admin/employees/dashboard') {
+            return true;
+        }
+
+        if (trimmedName === 'Dashboard' && path === '/admin/employees/dashboard') {
+            return true;
+        }
+
+        // Special case: When "Attendance" is clicked under Employees
+        if (trimmedName === 'Employees' && path === '/admin/employees/attendance') {
+            return true;
+        }
+
+        if (trimmedName === 'Attendance' && path === '/admin/employees/attendance') {
+            return true;
+        }
+
+        // Special case: When "Salaries" is clicked under Employees
+        if (trimmedName === 'Employees' && path === '/admin/employees/salaries') {
+            return true;
+        }
+
+        if (trimmedName === 'Salaries' && path === '/admin/employees/salaries') {
+            return true;
+        }
+
+        // Special case: When "Careers" is clicked
+        if (trimmedName === 'Employees' && path === '/admin/career') {
+            return true;
+        }
+
+        if (trimmedName === 'Careers' && path === '/admin/career') {
+            return true;
+        }
+
+        return false;
     };
 
     // Get user role from localStorage

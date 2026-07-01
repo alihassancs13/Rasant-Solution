@@ -3,6 +3,7 @@ import Login from "../pages/Login.vue";
 import Contact from "../pages/contactForm.vue";
 import Careers from "../pages/careers.vue";
 import Home from "../pages/home.vue";
+import EmployeeDashboard from '../admin/employeeDasboard.vue';
 import Chatbot from "../pages/chatbot.vue";
 import sentraAI from "../pages/sentraAI.vue";
 import omnipost from "@/pages/omnipost.vue";
@@ -113,6 +114,12 @@ const routes = [
       title: 'Services - Rasant Solutions',
       requiresAuth: false,
     },
+  },
+  {
+    path: '/admin/employees/dashboard',
+    name: 'EmployeeDashboard',
+    component: EmployeeDashboard,
+    meta: { requiresAuth: true, role: 'employee' }
   },
 ];
 

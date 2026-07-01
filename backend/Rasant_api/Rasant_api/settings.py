@@ -50,7 +50,8 @@ INSTALLED_APPS = [
     'corsheaders',
     'accounts',
     'contact_message',
-    'cv_management'
+    'cv_management',
+    'employee_dashboard'
 ]
 
 MIDDLEWARE = [
@@ -92,10 +93,12 @@ REST_FRAMEWORK = {
 WSGI_APPLICATION = 'Rasant_api.wsgi.application'
 
 CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # Your Vite frontend
     "http://localhost:3000",
     "http://127.0.0.1:5173",
+    "http://192.168.18.21:8000"
 ]
 
 # Database
