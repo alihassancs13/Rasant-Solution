@@ -43,14 +43,14 @@
         </svg>
         <span
             v-if="notificationCount > 0"
-            class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center"
+            class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none"
         >
           {{ notificationCount }}
         </span>
       </button>
 
       <div class="w-9 h-9 rounded-full bg-blue-600 text-white flex items-center justify-center font-semibold text-xs shrink-0">
-        {{ initials }}
+        {{ userInitials }}
       </div>
     </div>
   </header>
@@ -62,7 +62,10 @@ import { computed, ref, onMounted, onUnmounted } from 'vue'
 const props = defineProps({
   userName: { type: String, required: true },
   role: { type: String, required: true }, // 'admin' | 'employee' | 'client'
-  notificationCount: { type: Number, default: 0 }
+  notificationCount: { type: Number, default: 0 },
+  // Optional: separate name for the small circular avatar on the right
+  // (in the reference design this shows the logged-in user's initials, e.g. "SA")
+  accountName: { type: String, default: null }
 })
 
 const roleConfig = {
@@ -91,11 +94,14 @@ const subtitle = computed(() => roleConfig[props.role]?.subtitle || '')
 const roleLabel = computed(() => roleConfig[props.role]?.label || '')
 const roleBadgeClasses = computed(() => roleConfig[props.role]?.badgeClasses || 'bg-slate-100 text-slate-700')
 
-const initials = computed(() => {
-  const parts = props.userName.trim().split(/\s+/)
+function getInitials(name) {
+  const parts = name.trim().split(/\s+/)
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
   return (parts[0][0] + parts[1][0]).toUpperCase()
-})
+}
+
+const initials = computed(() => getInitials(props.userName))
+const userInitials = computed(() => getInitials(props.accountName || props.userName))
 
 // Live clock for greeting + date
 const now = ref(new Date())

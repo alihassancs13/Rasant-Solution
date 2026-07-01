@@ -46,7 +46,15 @@ import {
   faMedal,
   // ===== ADD THESE FOR THE RESPONSIBLE SIDEBAR TO WORK =====
   faBars,
-  faXmark
+  faXmark,
+  // ===== ADD THESE FOR THE CAREERS / ADMIN DASHBOARD TO WORK =====
+  faGlobe,
+  faInbox,
+  faPenToSquare,
+  faClipboardList,
+  faPlus,
+  faArrowUpRightFromSquare,
+  faBell
 } from '@fortawesome/free-solid-svg-icons'
 
 import {
@@ -145,5 +153,14 @@ library.add(
     faDownload,
     faTrash,
     faBriefcase,
-    faTriangleExclamation
+    faTriangleExclamation,
+
+    // ===== Careers / Admin Dashboard (header, stat cards, tabs, table, CV applications) =====
+    faGlobe,
+    faInbox,
+    faPenToSquare,
+    faClipboardList,
+    faPlus,
+    faArrowUpRightFromSquare,
+    faBell
 )

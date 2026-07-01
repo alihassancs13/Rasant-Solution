@@ -102,7 +102,7 @@
           </transition>
 
           <!-- ✅ Form with corrected submit -->
-          <form class="flex flex-col gap-4" @submit.prevent="handleSubmit">
+          <form class="flex flex-col gap-4" novalidate  @submit.prevent="handleSubmit">
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
               <!-- Full Name -->
