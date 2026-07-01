@@ -12,7 +12,7 @@ export function useOmniPost() {
 
     // Platform modules data
     const modules = [
-        { name: 'Dashboard', icon: 'fas fa-gauge-high', href: '#dashboard' },
+        { name: 'Dashboard', icon: 'fas fa-gauge-high', href: '/' },
         { name: 'AI Generator', icon: 'fas fa-wand-magic-sparkles', href: '#generator' },
         { name: 'Approvals', icon: 'fas fa-clipboard-check', href: '#approval' },
         { name: 'Scheduler', icon: 'fas fa-calendar-check', href: '#scheduler' },

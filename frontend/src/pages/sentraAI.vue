@@ -476,7 +476,7 @@ export default {
       queueFeatures: [
         { icon: 'fas fa-flag', title: 'Priority routing', description: 'High, medium, and low priority badges with color-coded urgency.' },
         { icon: 'fas fa-screwdriver-wrench', title: 'Skill-based matching', description: 'Route to Sales, Technical Support, or Customer Support automatically.' },
-        { icon: 'fas fa-accounts-gear', title: 'Auto assign all', description: 'Bulk-assign waiting calls to the next available skilled agents.' }
+        { icon: 'fa-solid fa-users-gear', title: 'Auto assign all', description: 'Bulk-assign waiting calls to the next available skilled agents.' }
       ],
       campaignFeatures: [
         { icon: 'fas fa-toggle-on', title: 'Campaign lifecycle', description: 'Full create, edit, delete, and on/off control for every workflow.' },

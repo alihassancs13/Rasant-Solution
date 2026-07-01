@@ -384,7 +384,7 @@
         <!-- If Logged In: Show Mobile Dashboard Button -->
         <router-link
             v-if="isLoggedIn"
-            to="/overview"
+            to="/admin/overview"
             @click="closeMobileMenu"
             class="w-full text-center py-3.5 rounded-xl font-display font-bold text-[14px] text-white no-underline transition-all duration-200 bg-primary-600 hover:bg-primary-500"
         >

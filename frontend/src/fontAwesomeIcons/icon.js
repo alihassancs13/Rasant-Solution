@@ -1,5 +1,7 @@
 import { library } from '@fortawesome/fontawesome-svg-core'
 import {
+  faCalendarCheck,
+  faProjectDiagram,
   faChevronLeft,
   faChevronRight,
   faChevronDown,
@@ -48,14 +50,18 @@ import {
   // ===== ADD THESE FOR THE RESPONSIBLE SIDEBAR TO WORK =====
   faBars,
   faXmark,
-  // ===== ADD THESE FOR THE CAREERS / ADMIN DASHBOARD TO WORK =====
   faGlobe,
   faInbox,
   faPenToSquare,
   faClipboardList,
   faPlus,
   faArrowUpRightFromSquare,
-  faBell
+  faBell,
+  // ===== ADD THESE NEW ICONS =====
+  faScrewdriverWrench,  // For skill-based matching
+  faUsersGear,          // For auto assign all (or faUsersCog)
+  faFlag,               // For priority routing
+  faUsersCog,           // Alternative for auto assign
 } from '@fortawesome/free-solid-svg-icons'
 
 import {
@@ -81,6 +87,8 @@ import {
 
 library.add(
     // Chevrons & arrows
+    faCalendarCheck,
+    faProjectDiagram,
     faChevronLeft,
     faChevronRight,
     faChevronDown,
@@ -102,7 +110,6 @@ library.add(
     faRobot,
     faClock,
     faMedal,
-    // ===== ADD THESE IN THE LIBRARY ARRAY =====
     faBars,
     faXmark,
 
@@ -156,13 +163,20 @@ library.add(
     faBriefcase,
     faTriangleExclamation,
 
-    // ===== Careers / Admin Dashboard (header, stat cards, tabs, table, CV applications) =====
+    // Careers / Admin Dashboard
     faGlobe,
     faInbox,
     faPenToSquare,
     faClipboardList,
     faPlus,
     faArrowUpRightFromSquare,
+    faBell,
+
+    // ===== ADD THESE TO THE LIBRARY =====
+    faScrewdriverWrench,
+    faUsersGear,
+    faFlag,
+    faUsersCog,  // Alternative
     faBell,
     faPlay
 

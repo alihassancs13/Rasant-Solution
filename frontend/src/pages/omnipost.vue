@@ -638,7 +638,7 @@
             Contact Sales
           </router-link>
           <router-link
-              to="/home#products"
+              to="/#products"
               class="px-6 py-3.5 border border-white/80 text-white font-semibold rounded-xl hover:bg-white/10 transition-colors text-sm inline-flex items-center justify-center font-primary"
           >
             Explore All Products
