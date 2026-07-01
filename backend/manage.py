@@ -6,7 +6,16 @@ import sys
 
 def main():
     """Run administrative tasks."""
+    # 1. Get the path to the inner project directory
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    project_dir = os.path.join(base_dir, 'Rasant_api')
+
+    # 2. Tell Python to look inside 'Rasant_api' first for all apps, settings, and urls
+    sys.path.insert(0, project_dir)
+
+    # 3. Use the original settings module path your project expects
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Rasant_api.settings')
+
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
