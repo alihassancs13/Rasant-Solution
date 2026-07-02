@@ -45,6 +45,7 @@
           <p class="text-[15px] text-textBody leading-relaxed mb-6 font-primary">Phone-first AI that handles customer service calls, internal dialing, outbound campaigns, and scheduled callbacks — with live queue visibility and call analytics built in.</p>
           <div class="flex justify-start gap-3 flex-wrap">
             <ShineButton to="/contact" >Book a Demo</ShineButton>
+            <!-- Pricing hidden for now
             <button
                 @click="scrollToPricing"
                 type="button"
@@ -52,6 +53,7 @@
             >
               View Pricing
             </button>
+            -->
           </div>
         </div>
 
@@ -251,7 +253,7 @@
       </div>
     </section>
 
-    <!-- Pricing Section -->
+    <!-- Pricing Section — hidden for now
     <section class="relative py-18 px-[5%] overflow-hidden bg-neutral-100" id="pricing">
       <div class="max-w-285 mx-auto text-center mb-12">
         <span class="inline-block uppercase tracking-wider text-[11px] font-bold text-accent-1 bg-accent-1/10 px-3 py-1 rounded-full mb-4 font-display">Pricing</span>
@@ -262,7 +264,7 @@
           From inbound support lines to outbound campaigns — every plan includes recordings, warm transfer, and usage analytics.
         </p>
 
-        <!-- Billing Toggle -->
+        Billing Toggle
         <div class="flex items-center justify-center gap-4 mt-8">
           <span class="text-sm font-medium font-primary" :class="billingType === 'monthly' ? 'text-headingMain' : 'text-textSupporting'">Monthly</span>
           <button
@@ -316,6 +318,7 @@
         </div>
       </div>
     </section>
+    -->
 
     <!-- CTA Section -->
     <section class="p-6 md:p-12 max-w-7xl mx-auto">
@@ -332,6 +335,7 @@
           >
             Contact Sales
           </button>
+          <!-- Pricing hidden for now
           <button
               @click="scrollToPricing"
               type="button"
@@ -339,6 +343,7 @@
           >
             View Pricing
           </button>
+          -->
         </div>
       </div>
     </section>
@@ -378,7 +383,6 @@ export default {
   data() {
     return {
       parallaxStyle: { transform: 'perspective(900px) rotateX(0deg) rotateY(0deg)' },
-      billingType: 'monthly',
       gridCells: CELL_CONFIGS,
 
       liveStats: [
@@ -414,6 +418,8 @@ export default {
         },
       ],
 
+      /* Pricing hidden for now
+      billingType: 'monthly',
       pricingPlans: [
         {
           name: 'Starter',
@@ -473,6 +479,7 @@ export default {
           ctaLink: '/contact'
         }
       ]
+      */
     }
   },
 
@@ -486,6 +493,7 @@ export default {
   },
 
   methods: {
+    /* Pricing hidden for now
     scrollToPricing() {
       const pricingSection = document.getElementById('pricing');
       if (pricingSection) {
@@ -495,6 +503,7 @@ export default {
         });
       }
     },
+    */
     goToContact() {
       this.$router.push('/contact?project=ai-agent')
     },
@@ -504,6 +513,7 @@ export default {
       const ry =  ((event.clientX - box.left - box.width  / 2) / (box.width  / 2)) * 8
       this.parallaxStyle.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg)`
     },
+    /* Pricing hidden for now
     toggleBilling() {
       this.billingType = this.billingType === 'monthly' ? 'yearly' : 'monthly'
     },
@@ -528,6 +538,7 @@ export default {
         period: plan.name === 'Enterprise' ? '' : period
       }))
     },
+    */
     resetParallax() {
       this.parallaxStyle.transform = 'perspective(900px) rotateX(0deg) rotateY(0deg)'
     },

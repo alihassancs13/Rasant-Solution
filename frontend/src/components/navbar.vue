@@ -26,7 +26,7 @@
         <img
             src="../assets/images/rasant-logo.png"
             alt="Rasant Solutions Logo"
-            class="h-8 sm:h-10 md:h-[42px] w-auto transition-opacity duration-200 hover:opacity-86"
+            class="h-11 sm:h-12 md:h-14 w-auto transition-opacity duration-200 hover:opacity-86"
             decoding="async"
         />
       </router-link>
@@ -49,10 +49,6 @@
                 : 'text-primary-900 bg-transparent hover:text-primary-500 hover:bg-primary-500/7'"
             >
               Services
-              <span
-                  class="inline-block w-0 h-0 border-l-[4px] border-r-[4px] border-t-[5px] border-l-transparent border-r-transparent border-t-neutral-600 transition-transform duration-300"
-                  :class="activeDropdown === 'services' ? 'rotate-180 !border-t-primary-500' : ''"
-              ></span>
             </button>
 
             <!-- Services Dropdown -->
@@ -73,7 +69,6 @@
                       <h4 class="text-[14px] font-display font-bold text-primary-900 mb-[3px] m-0">Custom Software</h4>
                       <p class="text-[12px] text-neutral-500 m-0 leading-[1.45]">Java, Grails, Python &amp; APIs</p>
                     </div>
-                    <span class="text-primary-500 font-bold opacity-0 -translate-x-3 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-300 mt-2.5">→</span>
                   </button>
 
                   <button
@@ -87,7 +82,6 @@
                       <h4 class="text-[14px] font-display font-bold text-primary-900 mb-[3px] m-0">Web Applications</h4>
                       <p class="text-[12px] text-neutral-500 m-0 leading-[1.45]">Vue.js, React, Tailwind &amp; HTML</p>
                     </div>
-                    <span class="text-primary-500 font-bold opacity-0 -translate-x-3 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-300 mt-2.5">→</span>
                   </button>
 
                   <button
@@ -101,7 +95,6 @@
                       <h4 class="text-[14px] font-display font-bold text-primary-900 mb-[3px] m-0">WordPress &amp; CMS</h4>
                       <p class="text-[12px] text-neutral-500 m-0 leading-[1.45]">Sites, themes &amp; integrations</p>
                     </div>
-                    <span class="text-primary-500 font-bold opacity-0 -translate-x-3 group-hover/item:opacity-100 group-hover/item:translate-x-0 transition-all duration-300 mt-2.5">→</span>
                   </button>
                 </div>
               </Transition>
@@ -141,7 +134,8 @@
                 >
                   <div class="text-[10px] font-bold uppercase tracking-[0.8px] text-primary-500 mb-1.5">Main Product</div>
                   <h4 class="font-display text-[14px] font-bold text-primary-900 mb-1 m-0">Sentra AI</h4>
-                  <p class="text-[11px] text-neutral-500 m-0 leading-[1.4]">AI call center — from Rs. 28,000/mo</p>
+                  <p class="text-[11px] text-neutral-500 m-0 leading-[1.4]">AI call center for omni-channel teams</p>
+                  <!-- <p class="text-[11px] text-neutral-500 m-0 leading-[1.4]">AI call center — from Rs. 28,000/mo</p> -->
                   <div class="h-[3px] bg-neutral-200 rounded mt-2.5 overflow-hidden">
                     <span class="block h-full w-full bg-gradient-to-r from-secondary-500 via-accent-4 to-primary-500 rounded"></span>
                   </div>
@@ -154,7 +148,8 @@
                 >
                   <div class="text-[10px] font-bold uppercase tracking-[0.8px] text-primary-500 mb-1.5">Voice</div>
                   <h4 class="font-display text-[14px] font-bold text-primary-900 mb-1 m-0">AI Agent</h4>
-                  <p class="text-[11px] text-neutral-500 m-0 leading-[1.4]">Talking voice agents — from Rs. 45,000/mo</p>
+                  <p class="text-[11px] text-neutral-500 m-0 leading-[1.4]">Talking voice agents for phone lines</p>
+                  <!-- <p class="text-[11px] text-neutral-500 m-0 leading-[1.4]">Talking voice agents — from Rs. 45,000/mo</p> -->
                   <div class="h-[3px] bg-neutral-200 rounded mt-2.5 overflow-hidden">
                     <span class="block h-full w-[88%] bg-gradient-to-r from-secondary-500 via-accent-4 to-primary-500 rounded"></span>
                   </div>
@@ -167,7 +162,8 @@
                 >
                   <div class="text-[10px] font-bold uppercase tracking-[0.8px] text-accent-3 mb-1.5">Chat</div>
                   <h4 class="font-display text-[14px] font-bold text-primary-900 mb-1 m-0">Chatbot</h4>
-                  <p class="text-[11px] text-neutral-500 m-0 leading-[1.4]">Conversational bots — from Rs. 35,000/mo</p>
+                  <p class="text-[11px] text-neutral-500 m-0 leading-[1.4]">Conversational bots for web and chat</p>
+                  <!-- <p class="text-[11px] text-neutral-500 m-0 leading-[1.4]">Conversational bots — from Rs. 35,000/mo</p> -->
                   <div class="h-[3px] bg-neutral-200 rounded mt-2.5 overflow-hidden">
                     <span class="block h-full w-[94%] bg-gradient-to-r from-secondary-500 via-accent-4 to-primary-500 rounded"></span>
                   </div>
@@ -180,7 +176,8 @@
                 >
                   <div class="text-[10px] font-bold uppercase tracking-[0.8px] text-secondary-600 mb-1.5">SDLC</div>
                   <h4 class="font-display text-[14px] font-bold text-primary-900 mb-1 m-0">Orchestri</h4>
-                  <p class="text-[11px] text-neutral-500 m-0 leading-[1.4]">AI multi-agent SDLC — from Rs. 85,000/mo</p>
+                  <p class="text-[11px] text-neutral-500 m-0 leading-[1.4]">AI multi-agent SDLC automation</p>
+                  <!-- <p class="text-[11px] text-neutral-500 m-0 leading-[1.4]">AI multi-agent SDLC — from Rs. 85,000/mo</p> -->
                   <div class="h-[3px] bg-neutral-200 rounded mt-2.5 overflow-hidden">
                     <span class="block h-full w-[76%] bg-gradient-to-r from-secondary-500 via-accent-4 to-primary-500 rounded"></span>
                   </div>
@@ -319,9 +316,6 @@
             <i class="fa-solid fa-code text-base"></i>
           </span>
           Services
-          <span class="ml-auto text-white/60">
-            <i class="fa-solid" :class="activeDropdown === 'services' ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-          </span>
         </button>
         <div v-show="activeDropdown === 'services'" class="ml-2 mb-2.5 pl-3 border-l-2 border-white/20 py-1 transition-all duration-300">
           <button @click="navigateToServicesSection('services')" class="block text-white/82 text-[13px] py-2 w-full text-left hover:text-white transition-colors duration-150 bg-transparent border-0 cursor-pointer">Custom Software</button>

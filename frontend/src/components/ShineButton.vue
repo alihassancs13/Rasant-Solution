@@ -14,7 +14,6 @@
       :disabled="disabled"
   >
     <slot>{{ label }}</slot>
-    <span v-if="hasShine" class="shine" aria-hidden="true"></span>
   </button>
 
   <RouterLink
@@ -31,7 +30,6 @@
       @click="$emit('click', $event)"
   >
     <slot>{{ label }}</slot>
-    <span v-if="hasShine" class="shine" aria-hidden="true"></span>
   </RouterLink>
 </template>
 
@@ -81,45 +79,4 @@ const variantClass = computed(() => {
   }
   return variants[props.variant] ?? variants.primary
 })
-
-const hasShine = computed(() => {
-  return !['outline', 'white', 'ghost'].includes(props.variant)
-})
 </script>
-
-<style scoped>
-@keyframes shine {
-  0%   { transform: translateX(-100%) skewX(-20deg); }
-  100% { transform: translateX(300%) skewX(-20deg); }
-}
-
-.shine {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  width: 30%;
-  height: 100%;
-  background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.15) 25%,
-      rgba(255, 255, 255, 0.40) 50%,
-      rgba(255, 255, 255, 0.15) 75%,
-      transparent 100%
-  );
-  animation: shine 0.8s ease-in-out infinite alternate;
-  filter: blur(0.5px);
-  border-radius: 50%;
-}
-
-.group:hover .shine {
-  animation-play-state: running;
-}
-
-@media (hover: none) {
-  .shine {
-    animation: none;
-    display: none;
-  }
-}
-</style>

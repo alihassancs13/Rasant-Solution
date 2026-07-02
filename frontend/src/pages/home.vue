@@ -34,7 +34,7 @@
         </h1>
 
         <p class="text-lg text-textBody font-medium max-w-xl leading-relaxed font-primary">
-          Rasant Solutions builds custom software with Java, Grails, Python, Vue.js, React, and WordPress — shipped fast and built to last.
+          Rasant Solutions builds custom software with Java, Grails, Python, Vue.js and React  — shipped fast and built to last.
         </p>
 
         <div class="flex flex-wrap gap-4 pt-4">
@@ -51,26 +51,6 @@
 
         </div>
 
-        <!-- Trust section -->
-        <div class="flex items-center gap-4 pt-2">
-          <div class="flex -space-x-3">
-            <div class="w-9 h-9 rounded-full bg-avatarPinkTeal border-2 border-white flex items-center justify-center text-[11px] font-bold text-white font-primary">
-              AK
-            </div>
-            <div class="w-9 h-9 rounded-full bg-avatarPurpleBlue border-2 border-white flex items-center justify-center text-[11px] font-bold text-white font-primary">
-              SR
-            </div>
-            <div class="w-9 h-9 rounded-full bg-avatarBlue border-2 border-white flex items-center justify-center text-[11px] font-bold text-white font-primary">
-              MJ
-            </div>
-            <div class="w-9 h-9 rounded-full bg-avatarTeal border-2 border-white flex items-center justify-center text-[11px] font-bold text-white font-primary">
-              +
-            </div>
-          </div>
-          <p class="text-sm text-textBody font-primary">
-            <span class="font-bold text-brandDark">50+ clients</span> shipped products with us this year
-          </p>
-        </div>
       </div>
 
       <!-- Right cards -->
@@ -252,11 +232,11 @@
   <!-- Trusted Technologies -->
   <section
       ref="techRef"
-      class="bg-sectionLight border-t border-borderDefault px-30 py-10 overflow-hidden font-primary"
+      class="bg-sectionLight border-t border-borderDefault py-8 sm:py-10 overflow-hidden font-primary"
   >
-    <div class="max-w-7xl mx-auto px-6 md:px-12 lg:px-24">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-12 lg:px-24">
       <p
-          class="text-center text-xs font-bold tracking-widest text-textSupporting uppercase mb-6 transition-all duration-700 ease-out font-primary"
+          class="text-center text-xs font-bold tracking-widest text-textSupporting uppercase mb-5 sm:mb-6 transition-all duration-700 ease-out font-primary"
           :class="visible.tech ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
       >
         Trusted Technologies We Build With
@@ -264,20 +244,27 @@
     </div>
 
     <div
-        class="relative transition-all duration-700 ease-out delay-200"
+        class="relative w-full transition-all duration-700 ease-out delay-200"
         :class="visible.tech ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'"
     >
-      <div class="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-sectionLight to-transparent z-10"></div>
-      <div class="pointer-events-none absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-sectionLight to-transparent z-10"></div>
-      <div class="overflow-hidden">
-        <div class="flex gap-6 w-max animate-marquee">
+      <div class="pointer-events-none absolute inset-y-0 left-0 w-4 sm:w-10 md:w-16 bg-gradient-to-r from-sectionLight to-transparent z-10"></div>
+      <div class="pointer-events-none absolute inset-y-0 right-0 w-4 sm:w-10 md:w-16 bg-gradient-to-r from-transparent to-sectionLight z-10"></div>
+      <div class="overflow-hidden w-full">
+        <div class="flex w-max animate-marquee tech-marquee-track">
           <div
-              v-for="tech in techListLooped"
-              :key="tech.key"
-              class="inline-flex items-center gap-2 bg-card border border-borderDefault rounded-full px-5 py-2.5 shadow-sm whitespace-nowrap shrink-0 font-primary"
+              v-for="copy in 4"
+              :key="copy"
+              class="flex shrink-0 items-center gap-3 sm:gap-6 pr-3 sm:pr-6"
+              :aria-hidden="copy > 1 ? 'true' : undefined"
           >
-            <font-awesome-icon :icon="tech.icon" :class="['text-sm', tech.color]" />
-            <span class="text-sm font-semibold text-brandDark">{{ tech.name }}</span>
+            <div
+                v-for="tech in techList"
+                :key="`${copy}-${tech.name}`"
+                class="inline-flex items-center gap-1.5 sm:gap-2 bg-card border border-borderDefault rounded-full px-3.5 py-2 sm:px-5 sm:py-2.5 shadow-sm whitespace-nowrap shrink-0 font-primary"
+            >
+              <font-awesome-icon :icon="tech.icon" :class="['text-xs sm:text-sm', tech.color]" />
+              <span class="text-xs sm:text-sm font-semibold text-brandDark">{{ tech.name }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -339,7 +326,7 @@
   <section
       id="products"
       ref="productsRef"
-      class="relative overflow-hidden px-[5%] py-24 scroll-mt-20 font-primary"
+      class="relative overflow-hidden px-[5%] py-24 scroll-mt-20 font-primary bg-sectionLight border-t border-borderDefault"
   >
     <div class="pointer-events-none absolute top-[10%] -right-[8%] w-[520px] h-[520px] rounded-full bg-orbPrimary"></div>
 
@@ -358,40 +345,44 @@
     </div>
 
     <div
-        class="relative z-10 max-w-[1100px] mx-auto transition-all duration-700 ease-out delay-200"
-        :class="visible.products ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'"
-        @mouseenter="pauseAuto"
-        @mouseleave="resumeAuto"
+        class="relative z-10 max-w-[1100px] mx-auto"
+        @mouseenter="productsCarousel.pauseIfFinePointer"
+        @mouseleave="productsCarousel.resume"
+        @touchstart="productsCarousel.onTouchStart"
+        @touchend="productsCarousel.onTouchEnd"
     >
-      <div class="grid grid-cols-[auto_1fr_auto] gap-3 items-center">
+      <div class="w-full lg:grid lg:grid-cols-[auto_1fr_auto] lg:gap-3 lg:items-center">
         <button
             type="button"
             aria-label="Previous product"
-            @click="prev"
+            @click="productsCarousel.prev"
             class="group hidden lg:flex w-11 h-11 rounded-full cursor-pointer border border-borderDefault bg-card text-headingCard items-center justify-center shrink-0 transition-all duration-200 hover:bg-buttonPrimaryHover hover:border-buttonPrimaryBorder hover:text-white hover:scale-105 hover:shadow-orange font-primary"
         >
           <font-awesome-icon :icon="['fas', 'chevron-left']" class="text-sm transition-transform duration-200 group-hover:-translate-x-0.5" />
         </button>
 
-        <div class="relative rounded-[28px] border border-activeBorder/20 bg-cardSemi shadow-lg overflow-hidden lg:min-h-[380px]">
+        <div class="relative w-full rounded-[28px] border border-activeBorder/20 bg-card shadow-lg overflow-hidden min-h-[460px] sm:min-h-[420px] lg:min-h-[380px]">
           <article
               v-for="(product, index) in products"
               :key="product.title"
               :class="[
-              index === activeIndex ? 'block' : 'hidden',
-              'lg:block lg:absolute lg:inset-0 lg:transition-all lg:duration-500 lg:ease-out p-6 sm:p-8 lg:p-9',
-              slideStateClasses(index)
+              'absolute inset-0 transition-all duration-500 ease-out p-5 sm:p-8 lg:p-9',
+              index === productsCarousel.index
+                ? 'opacity-100 visible translate-x-0 scale-100 pointer-events-auto z-20'
+                : index === productsCarousel.exitingIndex
+                  ? 'opacity-0 invisible -translate-x-6 scale-[0.98] z-10'
+                  : 'opacity-0 invisible translate-x-6 scale-[0.98] pointer-events-none z-0',
             ]"
           >
-            <div class="grid grid-cols-1 lg:grid-cols-[0.95fr_1.05fr] gap-6 lg:gap-7 items-center lg:min-h-[316px]">
-              <div>
+            <div class="grid grid-cols-1 lg:grid-cols-[0.95fr_1.05fr] gap-5 lg:gap-7 items-center lg:min-h-[316px] h-full">
+              <div class="order-2 lg:order-none">
                 <span :class="['inline-block text-[10px] font-bold uppercase tracking-wide px-3 py-1.5 rounded-full mb-3.5', product.tagClass]">
                   {{ product.tag }}
                 </span>
-                <h3 class="text-2xl lg:text-[32px] font-bold tracking-tight text-headingCard mb-3 font-display">
+                <h3 class="text-xl sm:text-2xl lg:text-[32px] font-bold tracking-tight text-headingCard mb-3 font-display">
                   {{ product.title }}
                 </h3>
-                <p class="text-[15px] text-textBody leading-relaxed mb-5 max-w-[420px] font-primary">
+                <p class="text-sm sm:text-[15px] text-textBody leading-relaxed mb-5 max-w-[420px] font-primary">
                   {{ product.description }}
                 </p>
                 <ShineButton :to="product.ctaLink" size="sm">
@@ -400,16 +391,16 @@
                 </ShineButton>
               </div>
 
-              <div class="relative flex cursor-pointer items-center justify-center min-h-[200px] lg:min-h-[280px] lg:max-h-[320px] order-first lg:order-none">
+              <div class="relative flex items-center justify-center min-h-[160px] sm:min-h-[200px] lg:min-h-[280px] lg:max-h-[320px] order-1 lg:order-none">
                 <div :class="['absolute inset-y-[5%] inset-x-0 rounded-full blur-md animate-pulse pointer-events-none', product.glow]"></div>
-                <object
-                    :data="product.svg"
-                    type="image/svg+xml"
+                <img
+                    :src="product.svg"
+                    :alt="product.title"
                     :title="product.title"
-                    class="relative z-[1] w-full max-h-[220px] lg:max-h-[300px] block rounded-xl drop-shadow-[0_16px_36px_rgba(15,23,42,0.1)] animate-float transition-transform duration-500 ease-out hover:scale-105"
-                >
-                  {{ product.title }}
-                </object>
+                    loading="lazy"
+                    decoding="async"
+                    class="relative z-[1] w-full max-h-[160px] sm:max-h-[220px] lg:max-h-[300px] object-contain block rounded-xl drop-shadow-[0_16px_36px_rgba(15,23,42,0.1)] animate-float transition-transform duration-500 ease-out hover:scale-105"
+                />
               </div>
             </div>
           </article>
@@ -418,14 +409,24 @@
         <button
             type="button"
             aria-label="Next product"
-            @click="next"
+            @click="productsCarousel.next"
             class="group hidden lg:flex w-11 h-11 rounded-full border border-borderDefault bg-card text-headingCard items-center justify-center shrink-0 transition-all duration-200 hover:bg-buttonPrimaryHover hover:border-buttonPrimaryBorder hover:text-white hover:scale-105 hover:shadow-orange font-primary"
         >
           <font-awesome-icon :icon="['fas', 'chevron-right']" class="text-sm cursor-pointer transition-transform duration-200 group-hover:translate-x-0.5" />
         </button>
       </div>
 
-
+      <HomeCarouselControls
+          class="lg:hidden"
+          :count="products.length"
+          :active="productsCarousel.index"
+          prev-label="Previous product"
+          next-label="Next product"
+          dot-label="Show product"
+          @prev="productsCarousel.prev"
+          @next="productsCarousel.next"
+          @select="productsCarousel.setActive"
+      />
     </div>
   </section>
 
@@ -433,7 +434,7 @@
   <section
       id="services"
       ref="servicesRef"
-      class="px-[5%] py-24 bg-sectionWhite scroll-mt-20 font-primary"
+      class="px-[5%] py-24 bg-sectionWhite border-t border-borderDefault scroll-mt-20 font-primary"
   >
     <div class="max-w-7xl mx-auto">
       <div
@@ -456,49 +457,54 @@
         </div>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-7">
+      <!-- Mobile slider -->
+      <div
+          class="md:hidden relative"
+          @mouseenter="servicesCarousel.pauseIfFinePointer"
+          @mouseleave="servicesCarousel.resume"
+          @touchstart="servicesCarousel.onTouchStart"
+          @touchend="servicesCarousel.onTouchEnd"
+      >
+        <div class="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-sectionWhite to-transparent z-10"></div>
+        <div class="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-sectionWhite to-transparent z-10"></div>
+        <div class="relative min-h-[520px] rounded-[24px] overflow-hidden">
+          <div
+              v-for="(service, index) in services"
+              :key="`mobile-${service.title}`"
+              :class="[
+                'absolute inset-0 transition-all duration-500 ease-out',
+                index === servicesCarousel.index
+                  ? 'opacity-100 visible translate-x-0 scale-100 pointer-events-auto z-20'
+                  : index === servicesCarousel.exitingIndex
+                    ? 'opacity-0 invisible -translate-x-6 scale-[0.98] z-10'
+                    : 'opacity-0 invisible translate-x-6 scale-[0.98] pointer-events-none z-0',
+              ]"
+          >
+            <HomeServiceCard :service="service" />
+          </div>
+        </div>
+        <HomeCarouselControls
+            :count="services.length"
+            :active="servicesCarousel.index"
+            prev-label="Previous service"
+            next-label="Next service"
+            dot-label="Show service"
+            @prev="servicesCarousel.prev"
+            @next="servicesCarousel.next"
+            @select="servicesCarousel.setActive"
+        />
+      </div>
+
+      <!-- Desktop grid -->
+      <div class="hidden md:grid md:grid-cols-3 gap-7">
         <div
             v-for="(service, i) in services"
             :key="service.title"
-            class="group bg-card rounded-xl border border-borderDefault shadow-blue p-7 transition-all duration-700 ease-out hover:-translate-y-1.5 hover:shadow-insetBlue"
+            class="transition-all duration-700 ease-out hover:-translate-y-1.5"
             :class="visible.services ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-14 scale-95'"
-            :style="{ transitionDelay: visible.services ? `${i * 150}ms` : '0ms', animationDelay: `${i * 0.4}s` }"
+            :style="{ transitionDelay: visible.services ? `${i * 150}ms` : '0ms' }"
         >
-          <img
-              :src="service.illustration"
-              :alt="service.title"
-              loading="lazy"
-              decoding="async"
-              class="w-full h-36 object-contain mb-5 transition-transform duration-500  "
-          />
-          <div :class="['w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform duration-300 ease-out', service.iconBg]">
-            <font-awesome-icon :icon="service.icon" :class="['text-3xl ', service.iconColor]" />
-          </div>
-          <h3 class="text-lg font-bold text-headingCard mb-2.5 font-display">{{ service.title }}</h3>
-          <p class="text-sm text-textBody leading-relaxed mb-5 font-primary">{{ service.description }}</p>
-          <div class="flex flex-wrap gap-2 mb-6">
-            <span
-                v-for="tag in service.tags"
-                :key="tag.label"
-                :class="['text-xs font-semibold px-3 py-1.5 rounded-full transition-transform duration-200 hover:scale-105', tag.class]"
-            >
-              {{ tag.label }}
-            </span>
-          </div>
-          <!-- RouterLink with custom navigation -->
-          <RouterLink
-              :to="service.link"
-              custom
-              v-slot="{ navigate }"
-          >
-            <a
-                @click="handleServiceClick(service, navigate)"
-                class="inline-flex items-center gap-2 text-sm font-bold text-textBrand group-hover:gap-3 transition-all duration-200 font-primary cursor-pointer"
-            >
-              Explore Service
-              <font-awesome-icon :icon="['fas', 'arrow-right']" class="text-xs transition-transform duration-200 group-hover:translate-x-1" />
-            </a>
-          </RouterLink>
+          <HomeServiceCard :service="service" />
         </div>
       </div>
     </div>
@@ -524,7 +530,49 @@
         </p>
       </div>
 
-      <div class="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-y-12 lg:gap-y-0">
+      <!-- Mobile slider -->
+      <div
+          class="lg:hidden relative"
+          @mouseenter="processCarousel.pauseIfFinePointer"
+          @mouseleave="processCarousel.resume"
+          @touchstart="processCarousel.onTouchStart"
+          @touchend="processCarousel.onTouchEnd"
+      >
+        <div class="relative min-h-[220px]">
+          <div
+              v-for="(step, index) in steps"
+              :key="`mobile-${step.number}`"
+              :class="[
+                'absolute inset-0 flex flex-col items-center text-center px-6 transition-all duration-500 ease-out',
+                index === processCarousel.index
+                  ? 'opacity-100 visible translate-x-0 scale-100 pointer-events-auto z-20'
+                  : index === processCarousel.exitingIndex
+                    ? 'opacity-0 invisible -translate-x-6 scale-[0.98] z-10'
+                    : 'opacity-0 invisible translate-x-6 scale-[0.98] pointer-events-none z-0',
+              ]"
+          >
+            <div :class="['relative z-[1] w-[72px] h-[72px] rounded-full flex items-center justify-center font-bold text-[22px] mb-5 border-2 font-display', step.circleClass]">
+              {{ step.number }}
+              <span :class="['absolute -inset-1.5 rounded-full border-2 animate-[ringPulse_2.5s_ease-out_infinite]', step.ringClass]"></span>
+            </div>
+            <h4 class="text-base font-bold text-headingCard mb-2 font-display">{{ step.title }}</h4>
+            <p class="text-[13px] text-textBody leading-relaxed max-w-sm font-primary">{{ step.description }}</p>
+          </div>
+        </div>
+        <HomeCarouselControls
+            :count="steps.length"
+            :active="processCarousel.index"
+            prev-label="Previous step"
+            next-label="Next step"
+            dot-label="Show step"
+            @prev="processCarousel.prev"
+            @next="processCarousel.next"
+            @select="processCarousel.setActive"
+        />
+      </div>
+
+      <!-- Desktop grid -->
+      <div class="relative hidden lg:grid lg:grid-cols-4 gap-y-0">
         <div
             class="hidden lg:block absolute top-9 h-0.5 bg-gradientLine opacity-45 origin-left transition-transform duration-[1200ms] ease-out"
             :style="{ left: 'calc(12.5% + 18px)', right: 'calc(12.5% + 18px)', transform: lineVisible ? 'scaleX(1)' : 'scaleX(0)' }"
@@ -590,7 +638,7 @@
           We're not just another dev shop. We embed ourselves in your business and build software that solves real problems — not just specs on paper.
         </p>
 
-        <ul class="flex flex-col gap-4 mt-8">
+        <ul class="hidden md:flex flex-col gap-4 mt-8">
           <li
               v-for="(feature, i) in aboutFeatures"
               :key="feature.title"
@@ -606,69 +654,164 @@
             </div>
           </li>
         </ul>
+
+        <!-- Mobile slider -->
+        <div
+            class="md:hidden mt-8"
+            @mouseenter="aboutCarousel.pauseIfFinePointer"
+            @mouseleave="aboutCarousel.resume"
+            @touchstart="aboutCarousel.onTouchStart"
+            @touchend="aboutCarousel.onTouchEnd"
+        >
+          <div class="relative min-h-[140px]">
+            <article
+                v-for="(feature, index) in aboutFeatures"
+                :key="`about-${feature.title}`"
+                :class="[
+                  'absolute inset-0 flex items-start gap-4 bg-card border border-borderDefault rounded-2xl px-5 py-5 shadow-blue transition-all duration-500 ease-out',
+                  index === aboutCarousel.index
+                    ? 'opacity-100 visible translate-x-0 scale-100 pointer-events-auto z-20'
+                    : index === aboutCarousel.exitingIndex
+                      ? 'opacity-0 invisible -translate-x-6 scale-[0.98] z-10'
+                      : 'opacity-0 invisible translate-x-6 scale-[0.98] pointer-events-none z-0',
+                ]"
+            >
+              <span
+                  :class="['w-2.5 h-2.5 rounded-full mt-1.5 shrink-0 animate-pulse', feature.dotColor, feature.delayClass]"
+              ></span>
+              <div>
+                <h4 class="text-sm font-semibold text-headingCard mb-1 font-display">{{ feature.title }}</h4>
+                <p class="text-[13px] text-textBody leading-relaxed font-primary">{{ feature.description }}</p>
+              </div>
+            </article>
+          </div>
+          <HomeCarouselControls
+              :count="aboutFeatures.length"
+              :active="aboutCarousel.index"
+              prev-label="Previous feature"
+              next-label="Next feature"
+              dot-label="Show feature"
+              @prev="aboutCarousel.prev"
+              @next="aboutCarousel.next"
+              @select="aboutCarousel.setActive"
+          />
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Testimonials Section -->
+  <!-- Client Reviews Section -->
   <section
-      id="projects"
+      id="reviews"
       ref="testimonialsRef"
-      class="px-[5%] py-24 font-primary"
+      class="px-[5%] py-24 font-primary overflow-hidden"
+      @mouseenter="pauseTestimonialAuto"
+      @mouseleave="resumeTestimonialAuto"
   >
     <div class="max-w-7xl mx-auto">
       <div
-          class="text-center max-w-2xl mx-auto mb-[60px] transition-all duration-700 ease-out"
+          class="text-center max-w-2xl mx-auto mb-12 transition-all duration-700 ease-out"
           :class="visible.testimonials ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'"
       >
-        <span class="text-xs font-bold tracking-widest text-textBrand uppercase font-primary">Our Projects</span>
+        <span class="text-xs font-bold tracking-widest text-textBrand uppercase font-primary">Client Reviews</span>
         <h2 class="text-3xl md:text-4xl font-bold text-headingSection mt-3 leading-tight font-display">
-          Work That Speaks<br />For Itself
+          Trusted by<br />Real Businesses
         </h2>
         <p class="text-textBody mt-4 leading-relaxed font-primary">
-          150+ projects delivered across 20+ industries. Real results from real clients.
+          Partners across hosting, creative, and IT services — built with Vue.js, chatbots, and custom software.
         </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
-        <div
-            v-for="(testimonial, i) in testimonials"
-            :key="testimonial.name"
-            class="bg-card border border-borderDefault rounded-[20px] p-8 shadow-sm transition-all duration-700 ease-out hover:-translate-y-1.5 hover:-rotate-[0.5deg] hover:border-activeBorder/25 hover:shadow-xl h-full flex flex-col"
-            :class="[
-            visible.testimonials ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-14'
-          ]"
-            :style="{ transitionDelay: visible.testimonials ? `${i * 150}ms` : '0ms' }"
-        >
-          <!-- Stars -->
-          <div class="flex gap-1 mb-[18px] flex-shrink-0">
-            <font-awesome-icon v-for="n in 5" :key="n" :icon="['fas', 'star']" class="text-headingCard text-sm" />
-          </div>
+      <div
+          class="relative max-w-4xl mx-auto transition-all duration-700 ease-out delay-150"
+          :class="visible.testimonials ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'"
+      >
+        <div class="grid grid-cols-1 gap-3 items-center sm:grid-cols-[auto_1fr_auto]">
+          <button
+              type="button"
+              aria-label="Previous review"
+              @click="testimonialPrev"
+              class="group hidden sm:flex w-11 h-11 rounded-full cursor-pointer border border-borderDefault bg-card text-headingCard items-center justify-center shrink-0 transition-all duration-200 hover:bg-buttonPrimaryHover hover:border-buttonPrimaryBorder hover:text-white hover:scale-105 hover:shadow-orange"
+          >
+            <font-awesome-icon :icon="['fas', 'chevron-left']" class="text-sm transition-transform duration-200 group-hover:-translate-x-0.5" />
+          </button>
 
-          <!-- Quote -->
-          <p class="text-[15px] text-textBody leading-[1.75] italic mb-6 flex-1 font-primary">
-            "{{ testimonial.quote }}"
-          </p>
-
-          <!-- Author -->
-          <div class="flex-shrink-0">
-            <div class="flex items-center gap-3">
-              <div :class="['w-11 h-11 rounded-full flex items-center justify-center font-bold text-base text-white shrink-0 font-primary', testimonial.avatarBg]">
-                {{ testimonial.initials }}
-              </div>
-              <div>
-                <div class="text-sm font-semibold text-headingCard font-primary">{{ testimonial.name }}</div>
-                <div class="text-xs text-textSupporting mt-0.5 font-primary">{{ testimonial.role }}</div>
-              </div>
-            </div>
-            <RouterLink
-                :to="testimonial.link"
-                class="inline-flex items-center gap-1.5 mt-5 text-[13px] font-bold text-linkText hover:gap-2.5 hover:text-linkHoverText transition-all duration-200 font-display"
+          <div
+              class="relative min-h-[300px] sm:min-h-[300px] rounded-[24px] border border-borderDefault bg-card shadow-blue overflow-hidden"
+              @touchstart="testimonialsCarousel.onTouchStart"
+              @touchend="testimonialsCarousel.onTouchEnd"
+          >
+            <article
+                v-for="(testimonial, index) in testimonials"
+                :key="testimonial.company"
+                :class="[
+                  'absolute inset-0 p-6 sm:p-8 lg:p-10 flex flex-col transition-all duration-500 ease-out',
+                  index === testimonialsCarousel.index
+                    ? 'opacity-100 visible translate-x-0 scale-100 pointer-events-auto z-20'
+                    : index === testimonialsCarousel.exitingIndex
+                      ? 'opacity-0 invisible -translate-x-6 scale-[0.98] z-10'
+                      : 'opacity-0 invisible translate-x-6 scale-[0.98] pointer-events-none z-0',
+                ]"
             >
-              {{ testimonial.linkText }}
-              <font-awesome-icon :icon="['fas', 'arrow-right']" class="text-[10px]" />
-            </RouterLink>
+              <div class="flex flex-wrap items-center gap-2 mb-5">
+                <span class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-tagBlueBg text-textBrand border border-borderDefault">
+                  {{ testimonial.service }}
+                </span>
+                <div class="flex gap-1">
+                  <font-awesome-icon v-for="n in 5" :key="n" :icon="['fas', 'star']" class="text-headingCard text-xs" />
+                </div>
+              </div>
+
+              <p class="text-[15px] sm:text-base text-textBody leading-[1.75] italic flex-1 font-primary">
+                "{{ testimonial.quote }}"
+              </p>
+
+              <div class="mt-6 pt-5 border-t border-borderDefault">
+                <div class="flex items-center gap-3">
+                  <div :class="['w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm text-white shrink-0 font-primary', testimonial.avatarBg]">
+                    {{ testimonial.initials }}
+                  </div>
+                  <div>
+                    <div class="text-sm font-semibold text-headingCard font-display">{{ testimonial.company }}</div>
+                    <div class="text-xs text-textSupporting mt-0.5 font-primary">{{ testimonial.role }}</div>
+                  </div>
+                </div>
+              </div>
+            </article>
           </div>
+
+          <button
+              type="button"
+              aria-label="Next review"
+              @click="testimonialNext"
+              class="group hidden sm:flex w-11 h-11 rounded-full border border-borderDefault bg-card text-headingCard items-center justify-center shrink-0 transition-all duration-200 hover:bg-buttonPrimaryHover hover:border-buttonPrimaryBorder hover:text-white hover:scale-105 hover:shadow-orange"
+          >
+            <font-awesome-icon :icon="['fas', 'chevron-right']" class="text-sm transition-transform duration-200 group-hover:translate-x-0.5" />
+          </button>
+        </div>
+
+        <HomeCarouselControls
+            class="sm:hidden"
+            :count="testimonials.length"
+            :active="testimonialsCarousel.index"
+            prev-label="Previous review"
+            next-label="Next review"
+            dot-label="Show review"
+            @prev="testimonialPrev"
+            @next="testimonialNext"
+            @select="setTestimonialActive"
+        />
+
+        <div class="hidden sm:flex items-center justify-center gap-2 mt-6">
+          <button
+              v-for="(testimonial, index) in testimonials"
+              :key="`${testimonial.company}-dot`"
+              type="button"
+              :aria-label="`Show review from ${testimonial.company}`"
+              @click="setTestimonialActive(index)"
+              class="h-2 rounded-full transition-all duration-300"
+              :class="index === testimonialsCarousel.index ? 'w-7 bg-primary-500' : 'w-2 bg-borderDefault hover:bg-primary-300'"
+          ></button>
         </div>
       </div>
     </div>
@@ -680,9 +823,12 @@
 <script setup>
 import Navbar from '@/components/Navbar.vue'
 import Footer from '@/components/footer.vue'
+import HomeServiceCard from '@/components/home/HomeServiceCard.vue'
+import HomeCarouselControls from '@/components/home/HomeCarouselControls.vue'
+import { useHomeCarousel } from '@/composables/useHomeCarousel.js'
 import sentraPlatformSvg from '@/assets/svg/sentra-platform.svg'
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
-import { RouterLink, useRouter, useRoute } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import sentraBotSvg from '@/assets/svg/sentra-bot.svg'
 import aiAgentSvg from '@/assets/svg/ai-agent-phone-bot.svg'
 import chatbotSvg from '@/assets/svg/chatbot-messenger-bot.svg'
@@ -778,13 +924,7 @@ function animateHeroMetrics() {
   }, interval)
 }
 
-const activeIndex = ref(0)
-const exitingIndex = ref(null)
-let autoTimer = null
-let exitTimer = null
-const SLIDE_DURATION = 6000
 const lineVisible = ref(false)
-let autoPaused = false
 
 const scrollToProducts = () => {
   const el = document.getElementById('products')
@@ -801,7 +941,7 @@ const techStack = [
   { name: 'HTML',     icon: ['fab', 'html5'],    color: 'text-[#E34F26]', chipClass: 'bg-[#FFF1F2] border-[#E34F26]/25' },
   { name: 'CSS',      icon: ['fab', 'css3-alt'], color: 'text-[#1572B6]', chipClass: 'bg-[#EFF6FF] border-[#1572B6]/25' },
   { name: 'Tailwind', icon: ['fas', 'wind'], color: 'text-[#38BDF8]', chipClass: 'bg-[#ECFEFF] border-[#38BDF8]/25' },
-  { name: 'WordPress', icon: ['fab', 'wordpress'], color: 'text-[#21759B]', chipClass: 'bg-[#EFF6FF] border-[#21759B]/25' },
+  
 ]
 
 const words = ['Intelligent', 'Scalable', 'Beautiful', 'Future-Ready']
@@ -819,10 +959,6 @@ const techList = [
   { name: 'Tailwind', icon: ['fas', 'wind'],    color: 'text-[#38BDF8]' },
   { name: 'WordPress', icon: ['fab', 'wordpress'], color: 'text-[#21759B]' },
 ]
-
-const techListLooped = computed(() =>
-    [...techList, ...techList].map((tech, i) => ({ ...tech, key: `${tech.name}-${i}` }))
-)
 
 const products = [
   {
@@ -915,54 +1051,46 @@ const aboutFeatures = [
 ]
 
 const testimonials = [
-  { name: 'Ahmed Khan',      role: 'Operations Head, Sentra AI Client',  initials: 'AK', avatarBg: 'bg-avatarTestimonial1', quote: 'Sentra AI transformed our call center — wait times dropped 60% and our agents handle twice the volume. The IVR and AI routing just works.',            link: '/sentra', linkText: 'View Sentra AI pricing' },
-  { name: 'Sara Rashid',     role: 'CEO, FinTech Startup',               initials: 'SR', avatarBg: 'bg-avatarTestimonial2', quote: 'Our AI agents now handle invoice processing and customer follow-ups autonomously. Rasant built a system that saves us 20+ hours every week.',        link: '/ai-agent',               linkText: 'Explore AI Agent'       },
-  { name: 'Michael Jensen',  role: 'Support Director, E-Commerce Brand', initials: 'MJ', avatarBg: 'bg-avatarTestimonial3', quote: 'The chatbot handles 80% of our support tickets on WhatsApp and web. Live handoff to agents is seamless — our CSAT scores went up immediately.',    link: '/chatbot',                linkText: 'Explore Chatbot Agent'  },
+  {
+    company: 'Hostbreak',
+    role: 'Web Hosting · Islamabad, Pakistan',
+    initials: 'HB',
+    avatarBg: 'bg-avatarTestimonial1',
+    service: 'Vue.js Development',
+    quote: 'Rasant built our Vue.js client portal and admin dashboard — fast, responsive, and straightforward for our team to extend. They understood hosting workflows and delivered on time.',
+  },
+  {
+    company: 'SAP Communications',
+    role: 'Creative Agency · Pakistan',
+    initials: 'SC',
+    avatarBg: 'bg-avatarTestimonial2',
+    service: 'AI Chatbot',
+    quote: 'The chatbot on our site answers visitor questions instantly and captures leads while we focus on creative work. Setup was smooth and handoff to our team was seamless.',
+  },
+  {
+    company: 'Sprint Solutions',
+    role: 'IT & Business Services · Gujranwala, Pakistan',
+    initials: 'SS',
+    avatarBg: 'bg-avatarTestimonial3',
+    service: 'Custom Software',
+    quote: 'Rasant helped us streamline internal operations with a tailored software solution — reliable APIs, clear documentation, and a team that stayed responsive from kickoff through launch.',
+  },
 ]
 
-const handleServiceClick = (_service, navigate) => {
-  navigate()
-  nextTick(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  })
-}
+const productsCarousel = useHomeCarousel(products.length, { autoMs: 6000 })
+const servicesCarousel = useHomeCarousel(services.length, { autoMs: 5500 })
+const processCarousel = useHomeCarousel(steps.length, { autoMs: 6000 })
+const aboutCarousel = useHomeCarousel(aboutFeatures.length, { autoMs: 5500 })
+const testimonialsCarousel = useHomeCarousel(testimonials.length, { autoMs: 5500 })
+
+const setTestimonialActive = (newIndex) => testimonialsCarousel.setActive(newIndex)
+const testimonialNext = () => testimonialsCarousel.next()
+const testimonialPrev = () => testimonialsCarousel.prev()
+const pauseTestimonialAuto = () => testimonialsCarousel.pauseIfFinePointer()
+const resumeTestimonialAuto = () => testimonialsCarousel.resume()
 
 const scrollToTop = () => {
   window.scrollTo({ top: 0, behavior: 'smooth' })
-}
-
-function slideStateClasses(index) {
-  if (index === activeIndex.value)   return 'lg:opacity-100 lg:visible lg:translate-x-0 lg:scale-100 lg:pointer-events-auto lg:z-20'
-  if (index === exitingIndex.value)  return 'lg:opacity-0 lg:invisible lg:-translate-x-7 lg:scale-[0.985] lg:z-10'
-  return 'lg:opacity-0 lg:invisible lg:translate-x-7 lg:scale-[0.985] lg:pointer-events-none lg:z-0'
-}
-
-function setActive(newIndex) {
-  if (newIndex === activeIndex.value) return
-  exitingIndex.value = activeIndex.value
-  activeIndex.value = newIndex
-  clearTimeout(exitTimer)
-  exitTimer = setTimeout(() => { exitingIndex.value = null }, 550)
-  restartAuto()
-}
-
-function next() { setActive((activeIndex.value + 1) % products.length) }
-function prev() { setActive((activeIndex.value - 1 + products.length) % products.length) }
-
-function restartAuto() {
-  if (autoPaused) return
-  clearInterval(autoTimer)
-  autoTimer = setInterval(next, SLIDE_DURATION)
-}
-
-function pauseAuto() {
-  autoPaused = true
-  clearInterval(autoTimer)
-}
-
-function resumeAuto() {
-  autoPaused = false
-  restartAuto()
 }
 
 onMounted(() => {
@@ -1010,16 +1138,12 @@ onMounted(() => {
     processObserver.observe(processSection.value)
   }
 
-  autoTimer = setInterval(next, SLIDE_DURATION)
-
   onUnmounted(() => processObserver.disconnect())
 })
 
 onUnmounted(() => {
   clearInterval(rotateInterval)
-  clearInterval(autoTimer)
   clearInterval(uptimeTimer)
-  clearTimeout(exitTimer)
   if (sectionObserver) sectionObserver.disconnect()
   refKeyMap.clear()
 })
@@ -1060,6 +1184,10 @@ onUnmounted(() => {
 }
 .animate-marquee { animation: marquee 25s linear infinite; }
 .animate-marquee:hover { animation-play-state: paused; }
+.tech-marquee-track { will-change: transform; }
+@media (max-width: 639px) {
+  .tech-marquee-track { animation-duration: 20s; }
+}
 @keyframes ringPulse {
   0%   { transform: scale(1);    opacity: 0.5; }
   100% { transform: scale(1.35); opacity: 0;   }

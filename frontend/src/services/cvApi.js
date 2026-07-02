@@ -21,6 +21,7 @@ export const cvAPI = {
     download: (id) => apiClient.get(`/api/cv_management/cv/${id}/download/`, {
         responseType: 'blob',
     }),
+    getPublishedJobs: () => apiClient.get(API_ENDPOINTS.JOB_OPENINGS),
 }
 
 export default apiClient

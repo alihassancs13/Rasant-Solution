@@ -24,6 +24,7 @@
           <p class="text-[15px] text-textBody leading-relaxed mb-6 font-primary">Web UI and FastAPI backend that drive a gated workflow: specification, user approval, plan, implementation, test/debug loop, deployment, and optional execution — on your local project folder.</p>
           <div class="flex justify-start gap-3 flex-wrap">
             <ShineButton to="/contact" >Contact Sales</ShineButton>
+            <!-- Pricing hidden for now
             <button
                 @click="scrollToPricing"
                 type="button"
@@ -31,6 +32,7 @@
             >
               View Pricing
             </button>
+            -->
           </div>
         </div>
 
@@ -200,7 +202,7 @@
       </div>
     </section>
 
-    <!-- Pricing Section -->
+    <!-- Pricing Section — hidden for now
     <section class="relative py-18 px-[5%] overflow-hidden bg-neutral-100" id="pricing">
       <div class="max-w-285 mx-auto text-center mb-12">
         <span class="inline-block uppercase tracking-wider text-[11px] font-bold text-accent-3 bg-accent-3/10 px-3 py-1 rounded-full mb-4 font-display">Pricing</span>
@@ -211,7 +213,7 @@
           Desktop builds, hosted bridge, and multi-agent SDLC automation — pick the tier that fits your engineering workflow.
         </p>
 
-        <!-- Billing Toggle -->
+        Billing Toggle
         <div class="flex items-center justify-center gap-4 mt-8">
           <span class="text-sm font-medium font-primary" :class="billingType === 'monthly' ? 'text-headingMain' : 'text-textSupporting'">Monthly</span>
           <button
@@ -265,6 +267,7 @@
         </div>
       </div>
     </section>
+    -->
 
     <!-- CTA Section -->
     <section class="p-6 md:p-12 max-w-7xl mx-auto">
@@ -281,6 +284,7 @@
           >
             Contact Sales
           </button>
+          <!-- Pricing hidden for now
           <button
               @click="scrollToPricing"
               type="button"
@@ -288,6 +292,7 @@
           >
             View Pricing
           </button>
+          -->
         </div>
       </div>
     </section>
@@ -325,7 +330,6 @@ export default {
 
   data() {
     return {
-      billingType: 'monthly',
       gridCells: CELL_CONFIGS,
 
       pipelineStats: [
@@ -360,6 +364,9 @@ export default {
           desc: 'Orchestri.exe / Orchestri.app — localhost API, browser UI, %APPDATA% data.',
         },
       ],
+
+      /* Pricing hidden for now
+      billingType: 'monthly',
 
       pricingPlans: [
         {
@@ -420,6 +427,7 @@ export default {
           ctaLink: '/contact'
         }
       ]
+      */
     }
   },
 
@@ -433,6 +441,7 @@ export default {
   },
 
   methods: {
+    /* Pricing hidden for now
     toggleBilling() {
       this.billingType = this.billingType === 'monthly' ? 'yearly' : 'monthly'
     },
@@ -458,11 +467,13 @@ export default {
         period: plan.name === 'Enterprise' ? '' : period
       }))
     },
+    */
 
     goToContact() {
       this.$router.push('/contact?project=orchestri')
     },
 
+    /* Pricing hidden for now
     scrollToPricing() {
       const pricingSection = document.getElementById('pricing')
       if (pricingSection) {
@@ -472,6 +483,7 @@ export default {
         })
       }
     }
+    */
   }
 }
 </script>
