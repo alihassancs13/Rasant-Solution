@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 import AdminSidebar from '../components/adminSidebar.vue'
 import TopHeader from '../components/header.vue'
 import StatCard from '../components/statCard.vue'
-import { useDashboard } from '@/composables/useDashboard.js'
+import { useEmployeeCareer } from '../composables/Admin/useEmployeeCareer.js'
 
 const activeTab = ref('site-openings')
 
@@ -83,7 +83,7 @@ const {
   cvSubmissions, cvLoading, cvError, cvSearchQuery,
   fetchCVSubmissions, deleteCV, filteredCVs,
   formatDate, initials, viewCV,
-} = useDashboard()
+} = useEmployeeCareer()
 
 const selectedApplicantId = ref(null)
 
@@ -187,7 +187,7 @@ fetchCVSubmissions().then(ensureSelection)
                 v-for="tab in tabs"
                 :key="tab.key"
                 @click="activeTab = tab.key"
-                class="flex items-center gap-2 px-3 py-1.5 sm:px-0 sm:py-2 rounded-full text-xs sm:text-sm font-semibold transition-colors cursor-pointer shrink-0"                :class="activeTab === tab.key
+                class="flex items-center gap-4 px-6 py-1.5 sm:px-0 sm:py-2 rounded-full text-xs sm:text-sm font-semibold transition-colors cursor-pointer shrink-0"                :class="activeTab === tab.key
         ? 'bg-blue-600 text-white shadow-sm'
         : 'text-slate-500 hover:bg-slate-50'"
             >

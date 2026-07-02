@@ -151,13 +151,10 @@ export function useContact() {
             const data   = err?.response?.data
             const status = err?.response?.status
 
-            // No response at all → real network failure
             if (!err.response) {
                 pushToast('error', genericMessageForStatus(status))
                 console.error('Contact form network error:', err)
             }
-                // Response exists but isn't usable JSON (HTML error page, plain
-            // string, etc.) — never render this raw, always show a clean message.
             else if (!isPlainObject(data) || looksLikeHtml(JSON.stringify(data))) {
                 pushToast('error', genericMessageForStatus(status))
                 console.error('Contact form returned a non-JSON response:', { status, data })

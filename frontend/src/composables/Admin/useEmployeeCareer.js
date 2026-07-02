@@ -1,8 +1,8 @@
 import { ref, computed, onMounted, useTemplateRef } from 'vue'
+import { contactAPI, cvAPI } from '@/services/cvAPI.js'
+import axios from "axios";
 
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://127.0.0.1:8000'
-
-export function useDashboard() {
+export function useEmployeeCareer() {
     // ─── Contact Messages ────────────────────────────────────────
     const messages    = ref([])
     const loading     = ref(false)
@@ -14,11 +14,10 @@ export function useDashboard() {
         loading.value = true
         error.value   = null
         try {
-            const res = await fetch(`${API_BASE}/api/contact/`)
-            if (!res.ok) throw new Error(`Server error: ${res.status}`)
-            messages.value = await res.json()
+            const res = await contactAPI.getAll()
+            messages.value = res.data
         } catch (err) {
-            error.value = err.message ?? 'Something went wrong.'
+            error.value = err.response?.data?.detail ?? err.message ?? 'Something went wrong.'
         } finally {
             loading.value = false
         }
@@ -27,10 +26,7 @@ export function useDashboard() {
     async function deleteMessage(id) {
         if (!confirm('Delete this message?')) return
         try {
-            const res = await fetch(`${API_BASE}/api/contact/${id}/`, {
-                method: 'DELETE',
-            })
-            if (!res.ok) throw new Error(`Server error: ${res.status}`)
+            await contactAPI.delete(id)
             messages.value = messages.value.filter(m => m.id !== id)
         } catch {
             alert('Could not delete message.')
@@ -57,11 +53,10 @@ export function useDashboard() {
         cvLoading.value = true
         cvError.value   = null
         try {
-            const res = await fetch(`${API_BASE}/api/cv_management/submit-cv/`)
-            if (!res.ok) throw new Error(`Server error: ${res.status}`)
-            cvSubmissions.value = await res.json()
+            const res = await cvAPI.getAll()
+            cvSubmissions.value = res.data
         } catch (err) {
-            cvError.value = err.message ?? 'Something went wrong.'
+            cvError.value = err.response?.data?.detail ?? err.message ?? 'Something went wrong.'
         } finally {
             cvLoading.value = false
         }
@@ -70,10 +65,7 @@ export function useDashboard() {
     async function deleteCV(id) {
         if (!confirm('Delete this CV submission?')) return
         try {
-            const res = await fetch(`${API_BASE}/api/cv_management/cv/${id}/`, {
-                method: 'DELETE',
-            })
-            if (!res.ok) throw new Error(`Server error: ${res.status}`)
+            await cvAPI.delete(id)
             cvSubmissions.value = cvSubmissions.value.filter(c => c.id !== id)
         } catch {
             alert('Could not delete CV submission.')
@@ -90,25 +82,15 @@ export function useDashboard() {
         )
     })
 
-    // ✅ Robust view — blob ki tarah fetch karke naye tab mein render karta hai
-    // Server ke Content-Disposition header pe depend nahi karta — kabhi download trigger nahi hoga
+    // ✅
     async function viewCV(cv) {
-        // Tab pehle hi khol do (synchronously, click ke andar) — warna popup blocker rok dega
         const newTab = window.open('', '_blank')
-
         try {
-            const fileUrl = `${API_BASE}/api/cv_management/cv/${cv.id}/download/`
-            const res = await fetch(fileUrl)
-            if (!res.ok) throw new Error(`Server error: ${res.status}`)
-
-            const blob    = await res.blob()
-            const blobUrl = URL.createObjectURL(blob)
-
+            const res     = await cvAPI.download(cv.id)
+            const blobUrl = URL.createObjectURL(res.data)
             if (newTab) {
                 newTab.location.href = blobUrl
             }
-
-            // Memory cleanup — tab band hone ke baad blob URL revoke kar do
             setTimeout(() => URL.revokeObjectURL(blobUrl), 60_000)
 
         } catch (err) {
@@ -116,7 +98,6 @@ export function useDashboard() {
             alert('Could not open CV file.')
         }
     }
-
     // ─── Helpers ─────────────────────────────────────────────────
     function formatDate(iso) {
         return new Date(iso).toLocaleDateString('en-PK', {
@@ -128,6 +109,7 @@ export function useDashboard() {
     function initials(name) {
         return name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()
     }
+
 
     // ─── Init ────────────────────────────────────────────────────
     onMounted(() => {
@@ -145,7 +127,5 @@ export function useDashboard() {
         fetchCVSubmissions, deleteCV, filteredCVs, viewCV,
         // helpers
         formatDate, initials,
-        // shared
-        API_BASE,
     }
 }
