@@ -21,9 +21,11 @@
           </p>
           <div class="flex justify-start gap-3 flex-wrap">
             <ShineButton to="/contact">Book a Chat Demo</ShineButton>
+            <!-- Pricing hidden for now
             <button @click="scrollToPricing" type="button" class="px-6 py-3 border border-borderDefault text-textBody font-semibold rounded-lg hover:bg-neutral-100 transition-colors text-sm cursor-pointer font-primary">
               View Pricing
             </button>
+            -->
           </div>
         </div>
 
@@ -251,7 +253,7 @@
       </div>
     </section>
 
-    <!-- Pricing Section -->
+    <!-- Pricing Section — hidden for now
     <section id="pricing" class="py-20 lg:py-28 bg-section-white relative overflow-hidden">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <span class="inline-block uppercase tracking-wider text-[11px] font-bold text-accent-1 bg-accent-1/10 px-3 py-1 rounded-full mb-4 font-display">Pricing</span>
@@ -292,6 +294,7 @@
         </div>
       </div>
     </section>
+    -->
 
     <!-- CTA Section -->
     <section class="p-6 md:p-12 max-w-7xl mx-auto">
@@ -307,9 +310,11 @@
             <button @click="goToContact" type="button" class="px-6 py-3.5 bg-white text-secondary-600 font-bold rounded-xl shadow-md hover:bg-secondary-50 transition duration-200 cursor-pointer font-primary">
               Contact Sales
             </button>
+            <!-- Pricing hidden for now
             <button @click="scrollToPricing" type="button" class="px-6 py-3.5 border border-white/40 text-white font-semibold rounded-xl hover:bg-white/10 transition duration-200 cursor-pointer font-primary">
               View Pricing
             </button>
+            -->
           </div>
         </div>
       </div>
@@ -336,6 +341,7 @@ const chatbotCards = [
   { tag: 'Control', title: 'Token analytics', desc: 'Track embeddings, prompts, and response usage over time.', hex: '#059669', delay: '1.5s' },
 ];
 
+/* Pricing hidden for now
 const pricingPlans = [
   {
     name: 'Starter', badgeClass: 'text-accent-1 bg-accent-1/10',
@@ -377,13 +383,16 @@ const pricingPlans = [
     ctaText: 'Contact Sales', ctaClass: 'border border-borderDefault text-textBody hover:bg-neutral-100', ctaLink: '/contact'
   }
 ];
+*/
 
 const goToContact = () => router.push('/contact?project=chatbot');
 
+/* Pricing hidden for now
 const scrollToPricing = () => {
   const pricingSection = document.getElementById('pricing');
   if (pricingSection) pricingSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
 };
+*/
 </script>
 
 <style scoped>

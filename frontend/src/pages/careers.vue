@@ -42,64 +42,71 @@
               Submit your CV
               <font-awesome-icon :icon="['fas', 'arrow-right']" class="text-sm transition-transform duration-200 group-hover:translate-x-1" />
             </ShineButton>
-            <ShineButton variant="outline" size="xl" @click="scrollToSection('open-roles')">
+            <ShineButton
+                v-if="hasOpenRoles"
+                variant="outline"
+                size="xl"
+                @click="scrollToSection('open-roles')"
+            >
               View open roles
             </ShineButton>
-          </div>
-
-          <div class="flex flex-wrap gap-6 mt-10 pt-8 border-t border-borderDefault/80">
-            <div v-for="(stat, i) in heroStats" :key="stat.label" class="min-w-[100px]">
-              <div
-                  class="font-display text-2xl font-bold text-headingMain transition-all duration-700"
-                  :class="heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
-                  :style="{ transitionDelay: `${400 + i * 100}ms` }"
-              >
-                {{ stat.value }}
-              </div>
-              <div class="text-[11px] text-textSupporting uppercase tracking-wide mt-0.5 font-semibold">{{ stat.label }}</div>
-            </div>
           </div>
         </div>
 
         <!-- Hero visual -->
         <div
-            class="relative hidden lg:block transition-all duration-1000 ease-out delay-200"
+            class="relative flex justify-center transition-all duration-1000 ease-out delay-200"
             :class="heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'"
         >
-          <div class="absolute inset-[8%] rounded-full bg-[radial-gradient(circle,rgba(74,144,226,0.18)_0%,transparent_70%)] animate-[botGlow_3s_ease-in-out_infinite]" aria-hidden="true"></div>
-          <div class="absolute -inset-3 rounded-full border-2 border-dashed border-accent-3/30 animate-[spin_24s_linear_infinite]" aria-hidden="true"></div>
-
-          <div class="relative grid grid-cols-2 gap-4 animate-[visualFloat_6s_ease-in-out_infinite]">
-            <div
-                v-for="(card, i) in heroCards"
-                :key="card.title"
-                class="bg-card border border-borderDefault rounded-2xl p-5 shadow-blue hover:-translate-y-1 hover:shadow-insetBlue transition-all duration-300"
-                :class="i === 1 ? 'mt-8' : i === 2 ? '-mt-4' : ''"
-            >
-              <div :class="['w-10 h-10 rounded-xl flex items-center justify-center mb-3', card.iconBg]">
-                <i :class="[card.icon, 'text-lg']" aria-hidden="true"></i>
-              </div>
-              <h3 class="font-display font-bold text-sm text-headingCard">{{ card.title }}</h3>
-              <p class="text-[12px] text-textBody mt-1 leading-relaxed">{{ card.text }}</p>
-            </div>
-          </div>
+          <div class="absolute inset-[5%] rounded-full bg-[radial-gradient(circle,rgba(74,144,226,0.15)_0%,transparent_70%)] animate-[botGlow_3s_ease-in-out_infinite] pointer-events-none" aria-hidden="true"></div>
+          <img
+              :src="careersHeroSvg"
+              alt=""
+              class="relative w-full max-w-[420px] lg:max-w-none lg:w-[110%] lg:-mr-8 drop-shadow-xl animate-[visualFloat_6s_ease-in-out_infinite]"
+              width="560"
+              height="480"
+              loading="eager"
+              decoding="async"
+          />
         </div>
       </div>
     </section>
 
     <!-- Tech marquee -->
-    <section class="py-8 bg-section-white border-y border-borderDefault overflow-hidden">
-      <p class="text-center text-[11px] font-bold uppercase tracking-[0.2em] text-textSupporting mb-5">Technologies we work with</p>
-      <div class="relative flex overflow-hidden">
-        <div class="flex gap-10 animate-[marquee_28s_linear_infinite] whitespace-nowrap px-4">
-          <span
-              v-for="(tech, i) in techMarqueeLooped"
-              :key="`${tech.name}-${i}`"
-              class="inline-flex items-center gap-2 text-sm font-semibold text-textBody"
-          >
-            <font-awesome-icon :icon="tech.icon" :class="tech.color" />
-            {{ tech.name }}
-          </span>
+    <section ref="techRef" class="py-10 bg-sectionLight border-y border-borderDefault overflow-hidden">
+      <div class="max-w-7xl mx-auto px-6">
+        <p
+            class="text-center text-xs font-bold tracking-widest text-textSupporting uppercase mb-6 transition-all duration-700 ease-out"
+            :class="visible.tech ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
+        >
+          Technologies we work with
+        </p>
+      </div>
+
+      <div
+          class="relative transition-all duration-700 ease-out delay-200"
+          :class="visible.tech ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'"
+      >
+        <div class="pointer-events-none absolute inset-y-0 left-0 w-16 sm:w-20 bg-gradient-to-r from-sectionLight to-transparent z-10"></div>
+        <div class="pointer-events-none absolute inset-y-0 right-0 w-16 sm:w-20 bg-gradient-to-l from-sectionLight to-transparent z-10"></div>
+        <div class="overflow-hidden">
+          <div class="flex w-max animate-marquee">
+            <div
+                v-for="copy in 4"
+                :key="copy"
+                class="flex shrink-0 items-center gap-6 pr-6"
+                :aria-hidden="copy > 1 ? 'true' : undefined"
+            >
+              <div
+                  v-for="tech in techList"
+                  :key="`${copy}-${tech.name}`"
+                  class="inline-flex items-center gap-2 bg-card border border-borderDefault rounded-full px-5 py-2.5 shadow-sm whitespace-nowrap shrink-0"
+              >
+                <font-awesome-icon :icon="tech.icon" :class="['text-sm', tech.color]" />
+                <span class="text-sm font-semibold text-brandDark">{{ tech.name }}</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -128,9 +135,11 @@
               :class="visible.perks ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'"
               :style="{ transitionDelay: visible.perks ? `${i * 100}ms` : '0ms' }"
           >
-            <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-primary-100/60 to-transparent rounded-bl-full opacity-0 group-hover:opacity-100 transition-opacity duration-300" aria-hidden="true"></div>
-            <div :class="['w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110', perk.iconBg]">
-              <i :class="[perk.icon, 'text-xl']" aria-hidden="true"></i>
+            <div class="absolute top-0 right-0 w-28 h-28 opacity-40 group-hover:opacity-70 transition-opacity duration-300 pointer-events-none" aria-hidden="true">
+              <img :src="perk.iconSvg" alt="" class="w-full h-full object-contain" loading="lazy" />
+            </div>
+            <div class="relative w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110 bg-gradient-to-br from-primary-50 to-secondary-50 border border-borderDefault/60">
+              <i :class="[perk.icon, 'text-lg text-primary-600']" aria-hidden="true"></i>
             </div>
             <h3 class="font-display font-bold text-headingCard mb-2">{{ perk.title }}</h3>
             <p class="text-sm text-textBody leading-relaxed">{{ perk.description }}</p>
@@ -140,8 +149,14 @@
     </section>
 
     <!-- Hiring process -->
-    <section ref="processRef" class="px-[5%] py-20 bg-section-white">
-      <div class="max-w-5xl mx-auto">
+    <section ref="processRef" class="px-[5%] py-20 bg-section-white relative overflow-hidden">
+      <img
+          :src="careersProcessSvg"
+          alt=""
+          class="absolute -right-8 top-12 w-40 h-40 opacity-[0.07] pointer-events-none hidden lg:block"
+          aria-hidden="true"
+      />
+      <div class="max-w-5xl mx-auto relative">
         <div
             class="text-center mb-14 transition-all duration-700 ease-out"
             :class="visible.process ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'"
@@ -168,9 +183,11 @@
               :class="visible.process ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'"
               :style="{ transitionDelay: visible.process ? `${i * 150}ms` : '0ms' }"
           >
-            <div class="relative z-10 w-20 h-20 mx-auto rounded-full bg-card border-2 border-primary-500/30 flex items-center justify-center shadow-blue mb-5 group-hover:scale-105 transition-transform">
-              <span class="font-display text-xl font-bold text-primary-600">{{ step.number }}</span>
-              <span class="absolute inset-0 rounded-full border-2 border-primary-400/40 animate-ping opacity-20" aria-hidden="true"></span>
+            <div class="relative z-10 w-20 h-20 mx-auto rounded-2xl bg-card border-2 border-primary-500/25 flex items-center justify-center shadow-blue mb-5 transition-transform duration-300 hover:scale-105 overflow-hidden">
+              <img :src="step.iconSvg" alt="" class="w-11 h-11" loading="lazy" />
+              <span class="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-primary-600 text-white text-[10px] font-bold flex items-center justify-center font-display shadow-sm">
+                {{ step.number }}
+              </span>
             </div>
             <h3 class="font-display font-bold text-headingCard mb-2">{{ step.title }}</h3>
             <p class="text-sm text-textBody leading-relaxed max-w-xs mx-auto">{{ step.description }}</p>
@@ -179,63 +196,61 @@
       </div>
     </section>
 
-    <!-- Open roles -->
-    <section id="open-roles" ref="rolesRef" class="px-[5%] py-20 md:py-24">
-      <div class="max-w-5xl mx-auto">
+    <!-- Open roles (only when published jobs exist) -->
+    <section
+        v-if="hasOpenRoles"
+        id="open-roles"
+        ref="openRolesRef"
+        class="px-[5%] py-20 md:py-24"
+    >
+      <div class="max-w-4xl mx-auto">
         <div
-            class="relative rounded-[24px] overflow-hidden bg-card border border-borderDefault shadow-blue transition-all duration-700 ease-out"
-            :class="visible.roles ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-12 scale-[0.98]'"
+            class="text-center mb-12 transition-all duration-700 ease-out"
+            :class="visible.openRoles ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'"
         >
-          <div class="absolute inset-0 bg-gradient-to-br from-primary-50/80 via-transparent to-secondary-50/60 pointer-events-none" aria-hidden="true"></div>
+          <span class="text-xs font-bold tracking-widest text-textBrand uppercase">Join the team</span>
+          <h2 class="font-display text-3xl md:text-4xl font-bold text-headingSection mt-3">Current openings</h2>
+          <p class="text-textBody mt-3 max-w-lg mx-auto leading-relaxed">
+            We're hiring for the roles below. Apply directly or submit your CV — we'll get back to you promptly.
+          </p>
+        </div>
 
-          <div class="relative grid grid-cols-1 lg:grid-cols-[1fr_280px]">
-            <div class="p-8 md:p-10 lg:border-r border-borderDefault">
-              <div class="flex flex-wrap items-center gap-3 mb-6">
-                <h2 class="font-display text-2xl md:text-[28px] font-bold text-headingSection">Open positions</h2>
-                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-amber-50 text-amber-800 border border-amber-200">
-                  <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
-                  Talent network open
-                </span>
-              </div>
-
-              <div class="flex flex-col sm:flex-row gap-5 items-start">
-                <div class="shrink-0 w-14 h-14 rounded-2xl flex items-center justify-center bg-gradient-to-br from-primary-100 to-secondary-100 border border-borderDefault shadow-sm animate-[visualFloat_5s_ease-in-out_infinite]">
-                  <i class="fa-solid fa-briefcase text-xl text-primary-600" aria-hidden="true"></i>
-                </div>
-                <div class="flex-1 min-w-0">
-                  <h3 class="font-display text-lg font-bold text-headingCard">No open roles right now</h3>
-                  <p class="text-sm text-textBody leading-relaxed mt-2 max-w-lg">
-                    Our team is at full strength — but strong engineers don't wait on job boards.
-                    Send your CV and we'll reach out personally when a role matches your skills in Java, Python, Vue, React, or WordPress.
-                  </p>
-                  <button
-                      type="button"
-                      @click="openModal('')"
-                      class="mt-6 inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm transition-all duration-200 hover:scale-[1.02] active:scale-95 cursor-pointer bg-buttonBackground text-white hover:bg-buttonHover shadow-orange group"
+        <div class="space-y-4">
+          <article
+              v-for="(job, i) in openRoles"
+              :key="job.id"
+              class="group bg-card border border-borderDefault rounded-2xl p-6 md:p-8 shadow-sm hover:border-activeBorder/30 hover:shadow-insetBlue hover:-translate-y-0.5 transition-all duration-300"
+              :class="visible.openRoles ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'"
+              :style="{ transitionDelay: visible.openRoles ? `${i * 100}ms` : '0ms' }"
+          >
+            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+              <div class="min-w-0 flex-1">
+                <div class="flex flex-wrap items-center gap-2 mb-2">
+                  <h3 class="font-display text-xl font-bold text-headingCard">{{ job.job_title }}</h3>
+                  <span
+                      v-if="job.job_type_name"
+                      class="inline-flex px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide bg-primary-50 text-primary-700 border border-primary-100"
                   >
-                    Submit your CV
-                    <i class="fa-solid fa-arrow-right text-xs transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true"></i>
-                  </button>
+                    {{ job.job_type_name }}
+                  </span>
                 </div>
+                <p class="text-sm text-textSupporting font-medium">
+                  {{ job.department }}
+                  <span v-if="job.location" class="text-textBody"> · {{ job.location }}</span>
+                </p>
+                <p v-if="job.description" class="text-sm text-textBody leading-relaxed mt-3 line-clamp-3">
+                  {{ job.description }}
+                </p>
               </div>
-            </div>
-
-            <div class="bg-neutral-100/70 border-t lg:border-t-0 border-borderDefault divide-y divide-borderDefault">
-              <div
-                  v-for="(stat, i) in sidebarStats"
-                  :key="stat.label"
-                  class="flex items-center justify-between px-6 py-4 transition-all duration-500 hover:bg-white/60"
-                  :class="visible.roles ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-4'"
-                  :style="{ transitionDelay: visible.roles ? `${200 + i * 80}ms` : '0ms' }"
+              <ShineButton
+                  size="md"
+                  class="shrink-0 self-start"
+                  @click="openModal(job.job_title)"
               >
-                <span class="flex items-center gap-2.5 text-[12px] text-textSupporting font-medium">
-                  <i :class="[stat.icon, 'text-accent-1']" aria-hidden="true"></i>
-                  {{ stat.label }}
-                </span>
-                <span class="font-display text-sm font-bold text-headingSection">{{ stat.value }}</span>
-              </div>
+                Apply now
+              </ShineButton>
             </div>
-          </div>
+          </article>
         </div>
       </div>
     </section>
@@ -270,7 +285,7 @@
     >
       <div
           v-if="isModalOpen"
-          class="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto bg-neutral-950/60 backdrop-blur-sm"
+          class="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-neutral-950/60 backdrop-blur-sm"
           role="dialog"
           aria-modal="true"
           aria-labelledby="cvModalTitle"
@@ -285,23 +300,29 @@
             leave-from-class="opacity-100 scale-100 translate-y-0"
             leave-to-class="opacity-0 scale-95 translate-y-4"
         >
-          <div class="relative w-full max-w-lg bg-card rounded-2xl shadow-2xl border border-borderDefault overflow-hidden flex flex-col max-h-[90vh]">
+          <div class="relative w-full max-w-3xl bg-card rounded-2xl shadow-2xl border border-borderDefault overflow-hidden flex flex-col">
 
-            <div class="p-6 border-b border-borderDefault flex items-start justify-between bg-gradient-to-br from-primary-50 via-accent-1/10 to-card shrink-0">
-              <div class="space-y-1">
-                <span class="inline-block px-2.5 py-0.5 rounded bg-accent-1/10 text-accent-2 text-[10px] font-bold uppercase tracking-wider">
-                  Join our team
-                </span>
-                <h3 id="cvModalTitle" class="font-display text-xl font-bold text-headingMain">Submit Your CV</h3>
-                <p class="text-xs text-textBody">Share your profile — we'll match you with the right role.</p>
+            <div class="relative px-6 py-5 md:px-8 md:py-6 border-b border-borderDefault flex items-start justify-between gap-4 bg-gradient-to-br from-primary-50/90 via-white to-secondary-50/40 shrink-0">
+              <div class="flex items-start gap-4 min-w-0">
+                <div class="hidden sm:flex w-12 h-12 rounded-xl bg-white border border-primary-100 shadow-sm items-center justify-center shrink-0">
+                  <img :src="careersStepSubmitSvg" alt="" class="w-8 h-8" aria-hidden="true" />
+                </div>
+                <div class="space-y-1 min-w-0">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-accent-1/10 text-accent-2 text-[10px] font-bold uppercase tracking-wider border border-accent-1/15">
+                    <span class="w-1.5 h-1.5 rounded-full bg-accent-2 animate-pulse"></span>
+                    Join our team
+                  </span>
+                  <h3 id="cvModalTitle" class="font-display text-xl md:text-2xl font-bold text-headingMain">Submit your CV</h3>
+                  <p class="text-sm text-textBody">Tell us about yourself — we'll match you with the right opportunity.</p>
+                </div>
               </div>
               <button
                   type="button"
                   @click="closeModal"
-                  class="text-2xl text-textBody hover:text-headingMain hover:rotate-90 transition-all duration-200 leading-none p-1 cursor-pointer"
+                  class="shrink-0 w-9 h-9 rounded-lg flex items-center justify-center text-textBody hover:text-headingMain hover:bg-neutral-100 transition-all duration-200 cursor-pointer"
                   aria-label="Close modal"
               >
-                &times;
+                <i class="fa-solid fa-xmark text-lg" aria-hidden="true"></i>
               </button>
             </div>
 
@@ -314,13 +335,13 @@
               <div
                   v-if="submitSuccess"
                   key="success"
-                  class="p-8 text-center my-auto space-y-3"
+                  class="px-8 py-12 text-center space-y-4"
               >
-                <div class="w-14 h-14 bg-accent-1/20 text-accent-2 rounded-full flex items-center justify-center text-2xl mx-auto border border-accent-1/30 shadow-lg shadow-accent-1/25 animate-[chipPop_0.55s_cubic-bezier(0.22,1,0.36,1)_both]">
+                <div class="w-16 h-16 bg-accent-1/20 text-accent-2 rounded-2xl flex items-center justify-center text-2xl mx-auto border border-accent-1/30 shadow-lg shadow-accent-1/20 animate-[chipPop_0.55s_cubic-bezier(0.22,1,0.36,1)_both]">
                   <i class="fa-solid fa-check" aria-hidden="true"></i>
                 </div>
-                <h4 class="font-display text-lg font-bold text-headingMain">Application received!</h4>
-                <p class="text-sm text-textBody max-w-xs mx-auto">
+                <h4 class="font-display text-xl font-bold text-headingMain">Application received!</h4>
+                <p class="text-sm text-textBody max-w-md mx-auto leading-relaxed">
                   Thank you — our team will review your CV and reach out if there's a match.
                 </p>
               </div>
@@ -330,179 +351,174 @@
                   key="form"
                   @submit.prevent="handleSubmit"
                   novalidate
-                  class="flex flex-col overflow-hidden"
+                  class="flex flex-col"
               >
-                <div class="p-6 space-y-4 overflow-y-auto">
-
-                  <div class="space-y-1.5">
-                    <label class="text-xs font-semibold text-headingMain flex items-center gap-0.5">
-                      Full Name <span class="text-error">*</span>
-                    </label>
-                    <input
-                        type="text"
-                        v-model="formData.name"
-                        placeholder="Enter your full name"
-                        autocomplete="name"
-                        :class="formErrors.name
-                          ? 'border-error/60 focus:border-error focus:ring-error/10'
-                          : 'border-borderDefault focus:border-primary-500 focus:ring-primary-500/15 hover:border-primary-500/35'"
-                        class="w-full text-sm px-3.5 py-2.5 rounded-lg border bg-neutral-100 focus:outline-none focus:ring-2 placeholder:text-textSupporting transition-all duration-200 hover:bg-card focus:bg-card"
-                    />
-                    <p v-if="formErrors.name" class="text-[11px] text-error flex items-center gap-1">
-                      <i class="fa-solid fa-circle-exclamation text-[10px]"></i>
-                      {{ formErrors.name }}
-                    </p>
-                  </div>
-
-                  <div class="space-y-1.5">
-                    <label class="text-xs font-semibold text-headingMain flex items-center gap-0.5">
-                      Email Address <span class="text-error">*</span>
-                    </label>
-                    <input
-                        type="email"
-                        v-model="formData.email"
-                        placeholder="Enter your email address"
-                        autocomplete="email"
-                        @input="onEmailInput"
-                        @blur="onEmailInput"
-                        :class="formErrors.email
-                          ? 'border-error/60 focus:border-error focus:ring-error/10'
-                          : 'border-borderDefault focus:border-primary-500 focus:ring-primary-500/15 hover:border-primary-500/35'"
-                        class="w-full text-sm px-3.5 py-2.5 rounded-lg border bg-neutral-100 focus:outline-none focus:ring-2 placeholder:text-textSupporting transition-all duration-200 hover:bg-card focus:bg-card"
-                    />
-                    <p v-if="formErrors.email" class="text-[11px] text-error flex items-center gap-1">
-                      <i class="fa-solid fa-circle-exclamation text-[10px]"></i>
-                      {{ formErrors.email }}
-                    </p>
-                  </div>
-
-                  <div class="space-y-1.5">
-                    <label class="text-xs font-semibold text-headingMain flex items-center gap-0.5">
-                      Phone / Contact <span class="text-error">*</span>
-                    </label>
-                    <input
-                        type="tel"
-                        v-model="formData.contact"
-                        placeholder="Enter your phone or WhatsApp number"
-                        autocomplete="tel"
-                        :class="formErrors.contact
-                          ? 'border-error/60 focus:border-error focus:ring-error/10'
-                          : 'border-borderDefault focus:border-primary-500 focus:ring-primary-500/15 hover:border-primary-500/35'"
-                        class="w-full text-sm px-3.5 py-2.5 rounded-lg border bg-neutral-100 focus:outline-none focus:ring-2 placeholder:text-textSupporting transition-all duration-200 hover:bg-card focus:bg-card"
-                    />
-                    <p v-if="formErrors.contact" class="text-[11px] text-error flex items-center gap-1">
-                      <i class="fa-solid fa-circle-exclamation text-[10px]"></i>
-                      {{ formErrors.contact }}
-                    </p>
-                  </div>
-
-                  <div class="space-y-1.5">
-                    <label class="text-xs font-semibold text-headingMain flex items-center gap-0.5">
-                      Desired Position <span class="text-error">*</span>
-                    </label>
-                    <input
-                        type="text"
-                        v-model="formData.position"
-                        placeholder="e.g., Vue Developer, Java Backend Engineer"
-                        :class="formErrors.position
-                          ? 'border-error/60 focus:border-error focus:ring-error/10'
-                          : 'border-borderDefault focus:border-primary-500 focus:ring-primary-500/15 hover:border-primary-500/35'"
-                        class="w-full text-sm px-3.5 py-2.5 rounded-lg border bg-neutral-100 focus:outline-none focus:ring-2 placeholder:text-textSupporting transition-all duration-200 hover:bg-card focus:bg-card"
-                    />
-                    <p v-if="formErrors.position" class="text-[11px] text-error flex items-center gap-1">
-                      <i class="fa-solid fa-circle-exclamation text-[10px]"></i>
-                      {{ formErrors.position }}
-                    </p>
-                  </div>
-
-                  <div class="space-y-1.5">
-                    <label class="text-xs font-semibold text-headingMain flex items-center gap-0.5">
-                      Upload CV (PDF, DOC, DOCX) <span class="text-error">*</span>
-                    </label>
-                    <div
-                        @dragover.prevent="isDragging = true"
-                        @dragleave.prevent="isDragging = false"
-                        @drop.prevent="handleFileDrop"
-                        @click="triggerFileSelect"
-                        :class="[
-                          isDragging
-                            ? 'border-primary-500 bg-primary-500/5 scale-[1.02]'
-                            : fileUploaded
-                              ? 'border-primary-500 border-solid bg-accent-1/5'
-                              : formErrors.file
-                                ? 'border-error/50 bg-error/5 border-2 border-dashed'
-                                : 'border-primary-500/35 bg-primary-50 hover:bg-primary-100/50 border-2 border-dashed',
-                        ]"
-                        class="relative rounded-xl p-6 text-center transition-all duration-200 cursor-pointer group hover:shadow-lg hover:shadow-primary-500/10"
-                    >
-                      <div
-                          class="text-2xl mb-1 select-none transition-colors duration-200"
-                          :class="formErrors.file ? 'text-error' : 'text-primary-500'"
-                          aria-hidden="true"
-                      >
-                        <i :class="formErrors.file ? 'fa-solid fa-triangle-exclamation' : 'fa-solid fa-folder-open'"></i>
-                      </div>
-                      <p class="text-xs font-semibold text-headingMain">Drag &amp; drop your CV here</p>
-                      <p class="text-[11px] text-textBody my-1">or</p>
-                      <button
-                          type="button"
-                          class="cursor-pointer px-3 py-1.5 bg-card border border-borderDefault rounded-md shadow-sm text-[11px] font-medium text-textBody group-hover:border-primary-500/35 transition-all duration-200"
-                      >
-                        Browse files
-                      </button>
-                      <span
-                          class="block text-[11px] font-medium mt-2 truncate max-w-[200px] mx-auto"
-                          :class="fileUploaded ? 'text-accent-2 font-semibold' : 'text-textBody'"
-                      >
-                        {{ fileName }}
-                      </span>
+                <div class="px-6 py-6 md:px-8 md:py-7">
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
+                    <div class="space-y-1.5">
+                      <label class="text-xs font-semibold text-headingMain flex items-center gap-1.5">
+                        <i class="fa-solid fa-user text-primary-500/70 text-[10px]" aria-hidden="true"></i>
+                        Full Name <span class="text-error">*</span>
+                      </label>
                       <input
-                          type="file"
-                          ref="fileInput"
-                          @change="handleFileSelect"
-                          accept=".pdf,.doc,.docx"
-                          class="hidden"
+                          type="text"
+                          v-model="formData.name"
+                          placeholder="Your full name"
+                          autocomplete="name"
+                          :class="inputClass(formErrors.name)"
                       />
+                      <p v-if="formErrors.name" class="text-[11px] text-error flex items-center gap-1">
+                        <i class="fa-solid fa-circle-exclamation text-[10px]"></i>
+                        {{ formErrors.name }}
+                      </p>
                     </div>
-                    <div class="flex items-center justify-between mt-0.5">
+
+                    <div class="space-y-1.5">
+                      <label class="text-xs font-semibold text-headingMain flex items-center gap-1.5">
+                        <i class="fa-solid fa-envelope text-primary-500/70 text-[10px]" aria-hidden="true"></i>
+                        Email Address <span class="text-error">*</span>
+                      </label>
+                      <input
+                          type="email"
+                          v-model="formData.email"
+                          placeholder="name@example.com"
+                          autocomplete="email"
+                          @input="onEmailInput"
+                          @blur="onEmailInput"
+                          :class="inputClass(formErrors.email)"
+                      />
+                      <p v-if="formErrors.email" class="text-[11px] text-error flex items-center gap-1">
+                        <i class="fa-solid fa-circle-exclamation text-[10px]"></i>
+                        {{ formErrors.email }}
+                      </p>
+                    </div>
+
+                    <div class="space-y-1.5">
+                      <label class="text-xs font-semibold text-headingMain flex items-center gap-1.5">
+                        <i class="fa-solid fa-phone text-primary-500/70 text-[10px]" aria-hidden="true"></i>
+                        Phone / Contact <span class="text-error">*</span>
+                      </label>
+                      <input
+                          type="tel"
+                          v-model="formData.contact"
+                          placeholder="Phone or WhatsApp"
+                          autocomplete="tel"
+                          :class="inputClass(formErrors.contact)"
+                      />
+                      <p v-if="formErrors.contact" class="text-[11px] text-error flex items-center gap-1">
+                        <i class="fa-solid fa-circle-exclamation text-[10px]"></i>
+                        {{ formErrors.contact }}
+                      </p>
+                    </div>
+
+                    <div class="space-y-1.5">
+                      <label class="text-xs font-semibold text-headingMain flex items-center gap-1.5">
+                        <i class="fa-solid fa-briefcase text-primary-500/70 text-[10px]" aria-hidden="true"></i>
+                        Desired Position <span class="text-error">*</span>
+                      </label>
+                      <input
+                          type="text"
+                          v-model="formData.position"
+                          placeholder="e.g. Vue Developer, Java Engineer"
+                          :class="inputClass(formErrors.position)"
+                      />
+                      <p v-if="formErrors.position" class="text-[11px] text-error flex items-center gap-1">
+                        <i class="fa-solid fa-circle-exclamation text-[10px]"></i>
+                        {{ formErrors.position }}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                    <div class="space-y-1.5">
+                      <label class="text-xs font-semibold text-headingMain flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-arrow-up text-primary-500/70 text-[10px]" aria-hidden="true"></i>
+                        Upload CV <span class="text-error">*</span>
+                      </label>
+                      <div
+                          @dragover.prevent="isDragging = true"
+                          @dragleave.prevent="isDragging = false"
+                          @drop.prevent="handleFileDrop"
+                          @click="triggerFileSelect"
+                          :class="[
+                            isDragging
+                              ? 'border-primary-500 bg-primary-500/5 ring-2 ring-primary-500/20'
+                              : fileUploaded
+                                ? 'border-primary-500 border-solid bg-accent-1/5'
+                                : formErrors.file
+                                  ? 'border-error/50 bg-error/5'
+                                  : 'border-primary-500/30 bg-primary-50/60 hover:bg-primary-50 hover:border-primary-500/50',
+                          ]"
+                          class="relative flex items-center gap-4 rounded-xl border-2 border-dashed px-4 py-4 transition-all duration-200 cursor-pointer group min-h-[104px]"
+                      >
+                        <div
+                            class="shrink-0 w-11 h-11 rounded-xl flex items-center justify-center transition-colors duration-200"
+                            :class="formErrors.file ? 'bg-error/10 text-error' : fileUploaded ? 'bg-accent-1/15 text-accent-2' : 'bg-white text-primary-500 border border-primary-100 shadow-sm'"
+                            aria-hidden="true"
+                        >
+                          <i :class="formErrors.file ? 'fa-solid fa-triangle-exclamation' : fileUploaded ? 'fa-solid fa-file-circle-check' : 'fa-solid fa-cloud-arrow-up'"></i>
+                        </div>
+                        <div class="flex-1 min-w-0 text-left">
+                          <p class="text-sm font-semibold text-headingMain">
+                            {{ fileUploaded ? 'CV attached' : 'Drag & drop or browse' }}
+                          </p>
+                          <p class="text-[11px] text-textBody mt-0.5">PDF, DOC, DOCX · Max 5MB</p>
+                          <p
+                              class="text-[11px] font-medium mt-1 truncate"
+                              :class="fileUploaded ? 'text-accent-2' : 'text-textSupporting'"
+                          >
+                            {{ fileName }}
+                          </p>
+                        </div>
+                        <button
+                            type="button"
+                            class="shrink-0 hidden sm:inline-flex cursor-pointer px-3 py-1.5 bg-white border border-borderDefault rounded-lg shadow-sm text-[11px] font-semibold text-textBody group-hover:border-primary-500/40 group-hover:text-primary-600 transition-all duration-200"
+                        >
+                          Browse
+                        </button>
+                        <input
+                            type="file"
+                            ref="fileInput"
+                            @change="handleFileSelect"
+                            accept=".pdf,.doc,.docx"
+                            class="hidden"
+                        />
+                      </div>
                       <p v-if="formErrors.file" class="text-[11px] text-error flex items-center gap-1">
                         <i class="fa-solid fa-circle-exclamation text-[10px]"></i>
                         {{ formErrors.file }}
                       </p>
-                      <p v-else class="text-[10px] text-textBody">Maximum file size: 5MB</p>
+                    </div>
+
+                    <div class="space-y-1.5 flex flex-col">
+                      <label class="text-xs font-semibold text-headingMain flex items-center gap-1.5">
+                        <i class="fa-solid fa-pen text-primary-500/70 text-[10px]" aria-hidden="true"></i>
+                        Cover Letter
+                        <span class="text-textSupporting font-normal">(optional)</span>
+                      </label>
+                      <textarea
+                          v-model="formData.coverLetter"
+                          placeholder="Brief note on your experience and what you're looking for..."
+                          class="flex-1 w-full min-h-[104px] text-sm px-3.5 py-3 rounded-xl border border-borderDefault bg-neutral-50 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/15 placeholder:text-textSupporting transition-all duration-200 hover:border-primary-500/35 hover:bg-white focus:bg-white resize-none"
+                      ></textarea>
                     </div>
                   </div>
-
-                  <div class="space-y-1.5">
-                    <label class="text-xs font-semibold text-headingMain">
-                      Cover Letter
-                      <span class="text-textSupporting font-normal">(optional)</span>
-                    </label>
-                    <textarea
-                        v-model="formData.coverLetter"
-                        placeholder="Tell us why you'd be a great fit for our team..."
-                        class="w-full text-sm px-3.5 py-2.5 rounded-lg border border-borderDefault bg-neutral-100 focus:outline-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500/15 placeholder:text-textSupporting transition-all duration-200 hover:border-primary-500/35 hover:bg-card focus:bg-card h-24 resize-none"
-                    ></textarea>
-                  </div>
-
                 </div>
 
-                <div class="p-4 border-t border-borderDefault flex flex-col gap-3 bg-gradient-to-b from-card to-neutral-100 shrink-0">
+                <div class="px-6 py-4 md:px-8 border-t border-borderDefault flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-gradient-to-r from-neutral-50/80 via-white to-primary-50/30 shrink-0">
+                  <p class="text-[11px] text-textSupporting hidden sm:block">
+                    <i class="fa-solid fa-lock text-[10px] mr-1 opacity-60" aria-hidden="true"></i>
+                    Your information is kept confidential.
+                  </p>
                   <button
                       type="submit"
                       :disabled="isSubmitting"
-                      class="w-full inline-flex items-center justify-center gap-1.5 px-5 py-2.5 bg-buttonBackground hover:bg-buttonHover disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-sm rounded-xl transition-all duration-200 shadow-orange hover:scale-[1.01] active:scale-[0.99] relative overflow-hidden group cursor-pointer"
+                      class="w-full sm:w-auto sm:min-w-[220px] inline-flex items-center justify-center gap-2 px-6 py-3 bg-buttonBackground hover:bg-buttonHover disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-sm rounded-xl transition-all duration-200 shadow-orange hover:scale-[1.01] active:scale-[0.99] relative overflow-hidden group cursor-pointer"
                   >
                     <span class="relative z-10">
                       {{ isSubmitting ? 'Submitting...' : 'Submit application' }}
                     </span>
-                    <span
-                        aria-hidden="true"
-                        class="relative z-10 transition-transform duration-200 group-hover:translate-x-1"
-                    >&rarr;</span>
-                    <div
-                        class="absolute inset-0 w-1/3 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent pointer-events-none animate-[shineLoop_0.98s_ease-in-out_infinite_alternate]"
-                    ></div>
+                    <i class="fa-solid fa-arrow-right relative z-10 text-xs transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true"></i>
                   </button>
                 </div>
               </form>
@@ -560,11 +576,18 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useCareers } from '@/composables/useCareers.js'
+import { cvAPI } from '@/services/cvApi.js'
 import Navbar from '../components/navbar.vue'
 import Footer from '../components/footer.vue'
 import ShineButton from '@/components/ShineButton.vue'
+import careersHeroSvg from '@/assets/svg/careers-hero.svg'
+import careersProcessSvg from '@/assets/svg/careers-process.svg'
+import careersPerkAccentSvg from '@/assets/svg/careers-perk-accent.svg'
+import careersStepSubmitSvg from '@/assets/svg/careers-step-submit.svg'
+import careersStepCallSvg from '@/assets/svg/careers-step-call.svg'
+import careersStepTechSvg from '@/assets/svg/careers-step-tech.svg'
 
 const {
   isModalOpen, submitSuccess, isDragging,
@@ -583,32 +606,25 @@ let wordInterval = null
 let heroTimer = null
 
 const visible = reactive({
+  tech: false,
   perks: false,
   process: false,
-  roles: false,
+  openRoles: false,
   cta: false,
 })
 
+const techRef = ref(null)
 const perksRef = ref(null)
 const processRef = ref(null)
-const rolesRef = ref(null)
+const openRolesRef = ref(null)
 const ctaRef = ref(null)
 
+const openRoles = ref([])
+const hasOpenRoles = computed(() => openRoles.value.length > 0)
+
 const heroWords = ['real impact', 'modern stacks', 'great teams']
-const heroStats = [
-  { label: 'Avg. response', value: '48h' },
-  { label: 'Active projects', value: '10+' },
-  { label: 'Client retention', value: '94%' },
-]
 
-const heroCards = [
-  { title: 'Modern stack', text: 'Java, Python, Vue, React & WordPress daily.', icon: 'fa-solid fa-code', iconBg: 'bg-tagBlueBg text-primary-600' },
-  { title: 'Real products', text: 'Ship features clients use — not slide decks.', icon: 'fa-solid fa-rocket', iconBg: 'bg-tagTealBg text-accent-1' },
-  { title: 'Growth path', text: 'Mentorship, ownership, and clear progression.', icon: 'fa-solid fa-users', iconBg: 'bg-tagPinkBg text-secondary-600' },
-  { title: 'Flexible culture', text: 'Focus on output, respect, and balance.', icon: 'fa-solid fa-handshake', iconBg: 'bg-accent-1/10 text-accent-2' },
-]
-
-const techMarquee = [
+const techList = [
   { name: 'Java', icon: ['fab', 'java'], color: 'text-[#E76F00]' },
   { name: 'Grails', icon: ['fas', 'seedling'], color: 'text-[#8E6CF0]' },
   { name: 'Python', icon: ['fab', 'python'], color: 'text-[#3776AB]' },
@@ -619,34 +635,31 @@ const techMarquee = [
   { name: 'HTML / CSS', icon: ['fab', 'html5'], color: 'text-[#E34F26]' },
 ]
 
-const techMarqueeLooped = computed(() => [...techMarquee, ...techMarquee, ...techMarquee])
-
 const perks = [
-  { title: 'Work on live products', description: 'Contribute to Sentra AI, client platforms, and greenfield apps — code that reaches real users.', icon: 'fa-solid fa-bolt', iconBg: 'bg-amber-50 text-amber-600 border border-amber-100' },
-  { title: 'Learn every day', description: 'Pair with senior engineers, explore new patterns, and deepen skills across backend and frontend.', icon: 'fa-solid fa-code', iconBg: 'bg-primary-50 text-primary-600 border border-primary-100' },
-  { title: 'Transparent team', description: 'Weekly check-ins, clear expectations, and direct access to leads — no mystery management.', icon: 'fa-solid fa-users', iconBg: 'bg-secondary-50 text-secondary-600 border border-secondary-100' },
-  { title: 'Remote-friendly', description: 'Collaborate from Islamabad or hybrid — we care about results and communication, not desk time.', icon: 'fa-solid fa-envelope', iconBg: 'bg-teal-50 text-teal-600 border border-teal-100' },
-  { title: 'Stable projects', description: 'Long-term client relationships and product work — not endless churn or throwaway MVPs.', icon: 'fa-solid fa-shield-halved', iconBg: 'bg-emerald-50 text-emerald-600 border border-emerald-100' },
-  { title: 'Room to grow', description: 'Take ownership as you grow — from contributor to lead on features and modules you believe in.', icon: 'fa-solid fa-rocket', iconBg: 'bg-violet-50 text-violet-600 border border-violet-100' },
+  { title: 'Work on live products', description: 'Contribute to Sentra AI, client platforms, and greenfield apps — code that reaches real users.', icon: 'fa-solid fa-bolt', iconSvg: careersPerkAccentSvg },
+  { title: 'Learn every day', description: 'Pair with senior engineers, explore new patterns, and deepen skills across backend and frontend.', icon: 'fa-solid fa-code', iconSvg: careersPerkAccentSvg },
+  { title: 'Transparent team', description: 'Weekly check-ins, clear expectations, and direct access to leads — no mystery management.', icon: 'fa-solid fa-users', iconSvg: careersPerkAccentSvg },
+  { title: 'Remote-friendly', description: 'Collaborate from Islamabad or hybrid — we care about results and communication, not desk time.', icon: 'fa-solid fa-envelope', iconSvg: careersPerkAccentSvg },
+  { title: 'Stable projects', description: 'Long-term client relationships and product work — not endless churn or throwaway MVPs.', icon: 'fa-solid fa-shield-halved', iconSvg: careersPerkAccentSvg },
+  { title: 'Room to grow', description: 'Take ownership as you grow — from contributor to lead on features and modules you believe in.', icon: 'fa-solid fa-rocket', iconSvg: careersPerkAccentSvg },
 ]
 
 const hiringSteps = [
-  { number: '01', title: 'Submit CV', description: 'Share your profile and the kind of role you are looking for — we read every application.' },
-  { number: '02', title: 'Intro call', description: 'A friendly conversation about your experience, interests, and how we work.' },
-  { number: '03', title: 'Technical chat', description: 'Practical discussion or short exercise aligned with the stack — no trick questions.' },
-]
-
-const sidebarStats = [
-  { label: 'avg. response', value: '48h', icon: 'fa-solid fa-clock' },
-  { label: 'teams hiring soon', value: '5', icon: 'fa-solid fa-users' },
-  { label: 'friendly env.', value: '100%', icon: 'fa-solid fa-handshake' },
-  { label: 'active projects', value: '10+', icon: 'fa-solid fa-code' },
-  { label: 'talent network', value: 'Open', icon: 'fa-solid fa-medal' },
+  { number: '01', title: 'Submit CV', description: 'Share your profile and the kind of role you are looking for — we read every application.', iconSvg: careersStepSubmitSvg },
+  { number: '02', title: 'Intro call', description: 'A friendly conversation about your experience, interests, and how we work.', iconSvg: careersStepCallSvg },
+  { number: '03', title: 'Technical chat', description: 'Practical discussion or short exercise aligned with the stack — no trick questions.', iconSvg: careersStepTechSvg },
 ]
 
 const scrollToSection = (id) => {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
+
+const inputClass = (hasError) => [
+  'w-full text-sm px-3.5 py-2.5 rounded-xl border bg-neutral-50 focus:outline-none focus:ring-2 placeholder:text-textSupporting transition-all duration-200 hover:bg-white focus:bg-white',
+  hasError
+    ? 'border-error/60 focus:border-error focus:ring-error/10'
+    : 'border-borderDefault focus:border-primary-500 focus:ring-primary-500/15 hover:border-primary-500/35',
+]
 
 const observeSection = (el, key) => {
   if (!el) return
@@ -662,16 +675,32 @@ const observeSection = (el, key) => {
   observer.observe(el)
 }
 
-onMounted(() => {
+const fetchOpenRoles = async () => {
+  try {
+    const { data } = await cvAPI.getPublishedJobs()
+    openRoles.value = Array.isArray(data) ? data : []
+  } catch {
+    openRoles.value = []
+  }
+}
+
+onMounted(async () => {
   heroTimer = setTimeout(() => { heroLoaded.value = true }, 80)
   wordInterval = setInterval(() => {
     currentWordIndex.value = (currentWordIndex.value + 1) % heroWords.length
   }, 2800)
 
+  await fetchOpenRoles()
+
+  observeSection(techRef.value, 'tech')
   observeSection(perksRef.value, 'perks')
   observeSection(processRef.value, 'process')
-  observeSection(rolesRef.value, 'roles')
   observeSection(ctaRef.value, 'cta')
+
+  if (hasOpenRoles.value) {
+    await nextTick()
+    observeSection(openRolesRef.value, 'openRoles')
+  }
 })
 
 onUnmounted(() => {
@@ -702,12 +731,16 @@ onUnmounted(() => {
   to { opacity: 1; transform: none; }
 }
 @keyframes marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-33.333%); }
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
 }
-@keyframes shineLoop {
-  0%   { transform: translateX(-200%); }
-  100% { transform: translateX(400%); }
+.animate-marquee { animation: marquee 25s linear infinite; }
+.animate-marquee:hover { animation-play-state: paused; }
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation: none !important;
+  }
 }
 
 .word-fade-enter-active,

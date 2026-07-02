@@ -96,8 +96,14 @@
           </p>
         </div>
         <div class="rounded-2xl p-[14px] bg-white/90 border border-borderDefault shadow-[var(--color-platform-shadow)]">
-          <img src="../assets/svg/sentra-platform.svg" alt="Sentra AI platform architecture"
-               class="w-full block rounded-[14px]" />
+          <object
+              :data="sentraPlatformSvg"
+              type="image/svg+xml"
+              class="w-full block rounded-[14px]"
+              title="Sentra AI platform architecture"
+          >
+            Sentra AI platform diagram
+          </object>
         </div>
       </div>
     </section>
@@ -423,6 +429,7 @@
 import Navbar from '@/components/navbar.vue'
 import Footer from '@/components/footer.vue'
 import ShineButton from "@/components/ShineButton.vue";
+import sentraPlatformSvg from '@/assets/svg/sentra-platform.svg'
 
 // Grid cell config
 const CELL_CONFIGS = [
@@ -452,6 +459,7 @@ export default {
   },
   data() {
     return {
+      sentraPlatformSvg,
       gridCells: CELL_CONFIGS,
       modules: [
         { name: 'Dashboard', icon: 'fas fa-gauge-high', link: '#dashboard' },

@@ -1,5 +1,5 @@
 <script setup>
-import { useDashboard } from '@/composables/useDashboard.js'
+
 
 const {
   messages, loading, error, searchQuery, searchInput,

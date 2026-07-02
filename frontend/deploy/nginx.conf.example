@@ -1,0 +1,32 @@
+# Nginx config for serving the Vite/Vue dist build (SPA).
+# Copy or include this in your site block for upgraded.rasantsol.com
+
+server {
+    listen 80;
+    server_name upgraded.rasantsol.com;
+
+    # Path to frontend/dist after build
+    root /var/www/rasant/frontend/dist;
+    index index.html;
+
+    # API requests go to Django (adjust upstream as needed)
+    location /api/ {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    # Static assets with cache
+    location /assets/ {
+        try_files $uri =404;
+        expires 1y;
+        add_header Cache-Control "public, immutable";
+    }
+
+    # SPA fallback — required for direct URLs like /careers, /contact, /services/...
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}

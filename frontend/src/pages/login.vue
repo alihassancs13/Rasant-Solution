@@ -1,9 +1,9 @@
 <template>
-  <div class="flex h-dvh w-full overflow-hidden bg-gradient-primary font-primary antialiased">
+  <div class="login-page fixed inset-0 flex h-dvh w-full max-w-[100vw] overflow-hidden bg-gradient-primary font-primary antialiased">
 
-    <div class="flex min-h-0 flex-1 overflow-hidden">
+    <div class="flex min-h-0 min-w-0 flex-1 w-full overflow-hidden">
       <!-- Left panel -->
-      <aside class="relative hidden min-h-0 flex-[1.08] flex-col justify-between overflow-hidden border-r border-borderDefault px-10 pt-8 pb-8 lg:px-12 lg:pt-10 lg:pb-10 xl:px-14 lg:flex">
+      <aside class="relative hidden min-h-0 min-w-0 flex-[1.08] flex-col justify-between overflow-hidden border-r border-borderDefault px-10 pt-8 pb-8 lg:flex lg:px-12 lg:pt-10 lg:pb-10 xl:px-14">
 
         <div class="absolute inset-0 bg-gradient-primary" aria-hidden="true"></div>
 
@@ -59,17 +59,17 @@
       </aside>
 
       <!-- Right panel -->
-      <main class="relative flex min-h-0 flex-[0.92] items-center justify-center overflow-x-hidden overflow-y-auto bg-gradient-primary px-5 py-6 sm:px-8 lg:bg-section-white/80 lg:backdrop-blur-sm">
+      <main class="relative flex min-h-0 min-w-0 flex-1 w-full items-center justify-center overflow-hidden bg-gradient-primary px-4 py-4 sm:px-6 sm:py-6 lg:bg-section-white/80 lg:backdrop-blur-sm">
 
-        <!-- Animated concentric rings -->
-        <div class="pointer-events-none absolute -top-48 -right-48 h-[580px] w-[580px] animate-login-ring rounded-full border border-primary-500/10" aria-hidden="true"></div>
-        <div class="pointer-events-none absolute -top-28 -right-28 h-[380px] w-[380px] animate-login-ring rounded-full border border-primary-500/10 [animation-delay:2s]" aria-hidden="true"></div>
-        <div class="pointer-events-none absolute -top-14 -right-14 h-[200px] w-[200px] animate-login-ring rounded-full border border-primary-500/8 [animation-delay:4s]" aria-hidden="true"></div>
+        <!-- Animated concentric rings (desktop only — avoids mobile horizontal overflow) -->
+        <div class="pointer-events-none absolute -top-48 -right-48 hidden h-[580px] w-[580px] animate-login-ring rounded-full border border-primary-500/10 lg:block" aria-hidden="true"></div>
+        <div class="pointer-events-none absolute -top-28 -right-28 hidden h-[380px] w-[380px] animate-login-ring rounded-full border border-primary-500/10 [animation-delay:2s] lg:block" aria-hidden="true"></div>
+        <div class="pointer-events-none absolute -top-14 -right-14 hidden h-[200px] w-[200px] animate-login-ring rounded-full border border-primary-500/8 [animation-delay:4s] lg:block" aria-hidden="true"></div>
 
-        <div class="pointer-events-none absolute -bottom-24 -left-20 h-[340px] w-[340px] rounded-full bg-[radial-gradient(circle,var(--color-secondary-500)/0.08_0%,var(--color-accent-3)/0.06_50%,transparent_70%)] blur-2xl" aria-hidden="true"></div>
+        <div class="pointer-events-none absolute -bottom-24 -left-20 hidden h-[340px] w-[340px] rounded-full bg-[radial-gradient(circle,var(--color-secondary-500)/0.08_0%,var(--color-accent-3)/0.06_50%,transparent_70%)] blur-2xl lg:block" aria-hidden="true"></div>
 
         <!-- Floating particles -->
-        <div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+        <div class="pointer-events-none absolute inset-0 hidden overflow-hidden lg:block" aria-hidden="true">
           <span class="particle absolute top-[15%] left-[8%] h-1 w-1 rounded-full bg-primary-400/30 animate-float-1"></span>
           <span class="particle absolute top-[35%] right-[12%] h-1.5 w-1.5 rounded-full bg-secondary-400/25 animate-float-2"></span>
           <span class="particle absolute bottom-[22%] left-[15%] h-1 w-1 rounded-full bg-accent-3/20 animate-float-3"></span>
@@ -77,7 +77,7 @@
           <span class="particle absolute bottom-[40%] left-[5%] h-1 w-1 rounded-full bg-secondary-300/20 animate-float-2 [animation-delay:2.5s]"></span>
         </div>
 
-        <div class="relative z-10 w-full max-w-[400px] animate-login-card overflow-hidden rounded-2xl border border-borderDefault/80 bg-section-white p-6 shadow-blue sm:max-w-[420px] sm:p-7 lg:max-w-[400px] transition-shadow duration-500 hover:shadow-[0_20px_60px_rgba(74,144,226,0.18)] [animation-delay:60ms]">
+        <div class="relative z-10 box-border w-full max-w-[400px] min-w-0 animate-login-card overflow-hidden rounded-2xl border border-borderDefault/80 bg-section-white p-4 shadow-blue sm:max-w-[420px] sm:p-6 lg:max-w-[400px] lg:p-7 transition-shadow duration-500 hover:shadow-[0_20px_60px_rgba(74,144,226,0.18)] [animation-delay:60ms]">
 
           <!-- Animated top accent bar -->
           <div class="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-secondary-500 via-accent-4 to-primary-500 animate-gradient-shift" aria-hidden="true"></div>
@@ -85,18 +85,23 @@
           <!-- Corner glow -->
           <div class="pointer-events-none absolute -top-12 -right-12 h-28 w-28 rounded-full bg-[radial-gradient(circle,var(--color-primary-500)/0.10,transparent_70%)] blur-xl" aria-hidden="true"></div>
 
-          <div class="mb-4 flex justify-center lg:hidden">
-            <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-headingMain to-primary-500 text-sm font-extrabold text-white shadow-lg shadow-primary-500/25 animate-logo-bounce">
-              RS
-            </div>
+          <div class="mb-4 flex justify-center">
+            <img
+                src="@/assets/images/rasant-logo.png"
+                alt="Rasant Solutions"
+                width="212"
+                height="42"
+                decoding="async"
+                class="h-10 w-auto max-w-[180px] object-contain animate-logo-bounce"
+            />
           </div>
 
-          <div class="mb-5">
+          <div class="mb-4 sm:mb-5">
             <div class="inline-flex items-center gap-1.5 rounded-full border border-primary-200 bg-primary-50 px-3 py-1 text-[0.68rem] font-bold tracking-widest text-primary-700 uppercase">
               <font-awesome-icon icon="fa-solid fa-shield-halved" class="text-[0.65rem] text-primary-500 animate-shield-pulse" />
               Secure Sign-In
             </div>
-            <h2 class="mt-3 font-display text-2xl font-bold text-headingMain animate-login-fade-up [animation-delay:120ms]">Welcome back</h2>
+            <h2 class="mt-2 font-display text-xl font-bold text-headingMain animate-login-fade-up [animation-delay:120ms] sm:mt-3 sm:text-2xl">Welcome back</h2>
             <p class="mt-1 text-sm leading-relaxed text-textBody animate-login-fade-up [animation-delay:180ms]">
               Sign in to access your Rasant Solutions workspace.
             </p>
@@ -111,7 +116,7 @@
             {{ errorMessage }}
           </div>
 
-          <form @submit.prevent="handleLoginSubmit" novalidate class="space-y-4">
+          <form @submit.prevent="handleLoginSubmit" novalidate class="space-y-3 sm:space-y-4">
             <div class="animate-login-fade-up [animation-delay:220ms]">
               <label for="username" class="mb-1.5 block text-[0.7rem] font-bold tracking-wider text-headingMain uppercase">
                 Email or Username
@@ -207,13 +212,13 @@
             </div>
           </form>
 
-          <div class="my-4 flex items-center gap-3 text-xs text-textSupporting animate-login-fade-up [animation-delay:400ms]">
-            <span class="h-px flex-1 bg-gradient-to-r from-transparent to-borderDefault"></span>
-            <span class="whitespace-nowrap font-medium tracking-wide">Rasant Solutions</span>
-            <span class="h-px flex-1 bg-gradient-to-l from-transparent to-borderDefault"></span>
+          <div class="my-3 flex items-center gap-3 text-xs text-textSupporting animate-login-fade-up [animation-delay:400ms] sm:my-4">
+            <span class="h-px min-w-0 flex-1 bg-gradient-to-r from-transparent to-borderDefault"></span>
+            <span class="shrink-0 font-medium tracking-wide">Rasant Solutions</span>
+            <span class="h-px min-w-0 flex-1 bg-gradient-to-l from-transparent to-borderDefault"></span>
           </div>
 
-          <div class="mb-4 grid grid-cols-3 gap-2 animate-login-fade-up [animation-delay:440ms]">
+          <div class="mb-3 hidden grid-cols-3 gap-2 animate-login-fade-up [animation-delay:440ms] sm:mb-4 sm:grid">
             <div
                 v-for="(badge, i) in securityBadges"
                 :key="badge.label"
@@ -230,7 +235,7 @@
             </div>
           </div>
 
-          <div class="space-y-1.5 text-center animate-login-fade-up [animation-delay:520ms]">
+          <div class="space-y-1 text-center animate-login-fade-up [animation-delay:520ms]">
             <p class="text-sm text-textBody">
               Need access?
               <router-link to="/contact" class="font-semibold text-secondary-500 transition-all duration-200 hover:text-accent-4 hover:underline hover:underline-offset-2">
@@ -248,6 +253,10 @@
 </template>
 
 <style scoped>
+.login-page {
+  overscroll-behavior: none;
+}
+
 .login-input:-webkit-autofill,
 .login-input:-webkit-autofill:hover,
 .login-input:-webkit-autofill:focus {
@@ -337,9 +346,20 @@
 </style>
 
 <script setup>
+import { onMounted, onUnmounted } from 'vue';
 import ShineButton from '../components/ShineButton.vue';
 import { useLogin } from '../composables/useLogin';
 import LoginVisual from "@/components/LoginVisual.vue";
+
+onMounted(() => {
+  document.documentElement.style.overflow = 'hidden';
+  document.body.style.overflow = 'hidden';
+});
+
+onUnmounted(() => {
+  document.documentElement.style.overflow = '';
+  document.body.style.overflow = '';
+});
 
 const stats = [
   { value: '99%', label: 'Uptime SLA' },
