@@ -181,20 +181,19 @@ fetchCVSubmissions().then(ensureSelection)
 
         <!-- Pill Tab Navigation -->
         <div class="w-full overflow-x-auto scrollbar-hide">
-          <div class="flex w-max items-center bg-white border border-slate-200 rounded-full shadow-sm p-1">
-
+          <div class="inline-flex items-center gap-1 bg-white border border-slate-200 rounded-full shadow-sm p-1">
             <button
                 v-for="tab in tabs"
                 :key="tab.key"
                 @click="activeTab = tab.key"
-                class="flex items-center gap-4 px-6 py-1.5 sm:px-0 sm:py-2 rounded-full text-xs sm:text-sm font-semibold transition-colors cursor-pointer shrink-0"                :class="activeTab === tab.key
-        ? 'bg-blue-600 text-white shadow-sm'
-        : 'text-slate-500 hover:bg-slate-50'"
+                class="flex items-center gap-2 px-6 py-2.5 rounded-full text-sm font-semibold transition-all duration-200 cursor-pointer whitespace-nowrap"
+                :class="activeTab === tab.key
+          ? 'bg-blue-600 text-white shadow-md'
+          : 'text-slate-500 hover:bg-slate-50 hover:text-slate-700'"
             >
-              <font-awesome-icon :icon="tab.icon" class="w-3.5 h-3.5" />
+              <font-awesome-icon :icon="tab.icon" class="w-3.5 h-3.5 flex-shrink-0" />
               {{ tab.label }}
             </button>
-
           </div>
         </div>
         <router-view />
