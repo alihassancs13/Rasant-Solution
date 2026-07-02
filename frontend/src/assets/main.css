@@ -288,6 +288,43 @@ html, body {
     /* Badge backgrounds */
     --color-badge-white: rgba(255,255,255,0.8);
     --color-badge-border: rgba(74,144,226,0.12);
+
+    /* ── Brand: Primary (links, buttons, active states, focus rings) ── */
+    --color-primary: #1B55E2;
+    --color-primary-hover: #1546B8;
+    --color-primary-subtle: #E2ECF9;   /* tint bg: badges, avatar bg, active row */
+
+    /* ── Brand: Accent (secondary CTA — salary/save/email buttons) ── */
+    --color-accent: #df5309;
+    --color-accent-hover: #c64907;
+
+    /* ── Tertiary action (external-link style buttons) ── */
+    --color-secondary: #9333ea;
+    --color-secondary-subtle: #faf5ff;
+    --color-secondary-subtle-border: #e9d5ff;
+
+    /* ── Status: Success (Published badge) ── */
+    --color-success: #047857;
+    --color-success-subtle: #d1fae5;
+
+    /* ── Status: Warning (Pending/Draft badge) ── */
+    --color-warning: #b45309;
+    --color-warning-subtle: #fef3c7;
+
+    /* ── Status: Danger (delete buttons, error states) ── */
+    --color-danger: #dc2626;
+    --color-danger-hover: #fee2e2;
+    --color-danger-subtle: #fef2f2;
+    --color-danger-border: #fecaca;
+
+    /* ── Neutrals (replaces mixed slate/gray usage) ── */
+    --color-surface: #f8fafc;          /* page bg */
+    --color-surface-alt: #f1f5f9;      /* tab bg, hover bg */
+    --color-border: #e2e8f0;           /* card/input borders */
+    --color-border-subtle: #f1f5f9;    /* dividers */
+    --color-text-primary: #1e293b;     /* headings */
+    --color-text-secondary: #64748b;   /* body text */
+    --color-text-muted: #4c4e51;       /* placeholders, meta text */
 }
 
 :root {

@@ -2,11 +2,15 @@
 import { ref, computed, onMounted } from 'vue';
 import { fetchUserModules, getStoredModules, storeModules } from '../../services/adminsidebarApi.js';
 
+const isSidebarOpen = ref(false);
+const collapsed = ref(false);
+
 export function useAdminSidebar() {
     const modules = ref([]);
     const loading = ref(false);
     const error = ref(null);
     const dropdownStates = ref({});
+
 
     // Fetch modules from API
     const loadModules = async () => {
@@ -188,6 +192,8 @@ export function useAdminSidebar() {
         toggleDropdown,
         getModuleRoute,
         isActive,
-        getUserRole
+        getUserRole,
+        isSidebarOpen,
+        collapsed
     };
 }

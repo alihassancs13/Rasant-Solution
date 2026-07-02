@@ -1,61 +1,86 @@
 <!-- AdminSidebar.vue -->
 <template>
-  <div>
-    <!-- Mobile menu button -->
-    <div class="md:hidden fixed top-3 left-3 z-50">
-      <button
-          @click="isSidebarOpen = true"
-          class="w-10 h-10 flex items-center justify-center rounded-xl bg-blue-500 text-white shadow-lg hover:bg-[#1546B8] transition-colors focus:outline-none cursor-pointer"
-          aria-label="Open Sidebar"
-      >
-        <font-awesome-icon icon="fa-solid fa-bars" class="text-lg" />
-      </button>
-    </div>
-
+  <div class="contents">
     <!-- Overlay for mobile -->
     <div
         v-if="isSidebarOpen"
         @click="isSidebarOpen = false"
-        class="fixed inset-0 z-40 bg-neutral-950/40 backdrop-blur-[2px] md:hidden transition-opacity"
+        class="fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px] md:hidden transition-opacity"
     ></div>
 
     <!-- Sidebar -->
     <aside
-        class="fixed inset-y-0 left-0 z-40 w-64 h-screen bg-[#F4F7FE] flex flex-col justify-between border-r border-gray-200 font-sans select-none shrink-0 transform md:transform-none md:static transition-transform duration-300 ease-in-out overflow-hidden"
-        :class="isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
+        class="fixed inset-y-0 left-0 z-40 h-screen bg-surface flex flex-col justify-between border-r border-border shadow-sm font-sans select-none shrink-0 transform transition-all duration-200 ease-in-out will-change-transform contain-layout md:relative md:inset-auto md:translate-x-0"
+        :class="[
+      isSidebarOpen ? 'translate-x-0' : '-translate-x-full',
+      collapsed ? 'w-64 md:w-20' : 'w-64 md:w-64'
+    ]"
     >
-      <div class="flex-1 overflow-y-auto px-4 py-6 scrollbar-thin scrollbar-track-[#F4F7FE] scrollbar-thumb-[#5E5CE6] hover:scrollbar-thumb-[#4A48C6] scrollbar-thumb-rounded-full">
+      <div class="flex-1 overflow-y-auto overflow-x-hidden px-4 py-6 scrollbar-thin scrollbar-track-surface scrollbar-thumb-primary hover:scrollbar-thumb-primary-hover scrollbar-thumb-rounded-full">
 
-        <!-- Logo -->
-        <div class="flex items-center justify-between mb-6 px-2">
-          <router-link to="/" @click="isSidebarOpen = false" class="cursor-pointer transition-opacity hover:opacity-90 mx-auto md:mx-0">
-            <img src="../assets/images/rasant-logo.png" alt="Rasant Solutions" class="h-11 object-contain" />
+        <!-- Logo + Toggle -->
+        <div
+            class="mb-6 px-2"
+            :class="showCollapsed ? 'flex flex-col items-center gap-3' : 'flex items-center justify-between'"
+        >
+          <router-link
+              to="/"
+              class="cursor-pointer transition-opacity hover:opacity-90 flex items-center"
+              @click="handleNavigation"
+          >
+            <img
+                src="../assets/images/rasant-logo.png"
+                alt="Rasant Solutions"
+                class="object-contain transition-all"
+                :class="showCollapsed ? 'h-10 w-10' : 'h-11'"
+            />
           </router-link>
+
+          <!-- Desktop/tablet collapse toggle -->
+          <button
+              @click.stop="toggleCollapse"
+              class="hidden md:flex w-9 h-9 items-center justify-center rounded-lg text-text-muted hover:text-primary hover:bg-primary-subtle transition-colors cursor-pointer shrink-0"
+              :aria-label="collapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+          >
+            <font-awesome-icon icon="fa-solid fa-bars" class="text-lg" />
+          </button>
+
+          <!-- Mobile close -->
           <button
               @click="isSidebarOpen = false"
-              class="md:hidden text-gray-400 hover:text-gray-600 p-1 cursor-pointer"
+              class="md:hidden text-text-muted hover:text-text-secondary p-1 cursor-pointer"
           >
             <font-awesome-icon icon="fa-solid fa-xmark" class="text-lg" />
           </button>
         </div>
 
-        <!-- Role Badge -->
-        <div class="mb-4">
-          <div class="bg-[#E2ECF9] text-[#1B55E2] font-bold text-xs tracking-wider text-center py-2 px-4 rounded-xl uppercase">
+        <!-- Role Badge (expanded) -->
+        <div class="mb-4" v-show="!showCollapsed">
+          <div class="bg-primary-subtle text-primary font-bold text-xs tracking-wider text-center py-2 px-4 rounded-xl uppercase">
             {{ userRole }}
+          </div>
+        </div>
+
+        <!-- Role Badge (collapsed - initials) -->
+        <div class="mb-4 flex justify-center" v-show="showCollapsed">
+          <div
+              class="w-8 h-8 rounded-full bg-primary-subtle text-primary font-bold text-[10px] flex items-center justify-center uppercase"
+              :title="userRole"
+          >
+            {{ userRole.slice(0, 2) }}
           </div>
         </div>
 
         <!-- Loading State -->
         <div v-if="loading" class="text-center py-10">
-          <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-[#1B55E2] border-t-transparent"></div>
-          <p class="text-sm text-gray-500 mt-2">Loading menu...</p>
+          <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent"></div>
+          <p class="text-sm text-text-muted mt-2" v-show="!showCollapsed">Loading menu...</p>
         </div>
 
         <!-- Error State -->
         <div v-if="error" class="text-center py-10">
-          <p class="text-red-500 text-sm">{{ error }}</p>
-          <button @click="loadModules" class="mt-2 text-blue-500 hover:underline text-sm">
+          <p class="text-danger text-sm" v-show="!showCollapsed">{{ error }}</p>
+          <button @click="loadModules" class="mt-2 text-primary hover:underline text-sm" v-show="!showCollapsed">
             Retry
           </button>
         </div>
@@ -64,45 +89,76 @@
         <nav v-if="!loading && !error" class="space-y-3">
           <!-- Company Section -->
           <div>
-            <p class="text-[11px] font-bold text-gray-400 tracking-widest px-3 mb-1 uppercase">Company</p>
+            <p class="text-[11px] font-bold text-text-muted tracking-widest px-3 mb-1 uppercase" v-show="!showCollapsed">Company</p>
             <div class="space-y-0.5">
-              <!-- Dynamic Company Modules -->
               <template v-for="module in companyModules" :key="module.id">
                 <!-- Regular module -->
                 <router-link
                     v-if="!module.children"
                     :to="getModuleRoute(module.name)"
-                    @click="isSidebarOpen = false"
-                    class="flex items-center space-x-3 px-4 py-2 rounded-xl text-gray-500 hover:bg-[#E2ECF9] hover:text-[#1B55E2] font-medium transition-all"
-                    :class="{'bg-[#E2ECF9] text-[#1B55E2] font-semibold shadow-sm border-l-4 border-[#1B55E2]': isActive(module.name, $route.path)}"
+                    @click="handleNavigation"
+                    class="flex items-center px-4 py-2 rounded-xl text-text-muted hover:bg-primary-subtle hover:text-primary font-medium transition-all"
+                    :class="[
+                      isActive(module.name, $route.path) ? 'bg-primary-subtle text-primary font-semibold shadow-sm border-l-4 border-primary' : '',
+                      showCollapsed ? 'justify-center' : 'space-x-3'
+                    ]"
+                    :title="showCollapsed ? module.name : null"
                 >
-                  <font-awesome-icon :icon="module.icon" class="text-lg w-5" />
-                  <span>{{ module.name }}</span>
+                  <font-awesome-icon :icon="module.icon" class="text-lg w-5 shrink-0" />
+                  <span v-show="!showCollapsed" class="transition-opacity duration-150">{{ module.name }}</span>
                 </router-link>
 
                 <!-- Module with dropdown (Employees) -->
-                <div v-else>
+                <div v-else class="relative sidebar-dropdown">
                   <button
-                      @click="toggleDropdown(module.name)"
-                      class="w-full flex items-center justify-between px-4 py-2 cursor-pointer rounded-xl text-gray-500 hover:bg-[#E2ECF9] hover:text-[#1B55E2] font-medium transition-all focus:outline-none"
-                      :class="{'bg-white text-[#1B55E2] font-semibold shadow-sm border-l-4 border-[#1B55E2]': isActive(module.name, $route.path)}"
+                      @click.stop="toggleDropdown(module.name)"
+                      class="w-full flex items-center px-4 py-2 cursor-pointer rounded-xl text-text-muted hover:bg-primary-subtle hover:text-primary font-medium transition-all focus:outline-none"
+                      :class="[
+                        isActive(module.name, $route.path) ? 'bg-primary-subtle text-primary font-semibold shadow-sm border-l-4 border-primary' : '',
+                        showCollapsed ? 'justify-center' : 'justify-between'
+                      ]"
+                      :title="showCollapsed ? module.name : null"
                   >
-                    <div class="flex items-center space-x-3">
-                      <font-awesome-icon :icon="module.icon" class="text-lg w-5" />
-                      <span>{{ module.name }}</span>
+                    <div class="flex items-center" :class="showCollapsed ? '' : 'space-x-3'">
+                      <font-awesome-icon :icon="module.icon" class="text-lg w-5 shrink-0" />
+                      <span v-show="!showCollapsed">{{ module.name }}</span>
                     </div>
-                    <font-awesome-icon :icon="dropdownStates[module.name] ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right'" class="text-xs transition-transform duration-200" />
+                    <font-awesome-icon
+                        v-show="!showCollapsed"
+                        :icon="dropdownStates[module.name] ? 'fa-solid fa-chevron-down' : 'fa-solid fa-chevron-right'"
+                        class="text-xs transition-transform duration-200"
+                    />
                   </button>
 
-                  <div v-show="dropdownStates[module.name]" class="mt-0.5 ml-6 pl-4 border-l border-gray-300 space-y-0.5">
+                  <!-- Inline children (expanded mode) -->
+                  <div v-show="!showCollapsed && dropdownStates[module.name]" class="mt-0.5 ml-6 pl-4 border-l border-border space-y-0.5">
                     <router-link
                         v-for="child in module.children"
                         :key="child.id"
                         :to="getModuleRoute(child.name)"
-                        @click="isSidebarOpen = false"
-                        class="block px-4 py-1.5 text-sm text-gray-500 hover:bg-[#E2ECF9] hover:text-[#1B55E2] rounded-lg transition-all"
-                        :class="{'bg-white/80 text-[#1B55E2] font-semibold shadow-xs': isActive(child.name, $route.path)}"
+                        @click="handleChildLinkClick(module.name)"
+                        class="block px-4 py-1.5 text-sm text-text-muted hover:bg-primary-subtle hover:text-primary rounded-lg transition-all"
+                        :class="{'bg-white/80 text-primary font-semibold shadow-xs': isActive(child.name, $route.path)}"
                     >
+                      {{ child.name }}
+                    </router-link>
+                  </div>
+
+                  <!-- Flyout children (collapsed mode) -->
+                  <div
+                      v-if="showCollapsed && dropdownStates[module.name]"
+                      class="fixed left-[80px] top-1/2 -translate-y-1/2 w-52 bg-white rounded-xl shadow-lg border border-border py-2 z-[100]"
+                  >
+                    <p class="px-4 py-1 text-xs font-semibold text-text-muted uppercase border-b border-border">{{ module.name }}</p>
+                    <router-link
+                        v-for="child in module.children"
+                        :key="child.id"
+                        :to="getModuleRoute(child.name)"
+                        @click="handleChildLinkClick(module.name)"
+                        class="block px-4 py-2 text-sm text-text-secondary hover:bg-primary-subtle hover:text-primary transition-all"
+                        :class="{'text-primary font-semibold bg-primary-subtle': isActive(child.name, $route.path)}"
+                    >
+                      <font-awesome-icon :icon="child.icon || 'fa-solid fa-circle'" class="text-xs mr-2 text-text-muted" />
                       {{ child.name }}
                     </router-link>
                   </div>
@@ -113,18 +169,22 @@
 
           <!-- Projects Section -->
           <div>
-            <p class="text-[11px] font-bold text-gray-400 tracking-widest px-3 mb-1 uppercase">Projects</p>
+            <p class="text-[11px] font-bold text-text-muted tracking-widest px-3 mb-1 uppercase" v-show="!showCollapsed">Projects</p>
             <div class="space-y-0.5">
               <router-link
                   v-for="module in projectModules"
                   :key="module.id"
                   :to="getModuleRoute(module.name)"
-                  @click="isSidebarOpen = false"
-                  class="flex items-center space-x-3 px-4 py-2 rounded-xl text-gray-500 hover:bg-[#E2ECF9] hover:text-[#1B55E2] font-medium transition-all"
-                  :class="{'bg-[#E2ECF9] text-[#1B55E2] font-semibold shadow-sm border-l-4 border-[#1B55E2]': isActive(module.name, $route.path)}"
+                  @click="handleNavigation"
+                  class="flex items-center px-4 py-2 rounded-xl text-text-muted hover:bg-primary-subtle hover:text-primary font-medium transition-all"
+                  :class="[
+                    isActive(module.name, $route.path) ? 'bg-primary-subtle text-primary font-semibold shadow-sm border-l-4 border-primary' : '',
+                    showCollapsed ? 'justify-center' : 'space-x-3'
+                  ]"
+                  :title="showCollapsed ? module.name : null"
               >
-                <font-awesome-icon :icon="module.icon" class="text-lg w-5" />
-                <span>{{ module.name }}</span>
+                <font-awesome-icon :icon="module.icon" class="text-lg w-5 shrink-0" />
+                <span v-show="!showCollapsed">{{ module.name }}</span>
               </router-link>
             </div>
           </div>
@@ -132,18 +192,22 @@
       </div>
 
       <!-- Account Section -->
-      <div class="p-4 border-t border-gray-200/60 bg-[#F4F7FE] shrink-0">
-        <p class="text-[11px] font-bold text-gray-400 tracking-widest px-3 mb-1 uppercase">Account</p>
+      <div class="p-4 border-t border-border/60 bg-surface shrink-0">
+        <p class="text-[11px] font-bold text-text-muted tracking-widest px-3 mb-1 uppercase" v-show="!showCollapsed">Account</p>
         <router-link
             v-for="module in accountModules"
             :key="module.id"
             :to="getModuleRoute(module.name)"
-            @click="isSidebarOpen = false"
-            class="flex items-center space-x-3 px-4 py-2 rounded-xl text-gray-500 hover:bg-[#E2ECF9] hover:text-[#1B55E2] font-medium transition-all"
-            :class="{'bg-white text-[#1B55E2] font-semibold shadow-sm border-l-4 border-[#1B55E2]': isActive(module.name, $route.path)}"
+            @click="handleNavigation"
+            class="flex items-center px-4 py-2 rounded-xl text-text-muted hover:bg-primary-subtle hover:text-primary font-medium transition-all"
+            :class="[
+              isActive(module.name, $route.path) ? 'bg-white text-primary font-semibold shadow-sm border-l-4 border-primary' : '',
+              showCollapsed ? 'justify-center' : 'space-x-3'
+            ]"
+            :title="showCollapsed ? module.name : null"
         >
-          <font-awesome-icon :icon="module.icon" class="text-lg w-5" />
-          <span>{{ module.name }}</span>
+          <font-awesome-icon :icon="module.icon" class="text-lg w-5 shrink-0" />
+          <span v-show="!showCollapsed">{{ module.name }}</span>
         </router-link>
       </div>
     </aside>
@@ -151,13 +215,71 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
+import { useRouter } from 'vue-router';
 import { useAdminSidebar } from '../composables/Admin/useAdminsidebar.js';
 
-// Sidebar state
-const isSidebarOpen = ref(false);
+const router = useRouter();
 
-// Use the sidebar composable
+const COLLAPSE_BREAKPOINT = 1024;
+const isDesktop = ref(window.innerWidth >= 768);
+const manualOverride = ref(false);
+
+const showCollapsed = computed(() => isDesktop.value && collapsed.value);
+
+const applyResponsiveState = () => {
+  const width = window.innerWidth;
+  isDesktop.value = width >= 768;
+
+  if (width < 768) return;
+
+  if (!manualOverride.value) {
+    collapsed.value = width < COLLAPSE_BREAKPOINT;
+  }
+};
+
+const toggleCollapse = () => {
+  manualOverride.value = true;
+  collapsed.value = !collapsed.value;
+  localStorage.setItem('sidebarCollapsed', String(collapsed.value));
+};
+
+// Handle navigation - only close mobile sidebar, don't affect collapse state
+const handleNavigation = () => {
+  // Only close sidebar on mobile
+  if (window.innerWidth < 768) {
+    isSidebarOpen.value = false;
+  }
+  // Do NOT toggle or change collapse state
+  // Do NOT reload or blink
+};
+
+// Handle child link click
+const handleChildLinkClick = (moduleName) => {
+  // Only close sidebar on mobile
+  if (window.innerWidth < 768) {
+    isSidebarOpen.value = false;
+  }
+  // Close dropdown
+  dropdownStates.value[moduleName] = false;
+};
+
+onMounted(() => {
+  const stored = localStorage.getItem('sidebarCollapsed');
+  if (stored !== null) {
+    manualOverride.value = true;
+    collapsed.value = stored === 'true';
+  }
+  applyResponsiveState();
+  window.addEventListener('resize', applyResponsiveState);
+  document.addEventListener('click', handleClickOutside);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', applyResponsiveState);
+  document.removeEventListener('click', handleClickOutside);
+});
+
 const {
   loading,
   error,
@@ -169,9 +291,50 @@ const {
   toggleDropdown,
   getModuleRoute,
   isActive,
-  getUserRole
+  getUserRole,
+  isSidebarOpen,
+  collapsed
 } = useAdminSidebar();
 
-// Get user role
 const userRole = getUserRole();
+
+const handleClickOutside = (e) => {
+  if (!e.target.closest('.sidebar-dropdown')) {
+    Object.keys(dropdownStates.value).forEach(key => {
+      dropdownStates.value[key] = false;
+    });
+  }
+};
+
 </script>
+
+<style scoped>
+/* Custom scrollbar styles */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: var(--color-surface, #F4F7FE);
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: var(--color-primary, #5E5CE6);
+  border-radius: 9999px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-hover, #4A48C6);
+}
+
+/* Prevent any layout shift */
+aside {
+  will-change: transform, width;
+  backface-visibility: hidden;
+}
+
+/* Smooth transitions */
+.router-link-active {
+  transition: none;
+}
+</style>

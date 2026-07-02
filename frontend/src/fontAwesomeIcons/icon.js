@@ -62,6 +62,8 @@ import {
   faUsersGear,          // For auto assign all (or faUsersCog)
   faFlag,               // For priority routing
   faUsersCog,           // Alternative for auto assign
+  faAnglesLeft,
+  faAnglesRight,
 } from '@fortawesome/free-solid-svg-icons'
 
 import {
@@ -178,6 +180,8 @@ library.add(
     faFlag,
     faUsersCog,  // Alternative
     faBell,
-    faPlay
+    faPlay,
+    faAnglesLeft,
+    faAnglesRight,
 
 )

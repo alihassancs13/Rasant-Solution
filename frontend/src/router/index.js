@@ -7,7 +7,6 @@ import EmployeeDashboard from '../admin/employeeDasboard.vue';
 import Chatbot from "../pages/chatbot.vue";
 import sentraAI from "../pages/sentraAI.vue";
 import omnipost from "@/pages/omnipost.vue";
-import Dashboard from "../pages/Dashboard.vue";
 
 const routes = [
   {

@@ -1,4 +1,4 @@
-import { ref, computed, onMounted, useTemplateRef } from 'vue'
+import { ref, computed, onMounted, useTemplateRef, watch } from 'vue'
 import { contactAPI, cvAPI } from '@/services/cvAPI.js'
 import axios from "axios";
 
@@ -41,6 +41,77 @@ export function useEmployeeCareer() {
             m.email.toLowerCase().includes(q) ||
             m.message.toLowerCase().includes(q),
         )
+    })
+
+    // ─── Pagination (Contact Messages) ────────────────────────────
+    const currentPage    = ref(1)
+    const pageSize       = ref(10)
+    const pageSizeOptions = [5, 10, 20, 50]
+
+    const totalPages = computed(() =>
+        Math.max(1, Math.ceil(filtered.value.length / pageSize.value))
+    )
+
+    const startIndex = computed(() => (currentPage.value - 1) * pageSize.value)
+    const endIndex   = computed(() =>
+        Math.min(startIndex.value + pageSize.value, filtered.value.length)
+    )
+
+    const paginatedItems = computed(() =>
+        filtered.value.slice(startIndex.value, endIndex.value)
+    )
+
+    // Builds page list with ellipsis, e.g. [1, 2, '...', 3, 4]
+    const pageNumbers = computed(() => {
+        const total = totalPages.value
+        const current = currentPage.value
+        const pages = []
+
+        if (total <= 5) {
+            for (let i = 1; i <= total; i++) pages.push(i)
+            return pages
+        }
+
+        pages.push(1)
+
+        if (current > 3) pages.push('...')
+
+        const start = Math.max(2, current - 1)
+        const end   = Math.min(total - 1, current + 1)
+        for (let i = start; i <= end; i++) pages.push(i)
+
+        if (current < total - 2) pages.push('...')
+
+        pages.push(total)
+
+        return pages
+    })
+
+    function goToPage(page) {
+        if (page === '...') return
+        currentPage.value = page
+    }
+
+    function nextPage() {
+        if (currentPage.value < totalPages.value) currentPage.value++
+    }
+
+    function prevPage() {
+        if (currentPage.value > 1) currentPage.value--
+    }
+
+    watch(searchQuery, () => {
+        currentPage.value = 1
+    })
+
+    watch(pageSize, () => {
+        currentPage.value = 1
+    })
+
+    watch(filtered, () => {
+        if (currentPage.value > totalPages.value) {
+            currentPage.value = totalPages.value
+        }
     })
 
     // ─── CV Submissions ──────────────────────────────────────────
@@ -122,6 +193,9 @@ export function useEmployeeCareer() {
         // contact
         messages, loading, error, searchQuery, searchInput,
         fetchMessages, deleteMessage, filtered,
+        // pagination
+        currentPage, totalPages, startIndex, endIndex, pageSize, pageSizeOptions,
+        paginatedItems, pageNumbers, nextPage, prevPage, goToPage,
         // cv
         cvSubmissions, cvLoading, cvError, cvSearchQuery,
         fetchCVSubmissions, deleteCV, filteredCVs, viewCV,
