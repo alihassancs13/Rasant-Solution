@@ -1,5 +1,5 @@
 // services/baseUrl.js
-export const BASE_URL = 'http://127.0.0.1:8000';
+export const BASE_URL = 'https://api.rasantsol.com/';
 
 export const API_ENDPOINTS = {
     LOGIN: '/api/accounts/login/',
@@ -12,4 +12,5 @@ export const API_ENDPOINTS = {
     CONTACT: '/api/contact/',
     PARSE_CV: '/api/employee_dashboard/parse_cv/',
     CV_SUBMIT: '/api/cv_management/submit-cv/',
+    JOB_OPENINGS: '/api/cv_management/job-openings/',
 };

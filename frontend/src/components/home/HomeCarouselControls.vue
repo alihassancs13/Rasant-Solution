@@ -6,7 +6,6 @@
         @click="$emit('prev')"
         class="group w-10 h-10 rounded-full border border-borderDefault bg-card text-headingCard flex items-center justify-center shrink-0 transition-all duration-200 hover:bg-buttonPrimaryHover hover:border-buttonPrimaryBorder hover:text-white hover:scale-105 hover:shadow-orange"
     >
-      <font-awesome-icon :icon="['fas', 'chevron-left']" class="text-xs transition-transform duration-200 group-hover:-translate-x-0.5" />
     </button>
 
     <div class="flex items-center gap-2">
@@ -27,7 +26,6 @@
         @click="$emit('next')"
         class="group w-10 h-10 rounded-full border border-borderDefault bg-card text-headingCard flex items-center justify-center shrink-0 transition-all duration-200 hover:bg-buttonPrimaryHover hover:border-buttonPrimaryBorder hover:text-white hover:scale-105 hover:shadow-orange"
     >
-      <font-awesome-icon :icon="['fas', 'chevron-right']" class="text-xs transition-transform duration-200 group-hover:translate-x-0.5" />
     </button>
   </div>
 </template>

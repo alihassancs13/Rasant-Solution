@@ -239,11 +239,11 @@
             <p class="text-sm text-textBody">
               Need access?
               <router-link to="/contact" class="font-semibold text-secondary-500 transition-all duration-200 hover:text-accent-4 hover:underline hover:underline-offset-2">
-                Contact sales →
+                Contact sales
               </router-link>
             </p>
             <router-link to="/" class="inline-block text-sm text-textBody transition-all duration-200 hover:text-headingMain hover:-translate-x-0.5">
-              ← Back to website
+              Back to website
             </router-link>
           </div>
         </div>

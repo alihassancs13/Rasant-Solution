@@ -115,10 +115,6 @@
                 : 'text-primary-900 bg-transparent hover:text-primary-500 hover:bg-primary-500/7'"
             >
               Projects
-              <span
-                  class="inline-block w-0 h-0 border-l-[4px] border-r-[4px] border-t-[5px] border-l-transparent border-r-transparent border-t-neutral-600 transition-transform duration-300"
-                  :class="activeDropdown === 'projects' ? 'rotate-180 !border-t-primary-500' : ''"
-              ></span>
             </button>
 
             <!-- Projects Dropdown (wide grid) -->
@@ -333,9 +329,6 @@
             <i class="fa-solid fa-rocket text-base"></i>
           </span>
           Projects
-          <span class="ml-auto text-white/60">
-            <i class="fa-solid" :class="activeDropdown === 'projects' ? 'fa-chevron-up' : 'fa-chevron-down'"></i>
-          </span>
         </button>
         <div v-show="activeDropdown === 'projects'" class="ml-2 mb-2.5 pl-3 border-l-2 border-white/20 py-1 transition-all duration-300">
           <router-link to="/sentra" @click="closeMobileMenu" class="block text-white/82 text-[13px] py-2 hover:text-white transition-colors no-underline">Sentra AI</router-link>

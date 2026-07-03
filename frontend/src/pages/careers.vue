@@ -40,7 +40,6 @@
           <div class="flex flex-wrap gap-4 mt-8">
             <ShineButton size="xl" @click="openModal('')">
               Submit your CV
-              <font-awesome-icon :icon="['fas', 'arrow-right']" class="text-sm transition-transform duration-200 group-hover:translate-x-1" />
             </ShineButton>
             <ShineButton
                 v-if="hasOpenRoles"
@@ -518,7 +517,6 @@
                     <span class="relative z-10">
                       {{ isSubmitting ? 'Submitting...' : 'Submit application' }}
                     </span>
-                    <i class="fa-solid fa-arrow-right relative z-10 text-xs transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true"></i>
                   </button>
                 </div>
               </form>

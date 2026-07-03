@@ -40,12 +40,8 @@
         <div class="flex flex-wrap gap-4 pt-4">
           <ShineButton to="/contact" size="xl">
             Start Your Project
-            <svg class="w-5 h-5 transition-transform duration-200 group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
-            </svg>
           </ShineButton>
           <ShineButton @click="scrollToProducts" variant="outline" size="xl">
-            <font-awesome-icon :icon="['fas', 'play']" class="text-sm transition-transform duration-200 group-hover:translate-x-1" />
             See Our Work
           </ShineButton>
 
@@ -358,7 +354,6 @@
             @click="productsCarousel.prev"
             class="group hidden lg:flex w-11 h-11 rounded-full cursor-pointer border border-borderDefault bg-card text-headingCard items-center justify-center shrink-0 transition-all duration-200 hover:bg-buttonPrimaryHover hover:border-buttonPrimaryBorder hover:text-white hover:scale-105 hover:shadow-orange font-primary"
         >
-          <font-awesome-icon :icon="['fas', 'chevron-left']" class="text-sm transition-transform duration-200 group-hover:-translate-x-0.5" />
         </button>
 
         <div class="relative w-full rounded-[28px] border border-activeBorder/20 bg-card shadow-lg overflow-hidden min-h-[460px] sm:min-h-[420px] lg:min-h-[380px]">
@@ -387,7 +382,6 @@
                 </p>
                 <ShineButton :to="product.ctaLink" size="sm">
                   {{ product.ctaText }}
-                  <font-awesome-icon :icon="['fas', 'arrow-right']" class="text-xs transition-transform duration-200 cursor-pointer group-hover:translate-x-1" />
                 </ShineButton>
               </div>
 
@@ -412,7 +406,6 @@
             @click="productsCarousel.next"
             class="group hidden lg:flex w-11 h-11 rounded-full border border-borderDefault bg-card text-headingCard items-center justify-center shrink-0 transition-all duration-200 hover:bg-buttonPrimaryHover hover:border-buttonPrimaryBorder hover:text-white hover:scale-105 hover:shadow-orange font-primary"
         >
-          <font-awesome-icon :icon="['fas', 'chevron-right']" class="text-sm cursor-pointer transition-transform duration-200 group-hover:translate-x-0.5" />
         </button>
       </div>
 
@@ -733,7 +726,6 @@
               @click="testimonialPrev"
               class="group hidden sm:flex w-11 h-11 rounded-full cursor-pointer border border-borderDefault bg-card text-headingCard items-center justify-center shrink-0 transition-all duration-200 hover:bg-buttonPrimaryHover hover:border-buttonPrimaryBorder hover:text-white hover:scale-105 hover:shadow-orange"
           >
-            <font-awesome-icon :icon="['fas', 'chevron-left']" class="text-sm transition-transform duration-200 group-hover:-translate-x-0.5" />
           </button>
 
           <div
@@ -786,7 +778,6 @@
               @click="testimonialNext"
               class="group hidden sm:flex w-11 h-11 rounded-full border border-borderDefault bg-card text-headingCard items-center justify-center shrink-0 transition-all duration-200 hover:bg-buttonPrimaryHover hover:border-buttonPrimaryBorder hover:text-white hover:scale-105 hover:shadow-orange"
           >
-            <font-awesome-icon :icon="['fas', 'chevron-right']" class="text-sm transition-transform duration-200 group-hover:translate-x-0.5" />
           </button>
         </div>
 

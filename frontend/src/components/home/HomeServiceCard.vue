@@ -29,7 +29,6 @@
           class="inline-flex items-center gap-2 text-sm font-bold text-textBrand group-hover:gap-3 transition-all duration-200 font-primary cursor-pointer"
       >
         Explore Service
-        <font-awesome-icon :icon="['fas', 'arrow-right']" class="text-xs transition-transform duration-200 group-hover:translate-x-1" />
       </a>
     </RouterLink>
   </article>
