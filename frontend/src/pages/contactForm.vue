@@ -24,48 +24,47 @@
       <section class="max-w-6xl mx-auto px-4 sm:px-6 py-10 sm:py-14 grid grid-cols-1 lg:grid-cols-[1fr_1.15fr] gap-6 sm:gap-9">
 
         <!-- Left: Contact Info -->
-        <div class="flex flex-col gap-3.5">
-
-          <div class="animate-reveal-left flex items-start gap-4 p-4 sm:p-5 bg-section-white border border-borderDefault rounded-xl shadow-sm hover:shadow-md hover:border-card-hover-border hover:translate-x-1 transition-all duration-300" style="animation-delay: 0.05s;">
-            <div class="w-11 h-11 rounded-xl bg-accent-3/10 border border-accent-3/20 flex items-center justify-center shrink-0">
-              <font-awesome-icon :icon="['fas', 'envelope']" class="text-headingMain text-lg" />
+        <MobileAutoSlide
+            :items="contactCards"
+            min-height="120px"
+            stack-below="lg"
+            desktop-class="grid-cols-1 gap-3.5"
+            item-key="id"
+        >
+          <template #default="{ item: card }">
+            <div
+                :class="[
+                  'flex items-start gap-4 p-4 sm:p-5 bg-section-white border border-borderDefault rounded-xl shadow-sm hover:shadow-md hover:border-card-hover-border hover:translate-x-1 transition-all duration-300',
+                  card.variant === 'hours' ? 'border-l-4 border-l-secondary-600' : '',
+                ]"
+            >
+              <div
+                  v-if="card.icon"
+                  class="w-11 h-11 rounded-xl bg-accent-3/10 border border-accent-3/20 flex items-center justify-center shrink-0"
+              >
+                <font-awesome-icon :icon="card.icon" class="text-headingMain text-lg" />
+              </div>
+              <div>
+                <h4 :class="['font-bold text-headingMain mb-1 font-display', card.variant === 'hours' ? 'text-xs uppercase tracking-wide text-secondary-600' : 'text-sm']">
+                  {{ card.title }}
+                </h4>
+                <a
+                    v-if="card.href"
+                    :href="card.href"
+                    class="text-sm text-textBody hover:text-accent-3 transition-colors font-primary"
+                >{{ card.text }}</a>
+                <p v-else class="text-sm text-textBody font-primary leading-relaxed">{{ card.text }}</p>
+                <div
+                    v-if="card.badge"
+                    class="inline-flex items-center gap-2 mt-3 text-xs font-semibold text-headingMain bg-accent-1/10 border border-accent-1/30 px-3 py-1.5 rounded-full font-primary"
+                >
+                  <span class="w-1.5 h-1.5 rounded-full bg-accent-1 animate-pulse"></span>
+                  {{ card.badge }}
+                </div>
+              </div>
             </div>
-            <div>
-              <h4 class="text-sm font-bold text-headingMain mb-1 font-display">Email Us</h4>
-              <a href="mailto:career@rasantsol.com" class="text-sm text-headingMain hover:text-accent-3 transition-colors font-primary">career@rasantsol.com</a>
-            </div>
-          </div>
-
-          <div class="animate-reveal-left flex items-start gap-4 p-4 sm:p-5 bg-section-white border border-borderDefault rounded-xl shadow-sm hover:shadow-md hover:border-card-hover-border hover:translate-x-1 transition-all duration-300" style="animation-delay: 0.12s;">
-            <div class="w-11 h-11 rounded-xl bg-accent-3/10 border border-accent-3/20 flex items-center justify-center shrink-0">
-              <font-awesome-icon :icon="['fas', 'phone']" class="text-headingMain text-lg" />
-            </div>
-            <div>
-              <h4 class="text-sm font-bold text-headingMain mb-1 font-display">Call Us</h4>
-              <a href="tel:051 2716768" class="text-sm text-textBody hover:text-accent-3 transition-colors font-primary">051 2716768</a>
-            </div>
-          </div>
-
-          <div class="animate-reveal-left flex items-start gap-4 p-4 sm:p-5 bg-section-white border border-borderDefault rounded-xl shadow-sm hover:shadow-md hover:border-card-hover-border hover:translate-x-1 transition-all duration-300" style="animation-delay: 0.19s;">
-            <div class="w-11 h-11 rounded-xl bg-accent-3/10 border border-accent-3/20 flex items-center justify-center shrink-0">
-              <font-awesome-icon :icon="['fas', 'location-dot']" class="text-headingMain text-lg" />
-            </div>
-            <div>
-              <h4 class="text-sm font-bold text-headingMain mb-1 font-display">Visit Us</h4>
-              <p class="text-sm text-textBody font-primary">Office no 1, Rasant Solutions, Karnal Sher Khan Shaheed Rd, near PSO pump, New Katarian Satellite Town, Islamabad</p>
-            </div>
-          </div>
-
-          <div class="animate-reveal-left p-4 sm:p-5 bg-section-white border border-borderDefault border-l-4 border-l-secondary-600 rounded-xl shadow-sm mt-1" style="animation-delay: 0.26s;">
-            <h4 class="text-xs font-bold uppercase tracking-wide text-secondary-600 mb-2 font-display">Business Hours</h4>
-            <p class="text-sm text-textBody leading-relaxed font-primary">Mon – Fri: 10:00 AM – 7:00 PM PKT</p>
-            <div class="inline-flex items-center gap-2 mt-3 text-xs font-semibold text-headingMain bg-accent-1/10 border border-accent-1/30 px-3 py-1.5 rounded-full font-primary">
-              <span class="w-1.5 h-1.5 rounded-full bg-accent-1 animate-pulse"></span>
-              Available for new projects
-            </div>
-          </div>
-
-        </div>
+          </template>
+        </MobileAutoSlide>
 
         <!-- Right: Contact Form -->
         <div class="animate-reveal-right relative bg-section-white border border-borderDefault rounded-2xl shadow-lg p-5 sm:p-7 lg:p-9 overflow-hidden" style="animation-delay: 0.1s;">
@@ -198,6 +197,37 @@ import { useContact } from '@/composables/useContactForm.js'
 import ShineButton from '@/components/ShineButton.vue'
 import Navbar from "@/components/navbar.vue"
 import Footer from "../components/footer.vue"
+import MobileAutoSlide from '@/components/MobileAutoSlide.vue'
+
+const contactCards = [
+  {
+    id: 'email',
+    icon: ['fas', 'envelope'],
+    title: 'Email Us',
+    href: 'mailto:career@rasantsol.com',
+    text: 'career@rasantsol.com',
+  },
+  {
+    id: 'phone',
+    icon: ['fas', 'phone'],
+    title: 'Call Us',
+    href: 'tel:+92512716768',
+    text: '051 2716768',
+  },
+  {
+    id: 'address',
+    icon: ['fas', 'location-dot'],
+    title: 'Visit Us',
+    text: 'Office no 1, Rasant Solutions, Karnal Sher Khan Shaheed Rd, near PSO pump, New Katarian Satellite Town, Islamabad',
+  },
+  {
+    id: 'hours',
+    variant: 'hours',
+    title: 'Business Hours',
+    text: 'Mon – Fri: 10:00 AM – 7:00 PM PKT',
+    badge: 'Available for new projects',
+  },
+]
 
 const { form, formErrors, loading, toasts, removeToast, handleSubmit, onEmailInput } = useContact()
 </script>

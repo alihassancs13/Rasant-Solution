@@ -44,16 +44,25 @@
 
     <!-- Features -->
     <section class="py-16 px-[5%] bg-section-white">
-      <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-5">
-        <article v-for="(feat, i) in service.features" :key="feat.title"
-                 class="group p-6 bg-cardSemi border border-borderDefault rounded-2xl shadow-sm hover:-translate-y-2 hover:shadow-lg transition-all duration-300 animate-[fadeUp_0.7s_ease_both]"
-                 :style="{ animationDelay: `${0.1 + i * 0.1}s` }">
-          <span class="w-11 h-11 rounded-xl bg-accent-3/10 flex items-center justify-center text-accent-3 mb-4 group-hover:scale-110 transition-transform">
-            <i :class="feat.icon"></i>
-          </span>
-          <h3 class="font-display font-bold text-headingCard mb-2">{{ feat.title }}</h3>
-          <p class="text-sm text-textSupporting leading-relaxed font-primary">{{ feat.text }}</p>
-        </article>
+      <div class="max-w-5xl mx-auto">
+        <MobileAutoSlide
+            :items="service.features"
+            min-height="180px"
+            desktop-class="grid-cols-3 gap-5"
+            item-key="title"
+        >
+          <template #default="{ item: feat }">
+            <article
+                class="group p-6 bg-cardSemi border border-borderDefault rounded-2xl shadow-sm hover:-translate-y-2 hover:shadow-lg transition-all duration-300 h-full"
+            >
+              <span class="w-11 h-11 rounded-xl bg-accent-3/10 flex items-center justify-center text-accent-3 mb-4 group-hover:scale-110 transition-transform">
+                <i :class="feat.icon"></i>
+              </span>
+              <h3 class="font-display font-bold text-headingCard mb-2">{{ feat.title }}</h3>
+              <p class="text-sm text-textSupporting leading-relaxed font-primary">{{ feat.text }}</p>
+            </article>
+          </template>
+        </MobileAutoSlide>
       </div>
     </section>
 
@@ -78,6 +87,7 @@ import { useRoute, useRouter } from 'vue-router'
 import Navbar from '@/components/navbar.vue'
 import Footer from '@/components/footer.vue'
 import ShineButton from '@/components/ShineButton.vue'
+import MobileAutoSlide from '@/components/MobileAutoSlide.vue'
 import { servicePages } from '@/config/servicesContent.js'
 
 const route = useRoute()

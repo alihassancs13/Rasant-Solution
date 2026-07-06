@@ -123,15 +123,17 @@
           </p>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-4 max-w-[900px] mx-auto gap-[14px]">
-          <router-link v-for="module in modules" :key="module.name" :to="module.link"
-                       class="flex flex-col items-center gap-2.5 p-[22px_14px] rounded-2xl bg-section-white border border-borderDefault text-headingCard font-display text-[13px] font-bold transition-all duration-300 shadow-sm hover:-translate-y-1 hover:shadow-[var(--shadow-card-hover)] hover:border-card-hover-border no-underline">
-            <div class="w-[42px] h-[42px] rounded-xl flex items-center justify-center text-lg " style="background: var(--color-icon-container-bg);">
-              <i :class="module.icon " class="text-button-hover  " aria-hidden="true"></i>
-            </div>
-            <span>{{ module.name }}</span>
-          </router-link>
-        </div>
+        <MobileAutoSlide :items="modules" min-height="130px" desktop-class="grid-cols-4 max-w-[900px] mx-auto gap-[14px]" item-key="name">
+          <template #default="{ item: module }">
+            <router-link :to="module.link"
+                         class="flex flex-col items-center gap-2.5 p-[22px_14px] rounded-2xl bg-section-white border border-borderDefault text-headingCard font-display text-[13px] font-bold transition-all duration-300 shadow-sm hover:-translate-y-1 hover:shadow-[var(--shadow-card-hover)] hover:border-card-hover-border no-underline h-full">
+              <div class="w-[42px] h-[42px] rounded-xl flex items-center justify-center text-lg" style="background: var(--color-icon-container-bg);">
+                <i :class="module.icon" class="text-button-hover" aria-hidden="true"></i>
+              </div>
+              <span>{{ module.name }}</span>
+            </router-link>
+          </template>
+        </MobileAutoSlide>
       </div>
     </section>
 
@@ -146,17 +148,7 @@
           <h2 class="font-display text-[clamp(24px,3vw,36px)] font-bold tracking-[-0.8px] leading-[1.15] text-headingSection mb-3">Real-time dashboard overview</h2>
           <p class="text-[15px] text-textBody leading-relaxed max-w-[480px] font-primary">A live snapshot of your entire operation — scheduled calls, queue depth, module usage, and activity trends that refresh automatically so supervisors always know what is happening right now.</p>
 
-          <div class="mt-[22px] max-w-[480px] grid grid-cols-1 gap-4">
-            <div v-for="item in dashboardFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-borderDefault hover:border-card-hover-border-alt transition-all duration-300">
-              <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-primary-500/10 text-textBrand">
-                <i :class="item.icon" class="text-sm text-textBody" aria-hidden="true"></i>
-              </span>
-              <div>
-                <h4 class="text-sm font-bold text-headingCard font-display">{{ item.title }}</h4>
-                <p class="text-[13px] text-textSupporting leading-relaxed font-primary">{{ item.description }}</p>
-              </div>
-            </div>
-          </div>
+          <SentraFeatureList :items="dashboardFeatures" />
         </div>
         <div class="relative z-[1]">
           <div class="relative w-full">
@@ -190,17 +182,7 @@
           <h2 class="font-display text-[clamp(24px,3vw,36px)] font-bold tracking-[-0.8px] leading-[1.15] text-headingSection mb-3">Monitor and manage active calls</h2>
           <p class="text-[15px] text-textBody leading-relaxed max-w-[480px] font-primary">Supervisors watch every active conversation in real time — who answered, which AI agent handled it, how long it ran, and whether a human agent has been assigned.</p>
 
-          <div class="mt-[22px] max-w-[480px] grid grid-cols-1 gap-4">
-            <div v-for="item in liveCallFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-borderDefault hover:border-card-hover-border-alt transition-all duration-300">
-              <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-primary-500/10 text-textBrand">
-                <i :class="item.icon" class="text-sm text-textBody" aria-hidden="true"></i>
-              </span>
-              <div>
-                <h4 class="text-sm font-bold text-headingCard font-display">{{ item.title }}</h4>
-                <p class="text-[13px] text-textSupporting leading-relaxed font-primary">{{ item.description }}</p>
-              </div>
-            </div>
-          </div>
+          <SentraFeatureList :items="liveCallFeatures" />
         </div>
       </div>
     </section>
@@ -216,17 +198,7 @@
           <h2 class="font-display text-[clamp(24px,3vw,36px)] font-bold tracking-[-0.8px] leading-[1.15] text-headingSection mb-3">Intelligent call routing and queue management</h2>
           <p class="text-[15px] text-textBody leading-relaxed max-w-[480px] font-primary">Calls waiting for assignment are prioritized by urgency and skill requirement. Managers see wait times, required expertise, and which agents are available to take the next call.</p>
 
-          <div class="mt-[22px] max-w-[480px] grid grid-cols-1 gap-4">
-            <div v-for="item in queueFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-borderDefault hover:border-card-hover-border-alt transition-all duration-300">
-              <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-primary-500/10 text-textBrand">
-                <i :class="item.icon" class="text-sm text-textBody" aria-hidden="true"></i>
-              </span>
-              <div>
-                <h4 class="text-sm font-bold text-headingCard font-display">{{ item.title }}</h4>
-                <p class="text-[13px] text-textSupporting leading-relaxed font-primary">{{ item.description }}</p>
-              </div>
-            </div>
-          </div>
+          <SentraFeatureList :items="queueFeatures" />
         </div>
         <div class="relative z-[1]">
           <div class="relative w-full">
@@ -260,17 +232,7 @@
           <h2 class="font-display text-[clamp(24px,3vw,36px)] font-bold tracking-[-0.8px] leading-[1.15] text-headingSection mb-3">Launch and manage outbound campaigns</h2>
           <p class="text-[15px] text-textBody leading-relaxed max-w-[480px] font-primary">Create AI-driven Sales, Service, or custom campaigns — toggle them on or off, set start dates, and import thousands of contacts in one CSV upload with validation built in.</p>
 
-          <div class="mt-[22px] max-w-[480px] grid grid-cols-1 gap-4">
-            <div v-for="item in campaignFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-borderDefault hover:border-card-hover-border-alt transition-all duration-300">
-              <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-primary-500/10 text-textBrand">
-                <i :class="item.icon" class="text-sm text-textBody" aria-hidden="true"></i>
-              </span>
-              <div>
-                <h4 class="text-sm font-bold text-headingCard font-display">{{ item.title }}</h4>
-                <p class="text-[13px] text-textSupporting leading-relaxed font-primary">{{ item.description }}</p>
-              </div>
-            </div>
-          </div>
+          <SentraFeatureList :items="campaignFeatures" />
         </div>
       </div>
     </section>
@@ -286,17 +248,7 @@
           <h2 class="font-display text-[clamp(24px,3vw,36px)] font-bold tracking-[-0.8px] leading-[1.15] text-headingSection mb-3">Automated dialing on your schedule</h2>
           <p class="text-[15px] text-textBody leading-relaxed max-w-[480px] font-primary">Per-campaign scheduling dials contacts automatically within your calling window. Monitor pool progress, daily limits, queue depth, and which AI agents are receiving calls.</p>
 
-          <div class="mt-[22px] max-w-[480px] grid grid-cols-1 gap-4">
-            <div v-for="item in schedulerFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-borderDefault hover:border-card-hover-border-alt transition-all duration-300">
-              <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-primary-500/10 text-textBrand">
-                <i :class="item.icon" class="text-sm text-textBody" aria-hidden="true"></i>
-              </span>
-              <div>
-                <h4 class="text-sm font-bold text-headingCard font-display">{{ item.title }}</h4>
-                <p class="text-[13px] text-textSupporting leading-relaxed font-primary">{{ item.description }}</p>
-              </div>
-            </div>
-          </div>
+          <SentraFeatureList :items="schedulerFeatures" />
         </div>
         <div class="relative z-[1]">
           <div class="relative w-full">
@@ -330,17 +282,7 @@
           <h2 class="font-display text-[clamp(24px,3vw,36px)] font-bold tracking-[-0.8px] leading-[1.15] text-headingSection mb-3">Token usage, embeddings, and chat insights</h2>
           <p class="text-[15px] text-textBody leading-relaxed max-w-[480px] font-primary">Filter analytics by client, user, date range, and grouping period. Track total tokens, embedding usage, AI response volume, and request counts — with drill-down into chat history and per-user stats.</p>
 
-          <div class="mt-[22px] max-w-[480px] grid grid-cols-1 gap-4">
-            <div v-for="item in analyticsFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-borderDefault hover:border-card-hover-border-alt transition-all duration-300">
-              <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-primary-500/10 text-textBrand">
-                <i :class="item.icon" class="text-sm text-textBody" aria-hidden="true"></i>
-              </span>
-              <div>
-                <h4 class="text-sm font-bold text-headingCard font-display">{{ item.title }}</h4>
-                <p class="text-[13px] text-textSupporting leading-relaxed font-primary">{{ item.description }}</p>
-              </div>
-            </div>
-          </div>
+          <SentraFeatureList :items="analyticsFeatures" />
         </div>
       </div>
     </section>
@@ -356,17 +298,7 @@
           <h2 class="font-display text-[clamp(24px,3vw,36px)] font-bold tracking-[-0.8px] leading-[1.15] text-headingSection mb-3">Agent availability and quick access</h2>
           <p class="text-[15px] text-textBody leading-relaxed max-w-[480px] font-primary">See who is online across your organization for call routing and transfers. Agent availability bars, quick-launch shortcuts into key modules, and high-level counts for contacts, campaigns, uploads, and tokens.</p>
 
-          <div class="mt-[22px] max-w-[480px] grid grid-cols-1 gap-4">
-            <div v-for="item in teamFeatures" :key="item.title" class="flex gap-4 bg-white/50 rounded-xl p-3 border border-borderDefault hover:border-card-hover-border-alt transition-all duration-300">
-              <span class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 mt-0.5 bg-primary-500/10 text-textBrand">
-                <i :class="item.icon" class="text-sm text-textBody" aria-hidden="true"></i>
-              </span>
-              <div>
-                <h4 class="text-sm font-bold text-headingCard font-display">{{ item.title }}</h4>
-                <p class="text-[13px] text-textSupporting leading-relaxed font-primary">{{ item.description }}</p>
-              </div>
-            </div>
-          </div>
+          <SentraFeatureList :items="teamFeatures" />
         </div>
         <div class="relative z-[1]">
           <div class="relative w-full">
@@ -392,13 +324,14 @@
           </h2>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[18px] max-w-[1100px] mx-auto">
-          <div v-for="benefit in benefits" :key="benefit.title"
-               class="bg-section-white border border-borderDefault rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-card-hover)] hover:border-card-hover-border">
-            <h3 class="font-display text-base font-bold text-headingCard mb-2">{{ benefit.title }}</h3>
-            <p class="text-sm text-textBody leading-relaxed font-primary">{{ benefit.description }}</p>
-          </div>
-        </div>
+        <MobileAutoSlide :items="benefits" min-height="120px" desktop-class="grid-cols-2 lg:grid-cols-3 gap-[18px] max-w-[1100px] mx-auto" item-key="title">
+          <template #default="{ item: benefit }">
+            <div class="bg-section-white border border-borderDefault rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-card-hover)] hover:border-card-hover-border h-full">
+              <h3 class="font-display text-base font-bold text-headingCard mb-2">{{ benefit.title }}</h3>
+              <p class="text-sm text-textBody leading-relaxed font-primary">{{ benefit.description }}</p>
+            </div>
+          </template>
+        </MobileAutoSlide>
       </div>
     </section>
 
@@ -430,6 +363,8 @@ import Navbar from '@/components/navbar.vue'
 import Footer from '@/components/footer.vue'
 import ShineButton from "@/components/ShineButton.vue";
 import sentraPlatformSvg from '@/assets/svg/sentra-platform.svg'
+import SentraFeatureList from '@/components/SentraFeatureList.vue'
+import MobileAutoSlide from '@/components/MobileAutoSlide.vue'
 
 // Grid cell config
 const CELL_CONFIGS = [
@@ -455,7 +390,9 @@ export default {
   components: {
     Navbar,
     Footer,
-    ShineButton
+    ShineButton,
+    SentraFeatureList,
+    MobileAutoSlide,
   },
   data() {
     return {

@@ -166,21 +166,20 @@
         </div>
 
         <!-- 6 Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-5xl mx-auto">
-          <article v-for="(card, i) in chatbotCards" :key="i"
-                   :class="[
-              'group relative bg-cardSemi border border-borderDefault rounded-[14px] p-4 pl-4.5 shadow-[var(--shadow-card-small)] overflow-hidden',
-              'transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.02]',
-              'animate-[cardFloat_5s_ease-in-out_infinite] hover:[animation-play-state:paused]',
-            ]"
-                   :style="{ animationDelay: card.delay }">
-            <span class="relative z-10 inline-block text-[9px] font-extrabold tracking-wider uppercase mb-2 font-display" :style="{ color: card.hex }">{{ card.tag }}</span>
-            <h3 class="relative z-10 font-display text-sm font-bold mb-1.5 text-headingCard">{{ card.title }}</h3>
-            <p class="relative z-10 text-[12.5px] text-textSupporting leading-normal font-primary">{{ card.desc }}</p>
-            <div class="absolute left-0 top-0 bottom-0 w-1 rounded-[16px_0_0_16px]" :style="{ background: card.hex }"></div>
-            <div class="absolute inset-0 pointer-events-none rounded-[14px]" :style="{ background: `linear-gradient(135deg, ${card.hex}14 0%, transparent 55%)` }"></div>
-          </article>
-        </div>
+        <MobileAutoSlide :items="chatbotCards" min-height="130px" stack-below="sm" desktop-class="grid-cols-2 gap-4 max-w-5xl mx-auto" :auto-ms="3500">
+          <template #default="{ item: card }">
+            <article
+                class="group relative bg-cardSemi border border-borderDefault rounded-[14px] p-4 pl-4.5 shadow-[var(--shadow-card-small)] overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.02] animate-[cardFloat_5s_ease-in-out_infinite] hover:[animation-play-state:paused] h-full"
+                :style="{ animationDelay: card.delay }"
+            >
+              <span class="relative z-10 inline-block text-[9px] font-extrabold tracking-wider uppercase mb-2 font-display" :style="{ color: card.hex }">{{ card.tag }}</span>
+              <h3 class="relative z-10 font-display text-sm font-bold mb-1.5 text-headingCard">{{ card.title }}</h3>
+              <p class="relative z-10 text-[12.5px] text-textSupporting leading-normal font-primary">{{ card.desc }}</p>
+              <div class="absolute left-0 top-0 bottom-0 w-1 rounded-[16px_0_0_16px]" :style="{ background: card.hex }"></div>
+              <div class="absolute inset-0 pointer-events-none rounded-[14px]" :style="{ background: `linear-gradient(135deg, ${card.hex}14 0%, transparent 55%)` }"></div>
+            </article>
+          </template>
+        </MobileAutoSlide>
 
       </div>
     </section>
@@ -198,35 +197,19 @@
             <p class="text-textBody leading-relaxed mb-6 font-primary">
               Intent routing, human handoff, and CRM integrations - the full toolkit for production chat deployments.
             </p>
-            <ul class="space-y-6">
-              <li class="flex items-start gap-4">
-                <span class="flex-shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-xl bg-neutral-200 text-headingMain font-bold text-sm tracking-wide shadow-sm shadow-primary-500/20">
-                  <i class="fa-solid fa-brain text-xl"></i>
-                </span>
-                <div>
-                  <h4 class="text-lg font-bold text-headingCard font-display">Intent and routing</h4>
-                  <p class="text-textSupporting text-sm mt-1 font-primary">Understand what users want and route to the right flow.</p>
+            <MobileAutoSlide :items="capabilityFeatures" min-height="110px" desktop-class="grid-cols-1 gap-6">
+              <template #default="{ item: feat }">
+                <div class="flex items-start gap-4 h-full">
+                  <span class="flex-shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-xl bg-neutral-200 text-headingMain font-bold text-sm tracking-wide shadow-sm" :class="feat.shadowClass">
+                    <i :class="feat.icon" class="text-xl"></i>
+                  </span>
+                  <div>
+                    <h4 class="text-lg font-bold text-headingCard font-display">{{ feat.title }}</h4>
+                    <p class="text-textSupporting text-sm mt-1 font-primary">{{ feat.desc }}</p>
+                  </div>
                 </div>
-              </li>
-              <li class="flex items-start gap-4">
-                <span class="flex-shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-xl bg-neutral-200 text-headingMain font-bold text-sm tracking-wide shadow-sm shadow-accent-7/20">
-                  <i class="fa-solid fa-headset text-xl"></i>
-                </span>
-                <div>
-                  <h4 class="text-lg font-bold text-headingCard font-display">Human handoff</h4>
-                  <p class="text-textSupporting text-sm mt-1 font-primary">Warm transfer to live agents when chat needs a person.</p>
-                </div>
-              </li>
-              <li class="flex items-start gap-4">
-                <span class="flex-shrink-0 inline-flex items-center justify-center w-8 h-8 rounded-xl bg-neutral-200 text-headingMain font-bold text-sm tracking-wide shadow-sm shadow-accent-1/20">
-                  <i class="fas fa-plug text-xl"></i>
-                </span>
-                <div>
-                  <h4 class="text-lg font-bold text-headingCard font-display">CRM and webhooks</h4>
-                  <p class="text-textSupporting text-sm mt-1 font-primary">Connect tickets, CRM records, and custom backends via API.</p>
-                </div>
-              </li>
-            </ul>
+              </template>
+            </MobileAutoSlide>
             <div class="ml-20">
               <span class="text-textSupporting font-primary">Need phone and voice automation? See our
                 <router-link to="/ai-agent" class="text-secondary-600 font-semibold underline">Voice AI Agent</router-link>.
@@ -329,8 +312,15 @@ import Navbar from '../components/navbar.vue';
 import Footer from '../components/footer.vue';
 import { useRouter } from 'vue-router';
 import ShineButton from "@/components/ShineButton.vue";
+import MobileAutoSlide from '@/components/MobileAutoSlide.vue';
 
 const router = useRouter();
+
+const capabilityFeatures = [
+  { title: 'Intent and routing', desc: 'Understand what users want and route to the right flow.', icon: 'fa-solid fa-brain', shadowClass: 'shadow-primary-500/20' },
+  { title: 'Human handoff', desc: 'Warm transfer to live agents when chat needs a person.', icon: 'fa-solid fa-headset', shadowClass: 'shadow-accent-7/20' },
+  { title: 'CRM and webhooks', desc: 'Connect tickets, CRM records, and custom backends via API.', icon: 'fas fa-plug', shadowClass: 'shadow-accent-1/20' },
+];
 
 const chatbotCards = [
   { tag: 'Use case', title: 'Customer support', desc: 'FAQ answers, order status, and ticket creation from chat.', hex: '#8B5CF6', delay: '0s' },

@@ -59,7 +59,7 @@
       </aside>
 
       <!-- Right panel -->
-      <main class="relative flex min-h-0 min-w-0 flex-1 w-full items-center justify-center overflow-hidden bg-gradient-primary px-4 py-4 sm:px-6 sm:py-6 lg:bg-section-white/80 lg:backdrop-blur-sm">
+      <main class="relative flex min-h-0 min-w-0 flex-1 w-full flex-col items-center justify-center overflow-hidden bg-gradient-primary px-4 py-4 sm:px-6 sm:py-6 lg:bg-section-white/80 lg:backdrop-blur-sm">
 
         <!-- Animated concentric rings (desktop only — avoids mobile horizontal overflow) -->
         <div class="pointer-events-none absolute -top-48 -right-48 hidden h-[580px] w-[580px] animate-login-ring rounded-full border border-primary-500/10 lg:block" aria-hidden="true"></div>
@@ -77,6 +77,14 @@
           <span class="particle absolute bottom-[40%] left-[5%] h-1 w-1 rounded-full bg-secondary-300/20 animate-float-2 [animation-delay:2.5s]"></span>
         </div>
 
+        <router-link
+            to="/"
+            class="relative z-20 mb-3 inline-flex items-center gap-1.5 text-sm font-semibold text-textBody transition-all duration-200 hover:text-headingMain no-underline"
+        >
+          <font-awesome-icon icon="fa-solid fa-arrow-left" class="text-xs" />
+          Back to website
+        </router-link>
+
         <div class="relative z-10 box-border w-full max-w-[400px] min-w-0 animate-login-card overflow-hidden rounded-2xl border border-borderDefault/80 bg-section-white p-4 shadow-blue sm:max-w-[420px] sm:p-6 lg:max-w-[400px] lg:p-7 transition-shadow duration-500 hover:shadow-[0_20px_60px_rgba(74,144,226,0.18)] [animation-delay:60ms]">
 
           <!-- Animated top accent bar -->
@@ -92,7 +100,7 @@
                 width="212"
                 height="42"
                 decoding="async"
-                class="h-10 w-auto max-w-[180px] object-contain animate-logo-bounce"
+                class="h-10 w-auto max-w-[180px] object-contain"
             />
           </div>
 
@@ -235,16 +243,13 @@
             </div>
           </div>
 
-          <div class="space-y-1 text-center animate-login-fade-up [animation-delay:520ms]">
+          <div class="text-center animate-login-fade-up [animation-delay:520ms]">
             <p class="text-sm text-textBody">
               Need access?
               <router-link to="/contact" class="font-semibold text-secondary-500 transition-all duration-200 hover:text-accent-4 hover:underline hover:underline-offset-2">
                 Contact sales
               </router-link>
             </p>
-            <router-link to="/" class="inline-block text-sm text-textBody transition-all duration-200 hover:text-headingMain hover:-translate-x-0.5">
-              Back to website
-            </router-link>
           </div>
         </div>
       </main>
@@ -291,16 +296,6 @@
 }
 .animate-underline-grow {
   animation: underline-grow 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.6s both;
-}
-
-/* Logo bounce */
-@keyframes logo-bounce {
-  0%, 100% { transform: translateY(0); }
-  40% { transform: translateY(-6px); }
-  60% { transform: translateY(-3px); }
-}
-.animate-logo-bounce {
-  animation: logo-bounce 2.4s ease-in-out 0.8s infinite;
 }
 
 /* Shield pulse */
