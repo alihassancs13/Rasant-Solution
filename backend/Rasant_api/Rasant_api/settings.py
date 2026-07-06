@@ -51,7 +51,8 @@ INSTALLED_APPS = [
     'accounts',
     'contact_message',
     'cv_management',
-    'employee_dashboard'
+    'employee_dashboard',
+    'jira',
 ]
 
 MIDDLEWARE = [

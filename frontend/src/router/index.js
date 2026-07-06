@@ -3,7 +3,7 @@ import Login from "../pages/Login.vue";
 import Contact from "../pages/contactForm.vue";
 import Home from "../pages/home.vue";
 import EmployeeDashboard from '../admin/employeeDasboard.vue';
-import EmployeeRegistration from '../pages/employeeRegistration.vue';
+
 import { useLoginStore } from '../stores/loginStore.js';
 
 const routes = [
@@ -43,6 +43,7 @@ const routes = [
       requiresAuth: false  // Public page (or true if you want to protect it)
     }
   },
+
   {
     path: "/orchestri",
     name: "Orchestri",
@@ -118,15 +119,13 @@ const routes = [
     component: EmployeeDashboard,
     meta: { requiresAuth: true, role: 'employee' }
   },
+
   {
-    path: '/employee/register',
-    name: 'EmployeeRegistration',
-    component: EmployeeRegistration,
-    meta: {
-      public: true,  // No authentication required
-      title: 'Employee Registration'
-    }
-  },
+  path: '/admin/jira',
+  name: 'Jira',
+  component: () => import('@/admin/jira/jira.vue'),
+  meta: { requiresAuth: true, role: 'employee' }
+},
 ];
 
 const router = createRouter({
