@@ -1,7 +1,7 @@
 // useOverview.js
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { useLoginStore } from '../../stores/loginStore.js';
+import { useLoginStore } from '@/stores/loginStore.js';
 
 export function useOverview() {
     const router = useRouter();

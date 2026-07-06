@@ -2,9 +2,9 @@
 import axios from 'axios';
 import { BASE_URL, API_ENDPOINTS } from '../services/baseUrl.js';
 
-// CHANGE THIS: Use sessionStorage instead of localStorage
+//  Use localStorage (same as loginStore and loginApi)
 const getAuthToken = () => {
-    return sessionStorage.getItem('accessToken');  // Changed from localStorage
+    return localStorage.getItem('accessToken');
 };
 
 // Create axios instance with auth header
@@ -19,7 +19,7 @@ const apiClient = axios.create({
 apiClient.interceptors.request.use(
     (config) => {
         const token = getAuthToken();
-        console.log('🔍 Token being sent:', token ? ' Present' : ' Missing'); // Debug
+        console.log('🔍 Token being sent:', token ? ' Present' : ' Missing');
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
@@ -47,10 +47,10 @@ export const fetchUserModules = async () => {
     }
 };
 
-// ✅ Also update storage functions to use sessionStorage
+//  All storage helpers use localStorage
 export const getStoredModules = () => {
     try {
-        const modules = sessionStorage.getItem('user_modules');  // Changed from localStorage
+        const modules = localStorage.getItem('user_modules');
         return modules ? JSON.parse(modules) : null;
     } catch (error) {
         console.error('Error reading stored modules:', error);
@@ -60,7 +60,7 @@ export const getStoredModules = () => {
 
 export const storeModules = (modules) => {
     try {
-        sessionStorage.setItem('user_modules', JSON.stringify(modules));  // Changed from localStorage
+        localStorage.setItem('user_modules', JSON.stringify(modules));
     } catch (error) {
         console.error('Error storing modules:', error);
     }
@@ -68,7 +68,7 @@ export const storeModules = (modules) => {
 
 export const clearStoredModules = () => {
     try {
-        sessionStorage.removeItem('user_modules');  // Changed from localStorage
+        localStorage.removeItem('user_modules');
     } catch (error) {
         console.error('Error clearing modules:', error);
     }

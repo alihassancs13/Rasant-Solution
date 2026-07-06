@@ -18,13 +18,12 @@ from django.contrib import admin
 from django.urls import path,include
 from django.conf.urls.static import static
 from django.conf import settings
-
+# At the top of Rasant_api/urls.py, after imports
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/accounts/', include('accounts.urls')),
-    path('api/employee_dashboard/', include('employee_dashboard.urls')),
-    path('api/', include('contact_message.urls')),
     path('api/cv_management/', include('cv_management.urls')),
+    path('api/employee_dashboard/', include('employee_dashboard.urls')),
+     path('api/', include('contact_message.urls')),
 
 ]
-

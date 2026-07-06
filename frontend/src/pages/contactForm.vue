@@ -195,7 +195,7 @@
 <script setup>
 import { useContact } from '@/composables/useContactForm.js'
 import ShineButton from '@/components/ShineButton.vue'
-import Navbar from "@/components/navbar.vue"
+import Navbar from "../components/navbar.vue"
 import Footer from "../components/footer.vue"
 import MobileAutoSlide from '@/components/MobileAutoSlide.vue'
 
