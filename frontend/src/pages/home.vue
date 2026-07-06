@@ -1,11 +1,13 @@
 <template>
-  <Navbar />
+  <div class="min-h-screen flex flex-col">
+    <Navbar />
 
+    <main class="flex-1">
   <!-- Hero Section -->
   <section
-      class="relative px-6 py-12 md:px-12 md:min-h-screen lg:px-24 flex items-center overflow-hidden bg-hero-gradient font-primary"
+      class="relative px-6 pt-20 pb-12 md:px-12 md:min-h-screen md:pt-12 lg:px-24 flex items-center overflow-hidden bg-hero-gradient font-primary"
   >
-    <div class="max-w-7xl pt-4 md:pt-14 mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+    <div class="max-w-7xl pt-2 md:pt-14 mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
       <!-- Left content -->
       <div
           class="lg:col-span-5 flex flex-col space-y-6 text-left transition-all duration-1000 ease-out"
@@ -553,7 +555,7 @@
   <section
       id="about"
       ref="aboutRef"
-      class="px-[5%] py-14 md:py-24 font-primary"
+      class="px-[5%] py-14 md:py-24 font-primary bg-sectionWhite border-t border-borderDefault"
   >
     <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
       <div
@@ -641,7 +643,7 @@
   <section
       id="reviews"
       ref="testimonialsRef"
-      class="px-[5%] py-14 md:py-24 font-primary overflow-hidden"
+      class="px-[5%] py-14 md:py-24 font-primary overflow-hidden bg-sectionLight border-t border-borderDefault"
       @mouseenter="pauseTestimonialAuto"
       @mouseleave="resumeTestimonialAuto"
   >
@@ -743,7 +745,10 @@
     </div>
   </section>
 
+    </main>
+
   <Footer />
+  </div>
 </template>
 
 <script setup>
