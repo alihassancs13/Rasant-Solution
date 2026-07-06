@@ -32,6 +32,15 @@ class JobType(models.Model):
     def __str__(self):
         return self.name
 
+class JobStatus(models.Model):
+    name = models.CharField(max_length=20, unique=True)
+
+    class Meta:
+        db_table = 'job_status'
+        ordering = ['id']
+
+    def __str__(self):
+        return self.name
 
 class JobOpening(models.Model):
     job_title = models.CharField(max_length=200)
@@ -46,7 +55,12 @@ class JobOpening(models.Model):
     description = models.CharField(max_length=2000)
     requirements = models.CharField(max_length=2000)
 
-    is_published = models.BooleanField(default=False)  # "Publish immediately on careers page"
+    status = models.ForeignKey(
+        JobStatus,
+        on_delete=models.PROTECT,
+        related_name='job_openings',
+        default=1
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
