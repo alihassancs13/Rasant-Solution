@@ -2,7 +2,7 @@
   <div class="min-h-screen flex flex-col">
     <Navbar />
 
-    <main class="flex-1">
+    <main class="flex-1 w-full">
   <!-- Hero Section -->
   <section
       class="relative px-6 pt-20 pb-12 md:px-12 md:min-h-screen md:pt-12 lg:px-24 flex items-center overflow-hidden bg-hero-gradient font-primary"
