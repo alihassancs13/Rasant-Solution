@@ -4,10 +4,10 @@ import { authAPI } from '../services/loginApi.js';
 
 export const useLoginStore = defineStore('login', {
     state: () => ({
-        accessToken: sessionStorage.getItem('accessToken') || null,
-        refreshToken: sessionStorage.getItem('refreshToken') || null,
-        user: JSON.parse(sessionStorage.getItem('user')) || null,
-        isAuthenticated: !!sessionStorage.getItem('accessToken'),
+        accessToken: localStorage.getItem('accessToken') || null,   //  changed
+        refreshToken: localStorage.getItem('refreshToken') || null,
+        user: JSON.parse(localStorage.getItem('user')) || null,
+        isAuthenticated: !!localStorage.getItem('accessToken'),
         isLoading: false,
         error: null,
         errorType: null,
@@ -25,15 +25,13 @@ export const useLoginStore = defineStore('login', {
             this.accessToken = accessToken;
             this.refreshToken = refreshToken;
             this.isAuthenticated = true;
-            sessionStorage.setItem('accessToken', accessToken);
-            sessionStorage.setItem('refreshToken', refreshToken);
+            localStorage.setItem('accessToken', accessToken);   //  changed
+            localStorage.setItem('refreshToken', refreshToken);
         },
-
         setUser(user) {
             this.user = user;
-            sessionStorage.setItem('user', JSON.stringify(user));
+            localStorage.setItem('user', JSON.stringify(user)); //  changed
         },
-
         clearTokens() {
             this.accessToken = null;
             this.refreshToken = null;
@@ -41,11 +39,10 @@ export const useLoginStore = defineStore('login', {
             this.isAuthenticated = false;
             this.error = null;
             this.errorType = null;
-            sessionStorage.removeItem('accessToken');
-            sessionStorage.removeItem('refreshToken');
-            sessionStorage.removeItem('user');
+            localStorage.removeItem('accessToken');  //  changed
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('user');
         },
-
         async login(credentials) {
             this.isLoading = true;
             this.error = null;
@@ -159,7 +156,22 @@ export const useLoginStore = defineStore('login', {
             };
             return roleMap[role] || '/';
         },
-
+        syncFromStorage(data) {
+            if (data.accessToken !== undefined) {
+                this.accessToken = data.accessToken;
+                this.isAuthenticated = !!data.accessToken;
+            }
+            if (data.refreshToken !== undefined) {
+                this.refreshToken = data.refreshToken;
+            }
+            if (data.user !== undefined) {
+                this.user = data.user;
+            }
+            if (data.accessToken === null) {
+                // Fully clear if logged out in another tab
+                this.clearTokens();
+            }
+        },
         hasRole(role) {
             return this.getUserRole?.toLowerCase() === role.toLowerCase();
         },
@@ -175,10 +187,10 @@ export const useLoginStore = defineStore('login', {
         },
 
         initialize() {
-            const token = sessionStorage.getItem('accessToken');
+            const token = localStorage.getItem('accessToken');   //  changed
             this.accessToken = token || null;
-            this.refreshToken = sessionStorage.getItem('refreshToken') || null;
-            this.user = JSON.parse(sessionStorage.getItem('user')) || null;
+            this.refreshToken = localStorage.getItem('refreshToken') || null;
+            this.user = JSON.parse(localStorage.getItem('user')) || null;
             this.isAuthenticated = !!token;
             return this.isAuthenticated;
         }
@@ -189,9 +201,10 @@ export const useLoginStore = defineStore('login', {
         strategies: [
             {
                 key: 'loginStore',
-                storage: sessionStorage,
+                storage: localStorage,   //  changed from sessionStorage
                 paths: ['accessToken', 'refreshToken', 'user', 'isAuthenticated'],
             },
         ],
     },
+
 });

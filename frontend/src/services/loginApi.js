@@ -13,8 +13,7 @@ const loginApi = axios.create({
 // Request interceptor to add token
 loginApi.interceptors.request.use(
     (config) => {
-        // Get token from sessionStorage
-        const token = sessionStorage.getItem('accessToken');  // Changed
+        const token = localStorage.getItem('accessToken');   // ← changed
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
         }
@@ -41,15 +40,15 @@ loginApi.interceptors.response.use(
                     });
 
                     const newAccessToken = response.data.access;
-                    sessionStorage.setItem('accessToken', newAccessToken);  // Changed
+                    localStorage.setItem('accessToken', newAccessToken);    // Changed
 
                     originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
                     return loginApi(originalRequest);
                 } catch (refreshError) {
                     // Refresh failed - logout
-                    sessionStorage.removeItem('accessToken');  // Changed
-                    sessionStorage.removeItem('refreshToken');  // Changed
-                    sessionStorage.removeItem('user');  // Changed
+                    localStorage.removeItem('accessToken');   // ← changed
+                    localStorage.removeItem('refreshToken');  // ← changed
+                    localStorage.removeItem('user');    // Changed
                     window.location.href = '/login';
                     return Promise.reject(refreshError);
                 }
