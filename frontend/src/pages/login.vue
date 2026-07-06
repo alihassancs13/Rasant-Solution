@@ -59,7 +59,7 @@
       </aside>
 
       <!-- Right panel -->
-      <main class="relative flex min-h-0 min-w-0 flex-1 w-full flex-col items-center justify-center overflow-hidden bg-gradient-primary px-4 py-4 sm:px-6 sm:py-6 lg:bg-section-white/80 lg:backdrop-blur-sm">
+      <main class="relative flex min-h-0 min-w-0 flex-1 w-full flex-col items-center overflow-hidden bg-gradient-primary px-4 py-4 sm:px-6 sm:py-6 lg:bg-section-white/80 lg:backdrop-blur-sm">
 
         <!-- Animated concentric rings (desktop only — avoids mobile horizontal overflow) -->
         <div class="pointer-events-none absolute -top-48 -right-48 hidden h-[580px] w-[580px] animate-login-ring rounded-full border border-primary-500/10 lg:block" aria-hidden="true"></div>
@@ -77,21 +77,8 @@
           <span class="particle absolute bottom-[40%] left-[5%] h-1 w-1 rounded-full bg-secondary-300/20 animate-float-2 [animation-delay:2.5s]"></span>
         </div>
 
-        <router-link
-            to="/"
-            class="relative z-20 mb-3 inline-flex items-center gap-1.5 text-sm font-semibold text-textBody transition-all duration-200 hover:text-headingMain no-underline"
-        >
-          <font-awesome-icon icon="fa-solid fa-arrow-left" class="text-xs" />
-          Back to website
-        </router-link>
-
-        <div class="relative z-10 box-border w-full max-w-[400px] min-w-0 animate-login-card overflow-hidden rounded-2xl border border-borderDefault/80 bg-section-white p-4 shadow-blue sm:max-w-[420px] sm:p-6 lg:max-w-[400px] lg:p-7 transition-shadow duration-500 hover:shadow-[0_20px_60px_rgba(74,144,226,0.18)] [animation-delay:60ms]">
-
-          <!-- Animated top accent bar -->
-          <div class="pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-secondary-500 via-accent-4 to-primary-500 animate-gradient-shift" aria-hidden="true"></div>
-
-          <!-- Corner glow -->
-          <div class="pointer-events-none absolute -top-12 -right-12 h-28 w-28 rounded-full bg-[radial-gradient(circle,var(--color-primary-500)/0.10,transparent_70%)] blur-xl" aria-hidden="true"></div>
+        <div class="relative z-10 flex w-full min-h-0 flex-1 flex-col items-center justify-center">
+        <div class="w-full max-w-[400px] min-w-0 animate-login-card sm:max-w-[420px] lg:max-w-[400px] [animation-delay:60ms]">
 
           <div class="mb-4 flex justify-center">
             <img
@@ -115,15 +102,6 @@
             </p>
           </div>
 
-          <!-- Error message display with better styling -->
-          <!-- Error message display -->
-          <div
-              v-if="errorMessage"
-              class="mb-3 rounded-lg border border-error/20 bg-error/10 px-3 py-2 text-xs text-error"
-          >
-            {{ errorMessage }}
-          </div>
-
           <form @submit.prevent="handleLoginSubmit" novalidate class="space-y-3 sm:space-y-4">
             <div class="animate-login-fade-up [animation-delay:220ms]">
               <label for="username" class="mb-1.5 block text-[0.7rem] font-bold tracking-wider text-headingMain uppercase">
@@ -144,8 +122,8 @@
                     'login-input w-full rounded-xl border border-borderDefault bg-neutral-100 py-2.5 pr-3 pl-10 text-[0.9375rem] text-headingMain outline-none transition-all duration-200 placeholder:text-textSupporting focus:border-primary-500 focus:bg-section-white focus:ring-4 focus:ring-primary-500/12 focus:shadow-[0_0_0_4px_rgba(74,144,226,0.08),0_2px_8px_rgba(74,144,226,0.12)]',
                     fieldErrors.emailOrUsername ? 'border-error ring-2 ring-error/20 bg-error/5' : ''
                   ]"
-                    @focus="fieldErrors.emailOrUsername = false; errorMessage = ''"
-                    @input="fieldErrors.emailOrUsername = false; errorMessage = ''"
+                    @focus="fieldErrors.emailOrUsername = false"
+                    @input="fieldErrors.emailOrUsername = false"
                 />
 
 
@@ -179,8 +157,8 @@
                     'login-input w-full rounded-xl border border-borderDefault bg-neutral-100 py-2.5 pr-11 pl-10 text-[0.9375rem] text-headingMain outline-none transition-all duration-200 placeholder:text-textSupporting focus:border-primary-500 focus:bg-section-white focus:ring-4 focus:ring-primary-500/12 focus:shadow-[0_0_0_4px_rgba(74,144,226,0.08),0_2px_8px_rgba(74,144,226,0.12)]',
                     fieldErrors.password ? 'border-error ring-2 ring-error/20 bg-error/5' : ''
                   ]"
-                    @focus="fieldErrors.password = false; errorMessage = ''"
-                    @input="fieldErrors.password = false; errorMessage = ''"
+                    @focus="fieldErrors.password = false"
+                    @input="fieldErrors.password = false"
                 />
                 <button
                     type="button"
@@ -220,30 +198,7 @@
             </div>
           </form>
 
-          <div class="my-3 flex items-center gap-3 text-xs text-textSupporting animate-login-fade-up [animation-delay:400ms] sm:my-4">
-            <span class="h-px min-w-0 flex-1 bg-gradient-to-r from-transparent to-borderDefault"></span>
-            <span class="shrink-0 font-medium tracking-wide">Rasant Solutions</span>
-            <span class="h-px min-w-0 flex-1 bg-gradient-to-l from-transparent to-borderDefault"></span>
-          </div>
-
-          <div class="mb-3 hidden grid-cols-3 gap-2 animate-login-fade-up [animation-delay:440ms] sm:mb-4 sm:grid">
-            <div
-                v-for="(badge, i) in securityBadges"
-                :key="badge.label"
-                :style="{ animationDelay: `${460 + i * 60}ms` }"
-                class="group flex flex-col items-center gap-1.5 rounded-xl border border-borderDefault bg-neutral-100 px-2 py-2.5 text-center text-[0.68rem] font-medium text-textBody transition-all duration-300 hover:-translate-y-1 hover:border-primary-200 hover:bg-section-white hover:shadow-[0_4px_16px_rgba(74,144,226,0.12)] cursor-default animate-login-fade-up"
-            >
-              <div
-                  class="flex h-8 w-8 items-center justify-center rounded-lg text-sm transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6"
-                  :style="{ backgroundColor: badge.bgColor, color: badge.color }"
-              >
-                <font-awesome-icon :icon="badge.icon" class="text-inherit" />
-              </div>
-              <span>{{ badge.label }}</span>
-            </div>
-          </div>
-
-          <div class="text-center animate-login-fade-up [animation-delay:520ms]">
+          <div class="mt-4 text-center animate-login-fade-up [animation-delay:400ms]">
             <p class="text-sm text-textBody">
               Need access?
               <router-link to="/contact" class="font-semibold text-secondary-500 transition-all duration-200 hover:text-accent-4 hover:underline hover:underline-offset-2">
@@ -252,6 +207,15 @@
             </p>
           </div>
         </div>
+        </div>
+
+        <router-link
+            to="/"
+            class="relative z-20 mt-auto inline-flex shrink-0 items-center gap-1.5 pb-2 pt-4 text-sm font-semibold text-textBody transition-all duration-200 hover:text-headingMain no-underline"
+        >
+          <font-awesome-icon icon="fa-solid fa-arrow-left" class="text-xs" />
+          Back to website
+        </router-link>
       </main>
     </div>
   </div>
@@ -362,36 +326,11 @@ const stats = [
   { value: '3×', label: 'Faster delivery' },
 ];
 
-const securityBadges = [
-  {
-    label: 'SSL Encrypted',
-    icon: 'fa-solid fa-lock',
-    color: '#3b82f6', // primary blue
-    bgColor: 'rgba(59, 130, 246, 0.1)'
-  },
-  {
-    label: 'SOC 2 Ready',
-    icon: 'fa-solid fa-shield-halved',
-    color: '#a855f7', // accent purple
-    bgColor: 'rgba(168, 85, 247, 0.1)'
-  },
-  {
-    label: 'Role-based',
-    icon: 'fa-solid fa-user-shield',
-    color: '#c2410c', // Your current orange/brown color
-    bgColor: 'rgba(194, 65, 12, 0.1)' // matching 10% tint background
-  },
-];
-
-// Whitelist safely so Tailwind forces these classes into production:
-const safelist = ['bg-primary-50', 'text-primary-500', 'bg-accent-3/10', 'text-accent-3', 'bg-secondary-50', 'text-secondary-500'];
-// Destructure with fieldErrors from useLogin
 const {
   emailOrUsername,
   password,
   rememberMe,
   isPasswordVisible,
-  errorMessage,
   isLoading,
   fieldErrors,
   togglePasswordVisibility,
