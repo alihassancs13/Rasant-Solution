@@ -135,28 +135,20 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <article v-for="(card, i) in orchestriCards" :key="i"
-                   :class="[
-              'group relative bg-cardSemi border border-borderDefault rounded-[14px] p-4 pl-4.5 shadow-[var(--shadow-card-small)] overflow-hidden',
-              'transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.02]',
-              'animate-[cardFloat_5s_ease-in-out_infinite] hover:[animation-play-state:paused]',
-              `hover:border-${card.color}/45 hover:shadow-[var(--shadow-card-hover)]`,
-              `before:absolute before:left-0 before:top-0 before:bottom-0 before:w-1 before:rounded-[16px_0_0_16px]`,
-              `after:absolute after:inset-0 after:pointer-events-none`
-            ]"
-                   :style="{
-              animationDelay: card.delay,
-              '--card-accent': card.hex,
-              '--before-bg': card.hex
-            }">
-            <span :class="`relative z-10 inline-block text-[9px] font-bold tracking-wider uppercase mb-2 font-display`" :style="{ color: card.hex }">{{ card.tag }}</span>
-            <h3 class="relative z-10 font-display text-sm font-bold mb-1.5 text-headingCard">{{ card.title }}</h3>
-            <p class="relative z-10 text-[12.5px] text-textSupporting leading-normal font-primary">{{ card.desc }}</p>
-            <div class="absolute left-0 top-0 bottom-0 w-1 rounded-[16px_0_0_16px]" :style="{ background: card.hex }"></div>
-            <div class="absolute inset-0 pointer-events-none rounded-[14px]" :style="{ background: `linear-gradient(135deg, ${card.hex}14 0%, transparent 55%)` }"></div>
-          </article>
-        </div>
+        <MobileAutoSlide :items="orchestriCards" min-height="130px" stack-below="sm" desktop-class="grid-cols-2 gap-4" :auto-ms="3500">
+          <template #default="{ item: card }">
+            <article
+                class="group relative bg-cardSemi border border-borderDefault rounded-[14px] p-4 pl-4.5 shadow-[var(--shadow-card-small)] overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.02] animate-[cardFloat_5s_ease-in-out_infinite] hover:[animation-play-state:paused] h-full"
+                :style="{ animationDelay: card.delay, '--card-accent': card.hex }"
+            >
+              <span class="relative z-10 inline-block text-[9px] font-bold tracking-wider uppercase mb-2 font-display" :style="{ color: card.hex }">{{ card.tag }}</span>
+              <h3 class="relative z-10 font-display text-sm font-bold mb-1.5 text-headingCard">{{ card.title }}</h3>
+              <p class="relative z-10 text-[12.5px] text-textSupporting leading-normal font-primary">{{ card.desc }}</p>
+              <div class="absolute left-0 top-0 bottom-0 w-1 rounded-[16px_0_0_16px]" :style="{ background: card.hex }"></div>
+              <div class="absolute inset-0 pointer-events-none rounded-[14px]" :style="{ background: `linear-gradient(135deg, ${card.hex}14 0%, transparent 55%)` }"></div>
+            </article>
+          </template>
+        </MobileAutoSlide>
       </div>
     </section>
 
@@ -181,19 +173,21 @@
           <h2 class="font-display text-[clamp(24px,3vw,36px)] font-bold tracking-[-0.8px] leading-[1.15] text-headingSection my-2 relative z-10">Monorepo, desktop, and cloud-ready</h2>
           <p class="text-[15px] text-textBody leading-relaxed max-w-115 font-primary">FastAPI backend with local DATA_DIR storage, React UI with SSE, Windows .exe and macOS .app builds, plus local folder bridge for hosted UI + local disk.</p>
 
-          <ul class="mt-4.5 flex flex-col gap-2.5 list-none p-0">
-            <li v-for="(feat, i) in platformFeatures" :key="i"
-                class="flex gap-4 items-start p-[14px_16px] bg-section-white border border-borderDefault rounded-xl shadow-sm animate-[featIn_0.6s_ease_both] font-primary"
-                :style="i > 0 ? { animationDelay: `${i * 0.07}s` } : {}">
-              <span class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm bg-accent-3/10 text-headingMain">
-                <i :class="feat.icon"></i>
-              </span>
-              <div>
-                <h4 class="text-sm font-bold text-headingCard font-display">{{ feat.title }}</h4>
-                <p class="text-xs text-textSupporting mt-0.5 font-primary">{{ feat.desc }}</p>
+          <div class="mt-4.5">
+          <MobileAutoSlide :items="platformFeatures" min-height="100px" desktop-class="grid-cols-1 gap-2.5" item-key="title">
+            <template #default="{ item: feat }">
+              <div class="flex gap-4 items-start p-[14px_16px] bg-section-white border border-borderDefault rounded-xl shadow-sm font-primary h-full">
+                <span class="flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center text-sm bg-accent-3/10 text-headingMain">
+                  <i :class="feat.icon"></i>
+                </span>
+                <div>
+                  <h4 class="text-sm font-bold text-headingCard font-display">{{ feat.title }}</h4>
+                  <p class="text-xs text-textSupporting mt-0.5 font-primary">{{ feat.desc }}</p>
+                </div>
               </div>
-            </li>
-          </ul>
+            </template>
+          </MobileAutoSlide>
+          </div>
 
           <p class="text-left text-sm text-textSupporting mt-4 ml-15 font-primary">
             Need voice or chat products? See <router-link to="/ai-agent" class="text-secondary-700 underline font-semibold hover:underline">Voice AI Agent</router-link> and <router-link to="/chatbot" class="text-secondary-700 underline font-semibold hover:underline">Chatbot</router-link>.
@@ -304,7 +298,7 @@
 <script>
 import Footer from '../components/footer.vue'
 import Navbar from '../components/navbar.vue'
-import ShineButton from "@/components/ShineButton.vue";
+import MobileAutoSlide from '@/components/MobileAutoSlide.vue'
 
 const CELL_CONFIGS = [
   { bg: 'bg-accent-3/20' },
@@ -326,7 +320,7 @@ const CELL_CONFIGS = [
 
 export default {
   name: 'OrchestriComponent',
-  components: {ShineButton, Footer, Navbar },
+  components: {ShineButton, Footer, Navbar, MobileAutoSlide },
 
   data() {
     return {

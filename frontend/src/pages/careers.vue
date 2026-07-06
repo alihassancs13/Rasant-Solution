@@ -126,24 +126,31 @@
           </p>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <article
-              v-for="(perk, i) in perks"
-              :key="perk.title"
-              class="group relative bg-card border border-borderDefault rounded-2xl p-6 shadow-sm hover:-translate-y-2 hover:shadow-insetBlue hover:border-activeBorder/25 transition-all duration-500 ease-out overflow-hidden"
-              :class="visible.perks ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'"
-              :style="{ transitionDelay: visible.perks ? `${i * 100}ms` : '0ms' }"
-          >
-            <div class="absolute top-0 right-0 w-28 h-28 opacity-40 group-hover:opacity-70 transition-opacity duration-300 pointer-events-none" aria-hidden="true">
-              <img :src="perk.iconSvg" alt="" class="w-full h-full object-contain" loading="lazy" />
-            </div>
-            <div class="relative w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110 bg-gradient-to-br from-primary-50 to-secondary-50 border border-borderDefault/60">
-              <i :class="[perk.icon, 'text-lg text-primary-600']" aria-hidden="true"></i>
-            </div>
-            <h3 class="font-display font-bold text-headingCard mb-2">{{ perk.title }}</h3>
-            <p class="text-sm text-textBody leading-relaxed">{{ perk.description }}</p>
-          </article>
-        </div>
+        <MobileAutoSlide
+            :items="perks"
+            min-height="180px"
+            stack-below="lg"
+            desktop-class="grid-cols-3 gap-6"
+            item-key="title"
+            :active="visible.perks"
+        >
+          <template #default="{ item: perk, index: i }">
+            <article
+                class="group relative bg-card border border-borderDefault rounded-2xl p-6 shadow-sm hover:-translate-y-2 hover:shadow-insetBlue hover:border-activeBorder/25 transition-all duration-500 ease-out overflow-hidden h-full"
+                :class="visible.perks ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'"
+                :style="{ transitionDelay: visible.perks ? `${i * 100}ms` : '0ms' }"
+            >
+              <div class="absolute top-0 right-0 w-28 h-28 opacity-40 group-hover:opacity-70 transition-opacity duration-300 pointer-events-none" aria-hidden="true">
+                <img :src="perk.iconSvg" alt="" class="w-full h-full object-contain" loading="lazy" />
+              </div>
+              <div class="relative w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform duration-300 group-hover:scale-110 bg-gradient-to-br from-primary-50 to-secondary-50 border border-borderDefault/60">
+                <i :class="[perk.icon, 'text-lg text-primary-600']" aria-hidden="true"></i>
+              </div>
+              <h3 class="font-display font-bold text-headingCard mb-2">{{ perk.title }}</h3>
+              <p class="text-sm text-textBody leading-relaxed">{{ perk.description }}</p>
+            </article>
+          </template>
+        </MobileAutoSlide>
       </div>
     </section>
 
@@ -164,7 +171,7 @@
           <h2 class="font-display text-3xl md:text-4xl font-bold text-headingSection mt-3">Our hiring process</h2>
         </div>
 
-        <div class="relative grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6">
+        <div class="relative">
           <div
               class="hidden md:block absolute top-10 left-[16%] right-[16%] h-0.5 bg-borderDefault overflow-hidden"
               aria-hidden="true"
@@ -175,22 +182,30 @@
             ></div>
           </div>
 
-          <div
-              v-for="(step, i) in hiringSteps"
-              :key="step.title"
-              class="relative text-center transition-all duration-700 ease-out"
-              :class="visible.process ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'"
-              :style="{ transitionDelay: visible.process ? `${i * 150}ms` : '0ms' }"
-          >
-            <div class="relative z-10 w-20 h-20 mx-auto rounded-2xl bg-card border-2 border-primary-500/25 flex items-center justify-center shadow-blue mb-5 transition-transform duration-300 hover:scale-105 overflow-hidden">
-              <img :src="step.iconSvg" alt="" class="w-11 h-11" loading="lazy" />
-              <span class="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-primary-600 text-white text-[10px] font-bold flex items-center justify-center font-display shadow-sm">
-                {{ step.number }}
-              </span>
+        <MobileAutoSlide
+            :items="hiringSteps"
+            min-height="220px"
+            desktop-class="grid-cols-3 gap-6"
+            item-key="title"
+            :active="visible.process"
+        >
+          <template #default="{ item: step, index: i }">
+            <div
+                class="relative text-center transition-all duration-700 ease-out"
+                :class="visible.process ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'"
+                :style="{ transitionDelay: visible.process ? `${i * 150}ms` : '0ms' }"
+            >
+              <div class="relative z-10 w-20 h-20 mx-auto rounded-2xl bg-card border-2 border-primary-500/25 flex items-center justify-center shadow-blue mb-5 transition-transform duration-300 hover:scale-105 overflow-hidden">
+                <img :src="step.iconSvg" alt="" class="w-11 h-11" loading="lazy" />
+                <span class="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-primary-600 text-white text-[10px] font-bold flex items-center justify-center font-display shadow-sm">
+                  {{ step.number }}
+                </span>
+              </div>
+              <h3 class="font-display font-bold text-headingCard mb-2">{{ step.title }}</h3>
+              <p class="text-sm text-textBody leading-relaxed max-w-xs mx-auto">{{ step.description }}</p>
             </div>
-            <h3 class="font-display font-bold text-headingCard mb-2">{{ step.title }}</h3>
-            <p class="text-sm text-textBody leading-relaxed max-w-xs mx-auto">{{ step.description }}</p>
-          </div>
+          </template>
+        </MobileAutoSlide>
         </div>
       </div>
     </section>
@@ -580,6 +595,7 @@ import { cvAPI } from '@/services/cvApi.js'
 import Navbar from '../components/navbar.vue'
 import Footer from '../components/footer.vue'
 import ShineButton from '@/components/ShineButton.vue'
+import MobileAutoSlide from '@/components/MobileAutoSlide.vue'
 import careersHeroSvg from '@/assets/svg/careers-hero.svg'
 import careersProcessSvg from '@/assets/svg/careers-process.svg'
 import careersPerkAccentSvg from '@/assets/svg/careers-perk-accent.svg'

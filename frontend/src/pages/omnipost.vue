@@ -547,16 +547,17 @@
         </p>
       </div>
 
-      <div class="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-6">
-        <div v-for="platform in platforms" :key="platform.name"
-             class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300">
-          <img :src="platform.image" :alt="platform.name" class="w-full rounded-xl"/>
-          <p class="flex items-center gap-2 mt-4 font-display font-bold text-slate-900">
-            <i :class="platform.icon" class="text-purple-600"></i>
-            {{ platform.name }}
-          </p>
-        </div>
-      </div>
+      <MobileAutoSlide :items="platforms" min-height="280px" stack-below="sm" desktop-class="grid-cols-3 gap-6 max-w-5xl mx-auto" item-key="name">
+        <template #default="{ item: platform }">
+          <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm hover:shadow-xl hover:-translate-y-2 transition-all duration-300 h-full">
+            <img :src="platform.image" :alt="platform.name" class="w-full rounded-xl"/>
+            <p class="flex items-center gap-2 mt-4 font-display font-bold text-slate-900">
+              <i :class="platform.icon" class="text-purple-600"></i>
+              {{ platform.name }}
+            </p>
+          </div>
+        </template>
+      </MobileAutoSlide>
     </section>
 
     <!-- How It Works -->
@@ -580,16 +581,17 @@
         </div>
       </div>
 
-      <div class="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div v-for="(step, index) in steps" :key="index"
-             class="bg-white border border-slate-200 rounded-xl p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 hover:border-purple-300">
-          <span class="w-11 h-11 rounded-xl bg-purple-100 text-accent-neutral-900 flex items-center justify-center font-display font-extrabold text-lg mb-3">
-            {{ index + 1 }}
-          </span>
-          <h3 class="font-display font-bold text-slate-900 text-lg mb-2">{{ step.title }}</h3>
-          <p class="text-sm text-slate-600">{{ step.description }}</p>
-        </div>
-      </div>
+      <MobileAutoSlide :items="steps" min-height="160px" stack-below="sm" desktop-class="grid-cols-3 gap-4 max-w-5xl mx-auto" item-key="title">
+        <template #default="{ item: step, index }">
+          <div class="bg-white border border-slate-200 rounded-xl p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 hover:border-purple-300 h-full">
+            <span class="w-11 h-11 rounded-xl bg-purple-100 text-accent-neutral-900 flex items-center justify-center font-display font-extrabold text-lg mb-3">
+              {{ index + 1 }}
+            </span>
+            <h3 class="font-display font-bold text-slate-900 text-lg mb-2">{{ step.title }}</h3>
+            <p class="text-sm text-slate-600">{{ step.description }}</p>
+          </div>
+        </template>
+      </MobileAutoSlide>
     </section>
 
     <!-- Capabilities -->
@@ -603,16 +605,17 @@
         </h2>
       </div>
 
-      <div class="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div v-for="capability in capabilities" :key="capability.title"
-             class="bg-white border border-slate-200 rounded-xl p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 hover:border-purple-300">
-          <span class="w-11 h-11 rounded-xl bg-purple-100 text-indigo-600 flex items-center justify-center text-lg mb-3">
-            <i :class="capability.icon"></i>
-          </span>
-          <h3 class="font-display font-bold text-slate-900 mb-2">{{ capability.title }}</h3>
-          <p class="text-sm text-slate-600">{{ capability.description }}</p>
-        </div>
-      </div>
+      <MobileAutoSlide :items="capabilities" min-height="150px" stack-below="sm" desktop-class="grid-cols-2 lg:grid-cols-3 gap-4 max-w-5xl mx-auto" item-key="title">
+        <template #default="{ item: capability }">
+          <div class="bg-white border border-slate-200 rounded-xl p-6 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 hover:border-purple-300 h-full">
+            <span class="w-11 h-11 rounded-xl bg-purple-100 text-indigo-600 flex items-center justify-center text-lg mb-3">
+              <i :class="capability.icon"></i>
+            </span>
+            <h3 class="font-display font-bold text-slate-900 mb-2">{{ capability.title }}</h3>
+            <p class="text-sm text-slate-600">{{ capability.description }}</p>
+          </div>
+        </template>
+      </MobileAutoSlide>
     </section>
 
     <!-- CTA Section -->
@@ -658,12 +661,14 @@ import { useOmniPost } from '../composables/useOmniPost.js'
 import { useRouter } from 'vue-router'
 import Navbar from '../components/navbar.vue'
 import Footer from '../components/footer.vue'
+import MobileAutoSlide from '@/components/MobileAutoSlide.vue'
 
 export default {
   name: 'OmniPost',
   components: {
     Navbar,
-    Footer
+    Footer,
+    MobileAutoSlide,
   },
   setup() {
     const router = useRouter()

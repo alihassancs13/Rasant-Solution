@@ -1,18 +1,20 @@
 <template>
-  <Navbar />
+  <div class="min-h-screen flex flex-col">
+    <Navbar />
 
+    <main class="flex-1 w-full">
   <!-- Hero Section -->
   <section
-      class="relative min-h-screen px-6 py-12 md:px-12 lg:px-24 flex items-center overflow-hidden bg-hero-gradient font-primary"
+      class="relative px-6 pt-20 pb-12 md:px-12 md:min-h-screen md:pt-12 lg:px-24 flex items-center overflow-hidden bg-hero-gradient font-primary"
   >
-    <div class="max-w-7xl pt-14 mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+    <div class="max-w-7xl pt-2 md:pt-14 mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
       <!-- Left content -->
       <div
           class="lg:col-span-5 flex flex-col space-y-6 text-left transition-all duration-1000 ease-out"
           :class="heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-16'"
       >
         <div
-            class="inline-flex items-center self-start bg-badgeSemi backdrop-blur-sm border border-borderDefault rounded-full px-4 py-1.5 shadow-sm font-primary"
+            class="inline-flex items-center self-start bg-badgeSemi backdrop-blur-sm border border-borderDefault rounded-full px-4 py-1.5 shadow-[0_2px_6px_-2px_rgba(15,23,42,0.06),0_8px_20px_-8px_rgba(15,23,42,0.08)] font-primary"
         >
           <span class="w-2 h-2 rounded-full bg-dotBlue mr-2.5 animate-pulse"></span>
           <span class="text-xs font-semibold tracking-wider text-textSupporting uppercase">
@@ -56,7 +58,7 @@
       >
         <!-- Card 1: Code example -->
         <div
-            class="md:col-span-2 bg-card rounded-xl shadow-blue border border-borderDefault flex flex-col h-44 max-w-md overflow-hidden transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-insetBlue hover:border-accent-1/30"
+            class="md:col-span-2 bg-card rounded-xl shadow-[0_4px_14px_-4px_rgba(15,23,42,0.08),0_16px_32px_-12px_rgba(74,144,226,0.16)] border border-borderDefault flex flex-col h-44 max-w-md overflow-hidden transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-[0_6px_18px_-4px_rgba(15,23,42,0.10),0_22px_44px_-14px_rgba(74,144,226,0.28)] hover:border-accent-1/30"
             :class="heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
             style="transition-delay: 80ms"
         >
@@ -84,7 +86,7 @@
 
         <!-- Card 2: Deployed -->
         <div
-            class="bg-card rounded-xl shadow-blue border border-borderDefault p-6 flex flex-col items-center justify-center text-center h-44 md:h-auto md:row-span-2 self-stretch transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-insetBlue hover:border-accent-1/30"
+            class="bg-card rounded-xl shadow-[0_4px_14px_-4px_rgba(15,23,42,0.08),0_16px_32px_-12px_rgba(74,144,226,0.16)] border border-borderDefault p-6 flex flex-col items-center justify-center text-center h-44 md:h-auto md:row-span-2 self-stretch transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-[0_6px_18px_-4px_rgba(15,23,42,0.10),0_22px_44px_-14px_rgba(74,144,226,0.28)] hover:border-accent-1/30"
             :class="heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
             style="transition-delay: 160ms"
         >
@@ -102,7 +104,7 @@
 
         <!-- Card 3: Uptime -->
         <div
-            class="bg-card rounded-xl shadow-blue border border-borderDefault p-5 flex flex-col justify-between h-36 transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-insetBlue hover:border-accent-1/30"
+            class="bg-card rounded-xl shadow-[0_4px_14px_-4px_rgba(15,23,42,0.08),0_16px_32px_-12px_rgba(74,144,226,0.16)] border border-borderDefault p-5 flex flex-col justify-between h-36 transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-[0_6px_18px_-4px_rgba(15,23,42,0.10),0_22px_44px_-14px_rgba(74,144,226,0.28)] hover:border-accent-1/30"
             :class="heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
             style="transition-delay: 240ms"
         >
@@ -120,7 +122,7 @@
 
         <!-- Card 4: Tech Stack -->
         <div
-            class="bg-card rounded-xl shadow-blue border border-borderDefault p-4 flex flex-col justify-between h-44 overflow-hidden transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-insetBlue hover:border-accent-1/30"
+            class="bg-card rounded-xl shadow-[0_4px_14px_-4px_rgba(15,23,42,0.08),0_16px_32px_-12px_rgba(74,144,226,0.16)] border border-borderDefault p-4 flex flex-col justify-between h-44 overflow-hidden transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-[0_6px_18px_-4px_rgba(15,23,42,0.10),0_22px_44px_-14px_rgba(74,144,226,0.28)] hover:border-accent-1/30"
             :class="heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
             style="transition-delay: 320ms"
         >
@@ -130,7 +132,7 @@
                 v-for="(tech, i) in techStack"
                 :key="tech.name"
                 :style="{ animationDelay: (i * 70) + 'ms' }"
-                class="tech-chip flex items-center justify-center gap-1 text-[9.5px] font-semibold border rounded-lg py-1 px-1 text-textBody font-primary transition-all duration-200 hover:-translate-y-0.5 hover:shadow-blue hover:text-textBrand cursor-default"
+                class="tech-chip flex items-center justify-center gap-1 text-[9.5px] font-semibold border rounded-lg py-1 px-1 text-textBody font-primary transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_4px_14px_-4px_rgba(15,23,42,0.08),0_16px_32px_-12px_rgba(74,144,226,0.16)] hover:text-textBrand cursor-default"
                 :class="tech.chipClass"
             >
               <font-awesome-icon :icon="tech.icon" :class="['text-[9px] shrink-0', tech.color]" />
@@ -141,7 +143,7 @@
 
         <!-- Card 5: Faster Delivery -->
         <div
-            class="md:col-span-3 bg-card rounded-xl shadow-blue border border-borderDefault p-4 flex items-center justify-between space-x-6 transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-insetBlue hover:border-accent-1/30"
+            class="md:col-span-3 bg-card rounded-xl shadow-[0_4px_14px_-4px_rgba(15,23,42,0.08),0_16px_32px_-12px_rgba(74,144,226,0.16)] border border-borderDefault p-4 flex items-center justify-between space-x-6 transition-all duration-500 ease-out hover:-translate-y-1 hover:shadow-[0_6px_18px_-4px_rgba(15,23,42,0.10),0_22px_44px_-14px_rgba(74,144,226,0.28)] hover:border-accent-1/30"
             :class="heroLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
             style="transition-delay: 400ms"
         >
@@ -256,7 +258,7 @@
             <div
                 v-for="tech in techList"
                 :key="`${copy}-${tech.name}`"
-                class="inline-flex items-center gap-1.5 sm:gap-2 bg-card border border-borderDefault rounded-full px-3.5 py-2 sm:px-5 sm:py-2.5 shadow-sm whitespace-nowrap shrink-0 font-primary"
+                class="inline-flex items-center gap-1.5 sm:gap-2 bg-card border border-borderDefault rounded-full px-3.5 py-2 sm:px-5 sm:py-2.5 shadow-[0_2px_6px_-2px_rgba(15,23,42,0.06),0_8px_20px_-8px_rgba(15,23,42,0.08)] whitespace-nowrap shrink-0 font-primary"
             >
               <font-awesome-icon :icon="tech.icon" :class="['text-xs sm:text-sm', tech.color]" />
               <span class="text-xs sm:text-sm font-semibold text-brandDark">{{ tech.name }}</span>
@@ -271,7 +273,7 @@
   <section
       id="platform"
       ref="platformRef"
-      class="relative overflow-hidden px-[5%] pt-20 pb-[72px] scroll-mt-20 bg-platform-gradient font-primary"
+      class="relative overflow-hidden px-[5%] pt-14 pb-12 md:pt-20 md:pb-[72px] scroll-mt-20 bg-platform-gradient font-primary"
   >
 
     <div
@@ -291,7 +293,7 @@
     </div>
 
     <div
-        class="relative z-10 max-w-[1320px] mx-auto rounded-[22px] bg-gradient-to-br from-secondary-100 via-platformBorder to-primary-500 p-[2px] opacity-90 shadow-blue transition-all duration-700 ease-out delay-200"
+        class="relative z-10 max-w-[1320px] mx-auto rounded-[22px] bg-gradient-to-br from-secondary-100 via-platformBorder to-primary-500 p-[2px] opacity-90 shadow-[0_4px_14px_-4px_rgba(15,23,42,0.08),0_16px_32px_-12px_rgba(74,144,226,0.16)] transition-all duration-700 ease-out delay-200"
         :class="visible.platform ? 'opacity-100 scale-100' : 'opacity-0 scale-95'"
     >
       <div
@@ -310,11 +312,11 @@
     </div>
 
     <div
-        class="relative z-10 flex flex-wrap justify-center gap-4 mt-9 transition-all duration-700 ease-out delay-300"
+        class="relative z-10 flex flex-nowrap justify-center gap-2.5 sm:gap-4 mt-9 transition-all duration-700 ease-out delay-300"
         :class="visible.platform ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'"
     >
-      <ShineButton to="/sentra">Explore Sentra Platform</ShineButton>
-      <ShineButton to="/login" variant="outline">Open Sentra Portal</ShineButton>
+      <ShineButton to="/sentra" size="sm" class="!px-4 sm:!px-6 !text-[13px] sm:!text-base whitespace-nowrap">Explore Sentra Platform</ShineButton>
+      <ShineButton to="/login" variant="outline" size="sm" class="!px-4 sm:!px-6 !text-[13px] sm:!text-base whitespace-nowrap">Open Sentra Portal</ShineButton>
     </div>
   </section>
 
@@ -322,7 +324,7 @@
   <section
       id="products"
       ref="productsRef"
-      class="relative overflow-hidden px-[5%] py-24 scroll-mt-20 font-primary bg-sectionLight border-t border-borderDefault"
+      class="relative overflow-hidden px-[5%] py-14 md:py-24 scroll-mt-20 font-primary bg-sectionLight border-t border-borderDefault"
   >
     <div class="pointer-events-none absolute top-[10%] -right-[8%] w-[520px] h-[520px] rounded-full bg-orbPrimary"></div>
 
@@ -344,90 +346,84 @@
         class="relative z-10 max-w-[1100px] mx-auto"
         @mouseenter="productsCarousel.pauseIfFinePointer"
         @mouseleave="productsCarousel.resume"
-        @touchstart="productsCarousel.onTouchStart"
-        @touchend="productsCarousel.onTouchEnd"
     >
       <div class="w-full lg:grid lg:grid-cols-[auto_1fr_auto] lg:gap-3 lg:items-center">
         <button
             type="button"
             aria-label="Previous product"
             @click="productsCarousel.prev"
-            class="group hidden lg:flex w-11 h-11 rounded-full cursor-pointer border border-borderDefault bg-card text-headingCard items-center justify-center shrink-0 transition-all duration-200 hover:bg-buttonPrimaryHover hover:border-buttonPrimaryBorder hover:text-white hover:scale-105 hover:shadow-orange font-primary"
+            class="group hidden lg:flex w-11 h-11 rounded-full cursor-pointer border border-borderDefault bg-card text-headingCard items-center justify-center shrink-0 transition-all duration-200 hover:bg-buttonPrimaryHover hover:border-buttonPrimaryBorder hover:text-white hover:scale-105 hover:shadow-[0_8px_22px_-6px_rgba(249,115,22,0.45)] font-primary"
         >
+          <font-awesome-icon :icon="['fas', 'chevron-left']" class="text-sm transition-transform duration-200 group-hover:-translate-x-0.5" />
         </button>
 
-        <div class="relative w-full rounded-[28px] border border-activeBorder/20 bg-card shadow-lg overflow-hidden min-h-[460px] sm:min-h-[420px] lg:min-h-[380px]">
-          <article
-              v-for="(product, index) in products"
-              :key="product.title"
-              :class="[
-              'absolute inset-0 transition-all duration-500 ease-out p-5 sm:p-8 lg:p-9',
-              index === productsCarousel.index
-                ? 'opacity-100 visible translate-x-0 scale-100 pointer-events-auto z-20'
-                : index === productsCarousel.exitingIndex
-                  ? 'opacity-0 invisible -translate-x-6 scale-[0.98] z-10'
-                  : 'opacity-0 invisible translate-x-6 scale-[0.98] pointer-events-none z-0',
-            ]"
-          >
-            <div class="grid grid-cols-1 lg:grid-cols-[0.95fr_1.05fr] gap-5 lg:gap-7 items-center lg:min-h-[316px] h-full">
-              <div class="order-2 lg:order-none">
-                <span :class="['inline-block text-[10px] font-bold uppercase tracking-wide px-3 py-1.5 rounded-full mb-3.5', product.tagClass]">
-                  {{ product.tag }}
-                </span>
-                <h3 class="text-xl sm:text-2xl lg:text-[32px] font-bold tracking-tight text-headingCard mb-3 font-display">
-                  {{ product.title }}
-                </h3>
-                <p class="text-sm sm:text-[15px] text-textBody leading-relaxed mb-5 max-w-[420px] font-primary">
-                  {{ product.description }}
-                </p>
-                <ShineButton :to="product.ctaLink" size="sm">
-                  {{ product.ctaText }}
-                </ShineButton>
-              </div>
+        <div class="slide-frame relative" :class="{ 'is-visible': visible.products }">
+          <div class="slide-card relative w-full rounded-[28px] border border-activeBorder/20 bg-card shadow-[0_6px_16px_-4px_rgba(15,23,42,0.08),0_24px_48px_-16px_rgba(15,23,42,0.14)] overflow-hidden min-h-[460px] sm:min-h-[420px] lg:min-h-[380px]">
+            <article
+                v-for="(product, index) in products"
+                :key="product.title"
+                :class="[
+                'slide-item absolute inset-0 transition-all duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)] p-5 sm:p-8 lg:p-9',
+                !visible.products
+                  ? 'opacity-0 scale-[0.7] -rotate-6 blur-md'
+                  : index === productsCarousel.index
+                    ? 'is-active opacity-100 scale-100 rotate-0 blur-none pointer-events-auto z-20'
+                    : index === productsCarousel.exitingIndex
+                      ? 'opacity-0 scale-110 rotate-6 blur-md z-10'
+                      : 'opacity-0 scale-[0.7] -rotate-6 blur-md pointer-events-none z-0',
+              ]"
+            >
+              <span class="slide-shine" aria-hidden="true"></span>
+              <div class="grid grid-cols-1 lg:grid-cols-[0.95fr_1.05fr] gap-5 lg:gap-7 items-center lg:min-h-[316px] h-full">
+                <div class="order-2 lg:order-none">
+                  <span :class="['inline-block text-[10px] font-bold uppercase tracking-wide px-3 py-1.5 rounded-full mb-3.5', product.tagClass]">
+                    {{ product.tag }}
+                  </span>
+                  <h3 class="text-xl sm:text-2xl lg:text-[32px] font-bold tracking-tight text-headingCard mb-3 font-display">
+                    {{ product.title }}
+                  </h3>
+                  <p class="text-sm sm:text-[15px] text-textBody leading-relaxed mb-5 max-w-[420px] font-primary">
+                    {{ product.description }}
+                  </p>
+                  <ShineButton :to="product.ctaLink" size="sm">
+                    {{ product.ctaText }}
+                  </ShineButton>
+                </div>
 
-              <div class="relative flex items-center justify-center min-h-[160px] sm:min-h-[200px] lg:min-h-[280px] lg:max-h-[320px] order-1 lg:order-none">
-                <div :class="['absolute inset-y-[5%] inset-x-0 rounded-full blur-md animate-pulse pointer-events-none', product.glow]"></div>
-                <img
-                    :src="product.svg"
-                    :alt="product.title"
-                    :title="product.title"
-                    loading="lazy"
-                    decoding="async"
-                    class="relative z-[1] w-full max-h-[160px] sm:max-h-[220px] lg:max-h-[300px] object-contain block rounded-xl drop-shadow-[0_16px_36px_rgba(15,23,42,0.1)] animate-float transition-transform duration-500 ease-out hover:scale-105"
-                />
+                <div class="relative flex items-center justify-center min-h-[160px] sm:min-h-[200px] lg:min-h-[280px] lg:max-h-[320px] order-1 lg:order-none">
+                  <div :class="['absolute inset-y-[5%] inset-x-0 rounded-full blur-md animate-pulse pointer-events-none', product.glow]"></div>
+                  <img
+                      :src="product.svg"
+                      :alt="product.title"
+                      :title="product.title"
+                      loading="lazy"
+                      decoding="async"
+                      class="relative z-[1] w-full max-h-[160px] sm:max-h-[220px] lg:max-h-[300px] object-contain block rounded-xl drop-shadow-[0_16px_36px_rgba(15,23,42,0.1)] animate-float transition-transform duration-500 ease-out hover:scale-105"
+                  />
+                </div>
               </div>
-            </div>
-          </article>
+            </article>
+          </div>
         </div>
 
         <button
             type="button"
             aria-label="Next product"
             @click="productsCarousel.next"
-            class="group hidden lg:flex w-11 h-11 rounded-full border border-borderDefault bg-card text-headingCard items-center justify-center shrink-0 transition-all duration-200 hover:bg-buttonPrimaryHover hover:border-buttonPrimaryBorder hover:text-white hover:scale-105 hover:shadow-orange font-primary"
+            class="group hidden lg:flex w-11 h-11 rounded-full border border-borderDefault bg-card text-headingCard items-center justify-center shrink-0 transition-all duration-200 hover:bg-buttonPrimaryHover hover:border-buttonPrimaryBorder hover:text-white hover:scale-105 hover:shadow-[0_8px_22px_-6px_rgba(249,115,22,0.45)] font-primary"
         >
+          <font-awesome-icon :icon="['fas', 'chevron-right']" class="text-sm transition-transform duration-200 group-hover:translate-x-0.5" />
         </button>
       </div>
-
-      <HomeCarouselControls
-          class="lg:hidden"
-          :count="products.length"
-          :active="productsCarousel.index"
-          prev-label="Previous product"
-          next-label="Next product"
-          dot-label="Show product"
-          @prev="productsCarousel.prev"
-          @next="productsCarousel.next"
-          @select="productsCarousel.setActive"
-      />
     </div>
   </section>
+
 
   <!-- Services Section -->
   <section
       id="services"
       ref="servicesRef"
-      class="px-[5%] py-24 bg-sectionWhite border-t border-borderDefault scroll-mt-20 font-primary"
+      class="px-[5%] py-14 md:py-24 bg-sectionWhite border-t border-borderDefault scroll-mt-20 font-primary"
   >
     <div class="max-w-7xl mx-auto">
       <div
@@ -450,42 +446,24 @@
         </div>
       </div>
 
-      <!-- Mobile slider -->
-      <div
-          class="md:hidden relative"
-          @mouseenter="servicesCarousel.pauseIfFinePointer"
-          @mouseleave="servicesCarousel.resume"
-          @touchstart="servicesCarousel.onTouchStart"
-          @touchend="servicesCarousel.onTouchEnd"
-      >
-        <div class="pointer-events-none absolute inset-y-0 left-0 w-8 bg-gradient-to-r from-sectionWhite to-transparent z-10"></div>
-        <div class="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-sectionWhite to-transparent z-10"></div>
-        <div class="relative min-h-[520px] rounded-[24px] overflow-hidden">
-          <div
-              v-for="(service, index) in services"
-              :key="`mobile-${service.title}`"
-              :class="[
-                'absolute inset-0 transition-all duration-500 ease-out',
-                index === servicesCarousel.index
-                  ? 'opacity-100 visible translate-x-0 scale-100 pointer-events-auto z-20'
+      <!-- Mobile auto-slide (single slot, no visible controls) -->
+      <div class="md:hidden relative min-h-[520px] rounded-[24px]">
+        <div
+            v-for="(service, index) in services"
+            :key="`mobile-${service.title}`"
+            :class="[
+              'absolute inset-0 transition-all duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
+              !visible.services
+                ? 'opacity-0 scale-75 -rotate-3 blur-md'
+                : index === servicesCarousel.index
+                  ? 'opacity-100 scale-100 rotate-0 blur-none pointer-events-auto z-20'
                   : index === servicesCarousel.exitingIndex
-                    ? 'opacity-0 invisible -translate-x-6 scale-[0.98] z-10'
-                    : 'opacity-0 invisible translate-x-6 scale-[0.98] pointer-events-none z-0',
-              ]"
-          >
-            <HomeServiceCard :service="service" />
-          </div>
+                    ? 'opacity-0 scale-110 rotate-3 blur-md z-10'
+                    : 'opacity-0 scale-75 -rotate-3 blur-md pointer-events-none z-0',
+            ]"
+        >
+          <HomeServiceCard :service="service" />
         </div>
-        <HomeCarouselControls
-            :count="services.length"
-            :active="servicesCarousel.index"
-            prev-label="Previous service"
-            next-label="Next service"
-            dot-label="Show service"
-            @prev="servicesCarousel.prev"
-            @next="servicesCarousel.next"
-            @select="servicesCarousel.setActive"
-        />
       </div>
 
       <!-- Desktop grid -->
@@ -507,7 +485,7 @@
   <section
       id="process"
       ref="processSection"
-      class="px-[5%] py-24 bg-sectionLight border-t border-b border-borderDefault font-primary"
+      class="px-[5%] py-14 md:py-24 bg-sectionLight border-t border-b border-borderDefault font-primary"
   >
     <div class="max-w-6xl mx-auto">
       <div
@@ -523,45 +501,29 @@
         </p>
       </div>
 
-      <!-- Mobile slider -->
-      <div
-          class="lg:hidden relative"
-          @mouseenter="processCarousel.pauseIfFinePointer"
-          @mouseleave="processCarousel.resume"
-          @touchstart="processCarousel.onTouchStart"
-          @touchend="processCarousel.onTouchEnd"
-      >
-        <div class="relative min-h-[220px]">
-          <div
-              v-for="(step, index) in steps"
-              :key="`mobile-${step.number}`"
-              :class="[
-                'absolute inset-0 flex flex-col items-center text-center px-6 transition-all duration-500 ease-out',
-                index === processCarousel.index
-                  ? 'opacity-100 visible translate-x-0 scale-100 pointer-events-auto z-20'
+      <!-- Mobile auto-slide (single slot, no visible controls) -->
+      <div class="lg:hidden relative min-h-[220px]">
+        <div
+            v-for="(step, index) in steps"
+            :key="`mobile-${step.number}`"
+            :class="[
+              'absolute inset-0 flex flex-col items-center text-center px-6 transition-all duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
+              !visible.process
+                ? 'opacity-0 scale-75 -rotate-3 blur-md'
+                : index === processCarousel.index
+                  ? 'opacity-100 scale-100 rotate-0 blur-none pointer-events-auto z-20'
                   : index === processCarousel.exitingIndex
-                    ? 'opacity-0 invisible -translate-x-6 scale-[0.98] z-10'
-                    : 'opacity-0 invisible translate-x-6 scale-[0.98] pointer-events-none z-0',
-              ]"
-          >
-            <div :class="['relative z-[1] w-[72px] h-[72px] rounded-full flex items-center justify-center font-bold text-[22px] mb-5 border-2 font-display', step.circleClass]">
-              {{ step.number }}
-              <span :class="['absolute -inset-1.5 rounded-full border-2 animate-[ringPulse_2.5s_ease-out_infinite]', step.ringClass]"></span>
-            </div>
-            <h4 class="text-base font-bold text-headingCard mb-2 font-display">{{ step.title }}</h4>
-            <p class="text-[13px] text-textBody leading-relaxed max-w-sm font-primary">{{ step.description }}</p>
+                    ? 'opacity-0 scale-110 rotate-3 blur-md z-10'
+                    : 'opacity-0 scale-75 -rotate-3 blur-md pointer-events-none z-0',
+            ]"
+        >
+          <div :class="['relative z-[1] w-[72px] h-[72px] rounded-full flex items-center justify-center font-bold text-[22px] mb-5 border-2 font-display', step.circleClass]">
+            {{ step.number }}
+            <span :class="['absolute -inset-1.5 rounded-full border-2 animate-[ringPulse_2.5s_ease-out_infinite]', step.ringClass]"></span>
           </div>
+          <h4 class="text-base font-bold text-headingCard mb-2 font-display">{{ step.title }}</h4>
+          <p class="text-[13px] text-textBody leading-relaxed max-w-sm font-primary">{{ step.description }}</p>
         </div>
-        <HomeCarouselControls
-            :count="steps.length"
-            :active="processCarousel.index"
-            prev-label="Previous step"
-            next-label="Next step"
-            dot-label="Show step"
-            @prev="processCarousel.prev"
-            @next="processCarousel.next"
-            @select="processCarousel.setActive"
-        />
       </div>
 
       <!-- Desktop grid -->
@@ -593,26 +555,26 @@
   <section
       id="about"
       ref="aboutRef"
-      class="px-[5%] py-24 font-primary"
+      class="px-[5%] py-14 md:py-24 font-primary bg-sectionWhite border-t border-borderDefault"
   >
     <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
       <div
           class="relative transition-all duration-700 ease-out"
           :class="visible.about ? 'opacity-100 translate-x-0' : 'opacity-0 -translate-x-16'"
       >
-        <div class="w-full rounded-[20px] overflow-hidden bg-sectionLight border border-borderDefault shadow-lg">
+        <div class="w-full rounded-[20px] overflow-hidden bg-sectionLight border border-borderDefault shadow-[0_6px_16px_-4px_rgba(15,23,42,0.08),0_24px_48px_-16px_rgba(15,23,42,0.14)]">
           <img :src="aboutIllustration" alt="About Rasant Solutions" loading="lazy" decoding="async" class="w-full block max-h-[180px] lg:max-h-full object-contain p-3 lg:p-0" />
         </div>
 
         <!-- Avg Delivery Badge -->
-        <div class="absolute -bottom-4 -left-2 lg:-bottom-5 lg:-left-7 max-w-[150px] lg:max-w-[200px] bg-card rounded-xl px-3 py-2.5 lg:px-5 lg:py-4 shadow-xl border border-borderDefault font-primary">
+        <div class="absolute -bottom-4 -left-2 lg:-bottom-5 lg:-left-7 max-w-[150px] lg:max-w-[200px] bg-card rounded-xl px-3 py-2.5 lg:px-5 lg:py-4 shadow-[0_10px_28px_-8px_rgba(15,23,42,0.20)] border border-borderDefault font-primary">
           <div class="text-[9px] lg:text-[10px] uppercase tracking-wide text-textSupporting mb-1">Avg. Delivery</div>
           <div class="text-[16px] lg:text-[22px] font-bold text-textBrand font-display">3 Weeks</div>
           <div class="text-[10px] lg:text-[11px] text-textSupporting mt-0.5">From design to launch</div>
         </div>
 
         <!-- Client Retention Badge -->
-        <div class="absolute -top-4 -right-2 lg:-top-5 lg:-right-5 max-w-[150px] lg:max-w-[200px] bg-card rounded-xl px-3 py-2.5 lg:px-5 lg:py-4 shadow-xl border border-borderDefault font-primary">
+        <div class="absolute -top-4 -right-2 lg:-top-5 lg:-right-5 max-w-[150px] lg:max-w-[200px] bg-card rounded-xl px-3 py-2.5 lg:px-5 lg:py-4 shadow-[0_10px_28px_-8px_rgba(15,23,42,0.20)] border border-borderDefault font-primary">
           <div class="text-[9px] lg:text-[10px] uppercase tracking-wide text-textSupporting mb-1">Client Retention</div>
           <div class="text-[16px] lg:text-[22px] font-bold text-Success font-display">94%</div>
           <div class="text-[10px] lg:text-[11px] text-textSupporting mt-0.5">Return for new projects</div>
@@ -635,7 +597,7 @@
           <li
               v-for="(feature, i) in aboutFeatures"
               :key="feature.title"
-              class="group flex items-start gap-4 bg-card border border-borderDefault rounded-xl px-5 py-[18px] shadow-sm transition-all duration-700 ease-out hover:bg-tagBlueBg hover:border-activeBorder/25 hover:translate-x-1.5 hover:shadow-md"
+              class="group flex items-start gap-4 bg-card border border-borderDefault rounded-xl px-5 py-[18px] shadow-[0_2px_6px_-2px_rgba(15,23,42,0.06),0_8px_20px_-8px_rgba(15,23,42,0.08)] transition-all duration-700 ease-out hover:bg-tagBlueBg hover:border-activeBorder/25 hover:translate-x-1.5 hover:shadow-[0_6px_16px_-4px_rgba(15,23,42,0.10),0_20px_36px_-12px_rgba(74,144,226,0.20)]"
               :class="visible.about ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'"
               :style="{ transitionDelay: visible.about ? `${300 + i * 100}ms` : '0ms' }"
           >
@@ -648,46 +610,30 @@
           </li>
         </ul>
 
-        <!-- Mobile slider -->
-        <div
-            class="md:hidden mt-8"
-            @mouseenter="aboutCarousel.pauseIfFinePointer"
-            @mouseleave="aboutCarousel.resume"
-            @touchstart="aboutCarousel.onTouchStart"
-            @touchend="aboutCarousel.onTouchEnd"
-        >
-          <div class="relative min-h-[140px]">
-            <article
-                v-for="(feature, index) in aboutFeatures"
-                :key="`about-${feature.title}`"
-                :class="[
-                  'absolute inset-0 flex items-start gap-4 bg-card border border-borderDefault rounded-2xl px-5 py-5 shadow-blue transition-all duration-500 ease-out',
-                  index === aboutCarousel.index
-                    ? 'opacity-100 visible translate-x-0 scale-100 pointer-events-auto z-20'
+        <!-- Mobile auto-slide (single slot, no visible controls) -->
+        <div class="md:hidden mt-8 relative min-h-[140px]">
+          <article
+              v-for="(feature, index) in aboutFeatures"
+              :key="`about-${feature.title}`"
+              :class="[
+                'absolute inset-0 flex items-start gap-4 bg-card border border-borderDefault rounded-2xl px-5 py-5 shadow-[0_4px_14px_-4px_rgba(15,23,42,0.08),0_16px_32px_-12px_rgba(74,144,226,0.16)] transition-all duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
+                !visible.about
+                  ? 'opacity-0 scale-75 -rotate-3 blur-md'
+                  : index === aboutCarousel.index
+                    ? 'opacity-100 scale-100 rotate-0 blur-none pointer-events-auto z-20'
                     : index === aboutCarousel.exitingIndex
-                      ? 'opacity-0 invisible -translate-x-6 scale-[0.98] z-10'
-                      : 'opacity-0 invisible translate-x-6 scale-[0.98] pointer-events-none z-0',
-                ]"
-            >
-              <span
-                  :class="['w-2.5 h-2.5 rounded-full mt-1.5 shrink-0 animate-pulse', feature.dotColor, feature.delayClass]"
-              ></span>
-              <div>
-                <h4 class="text-sm font-semibold text-headingCard mb-1 font-display">{{ feature.title }}</h4>
-                <p class="text-[13px] text-textBody leading-relaxed font-primary">{{ feature.description }}</p>
-              </div>
-            </article>
-          </div>
-          <HomeCarouselControls
-              :count="aboutFeatures.length"
-              :active="aboutCarousel.index"
-              prev-label="Previous feature"
-              next-label="Next feature"
-              dot-label="Show feature"
-              @prev="aboutCarousel.prev"
-              @next="aboutCarousel.next"
-              @select="aboutCarousel.setActive"
-          />
+                      ? 'opacity-0 scale-110 rotate-3 blur-md z-10'
+                      : 'opacity-0 scale-75 -rotate-3 blur-md pointer-events-none z-0',
+              ]"
+          >
+            <span
+                :class="['w-2.5 h-2.5 rounded-full mt-1.5 shrink-0 animate-pulse', feature.dotColor, feature.delayClass]"
+            ></span>
+            <div>
+              <h4 class="text-sm font-semibold text-headingCard mb-1 font-display">{{ feature.title }}</h4>
+              <p class="text-[13px] text-textBody leading-relaxed font-primary">{{ feature.description }}</p>
+            </div>
+          </article>
         </div>
       </div>
     </div>
@@ -697,7 +643,7 @@
   <section
       id="reviews"
       ref="testimonialsRef"
-      class="px-[5%] py-24 font-primary overflow-hidden"
+      class="px-[5%] py-14 md:py-24 font-primary overflow-hidden bg-sectionLight border-t border-borderDefault"
       @mouseenter="pauseTestimonialAuto"
       @mouseleave="resumeTestimonialAuto"
   >
@@ -724,74 +670,65 @@
               type="button"
               aria-label="Previous review"
               @click="testimonialPrev"
-              class="group hidden sm:flex w-11 h-11 rounded-full cursor-pointer border border-borderDefault bg-card text-headingCard items-center justify-center shrink-0 transition-all duration-200 hover:bg-buttonPrimaryHover hover:border-buttonPrimaryBorder hover:text-white hover:scale-105 hover:shadow-orange"
+              class="group hidden sm:flex w-11 h-11 rounded-full cursor-pointer border border-borderDefault bg-card text-headingCard items-center justify-center shrink-0 transition-all duration-200 hover:bg-buttonPrimaryHover hover:border-buttonPrimaryBorder hover:text-white hover:scale-105 hover:shadow-[0_8px_22px_-6px_rgba(249,115,22,0.45)]"
           >
+            <font-awesome-icon :icon="['fas', 'chevron-left']" class="text-sm transition-transform duration-200 group-hover:-translate-x-0.5" />
           </button>
 
-          <div
-              class="relative min-h-[300px] sm:min-h-[300px] rounded-[24px] border border-borderDefault bg-card shadow-blue overflow-hidden"
-              @touchstart="testimonialsCarousel.onTouchStart"
-              @touchend="testimonialsCarousel.onTouchEnd"
-          >
-            <article
-                v-for="(testimonial, index) in testimonials"
-                :key="testimonial.company"
-                :class="[
-                  'absolute inset-0 p-6 sm:p-8 lg:p-10 flex flex-col transition-all duration-500 ease-out',
-                  index === testimonialsCarousel.index
-                    ? 'opacity-100 visible translate-x-0 scale-100 pointer-events-auto z-20'
-                    : index === testimonialsCarousel.exitingIndex
-                      ? 'opacity-0 invisible -translate-x-6 scale-[0.98] z-10'
-                      : 'opacity-0 invisible translate-x-6 scale-[0.98] pointer-events-none z-0',
-                ]"
-            >
-              <div class="flex flex-wrap items-center gap-2 mb-5">
-                <span class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-tagBlueBg text-textBrand border border-borderDefault">
-                  {{ testimonial.service }}
-                </span>
-                <div class="flex gap-1">
-                  <font-awesome-icon v-for="n in 5" :key="n" :icon="['fas', 'star']" class="text-headingCard text-xs" />
-                </div>
-              </div>
-
-              <p class="text-[15px] sm:text-base text-textBody leading-[1.75] italic flex-1 font-primary">
-                "{{ testimonial.quote }}"
-              </p>
-
-              <div class="mt-6 pt-5 border-t border-borderDefault">
-                <div class="flex items-center gap-3">
-                  <div :class="['w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm text-white shrink-0 font-primary', testimonial.avatarBg]">
-                    {{ testimonial.initials }}
-                  </div>
-                  <div>
-                    <div class="text-sm font-semibold text-headingCard font-display">{{ testimonial.company }}</div>
-                    <div class="text-xs text-textSupporting mt-0.5 font-primary">{{ testimonial.role }}</div>
+          <div class="slide-frame relative" :class="{ 'is-visible': visible.testimonials }">
+            <div class="slide-card relative min-h-[300px] sm:min-h-[300px] rounded-[24px] border border-borderDefault bg-card shadow-[0_4px_14px_-4px_rgba(15,23,42,0.08),0_16px_32px_-12px_rgba(74,144,226,0.16)] overflow-hidden">
+              <article
+                  v-for="(testimonial, index) in testimonials"
+                  :key="testimonial.company"
+                  :class="[
+                    'slide-item absolute inset-0 p-6 sm:p-8 lg:p-10 flex flex-col transition-all duration-[900ms] ease-[cubic-bezier(0.16,1,0.3,1)]',
+                    !visible.testimonials
+                      ? 'opacity-0 scale-[0.7] rotate-6 blur-md'
+                      : index === testimonialsCarousel.index
+                        ? 'is-active opacity-100 scale-100 rotate-0 blur-none pointer-events-auto z-20'
+                        : index === testimonialsCarousel.exitingIndex
+                          ? 'opacity-0 scale-110 -rotate-6 blur-md z-10'
+                          : 'opacity-0 scale-[0.7] rotate-6 blur-md pointer-events-none z-0',
+                  ]"
+              >
+                <span class="slide-shine" aria-hidden="true"></span>
+                <div class="flex flex-wrap items-center gap-2 mb-5">
+                  <span class="inline-flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-tagBlueBg text-textBrand border border-borderDefault">
+                    {{ testimonial.service }}
+                  </span>
+                  <div class="flex gap-1">
+                    <font-awesome-icon v-for="n in 5" :key="n" :icon="['fas', 'star']" class="text-headingCard text-xs" />
                   </div>
                 </div>
-              </div>
-            </article>
+
+                <p class="text-[15px] sm:text-base text-textBody leading-[1.75] italic flex-1 font-primary">
+                  "{{ testimonial.quote }}"
+                </p>
+
+                <div class="mt-6 pt-5 border-t border-borderDefault">
+                  <div class="flex items-center gap-3">
+                    <div :class="['w-12 h-12 rounded-full flex items-center justify-center font-bold text-sm text-white shrink-0 font-primary', testimonial.avatarBg]">
+                      {{ testimonial.initials }}
+                    </div>
+                    <div>
+                      <div class="text-sm font-semibold text-headingCard font-display">{{ testimonial.company }}</div>
+                      <div class="text-xs text-textSupporting mt-0.5 font-primary">{{ testimonial.role }}</div>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            </div>
           </div>
 
           <button
               type="button"
               aria-label="Next review"
               @click="testimonialNext"
-              class="group hidden sm:flex w-11 h-11 rounded-full border border-borderDefault bg-card text-headingCard items-center justify-center shrink-0 transition-all duration-200 hover:bg-buttonPrimaryHover hover:border-buttonPrimaryBorder hover:text-white hover:scale-105 hover:shadow-orange"
+              class="group hidden sm:flex w-11 h-11 rounded-full border border-borderDefault bg-card text-headingCard items-center justify-center shrink-0 transition-all duration-200 hover:bg-buttonPrimaryHover hover:border-buttonPrimaryBorder hover:text-white hover:scale-105 hover:shadow-[0_8px_22px_-6px_rgba(249,115,22,0.45)]"
           >
+            <font-awesome-icon :icon="['fas', 'chevron-right']" class="text-sm transition-transform duration-200 group-hover:translate-x-0.5" />
           </button>
         </div>
-
-        <HomeCarouselControls
-            class="sm:hidden"
-            :count="testimonials.length"
-            :active="testimonialsCarousel.index"
-            prev-label="Previous review"
-            next-label="Next review"
-            dot-label="Show review"
-            @prev="testimonialPrev"
-            @next="testimonialNext"
-            @select="setTestimonialActive"
-        />
 
         <div class="hidden sm:flex items-center justify-center gap-2 mt-6">
           <button
@@ -808,14 +745,16 @@
     </div>
   </section>
 
+    </main>
+
   <Footer />
+  </div>
 </template>
 
 <script setup>
 import Navbar from '@/components/Navbar.vue'
 import Footer from '@/components/footer.vue'
 import HomeServiceCard from '@/components/home/HomeServiceCard.vue'
-import HomeCarouselControls from '@/components/home/HomeCarouselControls.vue'
 import { useHomeCarousel } from '@/composables/useHomeCarousel.js'
 import sentraPlatformSvg from '@/assets/svg/sentra-platform.svg'
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
@@ -932,7 +871,7 @@ const techStack = [
   { name: 'HTML',     icon: ['fab', 'html5'],    color: 'text-[#E34F26]', chipClass: 'bg-[#FFF1F2] border-[#E34F26]/25' },
   { name: 'CSS',      icon: ['fab', 'css3-alt'], color: 'text-[#1572B6]', chipClass: 'bg-[#EFF6FF] border-[#1572B6]/25' },
   { name: 'Tailwind', icon: ['fas', 'wind'], color: 'text-[#38BDF8]', chipClass: 'bg-[#ECFEFF] border-[#38BDF8]/25' },
-  
+
 ]
 
 const words = ['Intelligent', 'Scalable', 'Beautiful', 'Future-Ready']
@@ -1069,9 +1008,9 @@ const testimonials = [
 ]
 
 const productsCarousel = useHomeCarousel(products.length, { autoMs: 6000 })
-const servicesCarousel = useHomeCarousel(services.length, { autoMs: 5500 })
-const processCarousel = useHomeCarousel(steps.length, { autoMs: 6000 })
-const aboutCarousel = useHomeCarousel(aboutFeatures.length, { autoMs: 5500 })
+const servicesCarousel = useHomeCarousel(services.length, { autoMs: 3200 })
+const processCarousel = useHomeCarousel(steps.length, { autoMs: 3200 })
+const aboutCarousel = useHomeCarousel(aboutFeatures.length, { autoMs: 3200 })
 const testimonialsCarousel = useHomeCarousel(testimonials.length, { autoMs: 5500 })
 
 const setTestimonialActive = (newIndex) => testimonialsCarousel.setActive(newIndex)
@@ -1191,6 +1130,51 @@ onUnmounted(() => {
   animation: float 3.5s ease-in-out infinite;
 }
 
+/* Subtle, contained depth for the Products / Testimonials slide frame —
+   a soft brand-tinted shadow directly on the card, not a separate glow blob. */
+.slide-frame {
+  isolation: isolate;
+}
+.slide-card {
+  transition: box-shadow 0.9s ease-out;
+}
+.slide-frame.is-visible .slide-card {
+  box-shadow: 0 25px 50px -20px rgba(74, 144, 226, 0.28), 0 8px 20px -8px rgba(15, 23, 42, 0.12);
+}
+
+/* Diagonal light sweep that plays once across the card the moment it
+   becomes the active slide. */
+.slide-item {
+  overflow: hidden;
+}
+.slide-shine {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+  overflow: hidden;
+  border-radius: inherit;
+}
+.slide-shine::before {
+  content: '';
+  position: absolute;
+  top: -60%;
+  left: -40%;
+  width: 32%;
+  height: 220%;
+  background: linear-gradient(115deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  transform: translateX(-160%) rotate(10deg);
+  opacity: 0;
+}
+.slide-item.is-active .slide-shine::before {
+  animation: slideShineSweep 1.15s cubic-bezier(0.22, 1, 0.36, 1) 0.2s 1;
+}
+@keyframes slideShineSweep {
+  0%   { transform: translateX(-160%) rotate(10deg); opacity: 0;    }
+  12%  { opacity: 0.9; }
+  100% { transform: translateX(260%) rotate(10deg);  opacity: 0;    }
+}
+
 /* Respect accounts who prefer reduced motion */
 @media (prefers-reduced-motion: reduce) {
   .animate-marquee,
@@ -1201,6 +1185,10 @@ onUnmounted(() => {
   .blinking-cursor,
   .tech-chip {
     animation: none !important;
+  }
+  .slide-shine::before {
+    animation: none !important;
+    display: none;
   }
   * {
     transition-duration: 0.01ms !important;
