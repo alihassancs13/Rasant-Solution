@@ -1,12 +1,10 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Login from "../pages/Login.vue";
 import Contact from "../pages/contactForm.vue";
-import Careers from "../pages/careers.vue";
 import Home from "../pages/home.vue";
 import EmployeeDashboard from '../admin/employeeDasboard.vue';
-import Chatbot from "../pages/chatbot.vue";
-import sentraAI from "../pages/sentraAI.vue";
-import omnipost from "@/pages/omnipost.vue";
+import EmployeeRegistration from '../pages/employeeRegistration.vue';
+import { useLoginStore } from '../stores/loginStore.js';
 
 const routes = [
   {
@@ -120,6 +118,15 @@ const routes = [
     component: EmployeeDashboard,
     meta: { requiresAuth: true, role: 'employee' }
   },
+  {
+    path: '/employee/register',
+    name: 'EmployeeRegistration',
+    component: EmployeeRegistration,
+    meta: {
+      public: true,  // No authentication required
+      title: 'Employee Registration'
+    }
+  },
 ];
 
 const router = createRouter({
@@ -128,29 +135,17 @@ const router = createRouter({
 });
 
 // Add Navigation Guard
-router.beforeEach((to, from, next) => {
-  // Check if user is authenticated
-  const isAuthenticated = !!sessionStorage.getItem('accessToken');
+router.beforeEach((to) => {
+  const loginStore = useLoginStore();   //  Correct
 
-  // Get the page title
-  document.title = to.meta.title || 'Rasant Solutions';
-
-  // If trying to access login page but already authenticated
-  if (to.path === '/login' && isAuthenticated) {
-    // Redirect to home page
-    next('/');
-    return;
+  if (to.meta.requiresAuth && !loginStore.isAuthenticated) {
+    return '/login';
   }
 
-  // If trying to access protected route but not authenticated
-  if (to.meta.requiresAuth && !isAuthenticated) {
-    // Redirect to login page
-    next('/login');
-    return;
+  if (loginStore.isAuthenticated && (to.path === '/login' || to.path === '/register')) {
+    return loginStore.redirectBasedOnRole();
   }
 
-  // Allow navigation
-  next();
+  return true;
 });
-
 export default router;
