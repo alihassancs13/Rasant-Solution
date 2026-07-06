@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from .models import Employee
+from .models import Employee, Department
+
 
 class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -19,6 +21,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
         if Employee.objects.filter(email__iexact=value).exists():
             raise serializers.ValidationError("Employee with this email already exists.")
         return value
+    department_name = serializers.CharField(source="department.name", read_only=True)
 
     def validate_cnic(self, value):
         if Employee.objects.filter(cnic=value).exists():
@@ -38,6 +41,10 @@ class EmployeeListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = [
+            "id", "emp_id", "full_name", "avatar", "email", "phone",
+            "department", "department_name", "designation",
+            "employment_status", "salary", "joined_date",
+            "account_active", "created_at", "updated_at",
             'id',
             'employee_number',
             'name',
@@ -60,6 +67,10 @@ class EmployeeListSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at'
         ]
+        read_only_fields = ["emp_id", "created_at", "updated_at"]
+
+
+class EmployeeCreateUpdateSerializer(serializers.ModelSerializer):
         read_only_fields = ['employee_number']
 class UpdateEmployeeSerializer(serializers.ModelSerializer):
     """
@@ -69,6 +80,9 @@ class UpdateEmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = [
+            "full_name", "avatar", "email", "phone", "department",
+            "designation", "employment_status", "salary",
+            "joined_date", "account_active",
             'name',
             'email',
             'cnic',
