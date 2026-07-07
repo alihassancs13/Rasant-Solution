@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Employee
-from .models import Employee, Department
+from .models import Employee
 
 
 class EmployeeSerializer(serializers.ModelSerializer):
@@ -41,10 +41,10 @@ class EmployeeListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = [
-            "id", "emp_id", "full_name", "avatar", "email", "phone",
-            "department", "department_name", "designation",
-            "employment_status", "salary", "joined_date",
-            "account_active", "created_at", "updated_at",
+            "id", "employee_number", "full_name", "email", "phone_number",
+            "department", "designation",
+            "is_active", "salary", "joined_date",
+             "created_at", "updated_at","status",
             'id',
             'employee_number',
             'name',
@@ -80,9 +80,9 @@ class UpdateEmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = [
-            "full_name", "avatar", "email", "phone", "department",
-            "designation", "employment_status", "salary",
-            "joined_date", "account_active",
+            "full_name", "email", "phone_number", "department",
+            "designation", "is_active", "salary","status",
+            "joined_date",
             'name',
             'email',
             'cnic',

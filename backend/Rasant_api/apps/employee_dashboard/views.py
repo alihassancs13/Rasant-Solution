@@ -3,7 +3,7 @@ from rest_framework.parsers import MultiPartParser, FormParser,JSONParser   # no
 from rest_framework.response import Response
 from rest_framework import status
 from .models import Employee
-from .serializers import EmployeeSerializer,EmployeeListSerializer
+from .serializers import EmployeeSerializer,EmployeeListSerializer,UpdateEmployeeSerializer
 
 @api_view(['POST'])
 @parser_classes([MultiPartParser, FormParser,JSONParser])   # only accept multipart (with files)

@@ -1,6 +1,6 @@
 // composables/useEmployeeDashboard.js
 import { ref, reactive, watch } from 'vue';
-import { fetchEmployeesApi } from '@/services/employeesListApi';
+import { fetchEmployeesApi } from '../../services/employeesListApi.js';
 
 export function useEmployeeDashboard() {
     const employees = ref([]);

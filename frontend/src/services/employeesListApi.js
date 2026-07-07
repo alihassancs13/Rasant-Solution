@@ -1,4 +1,4 @@
-// services/employeeListApi.js
+
 import { BASE_URL, API_ENDPOINTS } from './baseUrl.js';
 
 export const fetchEmployeesApi = async ({ search = '', page = 1, page_size = 5 } = {}) => {

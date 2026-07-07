@@ -25,7 +25,6 @@ urlpatterns = [
     path('api/cv_management/', include('cv_management.urls')),
     path('api/employee_dashboard/', include('employee_dashboard.urls')),
      path('api/', include('contact_message.urls')),
-    path('api/', include('contact_message.urls')),
     path('api/cv_management/', include('cv_management.urls')),
     path('api/', include('jira.urls')),
 
