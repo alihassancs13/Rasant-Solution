@@ -1,5 +1,9 @@
 import { library } from '@fortawesome/fontawesome-svg-core'
 import {
+  faRightFromBracket,
+  faUmbrellaBeach,
+  faLink,
+  faFolderOpen,
   faCalendarCheck,
   faProjectDiagram,
   faChevronLeft,
@@ -91,6 +95,10 @@ import {
 
 library.add(
     // Chevrons & arrows
+    faRightFromBracket,
+    faUmbrellaBeach,
+    faLink,
+    faFolderOpen,
     faCalendarCheck,
     faProjectDiagram,
     faChevronLeft,

@@ -12,251 +12,83 @@
       </div>
 
       <div class="flex-1 overflow-y-auto p-4 md:p-6">
-        <!-- Top Action Buttons -->
+
         <div class="flex flex-wrap gap-4 mb-6">
           <button
               type="button"
-              class="flex items-center gap-2 cursor-pointer px-5 py-2.5 bg-buttonBackground text-buttonTextColor font-medium rounded-xl shadow-sm hover:bg-buttonHover transition-colors"
+              class="flex items-center gap-2 cursor-pointer px-5 py-2.5 bg-buttonBackground text-buttonTextColor font-medium rounded-xl shadow-sm hover:bg-buttonHover transition-colors text-sm"
           >
-            <span class="font-bold">$</span>
+            <span class="font-bold text-base">$</span>
             Manage salaries
           </button>
 
           <button
               type="button"
-              class="flex items-center gap-2 px-5 py-2.5 bg-white text-text-primary font-medium rounded-xl border border-border shadow-sm hover:bg-surface-alt transition-colors"
+              class="flex items-center gap-2 px-5 py-2.5 bg-white text-text-primary font-medium rounded-xl border border-border shadow-sm hover:bg-surface-alt transition-colors text-sm"
           >
             <font-awesome-icon :icon="['fas', 'users-cog']" class="text-text-muted" />
             Careers & hiring
           </button>
         </div>
 
-        <!-- Metrics Stats Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <StateCard
-              v-for="stat in stats"
-              :key="stat.label"
-              :label="stat.label"
-              :value="stat.value"
-              :subtitle="stat.subtitle"
-              :icon="stat.icon"
-              :color="stat.color"
-              :link="stat.link"
-              link-label="View more"
+              label="TOTAL EMPLOYEES"
+              :value="statsSummary.total || 0"
+              subtitle="Active roster"
+              :icon="['fas', 'users']"
+              color="blue"
+          />
+          <StateCard
+              label="IN OFFICE TODAY"
+              :value="statsSummary.inOffice || 0"
+              subtitle="Checked in via attendance"
+              :icon="['fas', 'circle-check']"
+              color="teal"
+          />
+          <StateCard
+              label="INTERN / PROBATION"
+              :value="statsSummary.internProbation || 0"
+              subtitle="Onboarding pipeline"
+              :icon="['fas', 'clipboard-list']"
+              color="purple"
+          />
+          <StateCard
+              label="AWAY TODAY"
+              :value="statsSummary.awayToday || 0"
+              subtitle="Not in office"
+              :icon="['fas', 'umbrella-beach']"
+              color="orange"
           />
         </div>
 
-        <!-- Employee Sub‑Navigation -->
-        <div class="inline-flex p-1.5 bg-surface-alt rounded-xl mb-6 shadow-sm border border-border">
-          <button
-              type="button"
-              @click="activeTab = 'list'"
-              :class="[
-              'px-4 py-2 text-sm font-medium transition-all rounded-lg flex items-center gap-2',
-              activeTab === 'list' ? 'bg-white text-text-primary shadow-sm' : 'text-text-muted hover:text-text-primary'
-            ]"
-          >
-            <font-awesome-icon :icon="['fas', 'file-lines']" class="text-text-muted" />
-            Employee list
-          </button>
+        <div class="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
 
-          <button
-              type="button"
-              @click="activeTab = 'add'"
-              :class="[
-              'px-4 py-2 text-sm font-medium transition-all rounded-lg flex items-center gap-2',
-              activeTab === 'add' ? 'bg-primary text-white shadow-sm' : 'text-text-muted hover:text-text-primary'
-            ]"
-          >
-            <font-awesome-icon :icon="['fas', 'plus']" />
-            Add new employee
-          </button>
-        </div>
-
-        <!-- ==================== ADD EMPLOYEE TAB ==================== -->
-        <div v-if="activeTab === 'add'" class="bg-white rounded-2xl border border-border shadow-sm p-6 max-w-6xl">
-          <div class="mb-6">
-            <h3 class="text-lg font-bold text-text-primary">Add new employee</h3>
-            <p class="text-sm text-text-muted">Upload a CV or ID document to auto‑fill fields, or enter details manually.</p>
-          </div>
-
-          <!-- Document Parser Dropzone -->
-          <div
-              @dragover.prevent
-              @drop.prevent="handleCvUpload"
-              class="border-2 border-dashed border-primary/30 rounded-2xl bg-primary-subtle/20 p-8 flex flex-col items-center justify-center text-center mb-8 relative group transition-colors hover:bg-primary-subtle/40"
-          >
-            <input
-                type="file"
-                id="cvUploader"
-                accept=".pdf,.doc,.docx,image/*"
-                class="absolute inset-0 opacity-0 cursor-pointer"
-                @change="handleCvUpload"
-            />
-
-            <!-- Uploading state -->
-            <div v-if="isParsingCv" class="flex flex-col items-center">
-              <font-awesome-icon :icon="['fas', 'spinner']" spin class="text-3xl text-primary mb-3" />
-              <p class="text-sm font-medium text-text-secondary">Reading details & auto‑filling form parameters…</p>
-            </div>
-
-            <!-- Default dropzone prompt -->
-            <div v-else class="flex flex-col items-center">
-              <div class="w-12 h-12 bg-primary-subtle rounded-xl flex items-center justify-center text-primary mb-3 relative">
-                <font-awesome-icon :icon="['fas', 'file-lines']" class="text-xl" />
-                <div class="absolute -bottom-1 -right-1 bg-primary text-white rounded-full w-5 h-5 flex items-center justify-center text-xs border-2 border-white">
-                  <font-awesome-icon :icon="['fas', 'plus']" class="text-[10px]" />
-                </div>
-              </div>
-              <h4 class="text-sm font-bold text-text-primary mb-1">Upload document for auto‑fill</h4>
-              <p class="text-xs text-text-muted">Drop a PDF, image, or Word file — we'll scan name, contact, and role fields.</p>
-            </div>
-          </div>
-
-          <!-- Manual Entry Form -->
-          <form @submit.prevent="handleAddEmployee" class="space-y-5">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-              <!-- Full Name -->
-              <div>
-                <label class="block text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Full Name</label>
-                <input
-                    v-model="formData.fullName"
-                    type="text"
-                    class="w-full px-4 py-3 bg-surface border border-border rounded-xl text-text-primary focus:outline-none focus:border-primary transition-colors"
-                    placeholder="e.g. John Doe"
-                />
-                <span v-if="errors.fullName" class="text-xs text-danger mt-1 block">{{ errors.fullName }}</span>
-              </div>
-
-              <!-- Email -->
-              <div>
-                <label class="block text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Email</label>
-                <input
-                    v-model="formData.email"
-                    type="email"
-                    class="w-full px-4 py-3 bg-surface border border-border rounded-xl text-text-primary focus:outline-none focus:border-primary transition-colors"
-                    placeholder="name@company.com"
-                />
-                <span v-if="errors.email" class="text-xs text-danger mt-1 block">{{ errors.email }}</span>
-              </div>
-
-              <!-- Phone -->
-              <div>
-                <label class="block text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Phone</label>
-                <input
-                    v-model="formData.phone"
-                    type="text"
-                    class="w-full px-4 py-3 bg-surface border border-border rounded-xl text-text-primary focus:outline-none focus:border-primary transition-colors"
-                    placeholder="+92 300 1234567"
-                />
-                <span v-if="errors.phone" class="text-xs text-danger mt-1 block">{{ errors.phone }}</span>
-              </div>
-
-              <!-- Department -->
-              <div>
-                <label class="block text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Department</label>
-                <input
-                    v-model="formData.department"
-                    type="text"
-                    class="w-full px-4 py-3 bg-surface border border-border rounded-xl text-text-primary focus:outline-none focus:border-primary transition-colors"
-                    placeholder="e.g. Engineering"
-                />
-                <span v-if="errors.department" class="text-xs text-danger mt-1 block">{{ errors.department }}</span>
-              </div>
-
-              <!-- Designation -->
-              <div>
-                <label class="block text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Designation</label>
-                <input
-                    v-model="formData.designation"
-                    type="text"
-                    class="w-full px-4 py-3 bg-surface border border-border rounded-xl text-text-primary focus:outline-none focus:border-primary transition-colors"
-                    placeholder="e.g. Flutter Developer"
-                />
-                <span v-if="errors.designation" class="text-xs text-danger mt-1 block">{{ errors.designation }}</span>
-              </div>
-
-              <!-- Employment Status -->
-              <div>
-                <label class="block text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Employment Status</label>
-                <div class="relative">
-                  <select
-                      v-model="formData.employmentStatus"
-                      class="w-full px-4 py-3 bg-surface border border-border rounded-xl text-text-primary appearance-none focus:outline-none focus:border-primary transition-colors"
-                  >
-                    <option v-for="status in statusOptions" :key="status" :value="status">
-                      {{ status }}
-                    </option>
-                  </select>
-                  <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-text-muted">
-                    <font-awesome-icon :icon="['fas', 'chevron-down']" class="text-xs" />
-                  </div>
-                </div>
-                <span v-if="errors.employmentStatus" class="text-xs text-danger mt-1 block">{{ errors.employmentStatus }}</span>
-              </div>
-
-              <!-- Monthly Salary -->
-              <div>
-                <label class="block text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Monthly Salary (PKR)</label>
-                <input
-                    v-model="formData.monthlySalary"
-                    type="number"
-                    class="w-full px-4 py-3 bg-surface border border-border rounded-xl text-text-primary focus:outline-none focus:border-primary transition-colors"
-                    placeholder="e.g. 75000"
-                />
-                <span v-if="errors.monthlySalary" class="text-xs text-danger mt-1 block">{{ errors.monthlySalary }}</span>
-              </div>
-
-              <!-- Join Date -->
-              <div>
-                <label class="block text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Join Date</label>
-                <input
-                    v-model="formData.joinDate"
-                    type="date"
-                    class="w-full px-4 py-3 bg-surface border border-border rounded-xl text-text-primary focus:outline-none focus:border-primary transition-colors"
-                />
-                <span v-if="errors.joinDate" class="text-xs text-danger mt-1 block">{{ errors.joinDate }}</span>
-              </div>
-            </div>
-
-            <!-- Form Actions -->
-            <div class="flex items-center gap-4 pt-4 border-t border-border">
-              <button
-                  type="submit"
-                  class="flex items-center gap-2 px-5 py-3 bg-primary text-white font-medium rounded-xl shadow-sm hover:bg-primary-hover transition-colors text-sm"
-              >
-                <font-awesome-icon :icon="['fas', 'plus']" />
-                Add employee
-              </button>
-
-              <button
-                  type="button"
-                  @click="clearForm"
-                  class="flex items-center gap-2 px-5 py-3 bg-white text-text-secondary font-medium rounded-xl border border-border shadow-sm hover:bg-surface-alt transition-colors text-sm"
-              >
-                <font-awesome-icon :icon="['fas', 'trash']" class="text-text-muted" />
-                Clear form
-              </button>
-            </div>
-          </form>
-        </div>
-
-        <!-- ==================== EMPLOYEE LIST TAB ==================== -->
-        <div v-else class="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between p-6 border-b border-border gap-4">
-            <div>
-              <h3 class="text-lg font-bold text-text-primary">Employee Records</h3>
-              <p class="text-sm text-text-muted">View and manage all employee information</p>
+            <div class="w-full sm:max-w-sm">
+              <div class="relative w-full">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-text-muted">
+                  <font-awesome-icon :icon="['fas', 'magnifying-glass']" />
+                </span>
+                <input
+                    v-model="searchQuery"
+                    type="text"
+                    placeholder="Search by name, ID, or department..."
+                    class="w-full pl-10 pr-4 py-2 bg-surface border border-border rounded-xl text-sm focus:outline-none focus:border-primary transition-colors"
+                />
+              </div>
             </div>
-            <div class="flex items-center gap-2">
+
+            <div class="flex items-center justify-start sm:justify-end gap-3 flex-wrap">
               <button
                   @click="copyRegistrationLink"
                   type="button"
-                  class="flex items-center cursor-pointer gap-2 px-5 py-2 bg-buttonBackground text-buttonTextColor text-sm font-medium rounded-xl hover:bg-buttonHover transition-colors whitespace-nowrap"
+                  class="flex items-center cursor-pointer gap-2 px-4 py-2 bg-buttonBackground text-buttonTextColor text-sm font-medium rounded-xl hover:bg-buttonHover transition-colors whitespace-nowrap"
               >
                 <font-awesome-icon :icon="['fas', 'link']" />
                 {{ copied ? 'Link Copied!' : 'Copy Registration Link' }}
               </button>
+
               <button
                   @click="showModal = true"
                   type="button"
@@ -268,17 +100,126 @@
             </div>
           </div>
 
-          <!-- Table placeholder -->
-          <div class="p-8 text-center text-text-muted">
-            <font-awesome-icon :icon="['fas', 'file-lines']" class="text-4xl mb-3 text-text-muted/50" />
-            <p class="text-sm font-medium">Employee records will appear here</p>
-            <p class="text-xs text-text-muted mt-1">Use the “Add employee” button to get started</p>
+          <div v-if="errorMessage" class="p-4 m-6 bg-danger-subtle text-danger rounded-xl border border-danger/20 flex items-center gap-3">
+            <font-awesome-icon :icon="['fas', 'triangle-exclamation']" />
+            <span class="text-sm font-medium">{{ errorMessage }}</span>
+            <button @click="loadEmployees" class="ml-auto text-xs underline font-bold cursor-pointer">Retry</button>
+          </div>
+
+          <div v-if="isLoading" class="p-20 text-center text-text-muted">
+            <font-awesome-icon :icon="['fas', 'spinner']" spin class="text-4xl text-primary mb-3" />
+            <p class="text-sm">Fetching employee records details...</p>
+          </div>
+
+          <div v-else-if="employees.length > 0" class="overflow-x-auto">
+            <table class="w-full min-w-[1000px] text-left border-collapse">
+              <thead>
+              <tr class="bg-surface border-b border-border">
+                <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Employee</th>
+                <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Department</th>
+                <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Status</th>
+                <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Account</th>
+                <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Salary</th>
+                <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Joined</th>
+
+                <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Contact</th>
+                <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider text-center">Actions</th>
+              </tr>
+              </thead>
+              <tbody class="divide-y divide-border text-sm text-text-primary">
+              <tr v-for="emp in employees" :key="emp.id" class="hover:bg-surface/40 transition-colors">
+                <td class="p-4 whitespace-nowrap">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-primary-subtle flex items-center justify-center font-bold text-primary overflow-hidden">
+                      <img v-if="emp.avatar" :src="emp.avatar" alt="Avatar" class="w-full h-full object-cover" />
+                      <span v-else>{{ emp.name ? emp.name.charAt(0) : 'E' }}</span>
+                    </div>
+                    <div>
+                      <h4 class="font-bold text-text-primary">{{ emp.name }}</h4>
+                      <p class="text-xs text-text-muted uppercase tracking-tight">{{ emp.emp_id }}</p>
+                    </div>
+                  </div>
+                </td>
+
+                <td class="p-4 whitespace-nowrap text-text-secondary">{{ emp.department }}</td>
+
+                <td class="p-4 whitespace-nowrap">
+                    <span :class="[
+                      'px-2.5 py-1 text-xs font-semibold rounded-lg inline-block',
+                      emp.status === 'Permanent' ? 'bg-emerald-50 text-emerald-700' : '',
+                      emp.status === 'Contract' ? 'bg-indigo-50 text-indigo-700' : '',
+                      emp.status === 'Probation' ? 'bg-amber-50 text-amber-700' : '',
+                      emp.status === 'Intern' ? 'bg-purple-50 text-purple-700' : ''
+                    ]">
+                      {{ emp.status }}
+                    </span>
+                </td>
+
+                <td class="p-4 whitespace-nowrap">
+                  <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" v-model="emp.account_active" class="sr-only peer" />
+                    <div class="w-9 h-5 bg-border rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-border after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-teal-500"></div>
+                  </label>
+                </td>
+
+                <td class="p-4 whitespace-nowrap font-medium text-text-secondary">
+                  Rs {{ Number(emp.salary).toLocaleString() }}
+                </td>
+
+                <td class="p-4 whitespace-nowrap text-text-secondary">{{ emp.joined_date }}</td>
+
+
+
+                <td class="p-4 whitespace-nowrap">
+                  <button class="flex items-center gap-1.5 px-3 py-1.5 bg-teal-500 text-white rounded-lg text-xs font-bold shadow-sm hover:bg-teal-600 transition-colors">
+                    <font-awesome-icon :icon="['far', 'comment']" />
+                    DM
+                  </button>
+                </td>
+
+                <td class="p-4 whitespace-nowrap text-center">
+                  <div class="flex items-center justify-center gap-2">
+                    <button class="p-1.5 hover:bg-surface rounded-lg text-text-muted hover:text-text-primary transition-colors">
+                      <font-awesome-icon :icon="['fas', 'pen-to-square']" class="text-sm" />
+                    </button>
+                    <button class="p-1.5 hover:bg-surface rounded-lg text-text-muted hover:text-text-primary transition-colors">
+                      <font-awesome-icon :icon="['fas', 'eye']" class="text-sm" />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div v-else class="p-16 text-center text-text-muted">
+            <font-awesome-icon :icon="['fas', 'folder-open']" class="text-5xl mb-4 text-slate-300" />
+            <h3 class="text-base font-semibold text-slate-700 mb-1">No matching employee data found</h3>
+            <p class="text-xs text-slate-400">Try modifying your query variables parameters filters.</p>
+          </div>
+
+          <div v-if="totalPages > 1" class="flex items-center justify-between p-4 bg-surface border-t border-border">
+            <button
+                :disabled="currentPage === 1"
+                @click="currentPage--"
+                class="px-3 py-1 text-xs font-semibold rounded-lg border bg-white disabled:opacity-50 transition-opacity cursor-pointer"
+            >
+              Previous
+            </button>
+            <span class="text-xs text-text-secondary font-medium">Page {{ currentPage }} of {{ totalPages }}</span>
+            <button
+                :disabled="currentPage === totalPages"
+                @click="currentPage++"
+                class="px-3 py-1 text-xs font-semibold rounded-lg border bg-white disabled:opacity-50 transition-opacity cursor-pointer"
+            >
+              Next
+            </button>
           </div>
         </div>
+
       </div>
     </div>
 
-    <!-- Add Employee Modal -->
     <AddEmployeeModal
         v-if="showModal"
         @close="showModal = false"
@@ -288,137 +229,43 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue';
+import { ref, onMounted } from 'vue';
 import DashboardHeader from '../components/header.vue';
 import StateCard from '../components/StatCard.vue';
 import AdminSidebar from '../components/adminSidebar.vue';
 import AddEmployeeModal from '../models/addEmployeemodel.vue';
 
-// ---------- Local state (replaces useEmployeeDashboard) ----------
-const activeTab = ref('list');
-const isParsingCv = ref(false);
+// Integrating Reactive Orchestration Composable Layer Architecture
+import { useEmployeeDashboard } from '../composables/Admin/useEmployeeDashboard.js';
 
-const formData = reactive({
-  fullName: '',
-  email: '',
-  phone: '',
-  department: '',
-  designation: '',
-  employmentStatus: 'Active',
-  monthlySalary: '',
-  joinDate: ''
-});
+const {
+  employees,
+  isLoading,
+  errorMessage,
+  searchQuery,
+  currentPage,
+  totalPages,
+  statsSummary,
+  loadEmployees
+} = useEmployeeDashboard();
 
-const errors = reactive({});
-
-const statusOptions = ['Active', 'On Leave', 'Terminated', 'Probation'];
-
-const clearForm = () => {
-  Object.assign(formData, {
-    fullName: '',
-    email: '',
-    phone: '',
-    department: '',
-    designation: '',
-    employmentStatus: 'Active',
-    monthlySalary: '',
-    joinDate: ''
-  });
-  // Clear errors
-  Object.keys(errors).forEach(key => delete errors[key]);
-};
-
-const handleAddEmployee = () => {
-  // Simple validation
-  const newErrors = {};
-  if (!formData.fullName) newErrors.fullName = 'Full name is required';
-  if (!formData.email) newErrors.email = 'Email is required';
-  if (!formData.phone) newErrors.phone = 'Phone is required';
-  if (!formData.department) newErrors.department = 'Department is required';
-  if (!formData.designation) newErrors.designation = 'Designation is required';
-  if (!formData.employmentStatus) newErrors.employmentStatus = 'Status is required';
-  if (!formData.monthlySalary) newErrors.monthlySalary = 'Salary is required';
-  if (!formData.joinDate) newErrors.joinDate = 'Join date is required';
-
-  if (Object.keys(newErrors).length) {
-    // Replace errors object (clear old and assign new)
-    Object.keys(errors).forEach(key => delete errors[key]);
-    Object.assign(errors, newErrors);
-    return;
-  }
-
-  // Clear errors and submit (replace with actual API call)
-  Object.keys(errors).forEach(key => delete errors[key]);
-  console.log('Employee added:', formData);
-  // Optionally reset form
-  clearForm();
-  // Show success or redirect
-};
-
-const handleCvUpload = (event) => {
-  // Simulate parsing – you can replace with real file reading
-  isParsingCv.value = true;
-  setTimeout(() => {
-    isParsingCv.value = false;
-    // Auto-fill dummy data for demonstration
-    formData.fullName = 'John Doe';
-    formData.email = 'john@example.com';
-    formData.phone = '+92 300 1234567';
-    formData.department = 'Engineering';
-    formData.designation = 'Senior Developer';
-    formData.employmentStatus = 'Active';
-    formData.monthlySalary = '150000';
-    formData.joinDate = '2025-01-01';
-  }, 1500);
-};
-
-// ---------- Other component state ----------
-const userName = ref('John Doe');
+// Basic Header Static Properties configuration
+const userName = ref('System Administrator');
 const showModal = ref(false);
 const copied = ref(false);
 
-const stats = ref([
-  {
-    label: 'Total Tasks',
-    value: 12,
-    subtitle: 'Active tasks this week',
-    icon: ['fas', 'clipboard-list'],
-    color: 'blue',
-    link: '/admin/employees/tasks'
-  },
-  {
-    label: 'Attendance',
-    value: '94%',
-    subtitle: "This month's attendance rate",
-    icon: ['fas', 'calendar-check'],
-    color: 'teal',
-    link: '/admin/employees/attendance'
-  },
-  {
-    label: 'Messages',
-    value: 8,
-    subtitle: 'Unread messages',
-    icon: ['fas', 'envelope'],
-    color: 'purple',
-    link: '/admin/inbox'
-  },
-  {
-    label: 'Projects',
-    value: 3,
-    subtitle: 'Active projects',
-    icon: ['fas', 'project-diagram'],
-    color: 'orange',
-    link: '/admin/projects'
-  }
-]);
+// Initialize remote data collection streams during component mounting lifecycle
+onMounted(() => {
+  loadEmployees();
+});
 
-// Modal handler
+// Refresh collection pipeline upon execution of inner custom creation modal triggers
 const handleAddEmployeeModal = (data) => {
-  console.log('Employee data from modal:', data);
-  // You can reuse handleAddEmployee logic or call an API
+  console.log('Employee added successfully via dashboard overlay context tracker payload:', data);
+  loadEmployees();
 };
 
-// Copy registration link
+// Clipboard automation handler system logic integration
 const copyRegistrationLink = () => {
   const baseUrl = window.location.origin;
   const registrationLink = `${baseUrl}/employee/register`;
@@ -428,7 +275,7 @@ const copyRegistrationLink = () => {
         setTimeout(() => { copied.value = false; }, 3000);
       })
       .catch(() => {
-        alert(`Registration link: ${registrationLink}`);
+        alert(`Registration link generated parameters: ${registrationLink}`);
       });
 };
 </script>
