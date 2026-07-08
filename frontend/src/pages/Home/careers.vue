@@ -591,7 +591,6 @@
 <script setup>
 import { ref, reactive, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useCareers } from '@/composables/useCareers.js'
-import { cvAPI } from '@/services/cvApi.js'
 import Navbar from '../../components/navbar.vue'
 import Footer from '../../components/footer.vue'
 import ShineButton from '@/components/ShineButton.vue'
@@ -602,6 +601,7 @@ import careersPerkAccentSvg from '@/assets/svg/careers-perk-accent.svg'
 import careersStepSubmitSvg from '@/assets/svg/careers-step-submit.svg'
 import careersStepCallSvg from '@/assets/svg/careers-step-call.svg'
 import careersStepTechSvg from '@/assets/svg/careers-step-tech.svg'
+import {useCvStore} from "@/stores/cvStore.js";
 
 const {
   isModalOpen, submitSuccess, isDragging,

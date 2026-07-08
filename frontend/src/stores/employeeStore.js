@@ -120,7 +120,67 @@ export const useEmployeeStore = defineStore('employee', {
         setSearch(query) {
             this.searchQuery = query;
         },
+        async addEmployee(formDataPayload) {
+            this.isLoading = true;
+            this.error = null;
+            try {
+                const cleanedBaseUrl = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL;
+                let endpoint = API_ENDPOINTS.ADD_EMPLOYEE;
+                if (!endpoint.startsWith('/')) endpoint = `/${endpoint}`;
+                const fullUrl = `${cleanedBaseUrl}${endpoint}`;
 
+                const token = getAuthToken();
+                const headers = {};
+                if (token) headers['Authorization'] = `Bearer ${token}`;
+                // No Content-Type header - let browser set for FormData
+
+                const response = await fetch(fullUrl, {
+                    method: 'POST',
+                    headers,
+                    body: formDataPayload
+                });
+
+                let responseData;
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    responseData = await response.json();
+                } else {
+                    responseData = await response.text();
+                }
+
+                if (!response.ok) {
+                    let errorMsg = 'Failed to add employee';
+                    if (responseData && typeof responseData === 'object') {
+                        // Extract error message - could be 'error' field or field errors
+                        if (responseData.error) errorMsg = responseData.error;
+                        else if (responseData.message) errorMsg = responseData.message;
+                        else {
+                            // Concatenate field errors
+                            const errs = Object.values(responseData).flat().join(' ');
+                            if (errs) errorMsg = errs;
+                        }
+                    } else if (typeof responseData === 'string') {
+                        errorMsg = responseData;
+                    }
+                    throw new Error(errorMsg);
+                }
+
+                // If employee added successfully, optionally add to local state? We could refresh or just return.
+                // Optionally we could push to employees list if we have the data
+                if (responseData && responseData.employee_number) {
+                    // We could add to employees list, but we might not have all fields.
+                    // Better to refetch or just return.
+                    // For now, we just return success.
+                }
+
+                return { success: true, data: responseData };
+            } catch (error) {
+                this.error = error.message || 'Failed to add employee';
+                return { success: false, error: this.error };
+            } finally {
+                this.isLoading = false;
+            }
+        },
         setPage(page) {
             this.currentPage = page;
         },

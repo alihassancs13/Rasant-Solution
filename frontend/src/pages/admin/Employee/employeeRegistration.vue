@@ -60,6 +60,7 @@
           </div>
         </div>
 
+        <!-- Row 1: Name + CNIC -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Name <span class="text-rose-500">*</span></label>
@@ -72,6 +73,7 @@
           </div>
         </div>
 
+        <!-- CNIC Scan (full width) -->
         <div>
           <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">CNIC Scan copy <span class="text-rose-500">*</span></label>
           <div class="border-2 border-dashed border-slate-200 rounded-2xl p-6 text-center hover:bg-slate-50 transition relative group cursor-pointer">
@@ -83,32 +85,77 @@
           </div>
         </div>
 
-        <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Present Address <span class="text-rose-500">*</span></label>
-          <textarea v-model="formData.present_address" required rows="3" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" placeholder="Your current residential address"></textarea>
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Permanent Address</label>
-          <textarea v-model="formData.permanent_address" rows="3" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" placeholder="Your permanent home address"></textarea>
-        </div>
-
+        <!-- Row 2: Email + Phone -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Email <span class="text-rose-500">*</span></label>
+            <input type="email" v-model="formData.email" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" placeholder="employee@company.com">
+          </div>
           <div>
             <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Phone Number <span class="text-rose-500">*</span></label>
             <input type="text" v-model="formData.phone_number" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" placeholder="+92 300 0000000">
           </div>
+        </div>
+
+        <!-- Row 3: Gender + Department (text input, not dropdown) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Gender</label>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Gender <span class="text-rose-500">*</span></label>
             <div class="flex gap-4">
               <label class="inline-flex items-center text-sm font-medium text-slate-700 bg-white border border-slate-200 px-4 py-2 rounded-xl cursor-pointer hover:bg-slate-50">
-                <input type="radio" v-model="formData.gender" value="Male" class="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500 mr-2"> Male
+                <input type="radio" v-model="formData.gender" value="Male" required class="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500 mr-2"> Male
               </label>
               <label class="inline-flex items-center text-sm font-medium text-slate-700 bg-white border border-slate-200 px-4 py-2 rounded-xl cursor-pointer hover:bg-slate-50">
                 <input type="radio" v-model="formData.gender" value="Female" class="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500 mr-2"> Female
               </label>
             </div>
           </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Department <span class="text-rose-500">*</span></label>
+            <input type="text" v-model="formData.department" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" placeholder="e.g. Engineering">
+            <!-- Note: we'll send a default department ID from the composable -->
+          </div>
+        </div>
+
+        <!-- Row 4: Designation + Salary -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Designation <span class="text-rose-500">*</span></label>
+            <input type="text" v-model="formData.designation" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" placeholder="e.g. Software Engineer">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Salary <span class="text-rose-500">*</span></label>
+            <input type="number" step="0.01" v-model="formData.salary" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" placeholder="0.00">
+          </div>
+        </div>
+
+        <!-- Row 5: Joined Date + Status (text input for status) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Joined Date <span class="text-rose-500">*</span></label>
+            <input type="date" v-model="formData.joined_date" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Status</label>
+            <select v-model="formData.status" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm bg-white">
+              <option value="Intern">Intern</option>
+              <option value="Probation">Probation</option>
+              <option value="Contract">Contract</option>
+              <option value="Permanent">Permanent</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Present Address (full width) -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Present Address <span class="text-rose-500">*</span></label>
+          <textarea v-model="formData.present_address" required rows="3" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" placeholder="Your current residential address"></textarea>
+        </div>
+
+        <!-- Permanent Address (full width) -->
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Permanent Address</label>
+          <textarea v-model="formData.permanent_address" rows="3" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" placeholder="Your permanent home address"></textarea>
         </div>
       </div>
 
@@ -290,20 +337,16 @@ export default {
       submitForm,
     } = registration;
 
-    // Custom handler for Continue/Submit button
     const customNextStep = () => {
       if (currentStep.value === totalSteps) {
-        // Submit and close modal on success
         submitForm(() => {
           emit('close');
         });
       } else {
-        // Validate and move to next step
         nextStep();
       }
     };
 
-    // Close handler for the X button
     const close = () => {
       emit('close');
     };

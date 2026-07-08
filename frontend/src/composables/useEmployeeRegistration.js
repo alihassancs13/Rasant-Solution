@@ -1,6 +1,11 @@
+// composables/useEmployeeRegistration.js
 import { ref, computed } from 'vue';
+import { useEmployeeStore } from '../stores/employeeStore.js';
 
 export function useEmployeeRegistration() {
+    const store = useEmployeeStore();
+
+    // --- state ---
     const currentStep = ref(1);
     const totalSteps = 4;
     const isSubmitted = ref(false);
@@ -12,19 +17,29 @@ export function useEmployeeRegistration() {
         { id: 3, name: 'Educational' },
         { id: 4, name: 'Bank' }
     ];
-
     const formData = ref({
+        // Personal
         name: '',
         cnic: '',
         present_address: '',
         permanent_address: '',
         phone_number: '',
         gender: '',
+        email: '',
+        department: '',
+        designation: '',
+        salary: '',
+        joined_date: '',
+        status: 'Intern',
+
+        // Emergency
         emergency_name: '',
         emergency_relation: '',
         emergency_cnic: '',
         emergency_phone: '',
         emergency_address: '',
+
+        // Bank
         bank_name: '',
         branch_name: '',
         account_number: ''
@@ -46,6 +61,7 @@ export function useEmployeeRegistration() {
         return progressMapping[currentStep.value];
     });
 
+    // --- file upload ---
     const handleFileUpload = (event, fieldKey) => {
         const files = event.target.files;
         if (files.length > 0) {
@@ -62,6 +78,7 @@ export function useEmployeeRegistration() {
         }
     };
 
+    // --- validation and navigation ---
     const validateCurrentStep = () => {
         const currentFormElement = document.getElementById('employeeForm');
         if (!currentFormElement) return true;
@@ -77,9 +94,7 @@ export function useEmployeeRegistration() {
             currentStep.value++;
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
-            // Final step – but we will handle submission via custom method in component
-            // to pass the callback, so we leave this as a fallback (no callback)
-            submitForm();
+            submitForm(); // fallback
         }
     };
 
@@ -90,36 +105,76 @@ export function useEmployeeRegistration() {
         }
     };
 
-    // Accept an optional onSuccess callback
-    const submitForm = (onSuccess) => {
+    // --- submission using store ---
+    const submitForm = async (onSuccess) => {
         isSubmitted.value = true;
         const payload = new FormData();
 
-        Object.keys(formData.value).forEach(key => {
-            payload.append(key, formData.value[key]);
+        // Helper: remove all non‑digits from CNIC
+        const cleanCnic = (value) => (value || '').replace(/\D/g, '');
+
+        // Prepare cleaned data with all fields and defaults
+        const cleanedData = {
+            // Personal
+            name: (formData.value.name || '').trim(),
+            cnic: cleanCnic(formData.value.cnic),
+            present_address: (formData.value.present_address || '').trim(),
+            permanent_address: (formData.value.permanent_address || '').trim(),
+            phone_number: (formData.value.phone_number || '').trim(),
+            gender: formData.value.gender || 'Male',
+            email: (formData.value.email || '').trim(),
+
+
+            department: (formData.value.department || '').trim(),
+
+            designation: (formData.value.designation || '').trim() || 'Employee',
+            salary: parseFloat(formData.value.salary) || 0,
+            joined_date: formData.value.joined_date || new Date().toISOString().split('T')[0],
+
+            status: formData.value.status || 'Intern',
+
+            is_active: true,
+
+            // Emergency
+            emergency_name: (formData.value.emergency_name || '').trim(),
+            emergency_relation: (formData.value.emergency_relation || '').trim(),
+            emergency_cnic: cleanCnic(formData.value.emergency_cnic),
+            emergency_phone: (formData.value.emergency_phone || '').trim(),
+            emergency_address: (formData.value.emergency_address || '').trim(),
+
+            // Bank
+            bank_name: (formData.value.bank_name || '').trim(),
+            branch_name: (formData.value.branch_name || '').trim(),
+            account_number: (formData.value.account_number || '').trim(),
+        };
+        Object.keys(cleanedData).forEach(key => {
+            payload.append(key, cleanedData[key]);
         });
         Object.keys(uploadedFiles.value).forEach(key => {
             payload.append(key, uploadedFiles.value[key]);
         });
 
-        fetch('http://127.0.0.1:8000/api/add-employee/', {
-            method: 'POST',
-            body: payload
-        })
-            .then(res => {
-                if (!res.ok) throw new Error('API transmission error occurred.');
-                return res.json();
-            })
-            .then(data => {
-                alert("Employee registration data processed successfully!");
-                console.log(data);
-                if (onSuccess) onSuccess();
-            })
-            .catch(err => {
-                alert("Submission failed. Ensure backend API server is online.");
-                console.error(err);
-                isSubmitted.value = false;
-            });
+        const result = await store.addEmployee(payload);
+
+        if (result.success) {
+            alert('Employee registration data processed successfully!');
+            console.log(result.data);
+            isSubmitted.value = false;
+            if (onSuccess) onSuccess(result.data);
+        } else {
+            // Show field‑specific errors
+            let errorMsg = 'Submission failed:\n';
+            if (result.errors && typeof result.errors === 'object') {
+                for (const [field, msgs] of Object.entries(result.errors)) {
+                    errorMsg += `\n${field}: ${msgs.join(', ')}`;
+                }
+            } else {
+                errorMsg += result.error || 'Unknown error';
+            }
+            alert(errorMsg);
+            console.error(result.error);
+            isSubmitted.value = false;
+        }
     };
 
     return {
@@ -132,6 +187,7 @@ export function useEmployeeRegistration() {
         handleFileUpload,
         nextStep,
         prevStep,
-        submitForm,   
+        submitForm,
+        isLoading: computed(() => store.isLoading),
     };
 }

@@ -17,4 +17,5 @@ export const API_ENDPOINTS = {
     JOB_PUBLIC_LIST: '/api/employeeDashboard/job-openings/public/',
     JOB_TYPES: '/api/employeeDashboard/job-types/',
     UPDATE_EMPLOYEE: '/api/employeeDashboard/update_employee/',
+    ADD_EMPLOYEE: '/api/employeeDashboard/add_employee/',
 };
