@@ -13,7 +13,7 @@ export function useEmployeeDashboard() {
 
     const searchQuery = ref('');
     const currentPage = ref(1);
-    const pageSize = ref(5);
+    const pageSize = ref(5);   // default 5
 
     const statsSummary = reactive({
         total: 0,
@@ -32,6 +32,15 @@ export function useEmployeeDashboard() {
         if (result.success) {
             calculateStats();
         }
+    };
+
+    // New action to update details via store and sync dashboard calculations
+    const updateEmployee = async (employeeId, payload) => {
+        const result = await employeeStore.updateEmployeeDetails(employeeId, payload);
+        if (result.success) {
+            calculateStats(); // Recalculate local counters with fresh data updates
+        }
+        return result;
     };
 
     const calculateStats = () => {
@@ -53,15 +62,22 @@ export function useEmployeeDashboard() {
         loadEmployees();
     });
 
+    watch(pageSize, () => {
+        currentPage.value = 1;
+        loadEmployees();
+    });
+
     return {
         employees,
         isLoading,
         errorMessage,
         searchQuery,
         currentPage,
+        pageSize,
         totalPages,
         totalEmployees,
         statsSummary,
-        loadEmployees
+        loadEmployees,
+        updateEmployee
     };
 }

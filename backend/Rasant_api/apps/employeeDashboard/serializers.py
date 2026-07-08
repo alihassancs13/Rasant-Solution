@@ -4,7 +4,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = '__all__'
-        read_only_fields = ['employee_number']
+        read_only_fields = ['employee_number',]
         extra_kwargs = {
             'cnic_scan': {'required': True},
             'emergency_cnic_scan': {'required': True},
@@ -27,10 +27,6 @@ class EmployeeSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("CNIC must be 13 digits.")
         return value
 
-    def validate_iban_number(self, value):
-        if len(value) < 15 or len(value) > 34:
-            raise serializers.ValidationError("IBAN must be between 15 and 34 characters.")
-        return value
 class EmployeeListSerializer(serializers.ModelSerializer):
     """
     Used ONLY for GET /employees/ – excludes all file fields.
@@ -59,7 +55,6 @@ class EmployeeListSerializer(serializers.ModelSerializer):
             'bank_name',
             'branch_name',
             'branch_code',
-            'iban_number',
             'account_number',
             'created_at',
             'updated_at'

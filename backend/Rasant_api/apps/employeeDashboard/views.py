@@ -36,18 +36,48 @@ def generate_employee_number():
 @parser_classes([MultiPartParser, FormParser, JSONParser])
 def add_employee(request):
     """
-    Add a new employee. Expects multipart/form-data with all required fields.
-    Files are mandatory (except other_course).
+    Add a new employee. Reads files from request.FILES,
+    converts them to bytes, and saves them directly to MySQL.
     """
+    # -------------------- FILE SIZE LIMIT --------------------
+    MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
     serializer = EmployeeSerializer(data=request.data)
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    employee = Employee(**serializer.validated_data)
 
-    # Retry up to 3 times to get a unique employee_number
+    file_fields = [
+        ('cnic_scan', True),
+        ('emergency_cnic_scan', True),
+        ('matric_certificate', True),
+        ('fsc_certificate', True),
+        ('university_degree', True),
+        ('other_course', False)  # Optional field
+    ]
+    for field_name, is_mandatory in file_fields:
+        uploaded_file = request.FILES.get(field_name)
+        if uploaded_file:
+            # ---------- NEW SIZE CHECK ----------
+            if uploaded_file.size > MAX_FILE_SIZE:
+                return Response(
+                    {"error": f"The file '{field_name}' exceeds the {MAX_FILE_SIZE // (1024*1024)} MB size limit."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            # Proceed as before
+            setattr(employee, f"{field_name}_data", uploaded_file.read())
+            setattr(employee, f"{field_name}_name", uploaded_file.name)
+            setattr(employee, f"{field_name}_mimetype", uploaded_file.content_type)
+        elif is_mandatory:
+            return Response(
+                {"error": f"The file '{field_name}' is required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
     for attempt in range(3):
         new_number = generate_employee_number()
+        employee.employee_number = new_number
         try:
-            employee = serializer.save(employee_number=new_number)
+            employee.save()
             return Response(
                 {
                     "message": "Employee added successfully.",
@@ -63,8 +93,6 @@ def add_employee(request):
         {"error": "Could not generate a unique employee number after multiple attempts."},
         status=status.HTTP_500_INTERNAL_SERVER_ERROR
     )
-
-
 @api_view(['GET'])
 def list_employees(request):
     employees = Employee.objects.all().order_by('-created_at')

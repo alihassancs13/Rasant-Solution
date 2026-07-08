@@ -1,9 +1,12 @@
 from django.db import models
 from django.conf import settings
+from datetime import date
+
 
 class Employee(models.Model):
     """
-    Employee model – fields match the existing database table.
+    Employee model – All file fields are converted into a 3-column
+    binary setup to store documents entirely inside XAMPP MySQL.
     """
     GENDER_CHOICES = [
         ('Male', 'Male'),
@@ -27,7 +30,12 @@ class Employee(models.Model):
     name = models.CharField(max_length=255)
     email = models.EmailField(unique=True)
     cnic = models.CharField(max_length=15, unique=True)
-    cnic_scan = models.FileField(upload_to='employee_docs/cnic/')
+
+    # 1. CNIC SCAN (3 Columns)
+    cnic_scan_data = models.BinaryField(null=True, blank=True)
+    cnic_scan_name = models.CharField(max_length=255, null=True, blank=True)
+    cnic_scan_mimetype = models.CharField(max_length=100, null=True, blank=True)
+
     present_address = models.TextField()
     permanent_address = models.TextField()
     phone_number = models.CharField(max_length=15)
@@ -36,32 +44,50 @@ class Employee(models.Model):
     designation = models.CharField(max_length=100)
     is_active = models.BooleanField(default=True)
     salary = models.DecimalField(max_digits=10, decimal_places=2)
-    joined_date = models.DateField(null=True, blank=True)
+    joined_date = models.DateField(default=date.today)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Intern')
 
     # ---------- Emergency Contact ----------
     emergency_name = models.CharField(max_length=255)
     emergency_relation = models.CharField(max_length=100)
     emergency_cnic = models.CharField(max_length=15)
-    emergency_cnic_scan = models.FileField(upload_to='employee_docs/emergency/')
+
+    # 2. EMERGENCY CNIC SCAN (3 Columns)
+    emergency_cnic_scan_data = models.BinaryField(null=True, blank=True)
+    emergency_cnic_scan_name = models.CharField(max_length=255, null=True, blank=True)
+    emergency_cnic_scan_mimetype = models.CharField(max_length=100, null=True, blank=True)
+
     emergency_phone = models.CharField(max_length=15)
     emergency_address = models.TextField()
 
     # ---------- Education ----------
-    matric_certificate = models.FileField(upload_to='employee_docs/education/matric/')
-    fsc_certificate = models.FileField(upload_to='employee_docs/education/fsc/')
-    university_degree = models.FileField(upload_to='employee_docs/education/university/')
-    other_course = models.FileField(
-        upload_to='employee_docs/education/other/',
-        null=True, blank=True
-    )
+    # 3. MATRIC CERTIFICATE (3 Columns)
+    matric_certificate_data = models.BinaryField(null=True, blank=True)
+    matric_certificate_name = models.CharField(max_length=255, null=True, blank=True)
+    matric_certificate_mimetype = models.CharField(max_length=100, null=True, blank=True)
+
+    # 4. FSC CERTIFICATE (3 Columns)
+    fsc_certificate_data = models.BinaryField(null=True, blank=True)
+    fsc_certificate_name = models.CharField(max_length=255, null=True, blank=True)
+    fsc_certificate_mimetype = models.CharField(max_length=100, null=True, blank=True)
+
+    # 5. UNIVERSITY DEGREE (3 Columns)
+    university_degree_data = models.BinaryField(null=True, blank=True)
+    university_degree_name = models.CharField(max_length=255, null=True, blank=True)
+    university_degree_mimetype = models.CharField(max_length=100, null=True, blank=True)
+
+    # 6. OTHER COURSE (3 Columns)
+    other_course_data = models.BinaryField(null=True, blank=True)
+    other_course_name = models.CharField(max_length=255, null=True, blank=True)
+    other_course_mimetype = models.CharField(max_length=100, null=True, blank=True)
 
     # ---------- Bank Details ----------
     bank_name = models.CharField(max_length=255)
     branch_name = models.CharField(max_length=255)
-    branch_code = models.CharField(max_length=50)
-    iban_number = models.CharField(max_length=34)
-    account_number = models.CharField(max_length=50)
+    branch_code = models.CharField(max_length=50, null=True, blank=True)
+    account_number = models.CharField(
+        max_length=50,
+    )
 
     # ---------- User Relation ----------
     user = models.ForeignKey(
