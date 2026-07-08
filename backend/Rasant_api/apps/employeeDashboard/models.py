@@ -1,8 +1,5 @@
-import datetime
 from django.db import models
-from django.db import IntegrityError
 from django.conf import settings
-
 
 class Employee(models.Model):
     """
@@ -14,14 +11,11 @@ class Employee(models.Model):
         ('Other', 'Other'),
     ]
     STATUS_CHOICES = [
-        ('intern', 'Intern'),
-        ('probation', 'Probation'),
-        ('contract', 'Contract'),
-        ('permanent', 'Permanent'),
+        ('Intern', 'Intern'),
+        ('Probation', 'Probation'),
+        ('Contract', 'Contract'),
+        ('Permanent', 'Permanent'),
     ]
-
-
-    # Primary key is auto‑created (id), no need to define it.
     employee_number = models.CharField(
         max_length=20,
         unique=True,
@@ -38,12 +32,12 @@ class Employee(models.Model):
     permanent_address = models.TextField()
     phone_number = models.CharField(max_length=15)
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
-    department = models.CharField(max_length=100, null=True, blank=True)
-    designation = models.CharField(max_length=100, null=True, blank=True)
+    department = models.CharField(max_length=100)
+    designation = models.CharField(max_length=100)
     is_active = models.BooleanField(default=True)
-    salary = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    salary = models.DecimalField(max_digits=10, decimal_places=2)
     joined_date = models.DateField(null=True, blank=True)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='intern')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Intern')
 
     # ---------- Emergency Contact ----------
     emergency_name = models.CharField(max_length=255)
@@ -59,7 +53,7 @@ class Employee(models.Model):
     university_degree = models.FileField(upload_to='employee_docs/education/university/')
     other_course = models.FileField(
         upload_to='employee_docs/education/other/',
-        null=True, blank=True    # matches the nullable column in DB
+        null=True, blank=True
     )
 
     # ---------- Bank Details ----------
@@ -88,35 +82,76 @@ class Employee(models.Model):
     def __str__(self):
         return self.name
 
-    # If your code expects `full_name`, you can use this property
     @property
     def full_name(self):
         return self.name
+class CVSubmission(models.Model):
+    full_name        = models.CharField(max_length=255)
+    email             = models.EmailField(unique=False)
+    phone             = models.CharField(max_length=50)
+    desired_position  = models.CharField(max_length=255)
 
-    # ---------- Employee Number Generation ----------
-    def generate_employee_number(self):
-        now = datetime.datetime.now()
-        prefix = f"RS-{now.strftime('%m%y')}-"
-        last = Employee.objects.filter(
-            employee_number__startswith=prefix
-        ).order_by('employee_number').last()
-        if last:
-            last_seq = int(last.employee_number.split('-')[-1])
-            new_seq = last_seq + 1
-        else:
-            new_seq = 1
-        return f"{prefix}{new_seq:02d}"
+    cv_file           = models.BinaryField()
+    cv_file_name      = models.CharField(max_length=255)
+    cv_file_type      = models.CharField(max_length=100)
+    cv_file_size      = models.PositiveIntegerField(default=0)
 
-    def save(self, *args, **kwargs):
-        if not self.employee_number:
-            for attempt in range(3):
-                try:
-                    self.employee_number = self.generate_employee_number()
-                    super().save(*args, **kwargs)
-                    break
-                except IntegrityError:
-                    continue
-            else:
-                raise IntegrityError("Could not generate a unique employee number.")
-        else:
-            super().save(*args, **kwargs)
+    submitted_at      = models.DateTimeField(auto_now_add=True)
+    cover_letter      = models.TextField(blank=True, null=True)
+
+    class Meta:
+        db_table = 'cv_submissions'
+        ordering = ['-submitted_at']
+
+    def __str__(self):
+        return f"{self.full_name} — {self.desired_position}"
+
+class JobType(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+
+    class Meta:
+        db_table = 'job_types'
+        ordering = ['name']
+
+    def __str__(self):
+        return self.name
+
+class JobStatus(models.Model):
+    name = models.CharField(max_length=20, unique=True)
+
+    class Meta:
+        db_table = 'job_status'
+        ordering = ['id']
+
+    def __str__(self):
+        return self.name
+
+class JobOpening(models.Model):
+    job_title = models.CharField(max_length=200)
+    job_type = models.ForeignKey(
+        JobType,
+        on_delete=models.PROTECT,
+        related_name='job_openings'
+    )
+    department = models.CharField(max_length=100)
+    location = models.CharField(max_length=150)
+    salary_range = models.IntegerField(null=True, blank=True)
+    description = models.CharField(max_length=2000)
+    requirements = models.CharField(max_length=2000)
+
+    status = models.ForeignKey(
+        JobStatus,
+        on_delete=models.PROTECT,
+        related_name='job_openings',
+        default=1
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'job_openings'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"{self.job_title} ({self.department})"

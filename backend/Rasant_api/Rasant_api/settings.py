@@ -49,9 +49,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     'accounts',
-    'contact_message',
-    'cv_management',
-    'employee_dashboard',
+    'employeeDashboard',
     'jira',
 ]
 

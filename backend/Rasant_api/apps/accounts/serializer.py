@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Role
+from .models import User, Role,ContactMessage
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(required=False)
@@ -48,3 +48,8 @@ class RoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Role
         fields = ['id', 'name']
+class ContactMessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContactMessage
+        fields = ['id', 'full_name', 'email', 'phone', 'message', 'created_at']
+        read_only_fields =  ['id', 'created_at']

@@ -22,10 +22,7 @@ from django.conf import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/accounts/', include('accounts.urls')),
-    path('api/cv_management/', include('cv_management.urls')),
-    path('api/employee_dashboard/', include('employee_dashboard.urls')),
-     path('api/', include('contact_message.urls')),
-    path('api/cv_management/', include('cv_management.urls')),
+    path('api/employeeDashboard/', include('employeeDashboard.urls')),
     path('api/', include('jira.urls')),
 
 ]
