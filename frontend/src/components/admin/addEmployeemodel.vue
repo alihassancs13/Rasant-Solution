@@ -227,7 +227,7 @@
 
 <script setup>
 import { ref, reactive, watch } from 'vue';
-import { Employee } from '../composables/Admin/addEmployeemodel.js';
+import { Employee } from '../../composables/Admin/addEmployeemodel.js';
 
 const emit = defineEmits(['close', 'add-employee']);
 

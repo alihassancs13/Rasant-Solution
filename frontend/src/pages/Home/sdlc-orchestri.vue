@@ -45,7 +45,7 @@
             <div class="relative w-full z-20 aspect-square max-w-sm mx-auto">
               <svg class="absolute inset-0 w-full h-full z-10 pointer-events-none" viewBox="0 0 400 400" fill="none" >
               </svg>
-              <img src="../assets/svg/orchestri-bot.svg" alt="Orchestri orchestrator" class="w-120 h-100 object-contain drop-shadow-[var(--shadow-primary-dark)]" title="Orchestri Bot" />
+              <img src="../../assets/svg/orchestri-bot.svg" alt="Orchestri orchestrator" class="w-120 h-100 object-contain drop-shadow-[var(--shadow-primary-dark)]" title="Orchestri Bot" />
             </div>
           </div>
         </div>
@@ -67,7 +67,7 @@
         <div class="relative z-10 flex items-center justify-center">
           <div class="relative w-full max-w-full">
             <div class="rounded-2xl overflow-hidden border border-borderDefault shadow-[var(--shadow-card)] bg-section-white transition-all duration-350 hover:shadow-[var(--shadow-orchestri)] hover:-translate-y-1 hover:scale-[1.01]">
-              <img src="../assets/svg/orchestri-flow.svg" alt="Orchestri SDLC workflow" class="w-full min-h-[280px] block" />
+              <img src="../../assets/svg/orchestri-flow.svg" alt="Orchestri SDLC workflow" class="w-full min-h-[280px] block" />
             </div>
           </div>
         </div>
@@ -82,7 +82,7 @@
         <div class="relative z-10 flex items-center justify-center order-last md:order-first">
           <div class="relative w-full max-w-full">
             <div class="rounded-2xl overflow-hidden border border-borderDefault shadow-[var(--shadow-card)] bg-section-white transition-all duration-350 hover:shadow-[var(--shadow-orchestri)] hover:-translate-y-1 hover:scale-[1.01]">
-              <img src="../assets/svg/orchestri-dashboard.svg" alt="Orchestri pipeline progress and workflow console" class="w-full min-h-[280px] block" />
+              <img src="../../assets/svg/orchestri-dashboard.svg" alt="Orchestri pipeline progress and workflow console" class="w-full min-h-[280px] block" />
             </div>
           </div>
         </div>
@@ -130,7 +130,7 @@
               <div class="absolute inset-5 rounded-full bg-[radial-gradient(circle,var(--color-bot-glow)_0%,transparent_68%)] animate-[voiceGlow_3.5s_ease-in-out_infinite]"></div>
               <div class="absolute inset-[-15%] rounded-full border-2 border-dashed border-neutral-400/32 animate-[botRingSpin_24s_linear_infinite]"></div>
               <div class="absolute inset-[-18%] rounded-full border-2 border-dashed border-accent-5/22 animate-[botRingSpin_30s_linear_infinite_reverse]"></div>
-              <img src="../assets/svg/orchestri-agent-bot.svg" alt="Orchestri multi-agent workflow" class="w-full block relative z-10 drop-shadow-[var(--shadow-primary-dark)]" />
+              <img src="../../assets/svg/orchestri-agent-bot.svg" alt="Orchestri multi-agent workflow" class="w-full block relative z-10 drop-shadow-[var(--shadow-primary-dark)]" />
             </div>
           </div>
         </div>
@@ -162,7 +162,7 @@
             <div class="absolute inset-[8%_4%] rounded-full bg-glow-orchestri-card blur-sm animate-[showcaseGlow_4s_ease-in-out_infinite] pointer-events-none"></div>
             <div class="absolute -inset-1.5 rounded-[22px] border-2 border-dashed border-accent-3/35 animate-[botRingSpin_26s_linear_infinite] pointer-events-none"></div>
             <div class="relative z-10 rounded-2xl overflow-hidden border border-borderDefault shadow-[var(--shadow-card)] bg-section-white transition-all duration-350 min-h-75 md:min-h-85 hover:shadow-[var(--shadow-orchestri)] hover:-translate-y-1 hover:scale-[1.01]">
-              <img src="../assets/svg/orchestri-capabilities.svg" alt="Orchestri platform capabilities" class="w-full min-h-80 block" />
+              <img src="../../assets/svg/orchestri-capabilities.svg" alt="Orchestri platform capabilities" class="w-full min-h-80 block" />
             </div>
           </div>
         </div>
@@ -296,9 +296,10 @@
 </template>
 
 <script>
-import Footer from '../components/footer.vue'
-import Navbar from '../components/navbar.vue'
+import Footer from '../../components/footer.vue'
+import Navbar from '../../components/navbar.vue'
 import MobileAutoSlide from '@/components/MobileAutoSlide.vue'
+import ShineButton from "@/components/ShineButton.vue";
 
 const CELL_CONFIGS = [
   { bg: 'bg-accent-3/20' },

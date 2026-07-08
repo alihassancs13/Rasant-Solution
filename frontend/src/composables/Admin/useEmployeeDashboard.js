@@ -1,20 +1,20 @@
 // composables/useEmployeeDashboard.js
-import { ref, reactive, watch } from 'vue';
-import { fetchEmployeesApi } from '../../services/employeesListApi.js';
+import { computed, reactive, watch, ref } from 'vue';
+import { useEmployeeStore } from '@/stores/employeeStore.js';
 
 export function useEmployeeDashboard() {
-    const employees = ref([]);
-    const isLoading = ref(false);
-    const errorMessage = ref('');
+    const employeeStore = useEmployeeStore();
 
-    // Search and Pagination Controls
+    const employees = computed(() => employeeStore.employees);
+    const isLoading = computed(() => employeeStore.isLoading);
+    const errorMessage = computed(() => employeeStore.error || '');
+    const totalEmployees = computed(() => employeeStore.totalCount);
+    const totalPages = computed(() => employeeStore.totalPages);
+
     const searchQuery = ref('');
     const currentPage = ref(1);
     const pageSize = ref(5);
-    const totalEmployees = ref(0);
-    const totalPages = ref(1);
 
-    // Statistics summaries mapped from UI prototype metrics counters
     const statsSummary = reactive({
         total: 0,
         inOffice: 0,
@@ -22,44 +22,15 @@ export function useEmployeeDashboard() {
         awayToday: 0
     });
 
-    // Main execution worker wrapper for network side-effects
-    // composables/useEmployeeDashboard.js
-
     const loadEmployees = async () => {
-        isLoading.value = true;
-        errorMessage.value = '';
-        try {
-            const data = await fetchEmployeesApi({
-                search: searchQuery.value,
-                page: currentPage.value,
-                page_size: pageSize.value
-            });
+        const result = await employeeStore.fetchEmployees({
+            search: searchQuery.value,
+            page: currentPage.value,
+            page_size: pageSize.value
+        });
 
-            // Defensive parsing block:
-            if (Array.isArray(data)) {
-                // If API returns a direct array [ {...} ]
-                employees.value = data;
-                totalEmployees.value = data.length;
-            } else if (data && Array.isArray(data.results)) {
-                // If API returns a paginated object { results: [ ... ], count: X }
-                employees.value = data.results;
-                totalEmployees.value = data.count || data.results.length;
-            } else {
-                // Fallback if data format is unexpected
-                employees.value = [];
-                totalEmployees.value = 0;
-            }
-
-            totalPages.value = Math.ceil(totalEmployees.value / pageSize.value) || 1;
-
-            // Recalculate dashboard counters dynamically
+        if (result.success) {
             calculateStats();
-        } catch (err) {
-            errorMessage.value = err.message || 'Failed to populate dashboard employee records.';
-            employees.value = [];
-            totalEmployees.value = 0;
-        } finally {
-            isLoading.value = false;
         }
     };
 
@@ -73,13 +44,11 @@ export function useEmployeeDashboard() {
         statsSummary.awayToday = employees.value.filter(e => e.today_status?.toLowerCase() === 'away').length;
     };
 
-    // Trigger reactive side-effect reload pipelines when search patterns change
     watch(searchQuery, () => {
-        currentPage.value = 1; // Reset to page 1 on active text input search mutations
+        currentPage.value = 1;
         loadEmployees();
     });
 
-    // Trigger reactive watch changes for manual pagination pagination
     watch(currentPage, () => {
         loadEmployees();
     });

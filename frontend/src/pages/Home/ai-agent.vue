@@ -64,7 +64,7 @@
             <div class="absolute -inset-3.5 rounded-full border-2 border-dashed border-accent-1/35 animate-[botRingSpin_22s_linear_infinite]"></div>
             <div class="absolute -inset-5.5 rounded-full border-2 border-dashed border-accent-3/35 animate-[botRingSpin_30s_linear_infinite_reverse]"></div>
             <div class="relative w-full z-20 aspect-square max-w-sm mx-auto flex items-center justify-center overflow-visible">
-              <img src="../assets/svg/ai-agent-bot.svg" alt="AI voice agent robot" class="w-full h-[450px] object-contain drop-shadow-[var(--shadow-primary-dark)] relative z-10" title="Voice AI Agent" />
+              <img src="../../assets/svg/ai-agent-bot.svg" alt="AI voice agent robot" class="w-full h-[450px] object-contain drop-shadow-[var(--shadow-primary-dark)] relative z-10" title="Voice AI Agent" />
             </div>
           </div>
         </div>
@@ -84,7 +84,7 @@
 
         <div class="relative z-10 flex items-center justify-center bg-section-white rounded-2xl shadow-[var(--shadow-primary-dark)]">
           <div class="relative w-full max-w-full">
-            <img src="../assets/svg/ai-agent-voice-flow.svg" alt="Voice AI agent call flow" title="Voice AI agent call flow" class="w-full min-h-[280px] block" />
+            <img src="../../assets/svg/ai-agent-voice-flow.svg" alt="Voice AI agent call flow" title="Voice AI agent call flow" class="w-full min-h-[280px] block" />
           </div>
         </div>
       </div>
@@ -108,7 +108,7 @@
                 <div class="bg-neutral-50 border border-borderDefault rounded-[14px] p-[10px_10px_8px] animate-[aaTileFloat_5s_ease-in-out_infinite] transition-all hover:border-card-hover-border-alt hover:shadow-md">
                   <span class="block text-[9px] font-bold tracking-wider uppercase text-textSupporting mb-2 pl-0.5 font-display">Scheduled queue</span>
                   <div class="overflow-hidden rounded-[10px] bg-section-white border border-borderDefault h-[170px] md:h-[108px]">
-                    <img src="../assets/svg/ai-agent-scheduled-calls.svg" alt="Scheduled calls overview" class="w-full block -mt-1.5" />
+                    <img src="../../assets/svg/ai-agent-scheduled-calls.svg" alt="Scheduled calls overview" class="w-full block -mt-1.5" />
                   </div>
                 </div>
 
@@ -116,10 +116,10 @@
                   <span class="block text-[9px] font-bold tracking-wider uppercase text-textSupporting mb-2 pl-0.5 font-display">Activity and usage</span>
                   <div class="grid grid-cols-1 sm:grid-cols-[0.42fr_0.58fr] gap-2">
                     <div class="overflow-hidden rounded-[10px] bg-section-white border border-borderDefault h-[150px] md:h-[108px]">
-                      <img src="../assets/svg/ai-agent-analytics.svg" alt="Analytics summary" class="w-full block" />
+                      <img src="../../assets/svg/ai-agent-analytics.svg" alt="Analytics summary" class="w-full block" />
                     </div>
                     <div class="overflow-hidden rounded-[10px] bg-neutral-50 border border-borderDefault h-[150px] md:h-[108px] flex items-center justify-center">
-                      <img src="../assets/images/agent_graphs.png" alt="Activity trend charts" class="w-[118%] h-auto block scale-[0.88] origin-center" width="1100" height="420" />
+                      <img src="../../assets/images/agent_graphs.png" alt="Activity trend charts" class="w-[118%] h-auto block scale-[0.88] origin-center" width="1100" height="420" />
                     </div>
                   </div>
                 </div>
@@ -176,7 +176,7 @@
               <div class="absolute inset-[-12%] rounded-full border-2 border-dashed border-accent-3/35 animate-[spin_30s_linear_infinite_reverse]"></div>
 
               <img
-                  src="../assets/svg/ai-agent-phone-bot.svg"
+                  src="../../assets/svg/ai-agent-phone-bot.svg"
                   alt="Voice AI agent on a call"
                   class="w-full block relative z-10 drop-shadow-[var(--shadow-primary-dark)]"
               />
@@ -213,7 +213,7 @@
             <div class="absolute -inset-1.5 rounded-[22px] border-2 border-dashed border-accent-1/35 animate-[spin_26s_linear_infinite] pointer-events-none"></div>
 
             <div class="relative z-10 rounded-2xl overflow-hidden border border-borderDefault shadow-[var(--shadow-card)] bg-section-white transition-all duration-350 min-h-75 md:min-h-85 hover:shadow-[var(--shadow-primary-dark)] hover:-translate-y-1 hover:scale-[1.01]">
-              <img src="../assets/svg/ai-agent-capabilities.svg" alt="Voice AI capabilities and telephony integrations" class="w-full min-h-80 block" />
+              <img src="../../assets/svg/ai-agent-capabilities.svg" alt="Voice AI capabilities and telephony integrations" class="w-full min-h-80 block" />
             </div>
           </div>
         </div>
@@ -347,9 +347,9 @@
 </template>
 
 <script>
-import Footer from '../components/footer.vue'
-import Navbar from '../components/navbar.vue'
-import ShineButton from "../components/ShineButton.vue";
+import Footer from '../../components/footer.vue'
+import Navbar from '../../components/navbar.vue'
+import ShineButton from "../../components/ShineButton.vue";
 import MobileAutoSlide from '@/components/MobileAutoSlide.vue'
 
 // Grid cell config

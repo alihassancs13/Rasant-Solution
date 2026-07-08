@@ -752,7 +752,7 @@
 </template>
 
 <script setup>
-import Navbar from '@/components/Navbar.vue'
+import Navbar from '@/components/navbar.vue'
 import Footer from '@/components/footer.vue'
 import HomeServiceCard from '@/components/home/HomeServiceCard.vue'
 import { useHomeCarousel } from '@/composables/useHomeCarousel.js'

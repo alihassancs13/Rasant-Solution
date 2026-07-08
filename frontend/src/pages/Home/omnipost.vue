@@ -73,23 +73,23 @@
 
                 <!-- Instagram - Dynamic percentage positioning prevents crossing the left boundary -->
                 <div class="absolute top-0 left-[2%] w-[22%] sm:w-[25%] animate-[float_5s_ease-in-out_infinite]">
-                  <img src="@/assets/svg/omnipost-post-instagram.svg" alt="Instagram" class="w-full rounded-xl shadow-lg"/>
+                  <img src="../../assets/svg/omnipost-post-instagram.svg" alt="Instagram" class="w-full rounded-xl shadow-lg"/>
                 </div>
 
                 <!-- Facebook - Safely bounded on the bottom right edge -->
                 <div class="absolute bottom-[10%] right-[2%] w-[22%] sm:w-[25%] animate-[float_5s_ease-in-out_infinite] [animation-delay:-1.6s]">
-                  <img src="@/assets/svg/omnipost-post-facebook.svg" alt="Facebook" class="w-full rounded-xl shadow-lg"/>
+                  <img src="../../assets/svg/omnipost-post-facebook.svg" alt="Facebook" class="w-full rounded-xl shadow-lg"/>
                 </div>
 
                 <!-- LinkedIn - Safely bounded on the upper right edge -->
                 <div class="absolute top-[30%] right-[0%] w-[22%] sm:w-[25%] animate-[float_5s_ease-in-out_infinite] [animation-delay:-3.2s]">
-                  <img src="@/assets/svg/omnipost-post-linkedin.svg" alt="LinkedIn" class="w-full rounded-xl shadow-lg"/>
+                  <img src="../../assets/svg/omnipost-post-linkedin.svg" alt="LinkedIn" class="w-full rounded-xl shadow-lg"/>
                 </div>
 
               </div>
 
               <!-- Central Hero Image -->
-              <img src="@/assets/svg/omnipost-hero.svg" alt="OmniPost" class="relative z-10 w-full drop-shadow-2xl"/>
+              <img src="../../assets/svg/omnipost-hero.svg" alt="OmniPost" class="relative z-10 w-full drop-shadow-2xl"/>
             </div>
           </div>
         </div>
@@ -165,7 +165,7 @@
           <div class="relative">
             <div class="absolute inset-0 bg-purple-500/10 rounded-full blur-2xl animate-pulse"></div>
             <div class="relative rounded-2xl overflow-hidden border border-slate-200 shadow-2xl bg-white/95">
-              <img src="@/assets/svg/omnipost-roles.svg" alt="Team roles workflow" class="w-full block"/>
+              <img src="../../assets/svg/omnipost-roles.svg" alt="Team roles workflow" class="w-full block"/>
             </div>
           </div>
         </div>
@@ -246,7 +246,7 @@
           <div class="relative">
             <div class="absolute inset-0 bg-purple-500/10 rounded-full blur-2xl animate-pulse"></div>
             <div class="relative rounded-2xl overflow-hidden border border-slate-200 shadow-2xl bg-white/95">
-              <img src="@/assets/svg/omnipost-dashboard.svg" alt="OmniPost performance dashboard" class="w-full block"/>
+              <img src="../../assets/svg/omnipost-dashboard.svg" alt="OmniPost performance dashboard" class="w-full block"/>
             </div>
           </div>
         </div>
@@ -302,7 +302,7 @@
           <div class="lg:order-1 relative">
             <div class="absolute inset-0 bg-purple-500/10 rounded-full blur-2xl animate-pulse"></div>
             <div class="relative rounded-2xl overflow-hidden border border-slate-200 shadow-2xl bg-white/95">
-              <img src="@/assets/svg/omnipost-generator.svg" alt="OmniPost AI post generator" class="w-full block"/>
+              <img src="../../assets/svg/omnipost-generator.svg" alt="OmniPost AI post generator" class="w-full block"/>
             </div>
           </div>
         </div>
@@ -358,7 +358,7 @@
           <div class="relative">
             <div class="absolute inset-0 bg-purple-500/10 rounded-full blur-2xl animate-pulse"></div>
             <div class="relative rounded-2xl overflow-hidden border border-slate-200 shadow-2xl bg-white/95">
-              <img src="@/assets/svg/omnipost-approval.svg" alt="Approval workflow" class="w-full block"/>
+              <img src="../../assets/svg/omnipost-approval.svg" alt="Approval workflow" class="w-full block"/>
             </div>
           </div>
         </div>
@@ -414,7 +414,7 @@
           <div class="lg:order-1 relative">
             <div class="absolute inset-0 bg-purple-500/10 rounded-full blur-2xl animate-pulse"></div>
             <div class="relative rounded-2xl overflow-hidden border border-slate-200 shadow-2xl bg-white/95">
-              <img src="@/assets/svg/omnipost-scheduler.svg" alt="Smart scheduler and content calendar" class="w-full block"/>
+              <img src="../../assets/svg/omnipost-scheduler.svg" alt="Smart scheduler and content calendar" class="w-full block"/>
             </div>
           </div>
         </div>
@@ -470,7 +470,7 @@
           <div class="relative">
             <div class="absolute inset-0 bg-purple-500/10 rounded-full blur-2xl animate-pulse"></div>
             <div class="relative rounded-2xl overflow-hidden border border-slate-200 shadow-2xl bg-white/95">
-              <img src="@/assets/svg/omnipost-bulk.svg" alt="Bulk upload" class="w-full block"/>
+              <img src="../../assets/svg/omnipost-bulk.svg" alt="Bulk upload" class="w-full block"/>
             </div>
           </div>
         </div>
@@ -526,7 +526,7 @@
           <div class="lg:order-1 relative">
             <div class="absolute inset-0 bg-purple-500/10 rounded-full blur-2xl animate-pulse"></div>
             <div class="relative rounded-2xl overflow-hidden border border-slate-200 shadow-2xl bg-white/95">
-              <img src="@/assets/svg/omnipost-team.svg" alt="Team accounts and roles" class="w-full block"/>
+              <img src="../../assets/svg/omnipost-team.svg" alt="Team accounts and roles" class="w-full block"/>
             </div>
           </div>
         </div>
@@ -577,7 +577,7 @@
       <div class="max-w-4xl mx-auto mb-12 relative">
         <div class="absolute inset-0 bg-purple-500/10 rounded-full blur-2xl animate-pulse"></div>
         <div class="relative rounded-2xl overflow-hidden border border-slate-200 shadow-2xl bg-white/95">
-          <img src="@/assets/svg/omnipost-flow.svg" alt="How OmniPost works" class="w-full block"/>
+          <img src="../../assets/svg/omnipost-flow.svg" alt="How OmniPost works" class="w-full block"/>
         </div>
       </div>
 
@@ -657,10 +657,10 @@
 </template>
 
 <script>
-import { useOmniPost } from '../composables/useOmniPost.js'
+import { useOmniPost } from '../../composables/useOmniPost.js'
 import { useRouter } from 'vue-router'
-import Navbar from '../components/navbar.vue'
-import Footer from '../components/footer.vue'
+import Navbar from '../../components/navbar.vue'
+import Footer from '../../components/footer.vue'
 import MobileAutoSlide from '@/components/MobileAutoSlide.vue'
 
 export default {

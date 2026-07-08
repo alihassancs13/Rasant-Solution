@@ -27,6 +27,6 @@
 </template>
 
 <script setup>
-import Sidebar from '../components/adminSidebar.vue';
-import AppHeader from '../components/Header.vue';
+import Sidebar from '../../../components/adminSidebar.vue';
+import AppHeader from '../../../components/header.vue';
 </script>

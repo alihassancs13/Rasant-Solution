@@ -230,13 +230,13 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import DashboardHeader from '../components/header.vue';
-import StateCard from '../components/StatCard.vue';
-import AdminSidebar from '../components/adminSidebar.vue';
-import AddEmployeeModal from '../models/addEmployeemodel.vue';
+import DashboardHeader from '../../../components/header.vue';
+import StateCard from '../../../components/StatCard.vue';
+import AdminSidebar from '../../../components/adminSidebar.vue';
+import AddEmployeeModal from '../../../components/admin/addEmployeemodel.vue';
 
 // Integrating Reactive Orchestration Composable Layer Architecture
-import { useEmployeeDashboard } from '../composables/Admin/useEmployeeDashboard.js';
+import { useEmployeeDashboard } from '../../../composables/Admin/useEmployeeDashboard.js';
 
 const {
   employees,

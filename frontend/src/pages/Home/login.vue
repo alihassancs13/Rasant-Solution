@@ -82,7 +82,7 @@
 
           <div class="mb-4 flex justify-center">
             <img
-                src="@/assets/images/rasant-logo.png"
+                src="../../assets/images/rasant-logo.png"
                 alt="Rasant Solutions"
                 width="212"
                 height="42"
@@ -306,8 +306,8 @@
 
 <script setup>
 import { onMounted, onUnmounted } from 'vue';
-import ShineButton from '../components/ShineButton.vue';
-import { useLogin } from '../composables/useLogin';
+import ShineButton from '../../components/ShineButton.vue';
+import { useLogin } from '../../composables/useLogin.js';
 import LoginVisual from "@/components/LoginVisual.vue";
 
 onMounted(() => {

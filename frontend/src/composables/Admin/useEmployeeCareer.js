@@ -1,35 +1,34 @@
-import { ref, computed, onMounted, useTemplateRef, watch } from 'vue'
-import { contactAPI, cvAPI } from '@/services/cvAPI.js'
-import axios from "axios";
+// composables/useEmployeeCareer.js
+import { computed, onMounted, useTemplateRef, watch, ref } from 'vue'
+import { useContactStore } from '@/stores/contactStore.js'
+import { useCvStore } from '@/stores/cvStore.js'
+import { useToast } from '../useToast.js'
 
 export function useEmployeeCareer() {
-    // ─── Contact Messages ────────────────────────────────────────
-    const messages    = ref([])
-    const loading     = ref(false)
-    const error       = ref(null)
+    const {showToast} = useToast()
+    const contactStore = useContactStore()
+    const cvStore = useCvStore()
+
+    const messages = computed(() => contactStore.messages)
+    const loading = computed(() => contactStore.isLoading)
+    const error = computed(() => contactStore.error)
     const searchQuery = ref('')
     const searchInput = useTemplateRef('searchInput')
 
     async function fetchMessages() {
-        loading.value = true
-        error.value   = null
-        try {
-            const res = await contactAPI.getAll()
-            messages.value = res.data
-        } catch (err) {
-            error.value = err.response?.data?.detail ?? err.message ?? 'Something went wrong.'
-        } finally {
-            loading.value = false
+        const result = await contactStore.fetchMessages()
+        if (!result.success) {
+            showToast(result.error, 'error')
         }
     }
 
     async function deleteMessage(id) {
         if (!confirm('Delete this message?')) return
-        try {
-            await contactAPI.delete(id)
-            messages.value = messages.value.filter(m => m.id !== id)
-        } catch {
-            alert('Could not delete message.')
+        const result = await contactStore.deleteMessage(id)
+        if (result.success) {
+            showToast('Message deleted.', 'success')
+        } else {
+            showToast(result.error, 'error')
         }
     }
 
@@ -44,8 +43,8 @@ export function useEmployeeCareer() {
     })
 
     // ─── Pagination (Contact Messages) ────────────────────────────
-    const currentPage    = ref(1)
-    const pageSize       = ref(10)
+    const currentPage = ref(1)
+    const pageSize = ref(10)
     const pageSizeOptions = [5, 10, 20, 50]
 
     const totalPages = computed(() =>
@@ -53,7 +52,7 @@ export function useEmployeeCareer() {
     )
 
     const startIndex = computed(() => (currentPage.value - 1) * pageSize.value)
-    const endIndex   = computed(() =>
+    const endIndex = computed(() =>
         Math.min(startIndex.value + pageSize.value, filtered.value.length)
     )
 
@@ -61,7 +60,6 @@ export function useEmployeeCareer() {
         filtered.value.slice(startIndex.value, endIndex.value)
     )
 
-    // Builds page list with ellipsis, e.g. [1, 2, '...', 3, 4]
     const pageNumbers = computed(() => {
         const total = totalPages.value
         const current = currentPage.value
@@ -77,7 +75,7 @@ export function useEmployeeCareer() {
         if (current > 3) pages.push('...')
 
         const start = Math.max(2, current - 1)
-        const end   = Math.min(total - 1, current + 1)
+        const end = Math.min(total - 1, current + 1)
         for (let i = start; i <= end; i++) pages.push(i)
 
         if (current < total - 2) pages.push('...')
@@ -114,62 +112,50 @@ export function useEmployeeCareer() {
         }
     })
 
-    // ─── CV Submissions ──────────────────────────────────────────
-    const cvSubmissions = ref([])
-    const cvLoading     = ref(false)
-    const cvError       = ref(null)
+    const cvSubmissions = computed(() => cvStore.cvList)
+    const cvLoading = computed(() => cvStore.isLoading)
+    const cvError = computed(() => cvStore.error)
     const cvSearchQuery = ref('')
 
     async function fetchCVSubmissions() {
-        cvLoading.value = true
-        cvError.value   = null
-        try {
-            const res = await cvAPI.getAll()
-            cvSubmissions.value = res.data
-        } catch (err) {
-            cvError.value = err.response?.data?.detail ?? err.message ?? 'Something went wrong.'
-        } finally {
-            cvLoading.value = false
+        const result = await cvStore.fetchCVs()
+        if (!result.success) {
+            showToast(result.error, 'error')
         }
     }
 
     async function deleteCV(id) {
         if (!confirm('Delete this CV submission?')) return
-        try {
-            await cvAPI.delete(id)
-            cvSubmissions.value = cvSubmissions.value.filter(c => c.id !== id)
-        } catch {
-            alert('Could not delete CV submission.')
+        const result = await cvStore.deleteCV(id)
+        if (result.success) {
+            showToast('CV submission deleted.', 'success')
+        } else {
+            showToast(result.error, 'error')
         }
     }
 
     const filteredCVs = computed(() => {
+        if (!Array.isArray(cvSubmissions.value)) return []
         const q = cvSearchQuery.value.toLowerCase().trim()
         if (!q) return cvSubmissions.value
         return cvSubmissions.value.filter(c =>
-            c.full_name.toLowerCase().includes(q) ||
-            c.email.toLowerCase().includes(q) ||
-            c.desired_position.toLowerCase().includes(q),
+            c.full_name?.toLowerCase().includes(q) ||
+            c.email?.toLowerCase().includes(q) ||
+            c.desired_position?.toLowerCase().includes(q),
         )
     })
 
-    // ✅
     async function viewCV(cv) {
         const newTab = window.open('', '_blank')
-        try {
-            const res     = await cvAPI.download(cv.id)
-            const blobUrl = URL.createObjectURL(res.data)
-            if (newTab) {
-                newTab.location.href = blobUrl
-            }
-            setTimeout(() => URL.revokeObjectURL(blobUrl), 60_000)
-
-        } catch (err) {
+        const result = await cvStore.downloadCV(cv.id, `${cv.full_name}_CV.pdf`)
+        if (!result.success) {
             if (newTab) newTab.close()
-            alert('Could not open CV file.')
+            showToast(result.error, 'error')
+        } else if (newTab) {
+            newTab.close()
         }
     }
-    // ─── Helpers ─────────────────────────────────────────────────
+
     function formatDate(iso) {
         return new Date(iso).toLocaleDateString('en-PK', {
             day: '2-digit', month: 'short', year: 'numeric',
@@ -181,8 +167,6 @@ export function useEmployeeCareer() {
         return name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()
     }
 
-
-    // ─── Init ────────────────────────────────────────────────────
     onMounted(() => {
         fetchMessages()
         fetchCVSubmissions()
@@ -190,16 +174,12 @@ export function useEmployeeCareer() {
     })
 
     return {
-        // contact
         messages, loading, error, searchQuery, searchInput,
         fetchMessages, deleteMessage, filtered,
-        // pagination
         currentPage, totalPages, startIndex, endIndex, pageSize, pageSizeOptions,
         paginatedItems, pageNumbers, nextPage, prevPage, goToPage,
-        // cv
         cvSubmissions, cvLoading, cvError, cvSearchQuery,
         fetchCVSubmissions, deleteCV, filteredCVs, viewCV,
-        // helpers
         formatDate, initials,
     }
 }

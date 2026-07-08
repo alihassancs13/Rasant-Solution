@@ -341,9 +341,9 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
-import AdminSidebar from '../components/adminSidebar.vue'
+import AdminSidebar from '../../../components/adminSidebar.vue'
 import TopHeader from '@/components/header.vue'
-import { useEmployeeCareer } from '../composables/Admin/useEmployeeCareer.js'
+import { useEmployeeCareer } from '../../../composables/Admin/useEmployeeCareer.js'
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 const {
@@ -354,8 +354,7 @@ const {
   formatDate, initials,
 } = useEmployeeCareer()
 
-// Keep view anchored on the pagination controls when page changes,
-// instead of jumping to the top of the page.
+
 const mainScroll = ref(null)
 const paginationRef = ref(null)
 const mobilePaginationRef = ref(null)

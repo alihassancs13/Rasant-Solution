@@ -144,10 +144,6 @@ export function useCareers() {
     const handleFileSelect = (e) => processUploadedFile(e.target.files[0])
     const handleFileDrop   = (e) => { isDragging.value = false; processUploadedFile(e.dataTransfer.files[0]) }
 
-    // ── Error helpers ────────────────────────────────────────────────────
-    // Only treat backend response as usable JSON if it's a plain object.
-    // Anything else (HTML error pages, plain strings, arrays, null) is unsafe
-    // to display directly — we fall back to a clean, generic message instead.
     const isPlainObject = (val) =>
         typeof val === 'object' && val !== null && !Array.isArray(val)
 
@@ -200,8 +196,6 @@ export function useCareers() {
                 return
             }
 
-            // Response exists but isn't usable JSON (HTML error page, plain
-            // string, etc.) — never render this raw, always show a clean message.
             if (!isPlainObject(data) || looksLikeHtml(JSON.stringify(data))) {
                 const msg = genericMessageForStatus(status)
                 submitError.value = msg

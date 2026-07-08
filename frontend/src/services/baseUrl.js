@@ -11,4 +11,12 @@ export const API_ENDPOINTS = {
     CV_SUBMIT: '/api/employeeDashboard/submit-cv/',
     JOB_OPENINGS: '/api/employeeDashboard/job-openings/',
     GET_EMPLOYEES: 'api/employeeDashboard/get_employees/',
+    CV_SUBMIT: '/api/cv_management/submit-cv/',
+    CV_LIST: '/api/cv_management/cv-list/',
+    JOB_OPENINGS: '/api/cv_management/job-openings/',
+    GET_EMPLOYEES: 'api/employee_dashboard/get_employees/',
+    JOB_CREATE: '/api/cv_management/job-openings/create/',
+    JOB_ADMIN_LIST: '/api/cv_management/job-openings/',
+    JOB_PUBLIC_LIST: '/api/cv_management/job-openings/public/',
+    JOB_TYPES: '/api/cv_management/job-types/',
 };

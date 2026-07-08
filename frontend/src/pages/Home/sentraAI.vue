@@ -71,7 +71,7 @@
             <!-- Bot image -->
             <div class="relative w-full z-20 aspect-square max-w-sm mx-auto flex items-center justify-center overflow-visible">
               <img
-                  src="../assets/svg/sentra-bot.svg"
+                  src="../../assets/svg/sentra-bot.svg"
                   alt="Sentra AI call routing"
                   class="w-full h-[450px] object-contain drop-shadow-[var(--shadow-primary-dark)] relative z-10"
               />
@@ -154,7 +154,7 @@
           <div class="relative w-full">
             <div class="absolute inset-[6%_2%] rounded-full bg-glow-queue blur-[10px] pointer-events-none"></div>
             <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-borderDefault shadow-[var(--shadow-card)] overflow-hidden">
-              <img src="@/assets/svg/sentra-dashboard.svg" alt="Sentra AI scheduled calls overview dashboard"
+              <img src="../../assets/svg/sentra-dashboard.svg" alt="Sentra AI scheduled calls overview dashboard"
                    class="w-full h-auto rounded-[10px]" />
             </div>
           </div>
@@ -171,7 +171,7 @@
           <div class="relative w-full">
             <div class="absolute inset-[6%_2%] rounded-full bg-glow-live blur-[10px] pointer-events-none"></div>
             <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-borderDefault shadow-[var(--shadow-card)] overflow-hidden">
-              <img src="@/assets/svg/sentra-live-calls.svg" alt="Sentra AI live calls table"
+              <img src="../../assets/svg/sentra-live-calls.svg" alt="Sentra AI live calls table"
                    class="w-full h-auto rounded-[10px]" />
             </div>
           </div>
@@ -204,7 +204,7 @@
           <div class="relative w-full">
             <div class="absolute inset-[6%_2%] rounded-full bg-glow-queue blur-[10px] pointer-events-none"></div>
             <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-borderDefault shadow-[var(--shadow-card)] overflow-hidden">
-              <img src="@/assets/svg/sentra-call-queue.svg" alt="Sentra AI call queue"
+              <img src="../../assets/svg/sentra-call-queue.svg" alt="Sentra AI call queue"
                    class="w-full h-auto rounded-[10px]" />
             </div>
           </div>
@@ -221,7 +221,7 @@
           <div class="relative w-full">
             <div class="absolute inset-[6%_2%] rounded-full bg-glow-campaign blur-[10px] pointer-events-none"></div>
             <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-borderDefault shadow-[var(--shadow-card)] overflow-hidden">
-              <img src="@/assets/svg/sentra-campaigns.svg" alt="Sentra AI campaigns and bulk contacts"
+              <img src="../../assets/svg/sentra-campaigns.svg" alt="Sentra AI campaigns and bulk contacts"
                    class="w-full h-auto rounded-[10px]" />
             </div>
           </div>
@@ -254,7 +254,7 @@
           <div class="relative w-full">
             <div class="absolute inset-[6%_2%] rounded-full bg-glow-scheduler blur-[10px] pointer-events-none"></div>
             <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-borderDefault shadow-[var(--shadow-card)] overflow-hidden">
-              <img src="@/assets/svg/sentra-call-scheduler.svg" alt="Sentra AI call scheduler"
+              <img src="../../assets/svg/sentra-call-scheduler.svg" alt="Sentra AI call scheduler"
                    class="w-full h-auto rounded-[10px]" />
             </div>
           </div>
@@ -271,7 +271,7 @@
           <div class="relative w-full">
             <div class="absolute inset-[6%_2%] rounded-full bg-glow-analytics blur-[10px] pointer-events-none"></div>
             <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-borderDefault shadow-[var(--shadow-card)] overflow-hidden">
-              <img src="@/assets/svg/sentra-chatbot-analytics.svg" alt="Sentra AI analytics and token insights"
+              <img src="../../assets/svg/sentra-chatbot-analytics.svg" alt="Sentra AI analytics and token insights"
                    class="w-full h-auto rounded-[10px]" />
             </div>
           </div>
@@ -304,7 +304,7 @@
           <div class="relative w-full">
             <div class="absolute inset-[6%_2%] rounded-full bg-glow-team blur-[10px] pointer-events-none"></div>
             <div class="relative z-[2] p-[10px] rounded-2xl bg-white/95 border border-borderDefault shadow-[var(--shadow-card)] overflow-hidden">
-              <img src="@/assets/svg/sentra-team-workspace.svg" alt="Sentra AI team workspace"
+              <img src="../../assets/svg/sentra-team-workspace.svg" alt="Sentra AI team workspace"
                    class="w-full h-auto rounded-[10px]" />
             </div>
           </div>
@@ -363,7 +363,7 @@ import Navbar from '@/components/navbar.vue'
 import Footer from '@/components/footer.vue'
 import ShineButton from "@/components/ShineButton.vue";
 import sentraPlatformSvg from '@/assets/svg/sentra-platform.svg'
-import SentraFeatureList from '@/components/SentraFeatureList.vue'
+import SentraFeatureList from '@/components/sentraAI/SentraFeatureList.vue'
 import MobileAutoSlide from '@/components/MobileAutoSlide.vue'
 
 // Grid cell config

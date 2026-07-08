@@ -29,10 +29,18 @@
               @click="handleNavigation"
           >
             <img
+                v-if="!showCollapsed"
                 src="../assets/images/rasant-logo.png"
                 alt="Rasant Solutions"
                 class="object-contain transition-all"
                 :class="showCollapsed ? 'h-10 w-10' : 'h-11'"
+            />
+            <img
+                v-else
+                src="../../public/favicon.png"
+                alt="Rasant Solutions"
+                class="object-contain transition-all"
+                :class="showCollapsed ? 'h-11 w-11' : 'h-11'"
             />
           </router-link>
 

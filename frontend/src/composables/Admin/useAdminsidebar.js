@@ -1,58 +1,31 @@
-// composables/useAdminSidebar.js
+// composables/Admin/useAdminSidebar.js
 import { ref, computed, onMounted } from 'vue';
-import { fetchUserModules, getStoredModules, storeModules } from '../../services/adminsidebarApi.js';
+import { useSidebarStore } from '@/stores/sidebarStore.js';
 
 const isSidebarOpen = ref(false);
 const collapsed = ref(false);
 
 export function useAdminSidebar() {
-    const modules = ref([]);
-    const loading = ref(false);
-    const error = ref(null);
+    const sidebarStore = useSidebarStore();
     const dropdownStates = ref({});
 
+    const modules = computed(() => sidebarStore.modules);
+    const loading = computed(() => sidebarStore.isLoading);
+    const error = computed(() => sidebarStore.error);
 
-    // Fetch modules from API
     const loadModules = async () => {
-        loading.value = true;
-        error.value = null;
-
-        try {
-            // First, try to get from localStorage
-            const storedModules = getStoredModules();
-            if (storedModules && storedModules.length > 0) {
-                modules.value = storedModules;
-                loading.value = false;
-                return;
-            }
-
-            // If not in localStorage, fetch from API
-            const response = await fetchUserModules();
-            if (response.status && response.data) {
-                modules.value = response.data.modules || [];
-                // Store in localStorage for future use
-                storeModules(modules.value);
-            } else {
-                modules.value = [];
-            }
-        } catch (err) {
-            error.value = err.message || 'Failed to load modules';
-            console.error('Error in loadModules:', err);
-        } finally {
-            loading.value = false;
-        }
+        // Agar already store mein modules hain to dobara fetch mat karo
+        if (sidebarStore.hasModules) return;
+        await sidebarStore.fetchModules();
     };
 
-    // Organize modules by section
-    const companyModules = computed(() => {
+        const companyModules = computed(() => {
         const companyNames = ['Overview', 'Inbox', 'Employees', 'Inquiries', 'Jira'];
         const allModules = modules.value.filter(m => companyNames.includes(m.name.trim()));
 
-        // Find Employees module
         const employees = allModules.find(m => m.name.trim() === 'Employees');
 
         if (employees) {
-            // Treat these modules as Employees children
             const children = modules.value.filter(m => {
                 const name = m.name.trim();
                 return ['Dashboard', 'Attendance', 'Careers', 'Salaries'].includes(name);
@@ -82,12 +55,10 @@ export function useAdminSidebar() {
         return modules.value.filter(m => m.name === 'Manage Profile');
     });
 
-    // Toggle dropdown for nested menus
     const toggleDropdown = (moduleName) => {
         dropdownStates.value[moduleName] = !dropdownStates.value[moduleName];
     };
 
-    // Get route for a module
     const getModuleRoute = (moduleName) => {
         moduleName = moduleName.trim();
 
@@ -111,53 +82,37 @@ export function useAdminSidebar() {
         return routeMap[moduleName] || `/admin/${moduleName.toLowerCase().replace(/ /g, '-')}`;
     };
 
-    // Check if a module is active - FIXED VERSION
     const isActive = (moduleName, currentPath) => {
         const path = currentPath.toLowerCase();
         const trimmedName = moduleName.trim();
 
-        // Get the route for this module
         const modulePath = getModuleRoute(trimmedName).toLowerCase();
 
-        // Exact match or starts with path (for nested routes)
         if (path === modulePath || path.startsWith(modulePath + '/')) {
             return true;
         }
 
-        // Special case: When "Dashboard" is clicked under Employees
-        // The URL will be /admin/employees/dashboard
-        // We want both "Employees" and "Dashboard" to be highlighted
         if (trimmedName === 'Employees' && path === '/admin/employees/dashboard') {
             return true;
         }
-
         if (trimmedName === 'Dashboard' && path === '/admin/employees/dashboard') {
             return true;
         }
-
-        // Special case: When "Attendance" is clicked under Employees
         if (trimmedName === 'Employees' && path === '/admin/employees/attendance') {
             return true;
         }
-
         if (trimmedName === 'Attendance' && path === '/admin/employees/attendance') {
             return true;
         }
-
-        // Special case: When "Salaries" is clicked under Employees
         if (trimmedName === 'Employees' && path === '/admin/employees/salaries') {
             return true;
         }
-
         if (trimmedName === 'Salaries' && path === '/admin/employees/salaries') {
             return true;
         }
-
-        // Special case: When "Careers" is clicked
         if (trimmedName === 'Employees' && path === '/admin/career') {
             return true;
         }
-
         if (trimmedName === 'Careers' && path === '/admin/career') {
             return true;
         }
@@ -165,7 +120,6 @@ export function useAdminSidebar() {
         return false;
     };
 
-    // Get user role from localStorage
     const getUserRole = () => {
         try {
             const user = JSON.parse(localStorage.getItem('user') || '{}');
@@ -175,7 +129,6 @@ export function useAdminSidebar() {
         }
     };
 
-    // Load modules on mount
     onMounted(() => {
         loadModules();
     });

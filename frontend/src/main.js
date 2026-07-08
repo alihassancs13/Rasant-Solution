@@ -6,7 +6,7 @@ import './assets/main.css'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import Toast from 'vue-toastification';
 import 'vue-toastification/dist/index.css';
-import './fontAwesomeIcons/icon.js'
+import './plugins/icon.js'
 import { useLoginStore } from './stores/loginStore.js';
 window.addEventListener('storage', (event) => {
     const loginStore = useLoginStore();

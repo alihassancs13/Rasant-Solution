@@ -39,10 +39,10 @@
             <div class="absolute inset-0 rounded-full border-2 border-dashed border-accent-3/20 animate-[spin_30s_linear_infinite_reverse]"></div>
 
             <!-- Main SVG graphics base -->
-            <img src="../assets/svg/chatbot-bot.svg" alt="Chatbot Agent" class="relative z-10 w-full h-full object-contain" />
+            <img src="../../assets/svg/chatbot-bot.svg" alt="Chatbot Agent" class="relative z-10 w-full h-full object-contain" />
 
             <!-- Fixed Face: Made absolute, perfectly centered, and scaled down to fit the center circle -->
-            <img src="../assets/images/chatbot-face.png" alt="Chatbot face" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-[32%] object-contain rounded-full" />
+            <img src="../../assets/images/chatbot-face.png" alt="Chatbot face" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-20 w-[32%] object-contain rounded-full" />
           </div>
         </div>
       </div>
@@ -66,9 +66,9 @@
           <!-- Image — always second -->
           <div class="lg:col-span-7 order-2">
             <div class="p-4 bg-section-white rounded-2xl border border-borderDefault shadow-[var(--shadow-primary-dark)] flex items-center justify-center relative">
-              <img src="../assets/svg/chatbot-flow.svg" alt="Chatbot flow diagram" class="w-full h-auto max-w-2xl" title="Chatbot conversation flow" />
+              <img src="../../assets/svg/chatbot-flow.svg" alt="Chatbot flow diagram" class="w-full h-auto max-w-2xl" title="Chatbot conversation flow" />
               <div class="absolute top-[32%] left-[34.8%] w-[6.5%] max-w-[44px] aspect-square flex items-center justify-center">
-                <img src="../assets/images/chatbot-face.png" alt="Chatbot agent face avatar" class="w-6 h-6 mr-12 mb-12 pt-0 object-contain rounded-full bg-gradient-to-b from-accent-1/30 to-accent-2/20 shadow-inner" />
+                <img src="../../assets/images/chatbot-face.png" alt="Chatbot agent face avatar" class="w-6 h-6 mr-12 mb-12 pt-0 object-contain rounded-full bg-gradient-to-b from-accent-1/30 to-accent-2/20 shadow-inner" />
               </div>
             </div>
           </div>
@@ -107,14 +107,14 @@
           <div class="lg:col-span-7 order-2 lg:order-1">
             <div class="bg-section-white p-6 rounded-2xl shadow-xl border border-borderDefault space-y-6 max-w-lg mx-auto">
               <div class="w-full">
-                <img src="../assets/images/chatbot-analytics-tokens.png" alt="Token metrics and activity trends" class="w-full h-auto rounded-xl border border-borderDefault" />
+                <img src="../../assets/images/chatbot-analytics-tokens.png" alt="Token metrics and activity trends" class="w-full h-auto rounded-xl border border-borderDefault" />
               </div>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div class="p-2 border border-borderDefault rounded-xl bg-neutral-50/50">
-                  <img src="../assets/images/chatbot-token-distribution.png" alt="Token distribution pie chart" class="w-full h-auto" />
+                  <img src="../../assets/images/chatbot-token-distribution.png" alt="Token distribution pie chart" class="w-full h-auto" />
                 </div>
                 <div class="p-2 border border-borderDefault rounded-xl bg-neutral-50/50">
-                  <img src="../assets/images/chatbot-usage-overview.png" alt="Usage overview bar chart" class="w-full h-auto" />
+                  <img src="../../assets/images/chatbot-usage-overview.png" alt="Usage overview bar chart" class="w-full h-auto" />
                 </div>
               </div>
             </div>
@@ -158,7 +158,7 @@
               </div>
 
               <div class="relative w-80 h-100 mx-auto z-10 flex items-center justify-center">
-                <img src="../assets/svg/chatbot-messenger-bot.svg" alt="Chatbot with messages" class="w-full h-full object-contain drop-shadow-[var(--shadow-primary-dark)]" title="Chatbot agent messaging" />
+                <img src="../../assets/svg/chatbot-messenger-bot.svg" alt="Chatbot with messages" class="w-full h-full object-contain drop-shadow-[var(--shadow-primary-dark)]" title="Chatbot agent messaging" />
               </div>
 
             </div>
@@ -225,9 +225,9 @@
               <!-- Changed border-4 to border-2, opacity to /25 for a dull look, and sent it to the back with z-0 -->
               <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100%] h-[90%] rounded-3xl border-2 border-dashed border-accent-3/25 animate-[spin_35s_linear_infinite] z-0 pointer-events-none"></div>
 
-              <img src="../assets/svg/chatbot-capabilities.svg" alt="Chatbot capabilities diagram" class="w-full h-auto block relative z-10" title="Chatbot capabilities and integrations" />
+              <img src="../../assets/svg/chatbot-capabilities.svg" alt="Chatbot capabilities diagram" class="w-full h-auto block relative z-10" title="Chatbot capabilities and integrations" />
 
-              <img src="../assets/images/chatbot-face.png" alt="Chatbot face indicator" class="mt-3 rounded-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[20%] object-contain z-20" title="Chatbot center face view" />
+              <img src="../../assets/images/chatbot-face.png" alt="Chatbot face indicator" class="mt-3 rounded-full absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[20%] object-contain z-20" title="Chatbot center face view" />
 
             </div>
           </div>
@@ -308,8 +308,8 @@
 </template>
 
 <script setup>
-import Navbar from '../components/navbar.vue';
-import Footer from '../components/footer.vue';
+import Navbar from '../../components/navbar.vue';
+import Footer from '../../components/footer.vue';
 import { useRouter } from 'vue-router';
 import ShineButton from "@/components/ShineButton.vue";
 import MobileAutoSlide from '@/components/MobileAutoSlide.vue';
