@@ -1,5 +1,16 @@
 import { defineStore } from 'pinia';
-import { jobAPI } from '../services/cvApi.js';
+import axios from 'axios';
+import { BASE_URL, API_ENDPOINTS } from '../services/baseUrl.js';
+
+const getAuthToken = () => localStorage.getItem('accessToken');
+
+const apiClient = axios.create({ baseURL: BASE_URL });
+
+apiClient.interceptors.request.use((config) => {
+    const token = getAuthToken();
+    if (token) config.headers.Authorization = `Bearer ${token}`;
+    return config;
+});
 
 export const useJobStore = defineStore('job', {
     state: () => ({
@@ -11,20 +22,27 @@ export const useJobStore = defineStore('job', {
     }),
 
     getters: {
+        getAdminJobs: (state) => state.adminJobs,
+        getPublicJobs: (state) => state.publicJobs,
         getJobTypes: (state) => state.jobTypes,
     },
 
     actions: {
         async createJob(jobData) {
             this.isLoading = true;
-            this.error = null;
             try {
-                const response = await jobAPI.create(jobData);
-                this.adminJobs.unshift(response.data);
-                return { success: true, data: response.data };
-            } catch (error) {
-                this.error = error.response?.data?.message || 'Failed to create job';
-                return { success: false, error: this.error };
+                const response = await apiClient.post(API_ENDPOINTS.JOB_CREATE, jobData);
+                return response;
+            } finally {
+                this.isLoading = false;
+            }
+        },
+
+        async updateJob(id, jobData) {
+            this.isLoading = true;
+            try {
+                const response = await apiClient.put(`/api/cv_management/job-openings/${id}/update/`, jobData);
+                return response;
             } finally {
                 this.isLoading = false;
             }
@@ -32,14 +50,10 @@ export const useJobStore = defineStore('job', {
 
         async fetchAdminJobs() {
             this.isLoading = true;
-            this.error = null;
             try {
-                const response = await jobAPI.getAdminJobs();
-                this.adminJobs = response.data;
-                return { success: true };
-            } catch (error) {
-                this.error = error.response?.data?.message || 'Failed to fetch jobs';
-                return { success: false, error: this.error };
+                const response = await apiClient.get(API_ENDPOINTS.JOB_ADMIN_LIST);
+                this.adminJobs = response.data?.data || [];
+                return response;
             } finally {
                 this.isLoading = false;
             }
@@ -47,44 +61,24 @@ export const useJobStore = defineStore('job', {
 
         async fetchPublicJobs() {
             this.isLoading = true;
-            this.error = null;
             try {
-                const response = await jobAPI.getPublicJobs();
-                this.publicJobs = response.data;
-                return { success: true };
-            } catch (error) {
-                this.error = error.response?.data?.message || 'Failed to fetch public jobs';
-                return { success: false, error: this.error };
+                const response = await apiClient.get(API_ENDPOINTS.JOB_PUBLIC_LIST);
+                this.publicJobs = response.data?.data || [];
+                return response;
             } finally {
                 this.isLoading = false;
             }
         },
 
         async fetchJobTypes() {
-            try {
-                const response = await jobAPI.getJobTypes();
-                this.jobTypes = response.data;
-                return { success: true };
-            } catch (error) {
-                this.error = error.response?.data?.message || 'Failed to fetch job types';
-                return { success: false, error: this.error };
-            }
+            const response = await apiClient.get(API_ENDPOINTS.JOB_TYPES);
+            this.jobTypes = response.data;
+            return response;
         },
 
-        async updateJob(id, jobData) {
-            try {
-                const response = await jobAPI.update(id, jobData);
-                const index = this.adminJobs.findIndex((j) => j.id === id);
-                if (index !== -1) {
-                    this.adminJobs[index] = { ...this.adminJobs[index], ...response.data };
-                }
-                return { success: true, data: response.data };
-            } catch (error) {
-                this.error = error.response?.data?.message || 'Failed to update job';
-                return { success: false, error: this.error };
-            }
+        async deleteJob(id) {
+            await apiClient.delete(`/api/cv_management/job-openings/${id}/delete/`);
+            this.adminJobs = this.adminJobs.filter((j) => j.id !== id);
         },
-
-
     },
 });

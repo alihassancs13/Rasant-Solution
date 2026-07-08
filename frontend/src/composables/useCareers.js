@@ -1,5 +1,5 @@
 import { reactive, ref, onMounted } from 'vue'
-import { cvAPI } from '@/services/cvApi.js'
+import { useCvStore } from '@/stores/cvStore.js'
 
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 const ALLOWED_FILE_TYPES = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document']
@@ -7,6 +7,8 @@ const ALLOWED_EXTENSIONS = ['.pdf', '.doc', '.docx']
 const MAX_FILE_SIZE = 5 * 1024 * 1024
 
 export function useCareers() {
+    const cvStore = useCvStore()
+
     const isModalOpen    = ref(false)
     const submitSuccess  = ref(false)
     const isDragging     = ref(false)
@@ -177,7 +179,7 @@ export function useCareers() {
             payload.append('cv_file',          formData.file)
             if (formData.coverLetter) payload.append('cover_letter', formData.coverLetter)
 
-            await cvAPI.submitCV(payload)
+            await cvStore.submitCV(payload)
 
             submitSuccess.value = true
             pushToast('success', 'Your CV has been submitted successfully!')

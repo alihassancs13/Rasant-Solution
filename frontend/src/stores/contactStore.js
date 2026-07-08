@@ -1,6 +1,26 @@
 import { defineStore } from 'pinia';
-import { contactAPI } from '../services/cvApi.js';       // admin: getAll/delete
-import { contactAPI as publicContactAPI } from '../services/contactApi.js'; // public: sendMessage
+import axios from 'axios';
+import { BASE_URL, API_ENDPOINTS } from '../services/baseUrl.js';
+
+const getAuthToken = () => localStorage.getItem('accessToken');
+
+// Admin calls need auth
+const apiClient = axios.create({
+    baseURL: BASE_URL,
+    headers: { 'Content-Type': 'application/json' },
+});
+
+apiClient.interceptors.request.use((config) => {
+    const token = getAuthToken();
+    if (token) config.headers.Authorization = `Bearer ${token}`;
+    return config;
+});
+
+// Public contact form submit — no auth needed
+const publicClient = axios.create({
+    baseURL: BASE_URL,
+    headers: { 'Content-Type': 'application/json' },
+});
 
 export const useContactStore = defineStore('contact', {
     state: () => ({
@@ -16,12 +36,12 @@ export const useContactStore = defineStore('contact', {
     },
 
     actions: {
-        // Admin: fetch all contact messages
+        // ── Admin: fetch all contact messages ──────────────
         async fetchMessages() {
             this.isLoading = true;
             this.error = null;
             try {
-                const response = await contactAPI.getAll();
+                const response = await apiClient.get(API_ENDPOINTS.CONTACT);
                 this.messages = response.data;
                 return { success: true };
             } catch (error) {
@@ -32,9 +52,10 @@ export const useContactStore = defineStore('contact', {
             }
         },
 
+        // ── Admin: delete a message ─────────────────────────
         async deleteMessage(id) {
             try {
-                await contactAPI.delete(id);
+                await apiClient.delete(`${API_ENDPOINTS.CONTACT}${id}/`);
                 this.messages = this.messages.filter((m) => m.id !== id);
                 return { success: true };
             } catch (error) {
@@ -42,16 +63,11 @@ export const useContactStore = defineStore('contact', {
                 return { success: false, error: this.error };
             }
         },
-
         async submitContactForm(data) {
             this.isSubmitting = true;
-            this.error = null;
             try {
-                const response = await publicContactAPI.sendMessage(data);
-                return { success: true, data: response.data };
-            } catch (error) {
-                this.error = error.response?.data?.message || 'Failed to send message';
-                return { success: false, error: this.error };
+                const response = await publicClient.post(API_ENDPOINTS.CONTACT, data);
+                return response;
             } finally {
                 this.isSubmitting = false;
             }

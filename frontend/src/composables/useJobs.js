@@ -123,7 +123,6 @@ export function useJobs() {
         createJob,
         resetForm,
         updateJob,
-        deleteJob,
         adminJobs,
         publicJobs,
         loadingAdmin,

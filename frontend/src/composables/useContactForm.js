@@ -1,10 +1,11 @@
 import { ref, reactive, nextTick } from 'vue'
-import { contactAPI } from '@/services/contactApi.js'
+import { useContactStore } from '@/stores/contactStore.js'
 
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 const PHONE_REGEX = /^[0-9+\-\s()]{7,15}$/
 
 export function useContact() {
+    const contactStore = useContactStore()
     const loading = ref(false)
 
     const form = ref({
@@ -65,9 +66,6 @@ export function useContact() {
     }
 
     // ── Error helpers ────────────────────────────────────────────────────
-    // Only treat backend response as usable JSON if it's a plain object.
-    // Anything else (HTML error pages, plain strings, arrays, null) is unsafe
-    // to display directly — fall back to a clean, generic message instead.
     const isPlainObject = (val) =>
         typeof val === 'object' && val !== null && !Array.isArray(val)
 
@@ -82,8 +80,7 @@ export function useContact() {
         return 'Something went wrong. Please try again.'
     }
 
-    // ── Body scroll lock — prevents ANY scroll movement (incl. keyboard
-    //    dismiss jump on mobile) while submit is in progress ────────────
+    // ── Body scroll lock ────────────────────────────────────────────────
     const lockBodyScroll = () => {
         savedScrollY = window.scrollY
         const scrollBarWidth = window.innerWidth - document.documentElement.clientWidth
@@ -95,7 +92,6 @@ export function useContact() {
         body.style.right = '0'
         body.style.width = '100%'
 
-        // prevent the tiny horizontal jiggle caused by scrollbar disappearing
         if (scrollBarWidth > 0) {
             body.style.paddingRight = `${scrollBarWidth}px`
         }
@@ -110,7 +106,6 @@ export function useContact() {
         body.style.width = ''
         body.style.paddingRight = ''
 
-        // restore exact scroll position instantly, no animation
         window.scrollTo({ top: savedScrollY, behavior: 'instant' })
     }
 
@@ -121,8 +116,6 @@ export function useContact() {
             event.stopPropagation()
         }
 
-        // Blur first so the keyboard starts closing while the page is still
-        // free to move — then immediately lock the body before it can jump.
         if (document.activeElement) {
             document.activeElement.blur()
         }
@@ -139,7 +132,7 @@ export function useContact() {
         loading.value = true
 
         try {
-            await contactAPI.sendMessage(form.value)
+            await contactStore.submitContactForm(form.value)
 
             // Reset form
             form.value = { full_name: '', email: '', phone: '', message: '' }
@@ -196,7 +189,6 @@ export function useContact() {
             }
         } finally {
             loading.value = false
-            // wait for DOM (label reset) to settle, then unlock
             await nextTick()
             unlockBodyScroll()
         }

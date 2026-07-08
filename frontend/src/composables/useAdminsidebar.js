@@ -14,7 +14,6 @@ export function useAdminSidebar() {
     const error = computed(() => sidebarStore.error);
 
     const loadModules = async () => {
-        // Agar already store mein modules hain to dobara fetch mat karo
         if (sidebarStore.hasModules) return;
         await sidebarStore.fetchModules();
     };

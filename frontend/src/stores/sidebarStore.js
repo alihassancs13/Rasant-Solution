@@ -1,9 +1,23 @@
 import { defineStore } from 'pinia';
-import { fetchUserModules, getStoredModules, storeModules, clearStoredModules } from '../services/adminsidebarApi.js';
+import axios from 'axios';
+import { BASE_URL, API_ENDPOINTS } from '../services/baseUrl.js';
+
+const getAuthToken = () => localStorage.getItem('accessToken');
+
+const apiClient = axios.create({
+    baseURL: BASE_URL,
+    headers: { 'Content-Type': 'application/json' },
+});
+
+apiClient.interceptors.request.use((config) => {
+    const token = getAuthToken();
+    if (token) config.headers.Authorization = `Bearer ${token}`;
+    return config;
+});
 
 export const useSidebarStore = defineStore('sidebar', {
     state: () => ({
-        modules: getStoredModules() || [],
+        modules: JSON.parse(localStorage.getItem('user_modules')) || [],
         isLoading: false,
         error: null,
     }),
@@ -18,10 +32,10 @@ export const useSidebarStore = defineStore('sidebar', {
             this.isLoading = true;
             this.error = null;
             try {
-                const data = await fetchUserModules();
-                this.modules = data;
-                storeModules(data);
-                return { success: true, data };
+                const response = await apiClient.get(API_ENDPOINTS.USER_MODULES);
+                this.modules = response.data;
+                localStorage.setItem('user_modules', JSON.stringify(response.data));
+                return { success: true, data: response.data };
             } catch (error) {
                 this.error = error.response?.data?.message || 'Failed to fetch modules';
                 return { success: false, error: this.error };
@@ -31,14 +45,14 @@ export const useSidebarStore = defineStore('sidebar', {
         },
 
         loadFromStorage() {
-            const modules = getStoredModules();
+            const modules = JSON.parse(localStorage.getItem('user_modules'));
             if (modules) this.modules = modules;
             return modules;
         },
 
         clearModules() {
             this.modules = [];
-            clearStoredModules();
+            localStorage.removeItem('user_modules');
         },
     },
 });

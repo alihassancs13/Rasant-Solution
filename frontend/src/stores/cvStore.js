@@ -1,5 +1,16 @@
 import { defineStore } from 'pinia';
-import { cvAPI } from '../services/cvApi.js';
+import axios from 'axios';
+import { BASE_URL, API_ENDPOINTS } from '../services/baseUrl.js';
+
+const getAuthToken = () => localStorage.getItem('accessToken');
+
+const apiClient = axios.create({ baseURL: BASE_URL });
+
+apiClient.interceptors.request.use((config) => {
+    const token = getAuthToken();
+    if (token) config.headers.Authorization = `Bearer ${token}`;
+    return config;
+});
 
 export const useCvStore = defineStore('cv', {
     state: () => ({
@@ -18,13 +29,11 @@ export const useCvStore = defineStore('cv', {
     actions: {
         async submitCV(formData) {
             this.isSubmitting = true;
-            this.error = null;
             try {
-                const response = await cvAPI.submitCV(formData);
-                return { success: true, data: response.data };
-            } catch (error) {
-                this.error = error.response?.data?.message || 'CV submission failed';
-                return { success: false, error: this.error };
+                const response = await apiClient.post(API_ENDPOINTS.CV_SUBMIT, formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                });
+                return response;
             } finally {
                 this.isSubmitting = false;
             }
@@ -34,8 +43,9 @@ export const useCvStore = defineStore('cv', {
             this.isLoading = true;
             this.error = null;
             try {
-                const response = await cvAPI.getAll();
-                this.cvList = response.data;
+                const response = await apiClient.get(API_ENDPOINTS.CV_LIST);
+                const raw = response?.data?.data ?? response?.data ?? [];
+                this.cvList = Array.isArray(raw) ? raw : [];
                 return { success: true };
             } catch (error) {
                 this.error = error.response?.data?.message || 'Failed to fetch CVs';
@@ -47,7 +57,7 @@ export const useCvStore = defineStore('cv', {
 
         async deleteCV(id) {
             try {
-                await cvAPI.delete(id);
+                await apiClient.delete(`/api/cv_management/cv/${id}/delete/`);
                 this.cvList = this.cvList.filter((cv) => cv.id !== id);
                 return { success: true };
             } catch (error) {
@@ -58,7 +68,9 @@ export const useCvStore = defineStore('cv', {
 
         async downloadCV(id, filename = 'cv.pdf') {
             try {
-                const response = await cvAPI.download(id);
+                const response = await apiClient.get(`/api/cv_management/cv/${id}/download/`, {
+                    responseType: 'blob',
+                });
                 const url = window.URL.createObjectURL(new Blob([response.data]));
                 const link = document.createElement('a');
                 link.href = url;
@@ -76,7 +88,7 @@ export const useCvStore = defineStore('cv', {
 
         async updateStatus(id, data) {
             try {
-                const response = await cvAPI.updateStatus(id, data);
+                const response = await apiClient.put(`/api/cv_management/cv/${id}/status/`, data);
                 const index = this.cvList.findIndex((cv) => cv.id === id);
                 if (index !== -1) {
                     this.cvList[index] = { ...this.cvList[index], ...response.data };

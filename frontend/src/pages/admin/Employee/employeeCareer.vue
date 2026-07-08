@@ -1,11 +1,20 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import AdminSidebar from '../../../components/adminSidebar.vue'
 import TopHeader from '../../../components/header.vue'
 import StatCard from '../../../components/statCard.vue'
 import { useEmployeeCareer } from '../../../composables/useEmployeeCareer.js'
+import { useJobs } from '../../../composables/useJobs.js'
+import { useJobStore } from '../../../stores/jobStore.js'
+import { useCvStore } from '../../../stores/cvStore.js'
+import { useToast } from '../../../composables/useToast.js'
+const { showToast } = useToast()
+
+const jobStore = useJobStore()
+const cvStore = useCvStore()
 
 const activeTab = ref('site-openings')
+const jobTypes = ref([])
 
 const tabs = [
   { key: 'site-openings', label: 'Site openings', icon: ['fas', 'globe'] },
@@ -13,104 +22,140 @@ const tabs = [
   { key: 'cv-applications', label: 'CV applications', icon: ['fas', 'desktop'] }
 ]
 
-const jobs = ref([
-  {
-    id: 'JOB-001',
-    role: 'Senior React Developer',
-    type: 'Full-time',
-    department: 'Engineering',
-    posted: '28 May 2025',
-    status: 'Published'
-  },
-  {
-    id: 'JOB-002',
-    role: 'AI / ML Engineer',
-    type: 'Remote',
-    department: 'Product',
-    posted: '2 Jun 2025',
-    status: 'Published'
-  }
-])
+const {
+  formData, formErrors, isClosed, isSubmitting,
+  toggleStatus, createJob, resetForm,
+  adminJobs, loadingAdmin, fetchAdminJobs,
+  updateJob,
+} = useJobs()
 
-const statusClasses = (status) => {
-  if (status === 'Published') return 'bg-success-subtle text-success'
-  if (status === 'Draft') return 'bg-surface-alt text-text-secondary'
+const statusClasses = (statusName) => {
+  if (statusName === 'Published') return 'bg-success-subtle text-success'
+  if (statusName === 'Draft') return 'bg-surface-alt text-text-secondary'
   return 'bg-warning-subtle text-warning'
 }
 
-// New job form state
-const newJob = ref({
-  title: '',
-  jobType: 'Full-time',
-  department: '',
-  location: '',
-  salaryRange: '',
-  description: '',
-  requirements: '',
-  publishImmediately: true
-})
+const publishedCount = computed(
+    () => adminJobs.value.filter((j) => j.status_name === 'Published').length
+)
+const draftCount = computed(
+    () => adminJobs.value.filter((j) => j.status_name === 'Draft').length
+)
 
-const jobTypeOptions = ['Full-time', 'Part-time', 'Remote', 'Contract', 'Internship']
+// ── Custom Job Type Dropdown ───────────────────────────────────
+const isJobTypeOpen = ref(false)
 
-const clearJobForm = () => {
-  newJob.value = {
-    title: '',
-    jobType: 'Full-time',
-    department: '',
-    location: '',
-    salaryRange: '',
-    description: '',
-    requirements: '',
-    publishImmediately: true
+const getJobTypeName = (id) => {
+  if (!id) return 'Select type'
+  const type = jobTypes.value.find(t => t.id === id)
+  return type ? type.name : 'Select type'
+}
+
+const selectJobType = (id) => {
+  formData.job_type = id
+  isJobTypeOpen.value = false
+}
+
+const fetchJobTypes = async () => {
+  try {
+    await jobStore.fetchJobTypes()
+    jobTypes.value = jobStore.jobTypes || []
+  } catch (err) {
+    console.error('Job types fetch error:', err)
+    showToast('Failed to load job types.', 'error')
+    jobTypes.value = []
   }
 }
 
-const saveJobPost = () => {
-  jobs.value.unshift({
-    id: `JOB-${String(jobs.value.length + 1).padStart(3, '0')}`,
-    role: newJob.value.title || 'Untitled role',
-    type: newJob.value.jobType,
-    department: newJob.value.department || '—',
-    posted: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }),
-    status: newJob.value.publishImmediately ? 'Published' : 'Draft'
-  })
-  clearJobForm()
-  activeTab.value = 'site-openings'
+// createJob/updateJob composable (useJobs.js) already shows a toast internally.
+// Here we only handle page-level side effects (tab switch, list refresh) — no duplicate toast.
+const handleCreateJob = async () => {
+  const created = await createJob()
+  if (created) {
+    await fetchAdminJobs()
+    activeTab.value = 'site-openings'
+  }
 }
 
-// ─── CV Applications — real data from backend ───────────────────────
+const handleCloseJob = async (job) => {
+  const updated = await updateJob(job.id, { status: 3 })
+  if (updated) {
+    await fetchAdminJobs()
+  }
+}
+
+onMounted(() => {
+  fetchAdminJobs()
+  fetchJobTypes()
+})
+
+// ─── CV Applications ───────────────────────────────────────────
+// useEmployeeCareer() already calls fetchCVSubmissions() internally on mount,
+// so we don't call it again here — avoids duplicate fetch + duplicate error banner/toast.
 const {
   cvSubmissions, cvLoading, cvError, cvSearchQuery,
   fetchCVSubmissions, deleteCV, filteredCVs,
-  formatDate, initials, viewCV,
+  formatDate, initials,
 } = useEmployeeCareer()
 
 const selectedApplicantId = ref(null)
 
-// Keep selection valid once real data arrives
+// ─── Download CV (store handles blob + auto-download, single toast) ───
+const downloadCV = async (applicant) => {
+  const result = await cvStore.downloadCV(applicant.id, `CV_${applicant.full_name.replace(/\s/g, '_')}.pdf`)
+  if (result.success) {
+    showToast('CV downloaded successfully.', 'success')
+  } else {
+    showToast(result.error || 'Failed to download CV.', 'error')
+  }
+}
+
+// ─── Update CV Status (store, single toast) ────────────────────
+const updateCVStatus = async (applicantId, status) => {
+  const statusMap = { 'New': 1, 'Reviewed': 2, 'Shortlisted': 3, 'Rejected': 4 }
+  const result = await cvStore.updateStatus(applicantId, { application_status: statusMap[status] })
+  if (result.success) {
+    showToast('CV status updated successfully.', 'success')
+  } else {
+    showToast(result.error || 'Failed to update CV status.', 'error')
+  }
+  await fetchCVSubmissions()
+}
+
+// ─── Delete CV (composable already toasts, no duplicate here) ─────
+const removeApplicant = async (id) => {
+  if (!confirm('Are you sure you want to delete this CV submission?')) return
+  await deleteCV(id)
+  await fetchCVSubmissions()
+  ensureSelection()
+}
+
 const selectedApplicant = computed(() => {
   if (!filteredCVs.value.length) return null
   return filteredCVs.value.find(a => a.id === selectedApplicantId.value) || filteredCVs.value[0]
 })
 
-// Auto-select the first applicant whenever the list changes and nothing is selected
 const ensureSelection = () => {
   if (filteredCVs.value.length && !filteredCVs.value.some(a => a.id === selectedApplicantId.value)) {
-    selectedApplicantId.value = filteredCVs.value[0].id
+    selectedApplicantId.value = filteredCVs.value[0]?.id
   }
 }
 
 const statusOptions = ['New', 'Reviewed', 'Shortlisted', 'Rejected']
-
-// Backend model doesn't track a review status yet — keep it locally per id
-// so the dropdown still works without breaking anything.
 const localStatusMap = ref({})
+
 const applicantStatus = computed({
-  get: () => localStatusMap.value[selectedApplicant.value?.id] || 'New',
-  set: (val) => {
-    if (selectedApplicant.value) {
-      localStatusMap.value[selectedApplicant.value.id] = val
-    }
+  get: () => {
+    const applicant = selectedApplicant.value
+    if (!applicant) return 'New'
+    const statusMap = { 1: 'New', 2: 'Reviewed', 3: 'Shortlisted', 4: 'Rejected' }
+    return localStatusMap.value[applicant.id] || statusMap[applicant.application_status] || 'New'
+  },
+  set: async (val) => {
+    const applicant = selectedApplicant.value
+    if (!applicant) return
+    localStatusMap.value[applicant.id] = val
+    await updateCVStatus(applicant.id, val)
   }
 })
 
@@ -123,14 +168,40 @@ const avatarPalette = [
 ]
 const avatarStyle = (id) => avatarPalette[id % avatarPalette.length]
 
-const removeApplicant = async (id) => {
-  await deleteCV(id)
+watch(filteredCVs, (newCVs) => {
+  if (newCVs?.length) {
+    newCVs.forEach(cv => {
+      if (!localStatusMap.value[cv.id]) {
+        const statusMap = { 1: 'New', 2: 'Reviewed', 3: 'Shortlisted', 4: 'Rejected' }
+        localStatusMap.value[cv.id] = statusMap[cv.application_status] || 'New'
+      }
+    })
+  }
   ensureSelection()
+}, { immediate: true })
+
+const sendEmail = async (email) => {
+  showToast(`Email sent to ${email}`, 'success')
 }
 
-fetchCVSubmissions().then(ensureSelection)
-</script>
+const handleViewCV = (applicant) => {
+  downloadCV(applicant)
+}
 
+// Close job-type dropdown when clicking outside
+const closeDropdown = (event) => {
+  if (isJobTypeOpen.value) {
+    const dropdown = document.getElementById('job-type-dropdown')
+    if (dropdown && !dropdown.contains(event.target)) {
+      isJobTypeOpen.value = false
+    }
+  }
+}
+
+onMounted(() => {
+  document.addEventListener('click', closeDropdown)
+})
+</script>
 <template>
   <div class="flex h-screen bg-surface">
     <!-- Sidebar -->
@@ -142,11 +213,12 @@ fetchCVSubmissions().then(ensureSelection)
         <TopHeader userName="System Admin" role="admin" :notificationCount="3" />
       </div>
 
-      <main class="flex-1 overflow-y-auto overflow-x-hidden px-3 sm:px-4 pb-4 space-y-4">        <!-- Stat Cards -->
+      <main class="flex-1 overflow-y-auto overflow-x-hidden px-3 sm:px-4 pb-4 space-y-4">
+        <!-- Stat Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <StatCard
               label="Live on Site"
-              :value="2"
+              :value="publishedCount"
               subtitle="Published jobs"
               :icon="['fas', 'globe']"
               color="orange"
@@ -162,7 +234,7 @@ fetchCVSubmissions().then(ensureSelection)
 
           <StatCard
               label="Draft Posts"
-              :value="0"
+              :value="draftCount"
               subtitle="Not yet public"
               :icon="['fas', 'pen-to-square']"
               color="blue"
@@ -186,9 +258,9 @@ fetchCVSubmissions().then(ensureSelection)
                 v-for="tab in tabs"
                 :key="tab.key"
                 @click="activeTab = tab.key"
-                class="flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold  duration-200 cursor-pointer whitespace-nowrap"
+                class="flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold duration-200 cursor-pointer whitespace-nowrap"
                 :class="activeTab === tab.key ? 'bg-linear-to-r from-[#2F6FC4] via-[#3F7FD2] to-[#4A88D8] text-white shadow-md'
-           : 'text-gray-500 hover:bg-blue-50 hover:text-[#2F6FC4]'"
+            : 'text-gray-500 hover:bg-blue-50 hover:text-[#2F6FC4]'"
             >
               <font-awesome-icon :icon="tab.icon" class="w-3.5 h-3.5 flex-shrink-0" />
               {{ tab.label }}
@@ -199,30 +271,30 @@ fetchCVSubmissions().then(ensureSelection)
 
         <!-- Jobs Cards -->
         <div v-if="activeTab === 'site-openings'" class="space-y-3">
+          <div v-if="loadingAdmin" class="text-center py-10 text-text-muted text-sm">Loading jobs...</div>
+
           <div
-              v-for="job in jobs"
+              v-for="job in adminJobs"
               :key="job.id"
               class="bg-white border border-border rounded-xl shadow-sm p-4 sm:p-5 hover:shadow-md transition-shadow"
           >
             <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-              <!-- Left: Role info -->
               <div class="min-w-0 flex-1">
                 <div class="flex items-center gap-2 flex-wrap">
-                  <h3 class="font-semibold text-text-primary">{{ job.role }}</h3>
+                  <h3 class="font-semibold text-text-primary">{{ job.job_title }}</h3>
                   <span
                       class="text-[11px] font-semibold px-2.5 py-0.5 rounded-full shrink-0"
-                      :class="statusClasses(job.status)"
+                      :class="statusClasses(job.status_name)"
                   >
-                    {{ job.status }}
+                    {{ job.status_name }}
                   </span>
                 </div>
-                <p class="text-xs text-text-muted mt-0.5">{{ job.id }}</p>
+                <p class="text-xs text-text-muted mt-0.5">JOB-{{ String(job.id).padStart(3, '0') }}</p>
 
-                <!-- Meta row -->
                 <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 mt-3 text-sm text-text-secondary">
                   <span class="flex items-center gap-1.5">
                     <font-awesome-icon :icon="['fas', 'briefcase']" class="w-3 h-3 text-text-muted" />
-                    {{ job.type }}
+                    {{ job.job_type_name }}
                   </span>
                   <span class="flex items-center gap-1.5">
                     <font-awesome-icon :icon="['fas', 'building']" class="w-3 h-3 text-text-muted" />
@@ -230,28 +302,27 @@ fetchCVSubmissions().then(ensureSelection)
                   </span>
                   <span class="flex items-center gap-1.5">
                     <font-awesome-icon :icon="['fas', 'calendar']" class="w-3 h-3 text-text-muted" />
-                    {{ job.posted }}
+                    {{ formatDate(job.created_at) }}
                   </span>
                 </div>
               </div>
 
-              <!-- Right: Actions -->
               <div class="flex items-center gap-2 shrink-0 sm:self-start">
-                <button class="flex-1 sm:flex-none w-9 h-9 flex items-center justify-center rounded-lg bg-white border border-border text-text-secondary hover:bg-surface transition">
+                <button
+                    @click="handleCloseJob(job)"
+                    class="flex-1 sm:flex-none w-9 h-9 flex items-center justify-center rounded-lg bg-white border border-border text-text-secondary hover:bg-surface transition"
+                    title="Mark as Closed"
+                >
                   <font-awesome-icon :icon="['fas', 'xmark']" class="w-3.5 h-3.5" />
                 </button>
                 <button class="flex-1 sm:flex-none w-9 h-9 flex items-center justify-center rounded-lg bg-white border border-secondary-subtle-border text-secondary hover:bg-secondary-subtle transition">
                   <font-awesome-icon :icon="['fas', 'arrow-up-right-from-square']" class="w-3.5 h-3.5" />
                 </button>
-                <button class="flex-1 sm:flex-none w-9 h-9 flex items-center justify-center rounded-lg bg-danger-subtle text-danger hover:bg-danger-hover transition">
-                  <font-awesome-icon :icon="['fas', 'trash']" class="w-3.5 h-3.5" />
-                </button>
               </div>
             </div>
           </div>
 
-          <!-- Empty state -->
-          <div v-if="jobs.length === 0" class="text-center py-16 bg-white border border-border rounded-xl">
+          <div v-if="!loadingAdmin && adminJobs.length === 0" class="text-center py-16 bg-white border border-border rounded-xl">
             <div class="w-12 h-12 rounded-full bg-surface-alt flex items-center justify-center mx-auto mb-3">
               <font-awesome-icon :icon="['fas', 'globe']" class="text-text-muted text-lg" />
             </div>
@@ -263,7 +334,7 @@ fetchCVSubmissions().then(ensureSelection)
         <!-- Create Job Opening Form -->
         <div
             v-if="activeTab === 'post-job'"
-            class="relative bg-gradient-to-b from-white to-accent-subtle border border-border rounded-xl shadow-sm overflow-hidden p-4 sm:p-6"
+            class="relative bg-gradient-to-b from-white to-accent-subtle border border-border rounded-xl shadow-sm overflow-visible p-4 sm:p-6"
         >
           <!-- Top accent gradient bar -->
           <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-teal-400 via-primary to-secondary"></div>
@@ -271,107 +342,141 @@ fetchCVSubmissions().then(ensureSelection)
           <h2 class="text-lg font-bold text-text-primary">Create job opening</h2>
           <p class="text-sm text-text-muted mt-0.5">Select job type and details — publish immediately or save as draft.</p>
 
-          <form class="mt-6" @submit.prevent="saveJobPost">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5">
+          <form class="mt-6 w-full max-w-full" @submit.prevent="handleCreateJob">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5 w-full">
               <!-- Job Title -->
-              <div>
+              <div class="w-full min-w-0">
                 <label class="block text-[11px] font-semibold text-text-muted tracking-wide uppercase mb-1.5">Job Title</label>
                 <input
-                    v-model="newJob.title"
+                    v-model="formData.job_title"
                     type="text"
                     placeholder="e.g. Senior React Developer"
-                    class="w-full px-3.5 py-2.5 text-sm bg-surface border border-border rounded-lg placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    class="w-full min-w-0 px-3.5 py-2.5 text-sm bg-surface border border-border rounded-lg placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                 />
+                <p v-if="formErrors.job_title" class="text-xs text-danger mt-1">{{ formErrors.job_title }}</p>
               </div>
 
-              <!-- Job Type -->
-              <div>
+              <!-- Job Type - Custom Dropdown -->
+              <div class="w-full min-w-0 relative" id="job-type-dropdown">
                 <label class="block text-[11px] font-semibold text-text-muted tracking-wide uppercase mb-1.5">Job Type</label>
-                <select
-                    v-model="newJob.jobType"
-                    class="w-full px-3.5 py-2.5 text-sm bg-surface border border-border rounded-lg text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-                >
-                  <option v-for="option in jobTypeOptions" :key="option" :value="option">{{ option }}</option>
-                </select>
+                <div class="relative">
+                  <button
+                      @click="isJobTypeOpen = !isJobTypeOpen"
+                      type="button"
+                      class="w-full min-w-0 max-w-full px-3.5 py-2.5 text-base sm:text-sm bg-white border border-border rounded-lg text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary flex items-center justify-between hover:bg-gray-50 transition-colors"
+                  >
+                    <span class="truncate">{{ getJobTypeName(formData.job_type) }}</span>
+                    <font-awesome-icon
+                        :icon="['fas', 'chevron-down']"
+                        class="text-text-muted w-3 h-3 flex-shrink-0 ml-2 transition-transform"
+                        :class="{ 'rotate-180': isJobTypeOpen }"
+                    />
+                  </button>
+
+                  <!-- Dropdown menu -->
+                  <div
+                      v-if="isJobTypeOpen"
+                      class="absolute z-50 w-full mt-1 bg-white border border-border rounded-lg shadow-lg max-h-60 overflow-y-auto"
+                  >
+                    <div
+                        v-for="type in jobTypes"
+                        :key="type.id"
+                        @click="selectJobType(type.id)"
+                        class="px-3.5 py-2.5 hover:bg-blue-50 cursor-pointer text-sm text-text-primary transition-colors border-b border-gray-50 last:border-0"
+                    >
+                      {{ type.name }}
+                    </div>
+                    <div v-if="!jobTypes.length" class="px-3.5 py-2.5 text-sm text-text-muted text-center">
+                      No job types available
+                    </div>
+                  </div>
+                </div>
+                <p v-if="formErrors.job_type" class="text-xs text-danger mt-1">{{ formErrors.job_type }}</p>
               </div>
 
               <!-- Department -->
-              <div>
+              <div class="w-full min-w-0">
                 <label class="block text-[11px] font-semibold text-text-muted tracking-wide uppercase mb-1.5">Department</label>
                 <input
-                    v-model="newJob.department"
+                    v-model="formData.department"
                     type="text"
                     placeholder="Engineering"
-                    class="w-full px-3.5 py-2.5 text-sm bg-surface border border-border rounded-lg placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    class="w-full min-w-0 px-3.5 py-2.5 text-sm bg-surface border border-border rounded-lg placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                 />
+                <p v-if="formErrors.department" class="text-xs text-danger mt-1">{{ formErrors.department }}</p>
               </div>
 
               <!-- Location -->
-              <div>
+              <div class="w-full min-w-0">
                 <label class="block text-[11px] font-semibold text-text-muted tracking-wide uppercase mb-1.5">Location</label>
                 <input
-                    v-model="newJob.location"
+                    v-model="formData.location"
                     type="text"
                     placeholder="Islamabad / Remote"
-                    class="w-full px-3.5 py-2.5 text-sm bg-surface border border-border rounded-lg placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    class="w-full min-w-0 px-3.5 py-2.5 text-sm bg-surface border border-border rounded-lg placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                 />
+                <p v-if="formErrors.location" class="text-xs text-danger mt-1">{{ formErrors.location }}</p>
               </div>
 
               <!-- Salary Range -->
-              <div>
+              <div class="w-full min-w-0">
                 <label class="block text-[11px] font-semibold text-text-muted tracking-wide uppercase mb-1.5">Salary Range</label>
                 <input
-                    v-model="newJob.salaryRange"
-                    type="text"
-                    placeholder="Rs. 150,000 - 220,000 / month"
-                    class="w-full px-3.5 py-2.5 text-sm bg-surface border border-border rounded-lg placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    v-model="formData.salary_range"
+                    type="number"
+                    placeholder="e.g. 220000"
+                    class="w-full min-w-0 px-3.5 py-2.5 text-sm bg-surface border border-border rounded-lg placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                 />
               </div>
 
               <!-- Description -->
-              <div class="md:col-span-2">
+              <div class="md:col-span-2 w-full min-w-0">
                 <label class="block text-[11px] font-semibold text-text-muted tracking-wide uppercase mb-1.5">Description</label>
                 <textarea
-                    v-model="newJob.description"
+                    v-model="formData.description"
                     rows="4"
                     placeholder="Role overview, responsibilities..."
-                    class="w-full px-3.5 py-2.5 text-sm bg-surface border border-border rounded-lg placeholder:text-text-muted resize-y focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    class="w-full min-w-0 px-3.5 py-2.5 text-sm bg-surface border border-border rounded-lg placeholder:text-text-muted resize-y focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                 ></textarea>
+                <p v-if="formErrors.description" class="text-xs text-danger mt-1">{{ formErrors.description }}</p>
               </div>
 
               <!-- Requirements -->
-              <div class="md:col-span-2">
+              <div class="md:col-span-2 w-full min-w-0">
                 <label class="block text-[11px] font-semibold text-text-muted tracking-wide uppercase mb-1.5">Requirements</label>
                 <textarea
-                    v-model="newJob.requirements"
+                    v-model="formData.requirements"
                     rows="4"
                     placeholder="Skills, experience, education..."
-                    class="w-full px-3.5 py-2.5 text-sm bg-surface border border-border rounded-lg placeholder:text-text-muted resize-y focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                    class="w-full min-w-0 px-3.5 py-2.5 text-sm bg-surface border border-border rounded-lg placeholder:text-text-muted resize-y focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                 ></textarea>
+                <p v-if="formErrors.requirements" class="text-xs text-danger mt-1">{{ formErrors.requirements }}</p>
               </div>
             </div>
 
-            <!-- Publish checkbox -->
+            <!-- Checkbox -->
             <label class="flex items-center gap-2 mt-5 cursor-pointer select-none">
               <input
-                  v-model="newJob.publishImmediately"
                   type="checkbox"
+                  :checked="isClosed"
+                  @change="toggleStatus($event.target.checked)"
                   class="w-4 h-4 rounded accent-primary"
               />
               <span class="text-sm font-semibold text-text-primary">Publish immediately on careers page</span>
             </label>
 
-            <!-- Actions -->
+            <!-- Buttons -->
             <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mt-5">
               <button
                   type="submit"
-                  class="w-full sm:w-auto px-5 py-2.5 text-sm font-semibold text-white bg-accent hover:bg-accent-hover rounded-lg transition shadow-sm"
+                  :disabled="isSubmitting"
+                  class="w-full sm:w-auto px-5 py-2.5 text-sm font-semibold text-white bg-accent hover:bg-accent-hover disabled:opacity-60 rounded-lg transition shadow-sm"
               >
-                Save job post
+                {{ isSubmitting ? 'Saving...' : 'Save job post' }}
               </button>
               <button
                   type="button"
-                  @click="clearJobForm"
+                  @click="resetForm"
                   class="w-full sm:w-auto px-5 py-2.5 text-sm font-semibold text-primary bg-white border border-primary hover:bg-primary-subtle rounded-lg transition"
               >
                 Clear
@@ -410,11 +515,6 @@ fetchCVSubmissions().then(ensureSelection)
               />
             </div>
 
-            <!-- Error -->
-            <div v-if="cvError" class="flex items-center gap-2 bg-danger-subtle border border-danger-border text-danger px-3 py-2 rounded-lg text-xs mb-3">
-              <font-awesome-icon :icon="['fas', 'circle-exclamation']" />
-              {{ cvError }}
-            </div>
 
             <!-- Loading skeleton -->
             <div v-if="cvLoading" class="space-y-2">
@@ -492,7 +592,6 @@ fetchCVSubmissions().then(ensureSelection)
                   <p class="text-sm font-semibold text-text-primary mt-1 truncate">{{ formatDate(selectedApplicant.submitted_at) }}</p>
                 </div>
 
-                <!-- ✅ CV File → now opens the actual uploaded CV -->
                 <button
                     @click="viewCV(selectedApplicant)"
                     class="bg-white border border-primary/30 hover:bg-primary-subtle rounded-lg p-3 text-left transition cursor-pointer group"
@@ -548,13 +647,38 @@ fetchCVSubmissions().then(ensureSelection)
   </div>
 </template>
 
-<style>
+<style scoped>
 .scrollbar-hide {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;     /* Firefox */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 .scrollbar-hide::-webkit-scrollbar {
-  display: none;             /* Chrome, Safari, Opera */
+  display: none;
+}
+
+/* Custom dropdown styles */
+#job-type-dropdown {
+  position: relative;
+  z-index: 10;
+}
+
+#job-type-dropdown .absolute {
+  position: absolute;
+  z-index: 9999;
+}
+
+/* Ensure dropdown options are visible on mobile */
+@media (max-width: 640px) {
+  #job-type-dropdown .absolute {
+    position: fixed;
+    top: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90% !important;
+    max-width: 400px;
+    max-height: 50vh;
+    margin-top: 4px;
+  }
 }
 </style>

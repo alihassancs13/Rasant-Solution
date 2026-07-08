@@ -1,5 +1,7 @@
 import { defineStore } from 'pinia';
-import { fetchEmployeesApi } from '../services/employeesListApi.js';
+import { BASE_URL, API_ENDPOINTS } from '../services/baseUrl.js';
+
+const getAuthToken = () => localStorage.getItem('accessToken');
 
 export const useEmployeeStore = defineStore('employee', {
     state: () => ({
@@ -14,7 +16,7 @@ export const useEmployeeStore = defineStore('employee', {
 
     getters: {
         getEmployees: (state) => state.employees,
-        totalPages: (state) => Math.ceil(state.totalCount / state.pageSize),
+        totalPages: (state) => Math.ceil(state.totalCount / state.pageSize) || 1,
     },
 
     actions: {
@@ -22,15 +24,51 @@ export const useEmployeeStore = defineStore('employee', {
             this.isLoading = true;
             this.error = null;
             try {
-                const data = await fetchEmployeesApi({ search, page, page_size });
-                this.employees = data.results || data;
-                this.totalCount = data.count ?? this.employees.length;
+                const queryParams = new URLSearchParams({
+                    search,
+                    page: page.toString(),
+                    page_size: page_size.toString(),
+                });
+
+                const cleanedBaseUrl = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL;
+                const cleanedEndpoint = API_ENDPOINTS.GET_EMPLOYEES.startsWith('/')
+                    ? API_ENDPOINTS.GET_EMPLOYEES
+                    : `/${API_ENDPOINTS.GET_EMPLOYEES}`;
+                const fullUrl = `${cleanedBaseUrl}${cleanedEndpoint}?${queryParams.toString()}`;
+
+                const token = getAuthToken();
+                const headers = { 'Content-Type': 'application/json' };
+                if (token) headers['Authorization'] = `Bearer ${token}`;
+
+                const response = await fetch(fullUrl, { method: 'GET', headers });
+
+                if (!response.ok) {
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.message || `HTTP Error: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (Array.isArray(data)) {
+                    this.employees = data;
+                    this.totalCount = data.length;
+                } else if (data && Array.isArray(data.results)) {
+                    this.employees = data.results;
+                    this.totalCount = data.count ?? data.results.length;
+                } else {
+                    this.employees = [];
+                    this.totalCount = 0;
+                }
+
                 this.currentPage = page;
                 this.pageSize = page_size;
                 this.searchQuery = search;
+
                 return { success: true, data };
             } catch (error) {
                 this.error = error.message || 'Failed to fetch employees';
+                this.employees = [];
+                this.totalCount = 0;
                 return { success: false, error: this.error };
             } finally {
                 this.isLoading = false;
