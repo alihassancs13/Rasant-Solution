@@ -343,7 +343,7 @@
 import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import AdminSidebar from '../../../components/adminSidebar.vue'
 import TopHeader from '@/components/header.vue'
-import { useEmployeeCareer } from '../../../composables/Admin/useEmployeeCareer.js'
+import { useEmployeeCareer } from '../../../composables/useEmployeeCareer.js'
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
 const {

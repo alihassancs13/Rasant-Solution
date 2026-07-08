@@ -236,7 +236,7 @@ import AdminSidebar from '../../../components/adminSidebar.vue';
 import AddEmployeeModal from '../../../components/admin/addEmployeemodel.vue';
 
 // Integrating Reactive Orchestration Composable Layer Architecture
-import { useEmployeeDashboard } from '../../../composables/Admin/useEmployeeDashboard.js';
+import { useEmployeeDashboard } from '../../../composables/useEmployeeDashboard.js';
 
 const {
   employees,

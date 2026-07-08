@@ -2,7 +2,7 @@
 import { computed, onMounted, useTemplateRef, watch, ref } from 'vue'
 import { useContactStore } from '@/stores/contactStore.js'
 import { useCvStore } from '@/stores/cvStore.js'
-import { useToast } from '../useToast.js'
+import { useToast } from './useToast.js'
 
 export function useEmployeeCareer() {
     const {showToast} = useToast()

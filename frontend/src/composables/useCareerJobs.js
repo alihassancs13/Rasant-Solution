@@ -1,6 +1,6 @@
 import { ref, reactive } from 'vue'
 import { jobAPI } from '@/services/cvApi.js'
-import { useToast } from '../useToast.js'
+import { useToast } from './useToast.js'
 
 export function useJobs() {
     const { showToast } = useToast()

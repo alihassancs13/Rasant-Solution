@@ -191,7 +191,7 @@
 
 <script setup>
 import { ref, reactive } from 'vue';
-import { Employee } from '../../../composables/Admin/addEmployeemodel.js';
+import { Employee } from '../../../composables/addEmployeemodel.js';
 
 const formData = reactive({
   fullName: '',

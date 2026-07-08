@@ -109,8 +109,8 @@
 
 <script setup>
 import { computed, ref, onMounted, onUnmounted } from 'vue'
-import { useOverview } from '../composables/Admin/useOverview.js'
-import { useAdminSidebar } from '../composables/Admin/useAdminsidebar.js'
+import { useOverview } from '../composables/useOverview.js'
+import { useAdminSidebar } from '../composables/useAdminsidebar.js'
 
 const props = defineProps({
   userName: { type: String, default: '' },

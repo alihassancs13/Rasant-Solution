@@ -225,7 +225,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
-import { useAdminSidebar } from '../composables/Admin/useAdminsidebar.js';
+import { useAdminSidebar } from '../composables/useAdminsidebar.js';
 
 const router = useRouter();
 

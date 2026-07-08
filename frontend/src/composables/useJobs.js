@@ -1,7 +1,7 @@
 // composables/useJobs.js
 import { ref, reactive, computed } from 'vue'
 import { useJobStore } from '@/stores/jobStore.js'
-import { useToast } from '../useToast.js'
+import { useToast } from './useToast.js'
 
 export function useJobs() {
     const jobStore = useJobStore()

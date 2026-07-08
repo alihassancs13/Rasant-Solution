@@ -1199,9 +1199,9 @@
 
 <script setup lang="ts">
 import { defineComponent } from 'vue';
-import AdminSidebar from "../../../composables/Admin/useAdminsidebar"
+import AdminSidebar from "../../../composables/useAdminsidebar"
 import TopHeader from '@/components/header.vue'
-import { useJiraConnect } from '@/composables/Admin/useJira.js';
+import { useJiraConnect } from '@/composables/useJira';
 import BaseModal from '@/components/baseModal.vue';
 import Multiselect from '@vueform/multiselect'
 import BaseDetailModal from '@/components/baseDetailModal.vue';
