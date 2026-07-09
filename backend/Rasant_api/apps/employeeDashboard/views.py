@@ -337,3 +337,75 @@ def job_update_view(request, pk):
         'message': 'Failed to update job.',
         'errors': serializer.errors
     }, status=status.HTTP_400_BAD_REQUEST)
+# Email API
+@api_view(['POST'])
+def send_invitation_email(request):
+    """
+    Send onboarding invitation email to an employee.
+    Expects: { "employee_id": <int> }
+    """
+    employee_id = request.data.get('employee_id')
+    if not employee_id:
+        return Response(
+            {"error": "employee_id is required"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    try:
+        employee = Employee.objects.get(id=employee_id)
+    except Employee.DoesNotExist:
+        return Response(
+            {"error": "Employee not found"},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    # ---------- Generate the onboarding link ----------
+    BASE_URL = "http://localhost:8000/"
+
+    onboarding_link = (
+        f"{BASE_URL}/html/dashboard-admin.html"
+        f"?onb=emp_{employee.employee_number}#employees"
+    )
+    # ---------- Email content ----------
+    subject = "Complete your employee onboarding — Rasant Solutions"
+
+    html_message = f"""
+    <html>
+    <body>
+        <p>Dear {employee.name},</p>
+        <p>Welcome to Rasant Solutions! Please complete your employee onboarding form to proceed.</p>
+        <p>Your reference: {employee.employee_number}</p>
+        <p>Open the link below in the admin dashboard onboarding section (your name and email are pre-filled):<br>
+        <a href="{onboarding_link}">{onboarding_link}</a></p>
+        <p>Please have the following documents ready:</p>
+        <ul>
+            <li>CNIC scan copies</li>
+            <li>Educational certificates (Metric, Intermediate, etc.)</li>
+            <li>Bank account details</li>
+        </ul>
+        <p>If you have questions, reply to this email or contact HR.</p>
+        <br>
+        <p>Best regards,<br>Rasant Solutions HR Team</p>
+    </body>
+    </html>
+    """
+    # ---------- Send email ----------
+    try:
+        send_mail(
+            subject=subject,
+            message="",  # plain text version (leave empty if using HTML)
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[employee.email],
+            html_message=html_message,
+            fail_silently=False,
+        )
+    except Exception as e:
+        return Response(
+            {"error": f"Failed to send email: {str(e)}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+    return Response(
+        {"message": "Invitation email sent successfully"},
+        status=status.HTTP_200_OK
+    )

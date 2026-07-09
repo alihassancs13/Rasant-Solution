@@ -92,16 +92,20 @@ export function useEmployeeRegistration() {
         }
         if (currentStep.value < totalSteps) {
             currentStep.value++;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Target the scrollable div inside your modal template
+            const scrollContainer = document.getElementById('employeeForm')?.parentElement;
+            if (scrollContainer) scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
         } else {
-            submitForm(); // fallback
+            submitForm();
         }
     };
 
     const prevStep = () => {
         if (currentStep.value > 1) {
             currentStep.value--;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Target the scrollable div inside your modal template
+            const scrollContainer = document.getElementById('employeeForm')?.parentElement;
+            if (scrollContainer) scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
         }
     };
 

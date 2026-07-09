@@ -89,7 +89,6 @@ class UpdateEmployeeSerializer(serializers.ModelSerializer):
             'bank_name',
             'branch_name',
             'branch_code',
-            'iban_number',
             'account_number',
         ]
         read_only_fields = ['employee_number']

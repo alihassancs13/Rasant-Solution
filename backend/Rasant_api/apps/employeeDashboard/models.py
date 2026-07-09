@@ -1,8 +1,6 @@
 from django.db import models
 from django.conf import settings
 from datetime import date
-
-
 class Employee(models.Model):
     """
     Employee model – All file fields are converted into a 3-column
@@ -29,36 +27,36 @@ class Employee(models.Model):
     # ---------- Personal Details ----------
     name = models.CharField(max_length=255)
     email = models.EmailField(unique=True)
-    cnic = models.CharField(max_length=15, unique=True)
+    cnic = models.CharField(max_length=15, unique=True, null=True, blank=True)
 
     # 1. CNIC SCAN (3 Columns)
     cnic_scan_data = models.BinaryField(null=True, blank=True)
     cnic_scan_name = models.CharField(max_length=255, null=True, blank=True)
     cnic_scan_mimetype = models.CharField(max_length=100, null=True, blank=True)
 
-    present_address = models.TextField()
-    permanent_address = models.TextField()
+    present_address = models.TextField(null=True, blank=True)
+    permanent_address = models.TextField(null=True, blank=True)
     phone_number = models.CharField(max_length=15)
-    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
-    department = models.CharField(max_length=100)
-    designation = models.CharField(max_length=100)
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, null=True, blank=True)
+    department = models.CharField(max_length=100, null=True, blank=True)
+    designation = models.CharField(max_length=100, null=True, blank=True)
     is_active = models.BooleanField(default=True)
-    salary = models.DecimalField(max_digits=10, decimal_places=2)
+    salary = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     joined_date = models.DateField(default=date.today)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Intern')
 
     # ---------- Emergency Contact ----------
-    emergency_name = models.CharField(max_length=255)
-    emergency_relation = models.CharField(max_length=100)
-    emergency_cnic = models.CharField(max_length=15)
+    emergency_name = models.CharField(max_length=255, null=True, blank=True)
+    emergency_relation = models.CharField(max_length=100, null=True, blank=True)
+    emergency_cnic = models.CharField(max_length=15, null=True, blank=True)
 
     # 2. EMERGENCY CNIC SCAN (3 Columns)
     emergency_cnic_scan_data = models.BinaryField(null=True, blank=True)
     emergency_cnic_scan_name = models.CharField(max_length=255, null=True, blank=True)
     emergency_cnic_scan_mimetype = models.CharField(max_length=100, null=True, blank=True)
 
-    emergency_phone = models.CharField(max_length=15)
-    emergency_address = models.TextField()
+    emergency_phone = models.CharField(max_length=15, null=True, blank=True)
+    emergency_address = models.TextField(null=True, blank=True)
 
     # ---------- Education ----------
     # 3. MATRIC CERTIFICATE (3 Columns)
@@ -82,12 +80,10 @@ class Employee(models.Model):
     other_course_mimetype = models.CharField(max_length=100, null=True, blank=True)
 
     # ---------- Bank Details ----------
-    bank_name = models.CharField(max_length=255)
-    branch_name = models.CharField(max_length=255)
+    bank_name = models.CharField(max_length=255, null=True, blank=True)
+    branch_name = models.CharField(max_length=255, null=True, blank=True)
     branch_code = models.CharField(max_length=50, null=True, blank=True)
-    account_number = models.CharField(
-        max_length=50,
-    )
+    account_number = models.CharField(max_length=50, null=True, blank=True)
 
     # ---------- User Relation ----------
     user = models.ForeignKey(

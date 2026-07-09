@@ -11,7 +11,7 @@
         />
       </div>
 
-      <div class="flex-1 overflow-y-auto p-4 md:p-6">
+      <div id="dashboardScrollContainer" class="flex-1 overflow-y-auto p-4 md:p-6">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <StateCard
               label="TOTAL EMPLOYEES"
@@ -78,21 +78,21 @@
 
             <div class="flex flex-wrap items-center gap-3">
               <button
-                  @click="copyRegistrationLink"
                   type="button"
+                  @click="openCreateModal"
                   class="flex items-center cursor-pointer gap-2 px-4 py-2 bg-buttonBackground text-buttonTextColor text-sm font-medium rounded-xl hover:bg-buttonHover transition-colors whitespace-nowrap"
               >
-                <font-awesome-icon :icon="['fas', 'link']" />
-                {{ copied ? 'Link Copied!' : 'Copy Registration Link' }}
+                <font-awesome-icon :icon="['fas', 'plus']" />
+                Create Employee
               </button>
 
               <button
                   @click="showModal = true"
                   type="button"
-                  class="flex items-center cursor-pointer gap-2 px-4 py-2 bg-buttonBackground text-buttonTextColor text-sm font-medium rounded-xl hover:bg-buttonHover transition-colors whitespace-nowrap"
+                  class="flex items-center cursor-pointer gap-2 px-4 py-2 border border-buttonBackground text-black text-sm font-medium rounded-xl hover:bg-slate-100 transition-colors whitespace-nowrap"
               >
-                <font-awesome-icon :icon="['fas', 'plus']" />
-                Add employee
+                <font-awesome-icon :icon="['fas', 'clipboard-list']" />
+                View onboarding form
               </button>
             </div>
           </div>
@@ -148,9 +148,15 @@
                       {{ emp.status }}
                     </span>
                 </td>
+                <!-- In the <td> for "Account" -->
                 <td class="p-4 whitespace-nowrap">
                   <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" v-model="emp.account_active" class="sr-only peer" />
+                    <input
+                        type="checkbox"
+                        :checked="emp.is_active"
+                        @change="toggleActive(emp, $event)"
+                        class="sr-only peer"
+                    />
                     <div class="w-9 h-5 bg-border rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-border after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-teal-500"></div>
                   </label>
                 </td>
@@ -212,14 +218,107 @@
 
     <div
         v-if="showModal"
-        class="fixed inset-0 z-50 flex items-start justify-center bg-black/30 backdrop-blur-sm p-4 overflow-y-auto"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm p-4"
         @click.self="showModal = false"
     >
-      <div class="w-full max-w-4xl my-8">
-        <EmployeeRegistrationForm @close="showModal = false" />
+      <div class="w-full max-w-3xl">
+        <EmployeeRegistrationModelForm @close="showModal = false" />
       </div>
     </div>
+      <!-- Create model-->
+    <CreateModal
+        :is-open="isCreateModalOpen"
+        mode="form"
+        title="Create employee"
+        subtitle="Enter basic details — onboarding continues in this dashboard."
+        submit-text="Create & send invitation"
+        :loading="isCreating"
+        :wide="false"
+        @close="closeCreateModal"
+        @save="handleCreateEmployee"
+    >
+      <form @submit.prevent="handleCreateEmployee" class="grid grid-cols-1 md:grid-cols-2 gap-5 text-left text-gray-700">
+        <!-- FULL NAME -->
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold uppercase tracking-wider text-gray-400">
+            Full Name <span class="text-red-500">*</span>
+          </label>
+          <input
+              type="text"
+              v-model="createFormData.name"
+              placeholder="e.g. Sarah Ali"
+              required
+              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition-all duration-200"
+          />
+        </div>
 
+        <!-- EMAIL ADDRESS -->
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold uppercase tracking-wider text-gray-400">
+            Email Address <span class="text-red-500">*</span>
+          </label>
+          <input
+              type="email"
+              v-model="createFormData.email"
+              placeholder="employee@email.com"
+              required
+              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition-all duration-200"
+          />
+        </div>
+
+        <!-- PHONE NUMBER (replaces "With Reference Of") -->
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold uppercase tracking-wider text-gray-400">
+            Phone Number <span class="text-red-500">*</span>
+          </label>
+          <input
+              type="tel"
+              v-model="createFormData.phone_number"
+              placeholder="e.g. 03XX-XXXXXXX"
+              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition-all duration-200"
+          />
+        </div>
+
+        <!-- POSITION — ADMIN ONLY -->
+        <div class="flex flex-col gap-1.5">
+          <div class="flex items-center justify-between">
+            <label class="text-xs font-bold uppercase tracking-wider text-gray-400">
+              Designation <span class="text-red-500">*</span>
+            </label>
+            <span class="text-[10px] font-semibold uppercase tracking-wider text-amber-600 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">
+            ADMIN ONLY
+          </span>
+          </div>
+          <input
+              type="text"
+              v-model="createFormData.position"
+              placeholder="e.g. Software Engineer"
+              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition-all duration-200"
+          />
+        </div>
+
+        <!-- MONTHLY SALARY (PKR) — ADMIN ONLY -->
+        <div class="flex flex-col gap-1.5">
+          <div class="flex items-center justify-between">
+            <label class="text-xs font-bold uppercase tracking-wider text-gray-400">
+              Monthly Salary (PKR) <span class="text-red-500">*</span>
+            </label>
+            <span class="text-[10px] font-semibold uppercase tracking-wider text-amber-600 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">
+            ADMIN ONLY
+          </span>
+          </div>
+          <input
+              type="number"
+              v-model="createFormData.salary"
+              placeholder="e.g. 85000"
+              min="0"
+              step="1000"
+              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition-all duration-200"
+          />
+        </div>
+      </form>
+    </CreateModal>
+    <!-- edit model-->
     <EditModal
         :is-open="isEditModalOpen"
         mode="form"
@@ -273,9 +372,9 @@
 
         <div class="flex flex-col gap-1.5">
           <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Account Status</label>
-          <select v-model="editFormData.account_status" class="w-full px-4 py-2.5 bg-white rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4]">
-            <option value="Active">Active</option>
-            <option value="Inactive">Inactive</option>
+          <select v-model="editFormData.is_active" class="w-full px-4 py-2.5 bg-white rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4]">
+            <option :value="true">Active</option>
+            <option :value="false">Inactive</option>
           </select>
         </div>
 
@@ -290,8 +389,7 @@
         </div>
       </form>
     </EditModal>
-
-    <!-- View Employee Modal -->
+    <!-- view model-->
     <ViewModal
         :is-open="isViewModalOpen"
         mode="view"
@@ -300,94 +398,67 @@
         size="md"
         @close="closeViewModal"
     >
-      <!-- Main structural container forced to fit tightly with no overflow allowances -->
-      <div v-if="viewEmployee" class="space-y-3 text-left overflow-hidden h-auto max-h-full">
+      <div v-if="viewEmployee" class="space-y-4 text-left overflow-hidden h-auto max-h-full">
 
-        <!-- Core Grid: Balanced 2-Columns to match smaller modal width footprint -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
-          <!-- Department Card -->
-          <div class="p-2.5 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
-            <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1">Department</span>
-            <span class="text-xs font-bold text-[#1e293b] truncate">{{ viewEmployee.department }}</span>
+          <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Department</span>
+            <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.department }}</span>
           </div>
 
-          <!-- Designation Card -->
-          <div class="p-2.5 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
-            <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1">Designation</span>
-            <span class="text-xs font-bold text-[#1e293b] truncate">{{ viewEmployee.designation }}</span>
+          <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Designation</span>
+            <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.designation }}</span>
           </div>
 
-          <!-- Email Card -->
-          <div class="p-2.5 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
-            <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1">Email</span>
-            <span class="text-xs font-bold text-[#1e293b] truncate" :title="viewEmployee.email">{{ viewEmployee.email }}</span>
+          <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Email</span>
+            <span class="text-sm font-bold text-[#1e293b] truncate" :title="viewEmployee.email">{{ viewEmployee.email }}</span>
           </div>
 
-          <!-- Phone Card -->
-          <div class="p-2.5 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
-            <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400 prepend-none leading-none mb-1">Phone</span>
-            <span class="text-xs font-bold text-[#1e293b] truncate">{{ viewEmployee.phone_number }}</span>
+          <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Phone</span>
+            <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.phone_number }}</span>
           </div>
 
-          <!-- Gender Card -->
-          <div class="p-2.5 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
-            <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1">Gender</span>
-            <span class="text-xs font-bold text-[#1e293b] truncate">{{ viewEmployee.gender }}</span>
+          <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Gender</span>
+            <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.gender }}</span>
           </div>
 
-          <!-- Monthly Salary Card -->
-          <div class="p-2.5 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
-            <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1">Monthly Salary</span>
-            <span class="text-xs font-bold text-[#1e293b] truncate">Rs {{ Number(viewEmployee.salary).toLocaleString() }}</span>
+          <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Monthly Salary</span>
+            <span class="text-sm font-bold text-[#1e293b] truncate">Rs {{ Number(viewEmployee.salary).toLocaleString() }}</span>
           </div>
 
-          <!-- Joined Date Card -->
-          <div class="p-2.5 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
-            <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1">Joined</span>
-            <span class="text-xs font-bold text-[#1e293b] truncate">{{ viewEmployee.joined_date }}</span>
+          <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Joined</span>
+            <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.joined_date }}</span>
           </div>
 
-          <!-- CNIC Card -->
-          <div class="p-2.5 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
-            <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1">CNIC</span>
-            <span class="text-xs font-bold text-[#1e293b] truncate">{{ viewEmployee.cnic }}</span>
+          <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">CNIC</span>
+            <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.cnic }}</span>
           </div>
         </div>
 
-        <!-- Address Row -->
-        <div v-if="viewEmployee.present_address || viewEmployee.permanent_address" class="pt-2 border-t border-slate-100">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            <!-- Present Address -->
-            <div v-if="viewEmployee.present_address" class="p-2.5 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
-              <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1">Present Address</span>
-              <span class="text-xs font-bold text-[#1e293b] line-clamp-1">{{ viewEmployee.present_address }}</span>
+        <div v-if="viewEmployee.present_address || viewEmployee.permanent_address" class="pt-3 border-t border-slate-100">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div v-if="viewEmployee.present_address" class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Present Address</span>
+              <span class="text-sm font-bold text-[#1e293b] line-clamp-1">{{ viewEmployee.present_address }}</span>
             </div>
 
-            <!-- Permanent Address -->
-            <div v-if="viewEmployee.permanent_address" class="p-2.5 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
-              <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1">Permanent Address</span>
-              <span class="text-xs font-bold text-[#1e293b] line-clamp-1">{{ viewEmployee.permanent_address }}</span>
+            <div v-if="viewEmployee.permanent_address" class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Permanent Address</span>
+              <span class="text-sm font-bold text-[#1e293b] line-clamp-1">{{ viewEmployee.permanent_address }}</span>
             </div>
           </div>
         </div>
 
       </div>
     </ViewModal>
-  </div>
-  <!-- Toast Container -->
-  <div class="fixed bottom-4 right-4 z-50 space-y-2">
-    <div
-        v-for="toast in toasts"
-        :key="toast.id"
-        :class="[
-      'px-4 py-3 rounded-xl shadow-lg text-white text-sm font-medium transition-all',
-      toast.type === 'success' ? 'bg-emerald-600' : 'bg-red-600'
-    ]"
-    >
-      {{ toast.message }}
-
-    </div>
   </div>
 </template>
 
@@ -397,20 +468,19 @@ import DashboardHeader from '../../../components/header.vue';
 import StateCard from '../../../components/StatCard.vue';
 import AdminSidebar from '../../../components/adminSidebar.vue';
 import EditModal from '../../../components/baseModal.vue';
+import CreateModal from '../../../components/baseModal.vue';
 import ViewModal from '../../../components/baseDetailModal.vue';
 import { useToast } from '@/composables/useToast.js';
-import EmployeeRegistrationForm from '@/pages/admin/Employee/employeeRegistration.vue';
-
+import EmployeeRegistrationModelForm from '@/pages/admin/Employee/employeeRegistrationModel.vue';
 import { useEmployeeDashboard } from '@/composables/useEmployeeDashboard.js';
-const { toasts, showToast } = useToast();
+const {  showToast } = useToast();
 const isViewModalOpen = ref(false);
 const viewEmployee = ref(null);
-
+import { watch } from 'vue';
 const openViewModal = (employee) => {
   viewEmployee.value = employee;
   isViewModalOpen.value = true;
 };
-
 const closeViewModal = () => {
   isViewModalOpen.value = false;
   viewEmployee.value = null;
@@ -425,18 +495,82 @@ const {
   statsSummary,
   pageSize,
   loadEmployees,
-  updateEmployee // Pulling update functionality cleanly out from composable boundaries
+  updateEmployee
 } = useEmployeeDashboard();
-
 const userName = ref('System Administrator');
 const showModal = ref(false);
-const copied = ref(false);
+watch(showModal, (isOpen) => {
+  const container = document.getElementById('dashboardScrollContainer');
 
-// Edit Modal State handlers
+  if (isOpen) {
+    document.body.classList.add('overflow-hidden');
+    if (container) container.classList.add('!overflow-y-hidden');
+  } else {
+    document.body.classList.remove('overflow-hidden');
+    if (container) container.classList.remove('!overflow-y-hidden');
+  }
+});
+const copied = ref(false);
 const isEditModalOpen = ref(false);
 const isUpdating = ref(false);
 const selectedEmployee = ref(null);
+const isCreateModalOpen = ref(false);
+const isCreating = ref(false);
+const createFormData = reactive({
+  name: '',
+  email: '',
+  phone_number: '',
+  position: '',
+  salary: '',
+});
+const openCreateModal = () => {
+  createFormData.name = '';
+  createFormData.email = '';
+  createFormData.phone_number = '';
+  createFormData.position = '';
+  createFormData.salary = '';
+  isCreateModalOpen.value = true;
+};
+const closeCreateModal = () => {
+  isCreateModalOpen.value = false;
+};
 
+const handleCreateEmployee = async () => {
+  // Basic client-side validation
+  if (!createFormData.name.trim() || !createFormData.email.trim()) {
+    // You can add a toast/notification here
+    console.warn('Name and Email are required.');
+    return;
+  }
+  isCreating.value = true;
+  try {
+    // 🔁 Replace with your actual API call
+    const payload = {
+      name: createFormData.name.trim(),
+      email: createFormData.email.trim(),
+      phone_number: createFormData.phone_number.trim(),
+      position: createFormData.position.trim(),
+      salary: createFormData.salary ? parseFloat(createFormData.salary) : null,
+    };
+
+    console.log('➡️ Creating employee:', payload);
+
+    // Simulate API delay
+    await new Promise((resolve) => setTimeout(resolve, 1200));
+
+    // On success — close modal
+    closeCreateModal();
+
+    // Optionally refresh employee list or show success toast
+    // await fetchEmployees();
+
+  } catch (error) {
+    console.error(' Failed to create employee:', error);
+    // Handle error (toast, etc.)
+  } finally {
+    isCreating.value = false;
+  }
+};
 const editFormData = reactive({
   name: '',
   email: '',
@@ -452,15 +586,8 @@ const editFormData = reactive({
 onMounted(() => {
   loadEmployees();
 });
-
-const handleAddEmployeeModal = (data) => {
-  console.log('Employee added successfully via dashboard overlay context tracker payload:', data);
-  loadEmployees();
-};
-
 const openEditModal = (employee) => {
   selectedEmployee.value = employee;
-
   editFormData.name = employee.name || '';
   editFormData.email = employee.email || '';
   editFormData.phone_number = employee.phone_number || '';
@@ -491,7 +618,7 @@ const handleUpdateEmployee = async () => {
     department: editFormData.department,
     designation: editFormData.designation,
     status: editFormData.status,
-    account_active: editFormData.account_status === 'Active',
+    is_active: editFormData.is_active,
     salary: editFormData.salary,
     joined_date: editFormData.joined_date
   };
@@ -507,16 +634,17 @@ const handleUpdateEmployee = async () => {
   }
 };
 
-const copyRegistrationLink = () => {
-  const baseUrl = window.location.origin;
-  const registrationLink = `${baseUrl}/employee/register`;
-  navigator.clipboard.writeText(registrationLink)
-      .then(() => {
-        copied.value = true;
-        setTimeout(() => { copied.value = false; }, 3000);
-      })
-      .catch(() => {
-        alert(`Registration link generated parameters: ${registrationLink}`);
-      });
+
+const toggleActive = async (employee, event) => {
+  const newActive = event.target.checked;
+  const result = await updateEmployee(employee.id, { is_active: newActive });
+  if (!result.success) {
+    showToast(`Error: ${result.error || 'Update failed'}`, 'error');
+    // revert the checkbox state by toggling back (if needed)
+    event.target.checked = !newActive;
+  } else {
+    showToast('Account status updated successfully!', 'success');
+    // Optionally recalc stats if needed (the composable's updateEmployee already calls calculateStats)
+  }
 };
 </script>
