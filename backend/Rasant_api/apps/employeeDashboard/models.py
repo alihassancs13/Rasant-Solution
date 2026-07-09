@@ -107,6 +107,15 @@ class Employee(models.Model):
     @property
     def full_name(self):
         return self.name
+class ApplicationStatus(models.Model):
+    name = models.CharField(max_length=20, unique=True)
+
+    class Meta:
+        db_table = 'application_status'
+        ordering = ['id']
+
+    def __str__(self):
+        return self.name
 class CVSubmission(models.Model):
     full_name        = models.CharField(max_length=255)
     email             = models.EmailField(unique=False)
