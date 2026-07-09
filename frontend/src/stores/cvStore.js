@@ -17,6 +17,7 @@ export const useCvStore = defineStore('cv', {
         cvList: [],
         isLoading: false,
         isSubmitting: false,
+        isSendingEmail: false,
         error: null,
     }),
 
@@ -57,7 +58,7 @@ export const useCvStore = defineStore('cv', {
 
         async deleteCV(id) {
             try {
-                await apiClient.delete(`/api/cv_management/cv/${id}/delete/`);
+                await apiClient.delete(`/api/employeeDashboard/cv/${id}/delete/`);
                 this.cvList = this.cvList.filter((cv) => cv.id !== id);
                 return { success: true };
             } catch (error) {
@@ -68,7 +69,7 @@ export const useCvStore = defineStore('cv', {
 
         async downloadCV(id, filename = 'cv.pdf') {
             try {
-                const response = await apiClient.get(`/api/cv_management/cv/${id}/download/`, {
+                const response = await apiClient.get(`/api/employeeDashboard/cv/${id}/download/`, {
                     responseType: 'blob',
                 });
                 const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -88,7 +89,7 @@ export const useCvStore = defineStore('cv', {
 
         async updateStatus(id, data) {
             try {
-                const response = await apiClient.put(`/api/cv_management/cv/${id}/status/`, data);
+                const response = await apiClient.put(`/api/employeeDashboard/cv/${id}/status/`, data);
                 const index = this.cvList.findIndex((cv) => cv.id === id);
                 if (index !== -1) {
                     this.cvList[index] = { ...this.cvList[index], ...response.data };
@@ -97,6 +98,23 @@ export const useCvStore = defineStore('cv', {
             } catch (error) {
                 this.error = error.response?.data?.message || 'Failed to update status';
                 return { success: false, error: this.error };
+            }
+        },
+        async sendCandidateEmail({ email, subject, message }) {
+            this.isSendingEmail = true;
+            this.error = null;
+            try {
+                const response = await apiClient.post('/api/employeeDashboard/send-email/', {
+                    email,
+                    subject,
+                    message,
+                });
+                return { success: true, data: response.data };
+            } catch (error) {
+                this.error = error.response?.data?.message || 'Failed to send email';
+                return { success: false, error: this.error };
+            } finally {
+                this.isSendingEmail = false;
             }
         },
     },

@@ -245,32 +245,39 @@
                       v-if="job.job_type_name"
                       class="inline-flex px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide bg-primary-50 text-primary-700 border border-primary-100"
                   >
-                    {{ job.job_type_name }}
-                  </span>
+            {{ job.job_type_name }}
+          </span>
                 </div>
                 <p class="text-sm text-textSupporting font-medium">
                   {{ job.department }}
                   <span v-if="job.location" class="text-textBody"> · {{ job.location }}</span>
                 </p>
-                <p v-if="job.description" class="text-sm text-textBody leading-relaxed mt-3 line-clamp-3">
-                  {{ job.description }}
-                </p>
               </div>
-              <ShineButton
-                  size="md"
-                  class="shrink-0 self-start"
-                  @click="openModal(job.job_title)"
-              >
-                Apply now
-              </ShineButton>
+
+              <div class="flex gap-2 shrink-0 self-start">
+                <!-- Updated View button to navigate to job details page -->
+                <router-link
+                    :to="{ name: 'JobDetails', params: { id: job.id } }"
+                    target="_blank"
+                    class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg border border-borderDefault bg-white text-textPrimary hover:bg-surface hover:border-activeBorder/30 transition-all duration-200"
+                >
+                  <font-awesome-icon :icon="['fas', 'external-link-alt']" class="mr-1.5 text-xs" />
+                  View
+                </router-link>
+                <ShineButton
+                    size="sm"
+                    @click="openModal(job.job_title)"
+                >
+                  Apply now
+                </ShineButton>
+              </div>
             </div>
           </article>
         </div>
       </div>
     </section>
-
     <!-- CTA -->
-    <section ref="ctaRef" class="px-[5%] pb-24">
+    <section v-if="!hasOpenRoles" ref="ctaRef" class="px-[5%] pb-24">
       <div
           class="max-w-5xl mx-auto bg-buttonBackground text-white p-8 md:p-12 rounded-3xl flex flex-col lg:flex-row lg:items-center justify-between gap-8 shadow-xl relative overflow-hidden transition-all duration-700 ease-out"
           :class="visible.cta ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'"
@@ -287,7 +294,6 @@
         </ShineButton>
       </div>
     </section>
-
     <!-- CV Submit Modal -->
     <Transition
         enter-active-class="transition-opacity duration-300 ease-out"
@@ -541,7 +547,60 @@
         </Transition>
       </div>
     </Transition>
+    <!-- ══════════ View Job Detail Modal ══════════ -->
+    <BaseDetailModal
+        :is-open="showViewModal"
+        mode="view"
+        :title="'Job Details'"
+        :subtitle="viewingJob ? '' : ''"
+        @close="closeViewModal"
+    >
+      <div v-if="viewingJob" class="space-y-5">
+        <div class="flex items-center justify-between flex-wrap gap-2">
+          <p class="font-display text-lg font-bold text-headingCard">{{viewingJob.job_title}}</p>
+        </div>
 
+        <!-- Info grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="bg-surface border border-border-subtle rounded-lg p-3">
+            <p class="text-[10px] font-semibold text-text-muted tracking-wide uppercase">Job Type</p>
+            <p class="text-sm font-semibold text-text-primary mt-1">{{ viewingJob.job_type_name || '—' }}</p>
+          </div>
+          <div class="bg-surface border border-border-subtle rounded-lg p-3">
+            <p class="text-[10px] font-semibold text-text-muted tracking-wide uppercase">Department</p>
+            <p class="text-sm font-semibold text-text-primary mt-1">{{ viewingJob.department || '—' }}</p>
+          </div>
+          <div class="bg-surface border border-border-subtle rounded-lg p-3">
+            <p class="text-[10px] font-semibold text-text-muted tracking-wide uppercase">Location</p>
+            <p class="text-sm font-semibold text-text-primary mt-1">{{ viewingJob.location || '—' }}</p>
+          </div>
+          <div class="bg-surface border border-border-subtle rounded-lg p-3">
+            <p class="text-[10px] font-semibold text-text-muted tracking-wide uppercase">Salary Range</p>
+            <p class="text-sm font-semibold text-text-primary mt-1">{{ viewingJob.salary_range || '—' }}</p>
+          </div>
+          <div class="bg-surface border border-border-subtle rounded-lg p-3 sm:col-span-2">
+            <p class="text-[10px] font-semibold text-text-muted tracking-wide uppercase">Posted</p>
+            <p class="text-sm font-semibold text-text-primary mt-1">{{ formatDate(viewingJob.created_at) }}</p>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div>
+          <p class="text-[11px] font-semibold text-text-muted tracking-wide uppercase mb-2">Description</p>
+          <div class="bg-surface border border-border-subtle rounded-lg p-4 text-sm text-text-secondary whitespace-pre-line">
+            {{ viewingJob.description || 'No description provided.' }}
+          </div>
+        </div>
+
+        <!-- Requirements -->
+        <div>
+          <p class="text-[11px] font-semibold text-text-muted tracking-wide uppercase mb-2">Requirements</p>
+          <div class="bg-surface border border-border-subtle rounded-lg p-4 text-sm text-text-secondary whitespace-pre-line">
+            {{ viewingJob.requirements || 'No requirements provided.' }}
+          </div>
+        </div>
+      </div>
+    </BaseDetailModal>
     <Footer />
     <div class="fixed top-4 right-4 z-[100] flex flex-col gap-2 w-[calc(100%-2rem)] max-w-sm" aria-live="polite" aria-atomic="true">
       <TransitionGroup
@@ -591,6 +650,7 @@
 <script setup>
 import { ref, reactive, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useCareers } from '@/composables/useCareers.js'
+import { useJobStore } from '@/stores/jobStore.js'
 import Navbar from '../../components/navbar.vue'
 import Footer from '../../components/footer.vue'
 import ShineButton from '@/components/ShineButton.vue'
@@ -602,6 +662,8 @@ import careersStepSubmitSvg from '@/assets/svg/careers-step-submit.svg'
 import careersStepCallSvg from '@/assets/svg/careers-step-call.svg'
 import careersStepTechSvg from '@/assets/svg/careers-step-tech.svg'
 import {useCvStore} from "@/stores/cvStore.js";
+import BaseDetailModal from '../../components/baseDetailModal.vue'
+import { useRouter } from 'vue-router'
 
 const {
   isModalOpen, submitSuccess, isDragging,
@@ -614,10 +676,14 @@ const {
   handleSubmit, onEmailInput,
 } = useCareers()
 
+const jobStore = useJobStore()
+const router = useRouter()
 const heroLoaded = ref(false)
 const currentWordIndex = ref(0)
 let wordInterval = null
 let heroTimer = null
+const showViewModal = ref(false)
+const viewingJob = ref(null)
 
 const visible = reactive({
   tech: false,
@@ -633,7 +699,7 @@ const processRef = ref(null)
 const openRolesRef = ref(null)
 const ctaRef = ref(null)
 
-const openRoles = ref([])
+const openRoles = computed(() => jobStore.publicJobs)
 const hasOpenRoles = computed(() => openRoles.value.length > 0)
 
 const heroWords = ['real impact', 'modern stacks', 'great teams']
@@ -671,8 +737,8 @@ const scrollToSection = (id) => {
 const inputClass = (hasError) => [
   'w-full text-sm px-3.5 py-2.5 rounded-xl border bg-neutral-50 focus:outline-none focus:ring-2 placeholder:text-textSupporting transition-all duration-200 hover:bg-white focus:bg-white',
   hasError
-    ? 'border-error/60 focus:border-error focus:ring-error/10'
-    : 'border-borderDefault focus:border-primary-500 focus:ring-primary-500/15 hover:border-primary-500/35',
+      ? 'border-error/60 focus:border-error focus:ring-error/10'
+      : 'border-borderDefault focus:border-primary-500 focus:ring-primary-500/15 hover:border-primary-500/35',
 ]
 
 const observeSection = (el, key) => {
@@ -690,12 +756,25 @@ const observeSection = (el, key) => {
 }
 
 const fetchOpenRoles = async () => {
-  try {
-    const { data } = await cvAPI.getPublishedJobs()
-    openRoles.value = Array.isArray(data) ? data : []
-  } catch {
-    openRoles.value = []
-  }
+  await jobStore.fetchPublicJobs()
+}
+
+
+const handleViewJob = (job) => {
+  viewingJob.value = job
+  showViewModal.value = true
+}
+
+const closeViewModal = () => {
+  showViewModal.value = false
+  viewingJob.value = null
+}
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return '—'
+  return new Date(dateStr).toLocaleDateString('en-US', {
+    year: 'numeric', month: 'short', day: 'numeric'
+  })
 }
 
 onMounted(async () => {

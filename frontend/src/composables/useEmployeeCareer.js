@@ -8,12 +8,13 @@ export function useEmployeeCareer() {
     const {showToast} = useToast()
     const contactStore = useContactStore()
     const cvStore = useCvStore()
-
     const messages = computed(() => contactStore.messages)
     const loading = computed(() => contactStore.isLoading)
     const error = computed(() => contactStore.error)
     const searchQuery = ref('')
     const searchInput = useTemplateRef('searchInput')
+    const showDeleteConfirm = ref(false)
+    const pendingDeleteId = ref(null)
 
     async function fetchMessages() {
         const result = await contactStore.fetchMessages()
@@ -125,7 +126,6 @@ export function useEmployeeCareer() {
     }
 
     async function deleteCV(id) {
-        if (!confirm('Delete this CV submission?')) return
         const result = await cvStore.deleteCV(id)
         if (result.success) {
             showToast('CV submission deleted.', 'success')
@@ -166,10 +166,30 @@ export function useEmployeeCareer() {
     function initials(name) {
         return name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()
     }
+    const removeApplicant = (id) => {
+        pendingDeleteId.value = id
+        showDeleteConfirm.value = true
+    }
+
+    const confirmDelete = async () => {
+        const id = pendingDeleteId.value
+        showDeleteConfirm.value = false
+        pendingDeleteId.value = null
+        if (!id) return
+        await deleteCV(id)
+        await fetchCVSubmissions()
+
+    }
+
+    const cancelDelete = () => {
+        showDeleteConfirm.value = false
+        pendingDeleteId.value = null
+    }
 
     onMounted(() => {
         fetchMessages()
         fetchCVSubmissions()
+
         searchInput.value?.focus()
     })
 
@@ -180,6 +200,6 @@ export function useEmployeeCareer() {
         paginatedItems, pageNumbers, nextPage, prevPage, goToPage,
         cvSubmissions, cvLoading, cvError, cvSearchQuery,
         fetchCVSubmissions, deleteCV, filteredCVs, viewCV,
-        formatDate, initials,
+        formatDate, initials,removeApplicant, confirmDelete, cancelDelete, showDeleteConfirm
     }
 }

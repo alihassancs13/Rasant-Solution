@@ -121,6 +121,14 @@ class CVSubmission(models.Model):
     submitted_at      = models.DateTimeField(auto_now_add=True)
     cover_letter      = models.TextField(blank=True, null=True)
 
+    application_status = models.ForeignKey(
+        ApplicationStatus,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='cv_submissions'
+    )
+
     class Meta:
         db_table = 'cv_submissions'
         ordering = ['-submitted_at']

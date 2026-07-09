@@ -7,15 +7,18 @@ export function useJobs() {
     const jobStore = useJobStore()
     const { showToast } = useToast()
 
+    const getStatusId = (name) => jobStore.jobStatus.find(s => s.name?.toLowerCase() === name.toLowerCase())?.id ?? null
+
     const formData = reactive({
         job_title: '',
-        job_type: '',
+        job_type: null,
         department: '',
         location: '',
         salary_range: null,
         description: '',
         requirements: '',
-        status: 1,
+        status: null,
+        id: null,
     })
     const formErrors = reactive({})
     const isClosed = ref(false)
@@ -31,7 +34,7 @@ export function useJobs() {
 
     const toggleStatus = (checked) => {
         isClosed.value = checked
-        formData.status = checked ? 3 : 1
+        formData.status = checked ? getStatusId('Published') : getStatusId('Draft')
     }
 
     const validateForm = () => {
@@ -48,14 +51,15 @@ export function useJobs() {
     }
 
     const resetForm = () => {
+        formData.id = null
         formData.job_title = ''
-        formData.job_type = ''
+        formData.job_type = null
         formData.department = ''
         formData.location = ''
         formData.salary_range = null
         formData.description = ''
         formData.requirements = ''
-        formData.status = 1
+        formData.status = getStatusId('Draft')
         isClosed.value = false
         submitSuccess.value = false
         submitError.value = ''
@@ -109,8 +113,6 @@ export function useJobs() {
     const fetchPublicJobs = async () => {
         await jobStore.fetchPublicJobs()
     }
-
-
 
     return {
         formData,

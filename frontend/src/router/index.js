@@ -4,7 +4,7 @@ import Contact from "../pages/Home/contactForm.vue";
 import Home from "../pages/Home/home.vue";
 import EmployeeDashboard from '../pages/admin/Employee/employeeDashboard.vue';
 import { useLoginStore } from '../stores/loginStore.js';
-
+import JobDetails from '../pages/Home/jobDetails.vue';
 const routes = [
   {
     path: "/",
@@ -12,7 +12,7 @@ const routes = [
     component: Home,
     meta: {
       title: "Rasant Solutions - Home",
-      requiresAuth: false  // Public page
+      requiresAuth: false
     }
   },
   {
@@ -21,7 +21,7 @@ const routes = [
     component: Login,
     meta: {
       title: "Login - Rasant Solutions",
-      requiresAuth: false  // Public page
+      requiresAuth: false
     }
   },
   {
@@ -30,7 +30,7 @@ const routes = [
     component: Contact,
     meta: {
       title: "Contact - Rasant Solutions",
-      requiresAuth: false  // Public page
+      requiresAuth: false
     }
   },
   {
@@ -39,7 +39,7 @@ const routes = [
     component: () => import("../pages/Home/ai-agent.vue"),
     meta: {
       title: "AI Agent - Rasant Solutions",
-      requiresAuth: false  // Public page (or true if you want to protect it)
+      requiresAuth: false
     }
   },
 
@@ -49,7 +49,7 @@ const routes = [
     component: () => import("../pages/Home/sdlc-orchestri.vue"),
     meta: {
       title: "Orchestri - Rasant Solutions",
-      requiresAuth: false  // Public page (or true if you want to protect it)
+      requiresAuth: false
     }
   },
   {
@@ -58,7 +58,16 @@ const routes = [
     component: () => import("../pages/Home/careers.vue"),
     meta: {
       title: "Careers- Rasant Solutions",
-      requiresAuth: false  // Public page
+      requiresAuth: false
+    }
+  },
+  {
+    path: "/careers/:id",
+    name: "JobDetails",
+    component: () => import("../pages/Home/jobDetails.vue"),
+    meta: {
+      title: "Job Details - Rasant Solutions",
+      requiresAuth: false
     }
   },
   {
@@ -67,7 +76,7 @@ const routes = [
     component: () => import("../pages/Home/chatbot.vue"),
     meta: {
       title: "Chatbot - Rasant Solutions",
-      requiresAuth: false  // Public page (or true if you want to protect it)
+      requiresAuth: false
     }
   },
   {
@@ -76,7 +85,7 @@ const routes = [
     component: () => import("../pages/Home/sentraAI.vue"),
     meta: {
       title: "SentraAI - Rasant Solutions",
-      requiresAuth: false  // Public page (or true if you want to protect it)
+      requiresAuth: false
     }
   },
   {
@@ -85,13 +94,13 @@ const routes = [
     component: () => import("../pages/Home/omnipost.vue"),
     meta: {
       title: "OmniPost - Rasant Solutions",
-      requiresAuth: false  // Public page (or true if you want to protect it)
+      requiresAuth: false
     }
   },
   {
     path: "/admin/overview",
     name: "AdminOverview",
-    component: () => import("../pages/admin/Overview/overview.vue"), // Points straight to your sidebar + welcome layout file
+    component: () => import("../pages/admin/Overview/overview.vue"),
     meta: { title: "Admin Overview - Rasant Solutions", requiresAuth: true }
   },
   {
@@ -132,9 +141,8 @@ const router = createRouter({
   routes,
 });
 
-// Add Navigation Guard
 router.beforeEach((to) => {
-  const loginStore = useLoginStore();   //  Correct
+  const loginStore = useLoginStore();
 
   if (to.meta.requiresAuth && !loginStore.isAuthenticated) {
     return '/login';

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Employee,CVSubmission , JobType, JobOpening
+from .models import Employee,CVSubmission , JobType, JobOpening, JobStatus
 class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
@@ -111,7 +111,7 @@ class CVSubmissionSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'full_name', 'email', 'phone', 'desired_position',
             'cv_file', 'cv_file_name', 'cv_file_type', 'cv_file_size',
-            'submitted_at', 'cover_letter',
+            'submitted_at', 'cover_letter','application_status',
         ]
         read_only_fields = ['id', 'submitted_at', 'cv_file_name', 'cv_file_type', 'cv_file_size']
 
@@ -129,6 +129,8 @@ class CVSubmissionSerializer(serializers.ModelSerializer):
         validated_data['cv_file_name'] = uploaded_file.name
         validated_data['cv_file_type'] = uploaded_file.content_type
         validated_data['cv_file_size'] = uploaded_file.size
+        if not validated_data.get('application_status'):
+            validated_data['application_status_id'] = 1
 
         return CVSubmission.objects.create(**validated_data)
 
@@ -136,7 +138,10 @@ class JobTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = JobType
         fields = ['id', 'name']
-
+class JobStatusSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = JobStatus
+        fields = ['id', 'name']
 class JobOpeningSerializer(serializers.ModelSerializer):
     job_type_name = serializers.CharField(source='job_type.name', read_only=True)
 

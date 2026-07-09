@@ -1,4 +1,5 @@
 <template>
+
   <!-- Backdrop -->
   <transition
       enter-active-class="transition-opacity duration-300 ease-out"
@@ -11,7 +12,7 @@
     <div
         v-if="props.isOpen"
         @click="$emit('close')"
-        class="fixed inset-0 bg-black/50 bg-opacity-50 backdrop-blur-sm z-40"
+        class="fixed inset-0 bg-black/50 bg-opacity-50 backdrop-blur-sm z-9998"
     ></div>
   </transition>
 
@@ -26,7 +27,7 @@
   >
     <div
         v-if="props.isOpen"
-        class="fixed inset-0 z-50 overflow-y-auto"
+        class="fixed inset-0 z-9999 overflow-y-auto"
         aria-labelledby="modal-title"
         aria-modal="true"
         role="dialog"
@@ -214,11 +215,14 @@
       </div>
     </div>
   </transition>
+
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+
+let savedScrollY = 0;
 
 
 // Add icons to library
@@ -339,6 +343,19 @@ const getFooterClasses = computed(() => {
     'error': 'bg-gradient-to-r from-red-50 to-pink-50'
   };
   return classes[props.mode] || 'bg-gradient-to-r from-gray-50 to-gray-100';
+});
+watch(() => props.isOpen, (isOpen) => {
+  if (isOpen) {
+    savedScrollY = window.scrollY;
+    document.body.style.position = 'fixed';
+    document.body.style.top = `-${savedScrollY}px`;
+    document.body.style.width = '100%';
+  } else {
+    document.body.style.position = '';
+    document.body.style.top = '';
+    document.body.style.width = '';
+    window.scrollTo(0, savedScrollY);
+  }
 });
 </script>
 

@@ -12,8 +12,8 @@ from django.core.mail import send_mail
 from django.db.models import Q
 from datetime import date
 from django.conf import settings
-from .models import Employee,CVSubmission, JobOpening
-from .serializers import EmployeeSerializer, EmployeeListSerializer, UpdateEmployeeSerializer,CVSubmissionSerializer, JobOpeningSerializer
+from .models import Employee,CVSubmission, JobOpening, JobType,JobStatus
+from .serializers import EmployeeSerializer, EmployeeListSerializer, UpdateEmployeeSerializer,CVSubmissionSerializer, JobOpeningSerializer, JobTypeSerializer, JobStatusSerializer
 
 
 # ---------- Helper function for employee number generation ----------
@@ -150,8 +150,8 @@ def update_employee(request, pk):
         )
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-@api_view(["GET", "POST", "DELETE"])
-@parser_classes([MultiPartParser, FormParser])
+@api_view(["GET", "POST", "DELETE", "PUT"])
+@parser_classes([MultiPartParser, FormParser, JSONParser])
 @permission_classes([AllowAny])
 def cv_submission_view(request, pk=None):
     # -------------------------------------------------------------
@@ -183,18 +183,13 @@ def cv_submission_view(request, pk=None):
 
             if already_submitted:
                 return Response(
-                    {
-                        "error": "You have already submitted a CV today. Please try again tomorrow."
-                    },
+                    {"error": "You have already submitted a CV today. Please try again tomorrow."},
                     status=status.HTTP_429_TOO_MANY_REQUESTS,
                 )
 
             serializer.save()
             return Response(
-                {
-                    "message": "Application submitted successfully.",
-                    "data": serializer.data,
-                },
+                {"message": "Application submitted successfully.", "data": serializer.data},
                 status=status.HTTP_201_CREATED,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -215,6 +210,30 @@ def cv_submission_view(request, pk=None):
         return Response(
             {"status": "success", "message": "CV submission deleted successfully."},
             status=status.HTTP_200_OK,
+        )
+
+    # -------------------------------------------------------------
+    # PUT: Update status (partial update)
+    # -------------------------------------------------------------
+    elif request.method == "PUT":
+        try:
+            cv = CVSubmission.objects.get(pk=pk)
+        except CVSubmission.DoesNotExist:
+            return Response(
+                {"status": "error", "message": "CV submission not found."},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        serializer = CVSubmissionSerializer(cv, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {"status": "success", "message": "CV status updated successfully.", "data": serializer.data},
+                status=status.HTTP_200_OK,
+            )
+        return Response(
+            {"status": "error", "message": "Failed to update.", "errors": serializer.errors},
+            status=status.HTTP_400_BAD_REQUEST,
         )
 
 # ==========================================
@@ -337,6 +356,22 @@ def job_update_view(request, pk):
         'message': 'Failed to update job.',
         'errors': serializer.errors
     }, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def job_types_view(request):
+    from .models import JobType
+    job_types = JobType.objects.all()
+    serializer = JobTypeSerializer(job_types, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+@permission_classes([AllowAny])
+def job_status_view(request):
+    statuses = JobStatus.objects.all()
+    serializer = JobStatusSerializer(statuses, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 # Email API
 @api_view(['POST'])
 def send_invitation_email(request):

@@ -14,8 +14,9 @@ export const API_ENDPOINTS = {
     CV_LIST: '/api/employeeDashboard/submit-cv/',
     JOB_CREATE: '/api/employeeDashboard/job-openings/create/',
     JOB_ADMIN_LIST: '/api/employeeDashboard/job-openings/',
-    JOB_PUBLIC_LIST: '/api/employeeDashboard/job-openings/public/',
+    JOB_PUBLIC_LIST: '/api/employeeDashboard/job-openings/',
     JOB_TYPES: '/api/employeeDashboard/job-types/',
     UPDATE_EMPLOYEE: '/api/employeeDashboard/update_employee/',
     ADD_EMPLOYEE: '/api/employeeDashboard/add_employee/',
+    JOB_STATUS: '/api/employeeDashboard/job-status/',
 };
