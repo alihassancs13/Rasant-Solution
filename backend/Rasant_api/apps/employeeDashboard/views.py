@@ -47,11 +47,11 @@ def add_employee(request):
     employee = Employee(**serializer.validated_data)
 
     file_fields = [
-        ('cnic_scan', True),
-        ('emergency_cnic_scan', True),
-        ('matric_certificate', True),
-        ('fsc_certificate', True),
-        ('university_degree', True),
+        ('cnic_scan', False),
+        ('emergency_cnic_scan', False),
+        ('matric_certificate', False),
+        ('fsc_certificate', False),
+        ('university_degree', False),
         ('other_course', False)  # Optional field
     ]
     for field_name, is_mandatory in file_fields:

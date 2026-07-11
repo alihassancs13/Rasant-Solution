@@ -6,11 +6,11 @@ class EmployeeSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ['employee_number',]
         extra_kwargs = {
-            'cnic_scan': {'required': True},
-            'emergency_cnic_scan': {'required': True},
-            'matric_certificate': {'required': True},
-            'fsc_certificate': {'required': True},
-            'university_degree': {'required': True},
+            'cnic_scan': {'required': False},
+            'emergency_cnic_scan': {'required': False},
+            'matric_certificate': {'required': False},
+            'fsc_certificate': {'required': False},
+            'university_degree': {'required': False},
             # other_course remains optional
         }
 
@@ -54,7 +54,6 @@ class EmployeeListSerializer(serializers.ModelSerializer):
             'emergency_address',
             'bank_name',
             'branch_name',
-            'branch_code',
             'account_number',
             'created_at',
             'updated_at'
@@ -103,7 +102,6 @@ MAX_SIZE = 10 * 1024 * 1024  # 10MB
 
 
 class CVSubmissionSerializer(serializers.ModelSerializer):
-    #  Upload ke liye normal FileField — write_only, DB mein direct nahi jaati
     cv_file = serializers.FileField(write_only=True)
 
     class Meta:

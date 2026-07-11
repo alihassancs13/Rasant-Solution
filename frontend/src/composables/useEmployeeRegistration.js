@@ -1,7 +1,7 @@
 // composables/useEmployeeRegistration.js
 import { ref, computed } from 'vue';
 import { useEmployeeStore } from '../stores/employeeStore.js';
-
+import { useToast } from '@/composables/useToast.js';
 export function useEmployeeRegistration() {
     const store = useEmployeeStore();
 
@@ -10,7 +10,7 @@ export function useEmployeeRegistration() {
     const totalSteps = 4;
     const isSubmitted = ref(false);
     const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
-
+    const { showToast } = useToast();
     const steps = [
         { id: 1, name: 'Personal' },
         { id: 2, name: 'Emergency' },
@@ -161,12 +161,12 @@ export function useEmployeeRegistration() {
         const result = await store.addEmployee(payload);
 
         if (result.success) {
-            alert('Employee registration data processed successfully!');
+            // 4. Trigger your custom success toast!
+            showToast('Employee added successfully!', 'success');
             console.log(result.data);
             isSubmitted.value = false;
             if (onSuccess) onSuccess(result.data);
         } else {
-            // Show field‑specific errors
             let errorMsg = 'Submission failed:\n';
             if (result.errors && typeof result.errors === 'object') {
                 for (const [field, msgs] of Object.entries(result.errors)) {
@@ -175,7 +175,8 @@ export function useEmployeeRegistration() {
             } else {
                 errorMsg += result.error || 'Unknown error';
             }
-            alert(errorMsg);
+            // 5. Trigger your custom error toast
+            showToast(errorMsg, 'error', 5000);
             console.error(result.error);
             isSubmitted.value = false;
         }

@@ -127,7 +127,12 @@ const routes = [
     component: EmployeeDashboard,
     meta: { requiresAuth: true, role: 'employee' }
   },
-
+  {
+    path: '/onboarding/:token?',
+    name: 'EmployeeOnboarding',
+    component: () => import('@/pages/admin/Employee/employeeRegistrationModel.vue'),
+    meta: { requiresAuth: false } // or true depending on your needs
+  },
   {
   path: '/admin/jira',
   name: 'Jira',

@@ -1,5 +1,5 @@
 // composables/useEmployeeDashboard.js
-import { computed, reactive, watch, ref } from 'vue';
+import { computed, reactive, ref } from 'vue';
 import { useEmployeeStore } from '@/stores/employeeStore.js';
 
 export function useEmployeeDashboard() {
@@ -19,7 +19,33 @@ export function useEmployeeDashboard() {
     const sortBy = ref('name');
     const sortDirection = ref('asc');
 
-    // ----- 1. Client‑side filtering (case‑insensitive) -----
+    const pageNumbers = computed(() => {
+        const total = totalPages.value;
+        const current = currentPage.value;
+        if (total <= 1) return [];
+        const pages = [];
+        const maxVisible = 5;
+        if (total <= maxVisible) {
+            for (let i = 1; i <= total; i++) pages.push(i);
+        } else {
+            const left = Math.max(1, current - 1);
+            const right = Math.min(total, current + 1);
+            if (left > 1) {
+                pages.push(1);
+                if (left > 2) pages.push('...');
+            }
+            for (let i = left; i <= right; i++) {
+                pages.push(i);
+            }
+            if (right < total) {
+                if (right < total - 1) pages.push('...');
+                pages.push(total);
+            }
+        }
+        return pages;
+    });
+
+    // Client‑side filtering (case‑insensitive)
     const filteredEmployees = computed(() => {
         if (!searchQuery.value.trim()) {
             return allEmployees.value;
@@ -32,7 +58,7 @@ export function useEmployeeDashboard() {
         );
     });
 
-    // ----- 2. Sorting the filtered list -----
+    // Sorting the filtered list
     const sortedEmployees = computed(() => {
         const list = filteredEmployees.value;
         if (!sortBy.value) return list;
@@ -40,7 +66,6 @@ export function useEmployeeDashboard() {
         const field = sortBy.value;
         const dir = sortDirection.value;
         return [...list].sort((a, b) => {
-            // Get values, fallback to empty string for null/undefined
             const valA = (a[field] ?? '').toString().toLowerCase();
             const valB = (b[field] ?? '').toString().toLowerCase();
 
@@ -50,7 +75,7 @@ export function useEmployeeDashboard() {
         });
     });
 
-    // ----- 3. Pagination on the sorted list -----
+    // Pagination on the sorted list
     const totalFiltered = computed(() => sortedEmployees.value.length);
     const totalPages = computed(() => Math.ceil(totalFiltered.value / pageSize.value));
 
@@ -60,7 +85,7 @@ export function useEmployeeDashboard() {
         return sortedEmployees.value.slice(start, end);
     });
 
-    // ----- 4. Stats summary (overall, not filtered) -----
+    // Stats summary (overall, not filtered)
     const statsSummary = reactive({
         total: 0,
         inOffice: 0,
@@ -78,7 +103,7 @@ export function useEmployeeDashboard() {
         statsSummary.awayToday = allEmployees.value.filter(e => e.today_status?.toLowerCase() === 'away').length;
     };
 
-    // ----- 5. Load employees (fetch all if searching, else paginated) -----
+    // Load employees (fetch all if searching, else paginated)
     const loadEmployees = async () => {
         const params = {
             search: searchQuery.value,
@@ -92,7 +117,7 @@ export function useEmployeeDashboard() {
         }
     };
 
-    // ----- 6. Update employee (re‑calculate stats after update) -----
+    // Update employee (re‑calculate stats after update)
     const updateEmployee = async (employeeId, payload) => {
         const result = await employeeStore.updateEmployeeDetails(employeeId, payload);
         if (result.success) {
@@ -101,26 +126,16 @@ export function useEmployeeDashboard() {
         return result;
     };
 
-    // ----- 7. Toggle sorting (called from view) -----
+    // Toggle sorting
     const toggleSort = (field) => {
         if (sortBy.value === field) {
             sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
         } else {
-
             sortBy.value = field;
             sortDirection.value = 'asc';
         }
     };
 
-    // ----- 8. Watchers -----
-    watch(searchQuery, () => {
-        loadEmployees();
-    });
-
-    watch(pageSize, () => {
-        currentPage.value = 1;
-        loadEmployees();
-    });
     return {
         // Display data
         employees: paginatedEmployees,
@@ -136,6 +151,9 @@ export function useEmployeeDashboard() {
         sortDirection,
         toggleSort,
         loadEmployees,
-        updateEmployee
+        updateEmployee,
+        pageNumbers,
+        allEmployees,
+        calculateStats
     };
 }
