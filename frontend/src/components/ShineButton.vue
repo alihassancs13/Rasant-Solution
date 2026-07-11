@@ -14,6 +14,12 @@
       :disabled="disabled"
   >
     <slot>{{ label }}</slot>
+    <span
+        v-if="badge !== null"
+        class="flex items-center justify-center w-5 h-5 rounded-full bg-white/25 text-xs font-bold shrink-0"
+    >
+      {{ badge }}
+    </span>
   </button>
 
   <RouterLink
@@ -30,6 +36,12 @@
       @click="$emit('click', $event)"
   >
     <slot>{{ label }}</slot>
+    <span
+        v-if="badge !== null"
+        class="flex items-center justify-center w-5 h-5 rounded-full bg-white/25 text-xs font-bold shrink-0"
+    >
+      {{ badge }}
+    </span>
   </RouterLink>
 </template>
 
@@ -45,6 +57,7 @@ const props = defineProps({
   shape:   { type: String, default: 'xl' },
   type:    { type: String, default: 'button' },
   disabled: { type: Boolean, default: false },
+  badge:   { type: [String, Number], default: null },
 })
 
 defineEmits(['click'])
@@ -76,6 +89,8 @@ const variantClass = computed(() => {
     ghost:     'bg-transparent hover:bg-neutral-100 text-primary-900 border border-transparent hover:border-neutral-300',
     danger:    'bg-error hover:bg-error/80 text-white shadow-lg shadow-error/20',
     success:   'bg-success hover:bg-success/80 text-white shadow-lg shadow-success/20',
+    teal:      'bg-teal-500 hover:bg-teal-600 text-white shadow-sm',
+    urgent:    'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg shadow-orange-500/30 hover:shadow-xl',
   }
   return variants[props.variant] ?? variants.primary
 })

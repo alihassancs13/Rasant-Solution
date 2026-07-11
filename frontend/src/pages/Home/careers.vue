@@ -217,7 +217,7 @@
         ref="openRolesRef"
         class="px-[5%] py-20 md:py-24"
     >
-      <div class="max-w-4xl mx-auto">
+      <div class="max-w-6xl mx-auto">
         <div
             class="text-center mb-12 transition-all duration-700 ease-out"
             :class="visible.openRoles ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'"
@@ -229,48 +229,46 @@
           </p>
         </div>
 
-        <div class="space-y-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
           <article
               v-for="(job, i) in openRoles"
               :key="job.id"
-              class="group bg-card border border-borderDefault rounded-2xl p-6 md:p-8 shadow-sm hover:border-activeBorder/30 hover:shadow-insetBlue hover:-translate-y-0.5 transition-all duration-300"
+              class="group bg-card border border-borderDefault rounded-[15px] p-5 shadow-sm hover:border-activeBorder/30 hover:shadow-insetBlue hover:-translate-y-0.5 transition-all duration-300 flex flex-col"
               :class="visible.openRoles ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'"
-              :style="{ transitionDelay: visible.openRoles ? `${i * 100}ms` : '0ms' }"
+              :style="{ transitionDelay: visible.openRoles ? `${i * 60}ms` : '0ms' }"
           >
-            <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-              <div class="min-w-0 flex-1">
-                <div class="flex flex-wrap items-center gap-2 mb-2">
-                  <h3 class="font-display text-xl font-bold text-headingCard">{{ job.job_title }}</h3>
-                  <span
-                      v-if="job.job_type_name"
-                      class="inline-flex px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide bg-primary-50 text-primary-700 border border-primary-100"
-                  >
-            {{ job.job_type_name }}
-          </span>
-                </div>
-                <p class="text-sm text-textSupporting font-medium">
-                  {{ job.department }}
-                  <span v-if="job.location" class="text-textBody"> · {{ job.location }}</span>
-                </p>
+            <div class="flex-1 min-w-0">
+              <div class="flex flex-wrap items-center gap-1.5 mb-1.5">
+                <h3 class="font-display text-[15px]  font-bold text-headingCard ">{{ job.job_title }}</h3>
+                <span
+                    v-if="job.job_type_name"
+                    class="inline-flex px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wide bg-primary-50 text-primary-700 border border-primary-100"
+                >
+          {{ job.job_type_name }}
+        </span>
               </div>
+              <p class="text-xs text-textSupporting font-medium">
+                {{ job.department }}
+                <span v-if="job.location" class="text-textBody"> · {{ job.location }}</span>
+              </p>
+            </div>
 
-              <div class="flex gap-2 shrink-0 self-start">
-                <!-- Updated View button to navigate to job details page -->
-                <router-link
-                    :to="{ name: 'JobDetails', params: { id: job.id } }"
-                    target="_blank"
-                    class="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg border border-borderDefault bg-white text-textPrimary hover:bg-surface hover:border-activeBorder/30 transition-all duration-200"
-                >
-                  <font-awesome-icon :icon="['fas', 'external-link-alt']" class="mr-1.5 text-xs" />
-                  View
-                </router-link>
-                <ShineButton
-                    size="sm"
-                    @click="openModal(job.job_title)"
-                >
-                  Apply now
-                </ShineButton>
-              </div>
+            <div class="flex gap-2 mt-3">
+              <router-link
+                  :to="{ name: 'JobDetails', params: { id: job.id } }"
+                  target="_blank"
+                  class="flex-1 inline-flex items-center justify-center px-2 py-1 text-[11px] font-medium rounded-lg border border-borderDefault bg-white text-textPrimary hover:bg-surface hover:border-activeBorder/30 transition-all duration-200"
+              >
+                <font-awesome-icon :icon="['fas', 'external-link-alt']" class="mr-1 text-[9px]" />
+                View
+              </router-link>
+              <ShineButton
+                  size="xs"
+                  class="flex-1 !px-2 !py-1 !text-[11px]"
+                  @click="openModal(job.job_title,job.id)"
+              >
+                Apply now
+              </ShineButton>
             </div>
           </article>
         </div>
@@ -437,10 +435,11 @@
                         Desired Position <span class="text-error">*</span>
                       </label>
                       <input
-                          type="text"
+
                           v-model="formData.position"
-                          placeholder="e.g. Vue Developer, Java Engineer"
-                          :class="inputClass(formErrors.position)"
+                          placeholder=""
+
+                          :class="[inputClass(formErrors.position), 'bg-surface  text-textSupporting']"
                       />
                       <p v-if="formErrors.position" class="text-[11px] text-error flex items-center gap-1">
                         <i class="fa-solid fa-circle-exclamation text-[10px]"></i>

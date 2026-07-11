@@ -24,7 +24,7 @@ export function useCareers() {
 
     const formData = reactive({
         name: '', email: '', contact: '',
-        position: '', coverLetter: '', file: null,
+        position: '', coverLetter: '', file: null,jobId: null,
     })
 
     const formErrors = reactive({
@@ -71,8 +71,9 @@ export function useCareers() {
     }
 
     // ── Modal ────────────────────────────────────────────────────────────
-    const openModal = (defaultPosition = '') => {
+    const openModal = (defaultPosition = '', jobId = null) => {
         formData.position    = defaultPosition
+        formData.jobId        = jobId
         savedScrollPos.value = window.scrollY
         isModalOpen.value    = true
         submitSuccess.value  = false
@@ -127,13 +128,13 @@ export function useCareers() {
         }
 
         if (file.size > MAX_FILE_SIZE) {
-            const msg = 'File size must not exceed 5MB.'
+            const msg = 'File size must not exceed 10MB.'
             formErrors.file    = msg
             formData.file      = null
             fileName.value     = 'No file chosen'
             fileUploaded.value = false
             if (fileInput.value) fileInput.value.value = ''
-            pushToast('error', msg)
+
             return
         }
 
@@ -178,6 +179,7 @@ export function useCareers() {
             payload.append('desired_position', formData.position)
             payload.append('cv_file',          formData.file)
             if (formData.coverLetter) payload.append('cover_letter', formData.coverLetter)
+            if (formData.jobId) payload.append('job', formData.jobId)
 
             await cvStore.submitCV(payload)
 
@@ -263,7 +265,7 @@ export function useCareers() {
 
     // ── Reset ────────────────────────────────────────────────────────────
     const resetForm = () => {
-        Object.assign(formData, { name: '', email: '', contact: '', position: '', coverLetter: '', file: null })
+        Object.assign(formData, { name: '', email: '', contact: '', position: '', coverLetter: '', file: null,jobId: null })
         Object.keys(formErrors).forEach(k => formErrors[k] = '')
         fileName.value     = 'No file chosen'
         fileUploaded.value = false

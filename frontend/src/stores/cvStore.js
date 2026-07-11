@@ -67,6 +67,7 @@ export const useCvStore = defineStore('cv', {
             }
         },
 
+        // Original download action — kept as-is, still used for explicit "Download" actions.
         async downloadCV(id, filename = 'cv.pdf') {
             try {
                 const response = await apiClient.get(`/api/employeeDashboard/cv/${id}/download/`, {
@@ -83,6 +84,28 @@ export const useCvStore = defineStore('cv', {
                 return { success: true };
             } catch (error) {
                 this.error = error.response?.data?.message || 'Failed to download CV';
+                return { success: false, error: this.error };
+            }
+        },
+
+        // NEW: fetches the same bytes but returns the raw Blob instead of triggering
+        // a file save. The component uses this blob to either render the PDF itself
+        // (via pdf.js, for full styling control) or show an <img>, and also to power
+        // the explicit "Download" button in the preview panel.
+        async previewCV(id) {
+            try {
+                const response = await apiClient.get(`/api/employeeDashboard/cv/${id}/download/`, {
+                    responseType: 'blob',
+                });
+
+                // Content-Type from the response tells us what kind of bytes these are
+                // (pdf, image, docx, etc). Falls back to pdf if the backend omits it.
+                const contentType = response.headers['content-type'] || 'application/pdf';
+                const blob = new Blob([response.data], { type: contentType });
+
+                return { success: true, blob, contentType };
+            } catch (error) {
+                this.error = error.response?.data?.message || 'Failed to load CV preview';
                 return { success: false, error: this.error };
             }
         },

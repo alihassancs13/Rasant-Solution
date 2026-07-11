@@ -36,7 +36,6 @@ export const useContactStore = defineStore('contact', {
     },
 
     actions: {
-        // ── Admin: fetch all contact messages ──────────────
         async fetchMessages() {
             this.isLoading = true;
             this.error = null;
@@ -44,9 +43,7 @@ export const useContactStore = defineStore('contact', {
                 const response = await apiClient.get(API_ENDPOINTS.CONTACT);
                 this.messages = response.data;
                 return { success: true };
-            } catch (error) {
-                this.error = error.response?.data?.message || 'Failed to fetch messages';
-                return { success: false, error: this.error };
+
             } finally {
                 this.isLoading = false;
             }

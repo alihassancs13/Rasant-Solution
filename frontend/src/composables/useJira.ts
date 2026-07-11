@@ -1,5 +1,5 @@
 import {computed, onMounted, reactive, ref, watch,nextTick} from 'vue';
-import { useJiraStore } from '@/stores/jiraStore';
+import { useJiraStore } from '@/stores/jiraStore.js';
 
 
 export interface JiraForm {

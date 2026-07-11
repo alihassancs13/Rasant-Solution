@@ -51,7 +51,7 @@ html, body {
     /* ═══════════════════════════════════════════════════════════
        CARD BACKGROUNDS
        ═══════════════════════════════════════════════════════════ */
-    --color-card: #FFFFFF;
+    --color-card: #ffffff;
     --color-cardSemi: rgba(255, 255, 255, 0.9);
     --color-badgeSemi: rgba(255, 255, 255, 0.8);
     --color-cardHeader: rgba(241, 245, 249, 0.5);
@@ -60,7 +60,7 @@ html, body {
     /* ═══════════════════════════════════════════════════════════
        STATUS COLORS (text + background pairs)
        ═══════════════════════════════════════════════════════════ */
-    --color-Success: #10B981;
+    --color-Success: #000000;
     --color-Warning: #F59E0B;
     --color-Error: #EF4444;
     --color-SuccessLight: rgba(74, 144, 226, 0.1);
@@ -212,8 +212,6 @@ html, body {
     /* ═══════════════════════════════════════════════════════════
        SEMANTIC COLORS
        ═══════════════════════════════════════════════════════════ */
-    --color-success: #22C55E;
-    --color-warning: #F59E0B;
     --color-error: #EF4444;
     --color-info: #4A90E2;
     --color-iconDark: #1a212c;
@@ -305,7 +303,7 @@ html, body {
 
     /* ── Status: Success (Published badge) ── */
     --color-success: #047857;
-    --color-success-subtle: #d1fae5;
+    --color-success-subtle: #00bf5e;
 
     /* ── Status: Warning (Pending/Draft badge) ── */
     --color-warning: #b45309;
@@ -325,6 +323,7 @@ html, body {
     --color-text-primary: #1e293b;     /* headings */
     --color-text-secondary: #64748b;   /* body text */
     --color-text-muted: #4c4e51;       /* placeholders, meta text */
+
 }
 
 :root {
@@ -332,8 +331,46 @@ html, body {
     --gradient-platform: linear-gradient(135deg, #ebf3f1, #e8e7f8, #b5d0f1);
     --gradient-secondary-bg: linear-gradient(165deg, #FFF8F3 0%, #FDF2F8 28%, #F5F0FF 52%, #EFF6FF 100%);
     --gradient-text-primary: linear-gradient(to right, #C96E3A, #B0457A, #6B52B8, #3B73C4);
+    --gradient-brand: linear-gradient(90deg, #C96E3A 0%, #B0457A 25%, #6B52B8 50%, #3B73C4 75%, #1D5AA8 100%);
+    --gradient-modal-header: linear-gradient(135deg, #FFF8F3 0%, #F5F0FF 50%, #EFF6FF 100%);
+    --gradient-icon-brand: linear-gradient(90deg, #2F6FC4 0%, #4A88D8 50%, #5C97E3 100%);
+    --shadow-sm: 0 1px 3px rgba(74, 144, 226, 0.06);
 }
 
+@layer topBarProfile {
+    .dash-topbar-profile {
+        width: 42px;
+        height: 42px;
+        border-radius: 12px;
+        border: 2px solid rgba(74, 144, 226, 0.25);
+        background: linear-gradient(135deg, #2A5F9E, #4A90E2);
+        color: #fff;
+        font-family: 'Space Grotesk', sans-serif;
+        font-weight: 800;
+        font-size: 13px;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(42, 95, 158, 0.2);
+        transition: transform 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .dash-topbar-profile:hover {
+        transform: scale(1.05);
+    }
+
+    .dash-topbar-profile:active {
+        transform: scale(0.95);
+    }
+
+    /* Tab active gradient - without flex */
+    .tab-active-gradient {
+        background: linear-gradient(135deg, #2A5F9E, #4A90E2);
+        color: #fff;
+        box-shadow: 0 4px 12px rgba(42, 95, 158, 0.2);
+    }
+}
 /* Custom Utility Classes */
 @layer utilities {
     /* Gradients */
@@ -344,6 +381,21 @@ html, body {
         background: var(--gradient-text-primary);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
+    }
+    .btn-primary-gradient {
+        background: linear-gradient(135deg, #C2410C 0%, #EA580C 55%, #F97316 100%);
+        box-shadow: 0 8px 24px rgba(194, 65, 12, 0.35);
+        transition: all 0.3s ease;
+        color: #fff;
+    }
+
+    .btn-primary-gradient:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 32px rgba(194, 65, 12, 0.45);
+    }
+
+    .btn-primary-gradient:active {
+        transform: translateY(0px);
     }
 
     /* Avatars */
@@ -406,6 +458,7 @@ html, body {
         transition: color 0.3s ease;
     }
 
+
     .section-number:hover {
         color: var(--color-sectionNumberHover);
     }
@@ -415,6 +468,40 @@ html, body {
 
     /* Button text colors */
     .text-button-hover { color: var(--color-buttonHover); }
+
+    /* Modal header + footer buttons */
+    .header-base-gradient { background: var(--gradient-modal-header); }
+
+    .icon-gradient-brand {
+        background: var(--gradient-icon-brand);
+        color: #FFFFFF;
+    }
+
+
+    .btn-gradient-border {
+        color: var(--color-brandDark);
+        border: 1.5px solid transparent;
+        border-radius: 0.75rem;
+        font-weight: 500;
+        background-image: linear-gradient(#fff, #fff), var(--gradient-brand);
+        background-origin: border-box;
+        background-clip: padding-box, border-box;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .btn-gradient-border:hover {
+        background-image: linear-gradient(#f9fafb, #f9fafb), var(--gradient-brand);
+    }
+
+    .btn-gradient-border:focus {
+        outline: none;
+        box-shadow: var(--shadow-sm), 0 0 0 2px rgba(59, 115, 196, 0.25);
+    }
+
+    .btn-gradient-border:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
 }
 
 /* Keyframe Animations */

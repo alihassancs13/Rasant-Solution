@@ -31,7 +31,8 @@
             class="px-6 py-4 border-b border-gray-100"
             :class="{
             'bg-gradient-to-r from-red-50 to-rose-50': props.mode === 'delete',
-            'bg-gradient-to-r from-[#F2F8FE] via-[#EAF4FD] to-[#E2F0FC]':props.mode === 'toggle' || (props.mode === 'form' && !props.title.includes('Error')),            'bg-gradient-to-r from-gray-50 to-gray-100': props.mode === 'view'
+            'header-base-gradient': (props.mode === 'toggle' || props.mode === 'form') && !props.title.includes('Error'),
+            'bg-gradient-to-r from-gray-50 to-gray-100': props.mode === 'view'
           }"
         >
           <div class="flex items-center justify-between">
@@ -41,7 +42,7 @@
                   class="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
                   :class="{
                   'bg-red-100 text-red-600': props.mode === 'delete',
-                  'bg-gradient-to-r from-[#2F6FC4] via-[#4A88D8] to-[#5C97E3] text-white': props.mode === 'toggle' || (props.mode === 'form' && !props.title.includes('Error')),                  'bg-rose-100 text-rose-600': props.title.includes('Error'),
+                  'icon-gradient-brand': props.mode === 'toggle' || (props.mode === 'form' && !props.title.includes('Error')),                  'bg-rose-100 text-rose-600': props.title.includes('Error'),
                   'bg-teal-100 text-teal-600': props.mode === 'view'
                 }"
               >
@@ -126,7 +127,7 @@
                 type="button"
                 @click="$emit('close')"
                 :disabled="props.loading"
-                class="px-5 py-2.5 text-sm font-medium rounded-xl border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                class="px-5 py-2.5 text-sm rounded-xl btn-gradient-border border border-0.125rem transition-all duration-200"
             >
               Cancel
             </button>
@@ -135,7 +136,7 @@
             <button
                 v-if="props.mode === 'view'"
                 @click="$emit('close')"
-                class="px-5 py-2.5 text-sm font-medium rounded-xl border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-400 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition-all duration-200"
+                class="px-5 py-2.5 text-sm rounded-xl btn-gradient-border transition-all duration-200"
             >
               Close Details
             </button>
@@ -246,5 +247,15 @@ defineEmits<{
 .slide-leave-to {
   transform: translateY(-20px);
   opacity: 0;
+}
+
+/* Field labels inside slotted form content (Job Title, Job Type, Department, etc.) */
+:deep(.dash-field label) {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-secondary);
+  font-family: var(--font-primary);
 }
 </style>

@@ -80,7 +80,10 @@ export function useJobs() {
 
         if (result.success) {
             submitSuccess.value = true
-            showToast('Job opening created successfully.', 'success')
+            showToast(
+                isClosed.value ? 'Job published on careers page.' : 'Job saved as draft.',
+                'success'
+            )
             return result.data
         } else {
             submitError.value = result.error

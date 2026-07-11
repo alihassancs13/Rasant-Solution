@@ -145,6 +145,57 @@ export function useEmployeeCareer() {
         )
     })
 
+    // ─── Job selection (drives STEP 1 -> STEP 2 drill-down in CV tab) ──
+    // selectedJobForCVs can be:
+    //   - a real JobOpening object   -> normal per-job view
+    //   - the GENERAL_APPLICATIONS sentinel below -> CVs with job = null
+    const GENERAL_APPLICATIONS = Object.freeze({
+        id: null,
+        job_title: 'General Applications',
+        department: null,
+        location: null,
+        isGeneral: true,
+    })
+
+    const selectedJobForCVs = ref(null)
+
+    // NOTE: previously this matched cv.desired_position against job.job_title
+    // as free text, so renaming a job (or a candidate typing the position
+    // slightly differently) silently broke the link. Now every CV carries a
+    // real `job` foreign key (the JobOpening id, or null for a general
+    // application), so matching is done by id — exact and rename-proof.
+    function cvCountForJob(job) {
+        if (!Array.isArray(cvSubmissions.value)) return 0
+        if (job?.isGeneral) {
+            return cvSubmissions.value.filter(cv => cv.job === null || cv.job === undefined).length
+        }
+        return cvSubmissions.value.filter(cv => Number(cv.job) === Number(job?.id)).length
+    }
+
+    const generalApplicationsCount = computed(() => cvCountForJob(GENERAL_APPLICATIONS))
+
+    function openJobCVs(job) {
+        selectedJobForCVs.value = job
+    }
+
+    function openGeneralApplications() {
+        selectedJobForCVs.value = GENERAL_APPLICATIONS
+    }
+
+    function backToJobsList() {
+        selectedJobForCVs.value = null
+    }
+
+    // filteredCVs (search-filtered) narrowed further to the selected job,
+    // by id — same rename-proof matching as cvCountForJob above.
+    const jobFilteredCVs = computed(() => {
+        if (!selectedJobForCVs.value) return []
+        if (selectedJobForCVs.value.isGeneral) {
+            return filteredCVs.value.filter(cv => cv.job === null || cv.job === undefined)
+        }
+        return filteredCVs.value.filter(cv => Number(cv.job) === Number(selectedJobForCVs.value.id))
+    })
+
     async function viewCV(cv) {
         const newTab = window.open('', '_blank')
         const result = await cvStore.downloadCV(cv.id, `${cv.full_name}_CV.pdf`)
@@ -159,7 +210,6 @@ export function useEmployeeCareer() {
     function formatDate(iso) {
         return new Date(iso).toLocaleDateString('en-PK', {
             day: '2-digit', month: 'short', year: 'numeric',
-            hour: '2-digit', minute: '2-digit',
         })
     }
 
@@ -200,6 +250,8 @@ export function useEmployeeCareer() {
         paginatedItems, pageNumbers, nextPage, prevPage, goToPage,
         cvSubmissions, cvLoading, cvError, cvSearchQuery,
         fetchCVSubmissions, deleteCV, filteredCVs, viewCV,
-        formatDate, initials,removeApplicant, confirmDelete, cancelDelete, showDeleteConfirm
+        formatDate, initials, removeApplicant, confirmDelete, cancelDelete, showDeleteConfirm,
+        selectedJobForCVs, cvCountForJob, openJobCVs, backToJobsList, jobFilteredCVs,
+        GENERAL_APPLICATIONS, generalApplicationsCount, openGeneralApplications,
     }
 }

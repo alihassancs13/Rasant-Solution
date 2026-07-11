@@ -199,25 +199,7 @@
         </nav>
       </div>
 
-      <!-- Account Section -->
-      <div class="p-4 border-t border-border/60 bg-surface shrink-0">
-        <p class="text-[11px] font-bold text-text-muted tracking-widest px-3 mb-1 uppercase" v-show="!showCollapsed">Account</p>
-        <router-link
-            v-for="module in accountModules"
-            :key="module.id"
-            :to="getModuleRoute(module.name)"
-            @click="handleNavigation"
-            class="flex items-center px-4 py-2 rounded-xl text-text-muted hover:bg-primary-subtle hover:text-primary font-medium transition-all"
-            :class="[
-              isActive(module.name, $route.path) ? 'bg-white text-primary font-semibold shadow-sm border-l-4 border-primary' : '',
-              showCollapsed ? 'justify-center' : 'space-x-3'
-            ]"
-            :title="showCollapsed ? module.name : null"
-        >
-          <font-awesome-icon :icon="module.icon" class="text-lg w-5 shrink-0" />
-          <span v-show="!showCollapsed">{{ module.name }}</span>
-        </router-link>
-      </div>
+
     </aside>
   </div>
 </template>

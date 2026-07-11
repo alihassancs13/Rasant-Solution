@@ -222,7 +222,6 @@
       </div>
 
       <!-- ===== DESKTOP RIGHT BUTTONS ===== -->
-      <!-- ===== DESKTOP RIGHT BUTTONS ===== -->
       <div class="hidden md:flex items-center gap-2 lg:gap-3 shrink-0 z-[2]">
 
         <!-- If Logged In: Show Dashboard Button -->

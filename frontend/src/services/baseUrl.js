@@ -19,4 +19,6 @@ export const API_ENDPOINTS = {
     UPDATE_EMPLOYEE: '/api/employeeDashboard/update_employee/',
     ADD_EMPLOYEE: '/api/employeeDashboard/add_employee/',
     JOB_STATUS: '/api/employeeDashboard/job-status/',
+    INCREMENT_POLICIES: '/api/employeeDashboard/salaries/policies/',
+    INCREMENT_LOOKUPS:  '/api/employeeDashboard/salaries/lookups/',
 };

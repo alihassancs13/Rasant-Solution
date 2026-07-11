@@ -2,10 +2,7 @@ from django.db import models
 from django.conf import settings
 from datetime import date
 class Employee(models.Model):
-    """
-    Employee model – All file fields are converted into a 3-column
-    binary setup to store documents entirely inside XAMPP MySQL.
-    """
+
     GENDER_CHOICES = [
         ('Male', 'Male'),
         ('Female', 'Female'),
@@ -138,6 +135,14 @@ class CVSubmission(models.Model):
 
     application_status = models.ForeignKey(
         ApplicationStatus,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='cv_submissions'
+    )
+
+    job = models.ForeignKey(
+        'JobOpening',
         on_delete=models.SET_NULL,
         null=True,
         blank=True,

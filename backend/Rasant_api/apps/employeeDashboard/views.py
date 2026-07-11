@@ -12,8 +12,17 @@ from django.core.mail import send_mail
 from django.db.models import Q
 from datetime import date
 from django.conf import settings
-from .models import Employee,CVSubmission, JobOpening, JobType,JobStatus
-from .serializers import EmployeeSerializer, EmployeeListSerializer, UpdateEmployeeSerializer,CVSubmissionSerializer, JobOpeningSerializer, JobTypeSerializer, JobStatusSerializer
+
+from .models import (
+    Employee, CVSubmission, JobOpening, JobType, JobStatus,
+    IncrementType, IncrementPolicy, CycleTiming, ApplicationMode,
+)
+from .serializers import (
+    EmployeeSerializer, EmployeeListSerializer, UpdateEmployeeSerializer,
+    CVSubmissionSerializer, JobOpeningSerializer, JobTypeSerializer, JobStatusSerializer,
+    IncrementTypeSerializer, CycleTimingSerializer, ApplicationModeSerializer,
+    IncrementPolicySerializer,
+)
 
 
 # ---------- Helper function for employee number generation ----------
@@ -93,6 +102,8 @@ def add_employee(request):
         {"error": "Could not generate a unique employee number after multiple attempts."},
         status=status.HTTP_500_INTERNAL_SERVER_ERROR
     )
+
+
 @api_view(['GET'])
 def list_employees(request):
     employees = Employee.objects.all().order_by('-created_at')
@@ -150,15 +161,23 @@ def update_employee(request, pk):
         )
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(["GET", "POST", "DELETE", "PUT"])
 @parser_classes([MultiPartParser, FormParser, JSONParser])
 @permission_classes([AllowAny])
 def cv_submission_view(request, pk=None):
     # -------------------------------------------------------------
-    # GET: List all CV Submissions
+    # GET: List CV Submissions (optionally filtered by job)
     # -------------------------------------------------------------
     if request.method == "GET":
-        cvs = CVSubmission.objects.all()
+        cvs = CVSubmission.objects.select_related('job', 'application_status').all()
+        job_param = request.query_params.get('job')
+        if job_param is not None:
+            if job_param.lower() in ('null', 'none', 'general', ''):
+                cvs = cvs.filter(job__isnull=True)
+            else:
+                cvs = cvs.filter(job_id=job_param)
+
         serializer = CVSubmissionSerializer(cvs, many=True)
         return Response(
             {"status": "success", "data": serializer.data},
@@ -213,7 +232,7 @@ def cv_submission_view(request, pk=None):
         )
 
     # -------------------------------------------------------------
-    # PUT: Update status (partial update)
+    # PUT: Update status / re-link job (partial update)
     # -------------------------------------------------------------
     elif request.method == "PUT":
         try:
@@ -235,6 +254,7 @@ def cv_submission_view(request, pk=None):
             {"status": "error", "message": "Failed to update.", "errors": serializer.errors},
             status=status.HTTP_400_BAD_REQUEST,
         )
+
 
 # ==========================================
 # 2. Send Candidate Email View
@@ -291,8 +311,10 @@ def cv_download_view(request, pk):
     response['Content-Disposition'] = f'attachment; filename="{cv.cv_file_name}"'
     return response
 
-# 4. Job Create View
 
+# ==========================================
+# 4. Job Create View
+# ==========================================
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -311,7 +333,10 @@ def job_create_view(request):
         'errors': serializer.errors
     }, status=status.HTTP_400_BAD_REQUEST)
 
+
+# ==========================================
 # 5. Job List View
+# ==========================================
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
@@ -357,6 +382,7 @@ def job_update_view(request, pk):
         'errors': serializer.errors
     }, status=status.HTTP_400_BAD_REQUEST)
 
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def job_types_view(request):
@@ -365,14 +391,19 @@ def job_types_view(request):
     serializer = JobTypeSerializer(job_types, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 @api_view(['GET'])
-@permission_classes([AllowAny])
 @permission_classes([AllowAny])
 def job_status_view(request):
     statuses = JobStatus.objects.all()
     serializer = JobStatusSerializer(statuses, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+# ==========================================
 # Email API
+# ==========================================
+
 @api_view(['POST'])
 def send_invitation_email(request):
     """
@@ -444,3 +475,70 @@ def send_invitation_email(request):
         {"message": "Invitation email sent successfully"},
         status=status.HTTP_200_OK
     )
+
+
+# ==========================================
+# 7. Increment Lookups View
+# ==========================================
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def increment_lookups_view(request):
+    """One call returns all 3 dropdown lists — powers Increment Type /
+    Cycle Timing / Application Mode selects in the Add/Edit Policy modal."""
+    return Response({
+        "status": "success",
+        "data": {
+            "increment_types":  IncrementTypeSerializer(IncrementType.objects.all(), many=True).data,
+            "cycle_timings":    CycleTimingSerializer(CycleTiming.objects.all(), many=True).data,
+            "application_modes": ApplicationModeSerializer(ApplicationMode.objects.all(), many=True).data,
+        }
+    }, status=status.HTTP_200_OK)
+
+
+# ==========================================
+# 8. Increment Policy View (CRUD)
+# ==========================================
+
+@api_view(["GET", "POST", "PUT", "DELETE"])
+@permission_classes([IsAuthenticated])
+def increment_policy_view(request, pk=None):
+    if request.method == "GET":
+        policies = IncrementPolicy.objects.select_related(
+            'increment_type', 'cycle_timing', 'application_mode'
+        ).all()
+        serializer = IncrementPolicySerializer(policies, many=True)
+        return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+    elif request.method == "POST":
+        serializer = IncrementPolicySerializer(data=request.data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {"status": "success", "message": "Policy created successfully.", "data": serializer.data},
+                status=status.HTTP_201_CREATED,
+            )
+        return Response({"status": "error", "errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == "PUT":
+        try:
+            policy = IncrementPolicy.objects.get(pk=pk)
+        except IncrementPolicy.DoesNotExist:
+            return Response({"status": "error", "message": "Policy not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = IncrementPolicySerializer(policy, data=request.data, partial=True, context={'request': request})
+        if serializer.is_valid():
+            serializer.save()
+            return Response(
+                {"status": "success", "message": "Policy updated successfully.", "data": serializer.data},
+                status=status.HTTP_200_OK,
+            )
+        return Response({"status": "error", "errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == "DELETE":
+        try:
+            policy = IncrementPolicy.objects.get(pk=pk)
+        except IncrementPolicy.DoesNotExist:
+            return Response({"status": "error", "message": "Policy not found."}, status=status.HTTP_404_NOT_FOUND)
+        policy.delete()
+        return Response({"status": "success", "message": "Policy deleted successfully."}, status=status.HTTP_200_OK)

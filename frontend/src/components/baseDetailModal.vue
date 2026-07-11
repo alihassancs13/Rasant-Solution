@@ -53,7 +53,7 @@
               <div class="flex items-center space-x-4">
                 <!-- Icon based on mode -->
                 <div
-                    class="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center shadow-sm"
+                    class="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center shadow-sm"
                     :class="getIconClasses"
                 >
                   <font-awesome-icon
@@ -111,7 +111,7 @@
                   v-if="props.mode !== 'view' && props.mode !== 'info'"
                   @click="$emit('cancel')"
                   :disabled="props.loading"
-                  class="px-6 py-3 text-sm font-medium rounded-xl border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-400 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  class="px-6 py-3 text-sm rounded-xl btn-gradient-border transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {{ props.cancelText }}
               </button>
@@ -141,7 +141,7 @@
                   v-if="props.mode === 'form'"
                   @click="$emit('save')"
                   :disabled="props.disabled || props.loading"
-                  class="px-6 py-3 text-sm font-medium rounded-xl border border-transparent bg-gradient-to-r from-teal-500 to-emerald-500 text-white hover:from-teal-600 hover:to-emerald-600 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                  class="px-6 py-3 text-sm font-medium rounded-xl border border-transparent bg-gradient-to-r from-[#2F6FC4] via-[#3F7FD2] to-[#4A88D8] text-white hover:from-[#295FB0] hover:via-[#386FC0] hover:to-[#417FD0] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#4A88D8] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
               >
                 <font-awesome-icon
                     v-if="props.loading"
@@ -201,7 +201,7 @@
               <button
                   v-if="props.mode === 'view' || props.mode === 'info'"
                   @click="$emit('close')"
-                  class="px-6 py-3 text-sm font-medium rounded-xl border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 hover:border-gray-400 hover:shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 transition-all duration-200 flex items-center"
+                  class="px-6 py-3 text-sm rounded-xl btn-gradient-border transition-all duration-200 flex items-center"
               >
                 <font-awesome-icon
                     icon="fa-solid fa-times"
@@ -295,9 +295,9 @@ const getModeIcon = computed(() => {
 
 const getHeaderClasses = computed(() => {
   const classes: Record<string, string> = {
-    'form': 'bg-gradient-to-r from-teal-50 to-emerald-50',
+    'form': 'header-base-gradient',
     'delete': 'bg-gradient-to-r from-red-50 to-rose-50',
-    'view': 'bg-gradient-to-r from-gray-50 to-gray-100',
+    'view': 'header-base-gradient',
     'warning': 'bg-gradient-to-r from-yellow-50 to-amber-50',
     'info': 'bg-gradient-to-r from-blue-50 to-cyan-50',
     'success': 'bg-gradient-to-r from-green-50 to-emerald-50',
@@ -308,9 +308,9 @@ const getHeaderClasses = computed(() => {
 
 const getIconClasses = computed(() => {
   const classes: Record<string, string> = {
-    'form': 'bg-teal-100 text-teal-600',
+    'form': 'icon-gradient-brand',
     'delete': 'bg-red-100 text-red-600',
-    'view': 'bg-gray-100 text-gray-600',
+    'view': 'icon-gradient-brand',
     'warning': 'bg-yellow-100 text-yellow-600',
     'info': 'bg-blue-100 text-blue-600',
     'success': 'bg-green-100 text-green-600',
@@ -334,9 +334,9 @@ const getTitleClasses = computed(() => {
 
 const getFooterClasses = computed(() => {
   const classes: Record<string, string> = {
-    'form': 'bg-gradient-to-r from-teal-50 to-emerald-50',
+    'form': 'bg-gray-50',
     'delete': 'bg-gradient-to-r from-red-50 to-rose-50',
-    'view': 'bg-gradient-to-r from-gray-50 to-gray-100',
+    'view': 'bg-gray-50',
     'warning': 'bg-gradient-to-r from-yellow-50 to-amber-50',
     'info': 'bg-gradient-to-r from-blue-50 to-cyan-50',
     'success': 'bg-gradient-to-r from-green-50 to-emerald-50',
@@ -558,5 +558,15 @@ watch(() => props.isOpen, (isOpen) => {
 @keyframes loading {
   0% { background-position: 200% 0; }
   100% { background-position: -200% 0; }
+}
+
+/* Field labels inside slotted form content (Job Title, Job Type, Department, etc.) */
+:deep(.dash-field label) {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--color-text-secondary);
+  font-family: var(--font-primary);
 }
 </style>
