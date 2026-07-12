@@ -3,8 +3,6 @@ from .models import (
     Employee, CVSubmission, JobType, JobOpening, JobStatus,
     IncrementType, IncrementPolicy, CycleTiming, ApplicationMode,
 )
-
-
 class EmployeeSerializer(serializers.ModelSerializer):
     department_name = serializers.CharField(source="department.name", read_only=True)
 
@@ -29,8 +27,6 @@ class EmployeeSerializer(serializers.ModelSerializer):
     def validate_cnic(self, value):
         if Employee.objects.filter(cnic=value).exists():
             raise serializers.ValidationError("Employee with this CNIC already exists.")
-        if not value.isdigit() or len(value) != 13:
-            raise serializers.ValidationError("CNIC must be 13 digits.")
         return value
 
 

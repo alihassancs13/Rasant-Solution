@@ -110,24 +110,6 @@ def list_employees(request):
     serializer = EmployeeListSerializer(employees, many=True)
     return Response(serializer.data)
 
-
-@api_view(['GET'])
-def get_employee_detail(request, pk):
-    """
-    Fetch a single employee by primary key (id).
-    Returns all fields including file URLs.
-    """
-    try:
-        employee = Employee.objects.get(pk=pk)
-    except Employee.DoesNotExist:
-        return Response(
-            {"error": "Employee not found."},
-            status=status.HTTP_404_NOT_FOUND
-        )
-    serializer = EmployeeSerializer(employee, context={'request': request})
-    return Response(serializer.data)
-
-
 @api_view(['PATCH'])
 def update_employee(request, pk):
     """

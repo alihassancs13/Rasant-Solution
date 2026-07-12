@@ -90,13 +90,28 @@
 
             <!-- CNIC Scan (full width) -->
             <div>
-              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">CNIC Scan copy <span class="text-rose-500">*</span></label>
-              <div class="border-2 border-dashed border-slate-200 rounded-2xl p-6 text-center hover:bg-slate-50 transition relative group cursor-pointer">
-                <input type="file" @change="handleFileUpload($event, 'cnic_scan')" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">CNIC Scan copy <span class="text-rose-500" v-if="!fileNames.cnic_scan">*</span></label>
+
+              <!-- Show file info if uploaded -->
+              <div v-if="fileNames.cnic_scan" class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <i class="fa-solid fa-file-pdf text-emerald-600 text-2xl"></i>
+                  <div>
+                    <p class="text-sm font-medium text-slate-700">{{ fileNames.cnic_scan }}</p>
+                    <p class="text-xs text-emerald-600">✓ File uploaded successfully</p>
+                  </div>
+                </div>
+                <button type="button" @click="removeFile('cnic_scan')" class="text-slate-400 hover:text-rose-500 transition p-1">
+                  <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+              </div>
+
+              <!-- Show upload area if no file -->
+              <div v-else class="border-2 border-dashed border-slate-200 rounded-2xl p-6 text-center hover:bg-slate-50 transition relative group cursor-pointer">
+                <input type="file" @change="handleFileUpload($event, 'cnic_scan')" data-field="cnic_scan" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                 <div class="text-blue-500 text-3xl mb-2 group-hover:scale-110 transition-transform"><i class="fa-solid fa-cloud-arrow-up"></i></div>
                 <p class="text-sm font-medium text-slate-600">Drag & drop or <span class="text-blue-500 underline font-semibold">click to upload</span></p>
                 <p class="text-xs text-slate-400 mt-1">.pdf, .png, .jpg, .jpeg (Max 10MB)</p>
-                <div v-if="fileNames.cnic_scan" class="mt-2 text-xs text-emerald-600 font-bold">Selected: {{ fileNames.cnic_scan }}</div>
               </div>
             </div>
 
@@ -133,11 +148,11 @@
 
             <!-- Row 4: Designation + Salary -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
+              <div v-if="!isDirectAccess">
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Designation <span class="text-rose-500">*</span></label>
                 <input type="text" v-model="formData.designation" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" placeholder="e.g. Software Engineer">
               </div>
-              <div>
+              <div v-if="!isDirectAccess">
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Salary <span class="text-rose-500">*</span></label>
                 <input type="number" step="0.01" v-model="formData.salary" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" placeholder="0.00">
               </div>
@@ -202,13 +217,28 @@
             </div>
 
             <div>
-              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">CNIC scan copy <span class="text-rose-500">*</span></label>
-              <div class="border-2 border-dashed border-slate-200 rounded-2xl p-6 text-center hover:bg-slate-50 transition relative group cursor-pointer">
-                <input type="file" @change="handleFileUpload($event, 'emergency_cnic_scan')" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">CNIC scan copy <span class="text-rose-500" v-if="!fileNames.emergency_cnic_scan">*</span></label>
+
+              <!-- Show file info if uploaded -->
+              <div v-if="fileNames.emergency_cnic_scan" class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <i class="fa-solid fa-file-pdf text-emerald-600 text-2xl"></i>
+                  <div>
+                    <p class="text-sm font-medium text-slate-700">{{ fileNames.emergency_cnic_scan }}</p>
+                    <p class="text-xs text-emerald-600">✓ File uploaded successfully</p>
+                  </div>
+                </div>
+                <button type="button" @click="removeFile('emergency_cnic_scan')" class="text-slate-400 hover:text-rose-500 transition p-1">
+                  <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+              </div>
+
+              <!-- Show upload area if no file -->
+              <div v-else class="border-2 border-dashed border-slate-200 rounded-2xl p-6 text-center hover:bg-slate-50 transition relative group cursor-pointer">
+                <input type="file" @change="handleFileUpload($event, 'emergency_cnic_scan')" data-field="emergency_cnic_scan" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                 <div class="text-blue-500 text-3xl mb-2 group-hover:scale-110 transition-transform"><i class="fa-solid fa-cloud-arrow-up"></i></div>
                 <p class="text-sm font-medium text-slate-600">Drag & drop or <span class="text-blue-500 underline font-semibold">click to upload</span></p>
                 <p class="text-xs text-slate-400 mt-1">.pdf, .png, .jpg, .jpeg (Max 10MB)</p>
-                <div v-if="fileNames.emergency_cnic_scan" class="mt-2 text-xs text-emerald-600 font-bold">Selected: {{ fileNames.emergency_cnic_scan }}</div>
               </div>
             </div>
 
@@ -236,47 +266,103 @@
               </div>
             </div>
 
+            <!-- Matric -->
             <div>
-              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Matric certificate or marksheet <span class="text-rose-500">*</span></label>
-              <div class="border-2 border-dashed border-slate-200 rounded-2xl p-6 text-center hover:bg-slate-50 transition relative group cursor-pointer">
-                <input type="file" @change="handleFileUpload($event, 'matric_certificate')" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Matric certificate or marksheet <span class="text-rose-500" v-if="!fileNames.matric_certificate">*</span></label>
+
+              <div v-if="fileNames.matric_certificate" class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <i class="fa-solid fa-file-pdf text-emerald-600 text-2xl"></i>
+                  <div>
+                    <p class="text-sm font-medium text-slate-700">{{ fileNames.matric_certificate }}</p>
+                    <p class="text-xs text-emerald-600">✓ File uploaded successfully</p>
+                  </div>
+                </div>
+                <button type="button" @click="removeFile('matric_certificate')" class="text-slate-400 hover:text-rose-500 transition p-1">
+                  <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+              </div>
+
+              <div v-else class="border-2 border-dashed border-slate-200 rounded-2xl p-6 text-center hover:bg-slate-50 transition relative group cursor-pointer">
+                <input type="file" @change="handleFileUpload($event, 'matric_certificate')" data-field="matric_certificate" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                 <div class="text-blue-500 text-3xl mb-2 group-hover:scale-110 transition-transform"><i class="fa-solid fa-cloud-arrow-up"></i></div>
                 <p class="text-sm font-medium text-slate-600">Drag & drop or <span class="text-blue-500 underline font-semibold">click to upload</span></p>
                 <p class="text-xs text-slate-400 mt-1">.pdf, .png, .jpg, .jpeg (Max 10MB)</p>
-                <div v-if="fileNames.matric_certificate" class="mt-2 text-xs text-emerald-600 font-bold">Selected: {{ fileNames.matric_certificate }}</div>
               </div>
             </div>
 
+            <!-- FSC -->
             <div>
-              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">FSC / Intermediate certificate or marksheet <span class="text-rose-500">*</span></label>
-              <div class="border-2 border-dashed border-slate-200 rounded-2xl p-6 text-center hover:bg-slate-50 transition relative group cursor-pointer">
-                <input type="file" @change="handleFileUpload($event, 'fsc_certificate')" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">FSC / Intermediate certificate or marksheet <span class="text-rose-500" v-if="!fileNames.fsc_certificate">*</span></label>
+
+              <div v-if="fileNames.fsc_certificate" class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <i class="fa-solid fa-file-pdf text-emerald-600 text-2xl"></i>
+                  <div>
+                    <p class="text-sm font-medium text-slate-700">{{ fileNames.fsc_certificate }}</p>
+                    <p class="text-xs text-emerald-600">✓ File uploaded successfully</p>
+                  </div>
+                </div>
+                <button type="button" @click="removeFile('fsc_certificate')" class="text-slate-400 hover:text-rose-500 transition p-1">
+                  <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+              </div>
+
+              <div v-else class="border-2 border-dashed border-slate-200 rounded-2xl p-6 text-center hover:bg-slate-50 transition relative group cursor-pointer">
+                <input type="file" @change="handleFileUpload($event, 'fsc_certificate')" data-field="fsc_certificate" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                 <div class="text-blue-500 text-3xl mb-2 group-hover:scale-110 transition-transform"><i class="fa-solid fa-cloud-arrow-up"></i></div>
                 <p class="text-sm font-medium text-slate-600">Drag & drop or <span class="text-blue-500 underline font-semibold">click to upload</span></p>
                 <p class="text-xs text-slate-400 mt-1">.pdf, .png, .jpg, .jpeg (Max 10MB)</p>
-                <div v-if="fileNames.fsc_certificate" class="mt-2 text-xs text-emerald-600 font-bold">Selected: {{ fileNames.fsc_certificate }}</div>
               </div>
             </div>
 
+            <!-- University -->
             <div>
-              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">University degree / graduation certificate <span class="text-rose-500">*</span></label>
-              <div class="border-2 border-dashed border-blue-200 bg-blue-50/10 rounded-2xl p-6 text-center hover:bg-slate-50 transition relative group cursor-pointer">
-                <input type="file" @change="handleFileUpload($event, 'university_degree')" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+              <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">University degree / graduation certificate <span class="text-rose-500" v-if="!fileNames.university_degree">*</span></label>
+
+              <div v-if="fileNames.university_degree" class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <i class="fa-solid fa-file-pdf text-emerald-600 text-2xl"></i>
+                  <div>
+                    <p class="text-sm font-medium text-slate-700">{{ fileNames.university_degree }}</p>
+                    <p class="text-xs text-emerald-600">✓ File uploaded successfully</p>
+                  </div>
+                </div>
+                <button type="button" @click="removeFile('university_degree')" class="text-slate-400 hover:text-rose-500 transition p-1">
+                  <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+              </div>
+
+              <div v-else class="border-2 border-dashed border-blue-200 bg-blue-50/10 rounded-2xl p-6 text-center hover:bg-slate-50 transition relative group cursor-pointer">
+                <input type="file" @change="handleFileUpload($event, 'university_degree')" data-field="university_degree" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                 <div class="text-blue-500 text-3xl mb-2 group-hover:scale-110 transition-transform"><i class="fa-solid fa-cloud-arrow-up"></i></div>
                 <p class="text-sm font-medium text-slate-600">Drag & drop or <span class="text-blue-500 underline font-semibold">click to upload</span></p>
                 <p class="text-xs text-slate-400 mt-1">.pdf, .png, .jpg, .jpeg (Max 10MB)</p>
-                <div v-if="fileNames.university_degree" class="mt-2 text-xs text-emerald-600 font-bold">Selected: {{ fileNames.university_degree }}</div>
               </div>
             </div>
 
+            <!-- Other Courses -->
             <div>
               <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Other courses / certificates</label>
-              <div class="border-2 border-dashed border-slate-200 rounded-2xl p-6 text-center hover:bg-slate-50 transition relative group cursor-pointer">
-                <input type="file" @change="handleFileUpload($event, 'other_course')" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+
+              <div v-if="fileNames.other_course" class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                  <i class="fa-solid fa-file-pdf text-emerald-600 text-2xl"></i>
+                  <div>
+                    <p class="text-sm font-medium text-slate-700">{{ fileNames.other_course }}</p>
+                    <p class="text-xs text-emerald-600">✓ File uploaded successfully</p>
+                  </div>
+                </div>
+                <button type="button" @click="removeFile('other_course')" class="text-slate-400 hover:text-rose-500 transition p-1">
+                  <i class="fa-solid fa-xmark text-xl"></i>
+                </button>
+              </div>
+
+              <div v-else class="border-2 border-dashed border-slate-200 rounded-2xl p-6 text-center hover:bg-slate-50 transition relative group cursor-pointer">
+                <input type="file" @change="handleFileUpload($event, 'other_course')" data-field="other_course" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                 <div class="text-blue-500 text-3xl mb-2 group-hover:scale-110 transition-transform"><i class="fa-solid fa-cloud-arrow-up"></i></div>
                 <p class="text-sm font-medium text-slate-600">Drag & drop or <span class="text-blue-500 underline font-semibold">click to upload</span></p>
                 <p class="text-xs text-slate-400 mt-1">.pdf, .png, .jpg, .jpeg (Max 10MB)</p>
-                <div v-if="fileNames.other_course" class="mt-2 text-xs text-emerald-600 font-bold">Selected: {{ fileNames.other_course }}</div>
               </div>
             </div>
           </div>
@@ -412,6 +498,29 @@ export default {
       submitForm,
     } = registration;
 
+    // Add removeFile function
+    const removeFile = (fieldName) => {
+      // Clear from fileNames
+      fileNames.value[fieldName] = null;
+
+      // Clear from formData
+      formData.value[fieldName] = null;
+
+      // Reset the file input
+      const inputs = document.querySelectorAll(`input[data-field="${fieldName}"]`);
+      inputs.forEach(input => {
+        input.value = '';
+      });
+    };
+
+    // Add scroll to top function
+    const scrollToTop = () => {
+      const container = document.querySelector('.flex-1.overflow-y-auto');
+      if (container) {
+        container.scrollTop = 0;
+      }
+    };
+
     onMounted(() => {
       checkDirectAccess();
 
@@ -435,6 +544,15 @@ export default {
         });
       } else {
         nextStep();
+        scrollToTop(); // Scroll to top when going to next step
+      }
+    };
+
+    // Override or extend the prevStep function
+    const customPrevStep = () => {
+      if (currentStep.value > 1) {
+        prevStep();
+        scrollToTop(); // Scroll to top when going back
       }
     };
 
@@ -454,12 +572,13 @@ export default {
       fileNames,
       currentProgressPercentage,
       handleFileUpload,
-      prevStep,
+      prevStep: customPrevStep, // Use custom prev step
       customNextStep,
       close,
       isDirectAccess,
       isSubmitted,
       redirectToHome,
+      removeFile,
     };
   }
 };
