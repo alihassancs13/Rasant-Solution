@@ -1,4 +1,4 @@
-import { reactive, computed } from 'vue'
+import { reactive, ref, computed } from 'vue'
 import { usePolicyStore } from '@/stores/policyStore.js'
 import { useToast } from './useToast.js'
 
@@ -25,6 +25,32 @@ export function useIncrementPolicy() {
     const incrementTypes   = computed(() => policyStore.incrementTypes)
     const cycleTimings     = computed(() => policyStore.cycleTimings)
     const applicationModes = computed(() => policyStore.applicationModes)
+    const activePolicies   = computed(() => policies.value.filter(p => p.is_active).length)
+
+    const formatCurrency = (amount) =>
+        amount || amount === 0 ? `₨${Number(amount).toLocaleString('en-US')}` : '—'
+
+    const formatIncrement = (policy) =>
+        policy.increment_type_code === 'percentage'
+            ? `+${Number(policy.amount)}%`
+            : `+${formatCurrency(Number(policy.amount))}`
+
+    const daysUntil = (dateStr) => {
+        if (!dateStr) return Infinity
+        return Math.ceil((new Date(dateStr) - new Date()) / (1000 * 60 * 60 * 24))
+    }
+    const isOverdue = (dateStr) => daysUntil(dateStr) < 0
+    const isDueSoon = (dateStr) => { const d = daysUntil(dateStr); return d >= 0 && d <= 14 }
+
+    const cardBorderClass = (policy) =>
+        isOverdue(policy.next_effective_date)
+            ? 'border-2 border-warning shadow-lg shadow-warning/20'
+            : 'border border-border'
+
+    const dateClass = (policy) =>
+        (isOverdue(policy.next_effective_date) || isDueSoon(policy.next_effective_date))
+            ? 'text-danger font-semibold'
+            : 'text-text-primary font-semibold'
 
     const validateForm = () => {
         Object.keys(formErrors).forEach((key) => delete formErrors[key])
@@ -93,15 +119,67 @@ export function useIncrementPolicy() {
         return null
     }
 
-    const deletePolicy = async (id) => {
-        const result = await policyStore.deletePolicy(id)
-        showToast(result.success ? 'Policy deleted.' : result.error, result.success ? 'success' : 'error')
-        return result.success
+    // ── Policy add/edit modal ──
+    const showPolicyModal = ref(false)
+
+    const policyModalTitle = computed(() => formData.id ? 'Edit policy' : 'Create Policy')
+    const policyModalSubtitle = computed(() =>
+        formData.id
+            ? `Update increment rules`
+            : 'Define raise rules for a new policy.'
+    )
+    const policySubmitText = computed(() => formData.id ? 'Save Policy' : 'Create Policy')
+
+    const openAddPolicyModal = () => { resetForm(); showPolicyModal.value = true }
+    const editPolicy = (policy) => { loadIntoForm(policy); showPolicyModal.value = true }
+    const closePolicyModal = () => { showPolicyModal.value = false; resetForm() }
+
+    const handleSavePolicy = async () => {
+        const saved = await savePolicy()
+        if (saved) closePolicyModal()
+    }
+
+    // ── Delete confirmation modal ──
+    const showDeleteModal = ref(false)
+    const policyToDelete  = ref(null)
+    const isDeleting       = ref(false)
+
+    const deleteModalSubtitle = computed(() => {
+        if (!policyToDelete.value) return ''
+        return `Remove "${policyToDelete.value.policy_name}" from active policies? Assigned employees will keep other policies only.`
+    })
+
+    const openDeleteModal = (policy) => {
+        policyToDelete.value = policy
+        showDeleteModal.value = true
+    }
+
+    const closeDeleteModal = () => {
+        showDeleteModal.value = false
+        policyToDelete.value = null
+    }
+
+    const confirmDeletePolicy = async () => {
+        if (!policyToDelete.value) return
+        isDeleting.value = true
+        const result = await policyStore.deletePolicy(policyToDelete.value.id)
+        isDeleting.value = false
+
+        showToast(result.success ? 'Policy deleted.' : (result.error || 'Failed to delete policy.'), result.success ? 'success' : 'error')
+
+        if (result.success) closeDeleteModal()
     }
 
     return {
         formData, formErrors, isSubmitting,
-        policies, loading, incrementTypes, cycleTimings, applicationModes,
-        resetForm, loadIntoForm, fetchPolicies, fetchLookups, savePolicy, deletePolicy,
+        policies, loading, incrementTypes, cycleTimings, applicationModes, activePolicies,
+        formatCurrency, formatIncrement, isOverdue, isDueSoon, cardBorderClass, dateClass,
+        resetForm, loadIntoForm, fetchPolicies, fetchLookups, savePolicy,
+        // add/edit policy modal
+        showPolicyModal, policyModalTitle, policyModalSubtitle, policySubmitText,
+        openAddPolicyModal, editPolicy, closePolicyModal, handleSavePolicy,
+        // delete modal
+        showDeleteModal, policyToDelete, isDeleting, deleteModalSubtitle,
+        openDeleteModal, closeDeleteModal, confirmDeletePolicy,
     }
 }

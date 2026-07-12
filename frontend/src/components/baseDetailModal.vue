@@ -35,7 +35,7 @@
       <div class="flex min-h-full items-center justify-center p-4 text-center">
         <!-- Modal container -->
         <div
-            class="relative w-full transform overflow-hidden rounded-2xl bg-white text-left shadow-2xl transition-all flex flex-col max-h-[90vh]"
+            class="relative w-full transform overflow-hidden rounded-xl bg-white text-left shadow-2xl transition-all flex flex-col max-h-[90vh]"
             :class="{
             'max-w-md': props.size === 'sm',
             'max-w-2xl': props.size === 'md',

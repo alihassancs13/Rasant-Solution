@@ -6,21 +6,21 @@ import StatCard from '@/components/statCard.vue'
 import ShineButton from '@/components/ShineButton.vue'
 import BaseModal from '@/components/baseModal.vue'
 import { useIncrementPolicy } from '@/composables/useIncrementPolicy.js'
+import { useAssignPolicy } from '@/composables/useAssignPolicy.js'
 
-// TODO: replace with a real salaryStore / useSalaries() composable once
-// the backend endpoints exist — same pattern as useJobs()/jobStore in
-// CareersPage.vue (fetchAdminJobs -> adminJobs etc.)
 const employeesCovered = ref(3)
 const dueNow           = ref(1)
 
-// ── Increment policies (real API, wired via composable) ──
 const {
   formData, formErrors, isSubmitting,
-  policies, loading: policiesLoading, incrementTypes, cycleTimings, applicationModes,
-  resetForm, loadIntoForm, fetchPolicies, fetchLookups, savePolicy, deletePolicy: removePolicy,
+  policies, loading: policiesLoading, incrementTypes, cycleTimings, applicationModes, activePolicies,
+  formatCurrency, formatIncrement, cardBorderClass, dateClass,
+  fetchPolicies, fetchLookups,
+  showPolicyModal, policyModalTitle, policyModalSubtitle, policySubmitText,
+  openAddPolicyModal, editPolicy, closePolicyModal, handleSavePolicy,
+  showDeleteModal, policyToDelete, isDeleting, deleteModalSubtitle,
+  openDeleteModal, closeDeleteModal, confirmDeletePolicy,
 } = useIncrementPolicy()
-
-const activePolicies = computed(() => policies.value.filter(p => p.is_active).length)
 
 // ── Pill Tab Navigation ──
 const tabs = [
@@ -28,10 +28,6 @@ const tabs = [
   { key: 'policies',        label: 'Policies',        icon: ['fas', 'file-lines'] },
 ]
 const activeTab = ref('employee-roster')
-
-// ── Shared helpers ──
-const formatCurrency = (amount) =>
-    amount || amount === 0 ? `₨${Number(amount).toLocaleString('en-US')}` : '—'
 
 const formatDate = (dateStr) => {
   if (!dateStr) return '—'
@@ -51,9 +47,6 @@ const avatarStyle = (index) => avatarPalette[index % avatarPalette.length]
 
 const initials = (name) =>
     name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()
-
-// ── Employee roster (placeholder data — matches design mock) ──
-// TODO: wire up to real employees + assigned-policies endpoint once it exists
 const employees = ref([
   {
     id: 'EMP-001',
@@ -98,79 +91,22 @@ const employees = ref([
   },
 ])
 
-const dueForIncrementCount = computed(() =>
-    employees.value.filter(e => e.incrementStatus !== 'none').length
-)
-
 const incrementStatusMeta = (status) => ({
-  approved: { label: 'Approved', icon: ['fas', 'circle-check'], classes: 'bg-success-subtle text-success' },
-  due_soon: { label: 'Due in 7d', icon: ['fas', 'clock'], classes: 'bg-amber-100 text-amber-700' },
-  due_now:  { label: 'Due now', icon: ['fas', 'circle-exclamation'], classes: 'bg-orange-100 text-orange-700' },
+  approved: { label: 'Approved', icon: ['fas', 'circle-check'], classes: 'policy-mode-auto' },
+  due_soon: { label: 'Due in 7d', icon: ['fas', 'clock'], classes: 'policy-mode-manual' },
+  due_now:  { label: 'Due now', icon: ['fas', 'circle-exclamation'], classes: 'policy-mode-manual' },
   none:     { label: '—', icon: null, classes: 'text-text-muted' },
 }[status] || { label: '—', icon: null, classes: 'text-text-muted' })
 
-// TODO: wire up to real endpoints once the increments API exists
 const applyIncrements = () => {}
 const forceIncrement = () => {}
 
-// ── Policies: card display helpers (fields match IncrementPolicySerializer) ──
-// Same brand gradients already used on the StatCards above — reused here
-// for the policy card top accent bars so the palette stays consistent.
-const policyAccentBars = [
-  'bg-gradient-to-r from-[#C9C4F8] to-[#8FB9F4]', // blue
-  'bg-gradient-to-r from-[#FFD5B4] to-[#E8C1D9]', // pink
-  'bg-gradient-to-r from-[#FDE68A] to-[#F59E0B]', // amber
-]
-const accentBar = (index) => policyAccentBars[index % policyAccentBars.length]
-
-const typeBadgeClasses = (modeCode) =>
-    modeCode === 'auto' ? 'bg-success-subtle text-success' : 'bg-warning-subtle text-warning'
-
-const formatIncrement = (policy) =>
-    policy.increment_type_code === 'percentage'
-        ? `+${Number(policy.amount)}%`
-        : `+${formatCurrency(Number(policy.amount))}`
-
-const daysUntil = (dateStr) => {
-  if (!dateStr) return Infinity
-  return Math.ceil((new Date(dateStr) - new Date()) / (1000 * 60 * 60 * 24))
-}
-const isOverdue = (dateStr) => daysUntil(dateStr) < 0
-const isDueSoon = (dateStr) => { const d = daysUntil(dateStr); return d >= 0 && d <= 14 }
-
-const cardBorderClass = (policy) =>
-    isOverdue(policy.next_effective_date)
-        ? 'border-2 border-warning shadow-lg shadow-warning/20'
-        : 'border border-border'
-
-const dateClass = (policy) =>
-    (isOverdue(policy.next_effective_date) || isDueSoon(policy.next_effective_date))
-        ? 'text-danger font-semibold'
-        : 'text-text-primary font-semibold'
-
-// ── Policy modal ──
-const showPolicyModal = ref(false)
-const policyModalTitle = computed(() => formData.id ? 'Edit policy' : 'Add new policy')
-const policyModalSubtitle = computed(() =>
-    formData.id ? `POL-${String(formData.id).padStart(3, '0')} · Update increment rules` : 'Define raise rules for a new policy.'
-)
-
-const openAddPolicyModal = () => { resetForm(); showPolicyModal.value = true }
-const editPolicy = (policy) => { loadIntoForm(policy); showPolicyModal.value = true }
-const closePolicyModal = () => { showPolicyModal.value = false; resetForm() }
-
-const handleSavePolicy = async () => {
-  const saved = await savePolicy()
-  if (saved) closePolicyModal()
-}
-
-const confirmDeletePolicy = async (policy) => {
-  if (!confirm(`Delete "${policy.policy_name}"? This cannot be undone.`)) return
-  await removePolicy(policy.id)
-}
-
-// TODO: wire once an employee-assignment endpoint exists
-const assignPolicy = (policy) => {}
+// ── Assign policy modal (separate composable) ──
+const {
+  showAssignModal, assigningPolicy, selectedEmployeeIds, isSaving: isSavingAssignments, assignSubtitle,
+  otherAssignedPolicies, toggleEmployeeSelection,
+  assignPolicy, closeAssignModal, saveAssignments,
+} = useAssignPolicy(employees)
 
 onMounted(() => {
   fetchPolicies()
@@ -194,26 +130,25 @@ onMounted(() => {
       </div>
 
       <main class="flex-1 overflow-y-auto overflow-x-hidden px-3 sm:px-4 pb-4 space-y-4">
-        <!-- Stat Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
           <StatCard
               label="Employees Covered"
               :value="employeesCovered"
-              subtitle="On increment plans"
+
               :icon="['fas', 'users']"
               color="pink"
           />
           <StatCard
               label="Due Now"
               :value="dueNow"
-              subtitle="Ready for Apply"
+
               :icon="['fas', 'circle-exclamation']"
               color="yellow"
           />
           <StatCard
               label="Active Policies"
               :value="activePolicies"
-              subtitle="1 due within 14d"
+
               :icon="['fas', 'clipboard-list']"
               color="purple"
           />
@@ -251,10 +186,13 @@ onMounted(() => {
                 Apply
               </ShineButton>
 
-              <ShineButton variant="urgent" shape="xl" size="md" :badge="dueForIncrementCount" @click="forceIncrement">
+              <button
+                  class="flex items-center gap-2 px-5 py-3.5 text-sm font-semibold text-white rounded-lg shadow-md transition-all duration-300 cursor-pointer btn-primary-gradient"
+                  @click="forceIncrement"
+              >
                 <font-awesome-icon :icon="['fas', 'bolt']" class="w-3.5 h-3.5" />
                 Force Increment
-              </ShineButton>
+              </button>
             </div>
           </div>
 
@@ -283,7 +221,6 @@ onMounted(() => {
                     </div>
                     <div class="min-w-0">
                       <p class="font-semibold text-text-primary truncate">{{ emp.name }}</p>
-                      <p class="text-xs text-text-muted truncate">{{ emp.id }} · {{ emp.department }}</p>
                     </div>
                   </div>
                 </td>
@@ -318,10 +255,13 @@ onMounted(() => {
               <p class="text-sm text-text-muted mt-0.5">Define raise rules, edit details, and assign staff to each policy.</p>
             </div>
 
-            <ShineButton variant="urgent" shape="pill" size="md" @click="openAddPolicyModal">
+            <button
+                @click="openAddPolicyModal"
+                class="flex items-center gap-2 px-5 py-3 text-sm font-semibold text-white rounded-xl shadow-md transition-all duration-300 cursor-pointer btn-primary-gradient"
+            >
               <font-awesome-icon :icon="['fas', 'plus']" class="w-3.5 h-3.5" />
               Add new policy
-            </ShineButton>
+            </button>
           </div>
 
           <div v-if="policiesLoading" class="bg-white border border-border rounded-xl shadow-sm text-center py-16">
@@ -344,21 +284,23 @@ onMounted(() => {
                 class="relative bg-white rounded-xl shadow-sm overflow-hidden flex flex-col"
                 :class="cardBorderClass(policy)"
             >
-              <div class="absolute top-0 left-0 right-0 h-1" :class="accentBar(i)"></div>
+              <div class="absolute top-0 left-0 right-0 h-1 policy-accent-brand"></div>
 
               <div class="p-4 sm:p-5 flex-1">
                 <div class="flex items-start justify-between gap-2">
                   <h3 class="font-display font-bold text-text-primary">{{ policy.policy_name }}</h3>
                   <span
                       class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide shrink-0"
-                      :class="typeBadgeClasses(policy.application_mode_code)"
+                      :class="{
+                'policy-mode-auto': policy.application_mode_code === 'auto',
+                'policy-mode-manual': policy.application_mode_code === 'manual'
+            }"
                   >
-                    {{ policy.application_mode_code }}
-                  </span>
+          {{ policy.application_mode_code }}
+        </span>
                 </div>
 
                 <p class="text-2xl font-bold text-primary mt-2">{{ formatIncrement(policy) }}</p>
-
                 <p v-if="policy.description" class="text-sm text-text-secondary mt-2 leading-relaxed">{{ policy.description }}</p>
 
                 <p class="text-sm text-text-secondary mt-2">
@@ -374,18 +316,24 @@ onMounted(() => {
               </div>
 
               <div class="flex items-center gap-2 px-4 sm:px-5 pb-4 sm:pb-5">
-                <ShineButton variant="outline" shape="xl" size="sm" class="flex-1" @click="editPolicy(policy)">
+                <button
+                    @click="editPolicy(policy)"
+                    class="flex-1 flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-300 cursor-pointer btn-gradient-border hover:-translate-y-0.5 hover:shadow-md"
+                >
                   <font-awesome-icon :icon="['fas', 'pen']" class="w-3 h-3" />
                   Edit
-                </ShineButton>
-
-                <ShineButton variant="urgent" shape="xl" size="sm" class="flex-1" @click="assignPolicy(policy)">
-                  <font-awesome-icon :icon="['fas', 'users']" class="w-3 h-3" />
-                  Assign
-                </ShineButton>
+                </button>
 
                 <button
-                    @click="confirmDeletePolicy(policy)"
+                    @click="assignPolicy(policy)"
+                    class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold text-white rounded-xl shadow-md transition-all duration-300 cursor-pointer btn-primary-gradient"
+                >
+                  <font-awesome-icon :icon="['fas', 'users']" class="w-3 h-3" />
+                  Assign
+                </button>
+
+                <button
+                    @click="openDeleteModal(policy)"
                     class="w-9 h-9 flex items-center justify-center rounded-lg bg-white border border-border text-text-secondary hover:bg-danger-subtle hover:text-danger hover:border-danger/30 transition cursor-pointer shrink-0"
                     title="Delete policy"
                 >
@@ -404,32 +352,31 @@ onMounted(() => {
         mode="form"
         :title="policyModalTitle"
         :subtitle="policyModalSubtitle"
-        submit-text="Save Policy"
+        :submit-text="policySubmitText"
         :loading="isSubmitting"
         @close="closePolicyModal"
         @save="handleSavePolicy"
     >
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-4">
 
-        <!-- Policy Name -->
-        <div class="dash-field sm:col-span-2">
+        <!-- Row 1: Policy Name | Increment Type -->
+        <div class="dash-field">
           <label>Policy Name</label>
           <input
               v-model="formData.policy_name"
               type="text"
-              placeholder="e.g. Annual Merit Increase"
-              class="w-full mt-1 px-3.5 py-2.5 rounded-lg border text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+              placeholder="e.g. Annual Merit Raise"
+              class="w-full mt-1 px-3.5 py-2.5 rounded-md border text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
               :class="formErrors.policy_name ? 'border-danger' : 'border-border'"
           />
           <p v-if="formErrors.policy_name" class="text-xs text-danger mt-1">{{ formErrors.policy_name }}</p>
         </div>
 
-        <!-- Increment Type -->
         <div class="dash-field">
           <label>Increment Type</label>
           <select
               v-model="formData.increment_type"
-              class="w-full mt-1 px-3.5 py-2.5 rounded-lg border text-sm text-text-primary bg-white focus:outline-none focus:ring-2 focus:ring-primary/30"
+              class="w-full mt-1 px-3.5 py-2.5 rounded-md border text-sm text-text-primary bg-white focus:outline-none focus:ring-2 focus:ring-primary/30"
               :class="formErrors.increment_type ? 'border-danger' : 'border-border'"
           >
             <option :value="null" disabled>Select type</option>
@@ -440,7 +387,7 @@ onMounted(() => {
           <p v-if="formErrors.increment_type" class="text-xs text-danger mt-1">{{ formErrors.increment_type }}</p>
         </div>
 
-        <!-- Amount -->
+        <!-- Row 2: Amount | Cycle/Timing -->
         <div class="dash-field">
           <label>Amount</label>
           <input
@@ -448,19 +395,18 @@ onMounted(() => {
               type="number"
               step="0.01"
               min="0"
-              placeholder="e.g. 10"
-              class="w-full mt-1 px-3.5 py-2.5 rounded-lg border text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+              placeholder="10 or 5000"
+              class="w-full mt-1 px-3.5 py-2.5 rounded-md border text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
               :class="formErrors.amount ? 'border-danger' : 'border-border'"
           />
           <p v-if="formErrors.amount" class="text-xs text-danger mt-1">{{ formErrors.amount }}</p>
         </div>
 
-        <!-- Cycle Timing -->
         <div class="dash-field">
           <label>Cycle / Timing</label>
           <select
               v-model="formData.cycle_timing"
-              class="w-full mt-1 px-3.5 py-2.5 rounded-lg border text-sm text-text-primary bg-white focus:outline-none focus:ring-2 focus:ring-primary/30"
+              class="w-full mt-1 px-3.5 py-2.5 rounded-md border text-sm text-text-primary bg-white focus:outline-none focus:ring-2 focus:ring-primary/30"
               :class="formErrors.cycle_timing ? 'border-danger' : 'border-border'"
           >
             <option :value="null" disabled>Select cycle</option>
@@ -471,22 +417,21 @@ onMounted(() => {
           <p v-if="formErrors.cycle_timing" class="text-xs text-danger mt-1">{{ formErrors.cycle_timing }}</p>
         </div>
 
-        <!-- Next Effective Date -->
+        <!-- Row 3: Next Effective Date | Application Mode -->
         <div class="dash-field">
           <label>Next Effective Date</label>
           <input
               v-model="formData.next_effective_date"
               type="date"
-              class="w-full mt-1 px-3.5 py-2.5 rounded-lg border border-border text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+              class="w-full mt-1 px-3.5 py-2.5 rounded-md border border-border text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
           />
         </div>
 
-        <!-- Application Mode -->
         <div class="dash-field">
           <label>Application Mode</label>
           <select
               v-model="formData.application_mode"
-              class="w-full mt-1 px-3.5 py-2.5 rounded-lg border text-sm text-text-primary bg-white focus:outline-none focus:ring-2 focus:ring-primary/30"
+              class="w-full mt-1 px-3.5 py-2.5 rounded-md border text-sm text-text-primary bg-white focus:outline-none focus:ring-2 focus:ring-primary/30"
               :class="formErrors.application_mode ? 'border-danger' : 'border-border'"
           >
             <option :value="null" disabled>Select mode</option>
@@ -497,36 +442,77 @@ onMounted(() => {
           <p v-if="formErrors.application_mode" class="text-xs text-danger mt-1">{{ formErrors.application_mode }}</p>
         </div>
 
-        <!-- Description -->
+        <!-- Row 4: Description (full width) -->
         <div class="dash-field sm:col-span-2">
           <label>Description <span class="text-text-secondary normal-case font-normal">(optional)</span></label>
           <textarea
               v-model="formData.description"
               rows="3"
-              placeholder="Notes about this policy..."
-              class="w-full mt-1 px-3.5 py-2.5 rounded-lg border border-border text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
+              placeholder="Who qualifies, performance criteria, notes..."
+              class="w-full mt-1 px-3.5 py-2.5 rounded-md border border-border text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/30 resize-none"
           ></textarea>
         </div>
 
-        <!-- Active toggle -->
-        <div class="dash-field sm:col-span-2 flex items-center justify-between border border-border rounded-lg px-3.5 py-2.5">
-          <div>
-            <label class="!text-text-primary !normal-case !text-sm !font-semibold">Active</label>
-            <p class="text-xs text-text-secondary mt-0.5">Inactive policies won't be applied automatically.</p>
-          </div>
-          <button
-              type="button"
-              @click="formData.is_active = !formData.is_active"
-              class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors shrink-0"
-              :class="formData.is_active ? 'bg-emerald-500' : 'bg-gray-300'"
-          >
-            <span
-                class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform"
-                :class="formData.is_active ? 'translate-x-6' : 'translate-x-1'"
-            />
-          </button>
-        </div>
+      </div>
+    </BaseModal>
 
+    <!-- ══════════ Delete Policy Modal ══════════ -->
+      <BaseModal
+          :is-open="showDeleteModal"
+          mode="delete"
+          title="Delete policy?"
+          :subtitle="deleteModalSubtitle"
+          cancel-text="Keep policy"
+          submit-text="Yes, delete"
+          :loading="isDeleting"
+          @close="closeDeleteModal"
+          @save="confirmDeletePolicy"
+      />
+
+    <!-- ══════════ Assign Policy Modal ══════════ -->
+    <BaseModal
+        :is-open="showAssignModal"
+        mode="form"
+        :title="`Assign: ${assigningPolicy?.policy_name}`"
+        :subtitle="assignSubtitle"
+        submit-text="Save assignments"
+        :loading="isSavingAssignments"
+        @close="closeAssignModal"
+        @save="saveAssignments"
+    >
+      <p class="text-sm text-text-muted mb-4">
+        Check employees to assign this policy. Uncheck to remove them from this policy.
+      </p>
+
+      <div class="space-y-3">
+        <label
+            v-for="(emp, i) in employees"
+            :key="emp.id"
+            class="flex items-center justify-between gap-3 px-4 py-3 rounded-lg border border-border cursor-pointer hover:bg-surface/50 transition"
+        >
+          <div class="flex items-center gap-3 min-w-0">
+            <input
+                type="checkbox"
+                class="w-4 h-4 rounded border-border accent-primary shrink-0"
+                :checked="selectedEmployeeIds.includes(emp.id)"
+                @change="toggleEmployeeSelection(emp.id)"
+            />
+            <div class="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0" :class="[avatarStyle(i).bg, avatarStyle(i).text]">
+              {{ initials(emp.name) }}
+            </div>
+            <div class="min-w-0">
+              <p class="font-semibold text-text-primary truncate">{{ emp.name }}</p>
+              <p class="text-xs text-text-muted truncate">{{ emp.id }} · {{ emp.department }}</p>
+            </div>
+          </div>
+
+          <span
+              v-if="otherAssignedPolicies(emp)"
+              class="shrink-0 px-2.5 py-1 rounded-full text-xs font-semibold bg-warning-subtle text-warning whitespace-nowrap"
+          >
+            Also: {{ otherAssignedPolicies(emp) }}
+          </span>
+        </label>
       </div>
     </BaseModal>
   </div>

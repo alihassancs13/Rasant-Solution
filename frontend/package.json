@@ -20,6 +20,7 @@
     "@tailwindcss/vite": "^4.3.1",
     "@vueup/vue-quill": "^1.5.5",
     "axios": "^1.18.1",
+    "pdfjs-dist": "^6.1.200",
     "pinia": "^3.0.4",
     "vue": "beta",
     "vue-router": "^5.1.0",

@@ -324,6 +324,14 @@ html, body {
     --color-text-secondary: #64748b;   /* body text */
     --color-text-muted: #4c4e51;       /* placeholders, meta text */
 
+    /* ═══════════════════════════════════════════════════════════
+       POLICY MODE COLORS
+       ═══════════════════════════════════════════════════════════ */
+    --color-policy-auto-bg: rgba(20, 184, 166, 0.12);
+    --color-policy-auto-text: #0F766E;
+    --color-policy-manual-bg: rgba(245, 158, 11, 0.15);
+    --color-policy-manual-text: #92400E;
+
 }
 
 :root {
@@ -480,7 +488,7 @@ html, body {
 
     .btn-gradient-border {
         color: var(--color-brandDark);
-        border: 1.5px solid transparent;
+        border: 2px solid transparent;
         border-radius: 0.75rem;
         font-weight: 500;
         background-image: linear-gradient(#fff, #fff), var(--gradient-brand);
@@ -501,6 +509,18 @@ html, body {
     .btn-gradient-border:disabled {
         opacity: 0.5;
         cursor: not-allowed;
+    }
+    /* Policy Mode - Auto */
+    .policy-mode-auto {
+        background: var(--color-policy-auto-bg);
+        color: var(--color-policy-auto-text);
+    }
+    .policy-mode-manual {
+        background: var(--color-policy-manual-bg);
+        color: var(--color-policy-manual-text);
+    }
+    .policy-accent-brand {
+        background: var(--gradient-brand);
     }
 }
 

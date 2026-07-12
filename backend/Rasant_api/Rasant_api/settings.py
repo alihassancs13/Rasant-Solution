@@ -97,7 +97,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",  # Your Vite frontend
     "http://localhost:3000",
     "http://127.0.0.1:5173",
-    "http://192.168.18.21:8000"
+    "http://192.168.18.29:8000"
 ]
 
 # Database
@@ -110,7 +110,7 @@ DATABASES = {
         'NAME': 'rasant_solutions',
         'USER': 'rasant_user',
         'PASSWORD': 'Rasant123',
-        'HOST': '192.168.18.21',
+        'HOST': '192.168.18.29',
         'PORT': '3306',
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
