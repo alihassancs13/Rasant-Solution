@@ -1,135 +1,163 @@
 // composables/Admin/useAdminSidebar.js
-import { ref, computed, onMounted } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import { useSidebarStore } from '@/stores/sidebarStore.js';
 
-const isSidebarOpen = ref(false);
-const collapsed = ref(false);
+const COMPANY_MODULES = ['Overview', 'Inbox', 'Employees', 'Inquiries', 'Jira'];
+const PROJECT_MODULES = ['Sentra AI', 'AI Agent', 'Chatbot', 'Orchestri'];
+const EMPLOYEE_CHILDREN = ['Dashboard', 'Attendance', 'Careers', 'Salaries'];
 
 export function useAdminSidebar() {
-    const sidebarStore = useSidebarStore();
+    const route = useRoute();
+    const router = useRouter();
+    const store = useSidebarStore();
+
     const dropdownStates = ref({});
+    const isSidebarOpen = ref(false);
+    const collapsed = ref(false);
 
-    const modules = computed(() => sidebarStore.modules);
-    const loading = computed(() => sidebarStore.isLoading);
-    const error = computed(() => sidebarStore.error);
+    // 🔥 FIX: Persist drill-down state in localStorage
+    const isDrillDown = ref(localStorage.getItem('sidebarDrillDown') === 'true');
 
-    const loadModules = async () => {
-        if (sidebarStore.hasModules) return;
-        await sidebarStore.fetchModules();
-    };
+    const modules = computed(() => {
+        return Array.isArray(store.modules) ? store.modules : [];
+    });
 
-        const companyModules = computed(() => {
-        const companyNames = ['Overview', 'Inbox', 'Employees', 'Inquiries', 'Jira'];
-        const allModules = modules.value.filter(m => companyNames.includes(m.name.trim()));
+    const loading = computed(() => store.isLoading);
+    const error = computed(() => store.error);
 
-        const employees = allModules.find(m => m.name.trim() === 'Employees');
+    // Get employee children modules
+    const employeeChildrenModules = computed(() => {
+        const moduleList = modules.value;
+        if (!moduleList.length) return [];
+
+        return moduleList.filter(m =>
+            m && EMPLOYEE_CHILDREN.includes(m.name?.trim())
+        );
+    });
+
+    // Get the Employees parent module
+    const employeesParent = computed(() => {
+        if (isDrillDown.value) return null;
+        return modules.value.find(m => m?.name?.trim() === 'Employees');
+    });
+
+    const companyModules = computed(() => {
+        const moduleList = modules.value;
+        if (!moduleList.length) return [];
+
+        const all = moduleList.filter(m =>
+            m && COMPANY_MODULES.includes(m.name?.trim())
+        );
+
+        const employees = all.find(m => m?.name?.trim() === 'Employees');
 
         if (employees) {
-            const children = modules.value.filter(m => {
-                const name = m.name.trim();
-                return ['Dashboard', 'Attendance', 'Careers', 'Salaries'].includes(name);
-            });
-
+            const children = moduleList.filter(m =>
+                m && EMPLOYEE_CHILDREN.includes(m.name?.trim())
+            );
             if (children.length) {
-                return allModules
-                    .filter(m => m.name.trim() !== 'Employees')
-                    .concat([
-                        {
-                            ...employees,
-                            children
-                        }
-                    ]);
+                return all
+                    .filter(m => m?.name?.trim() !== 'Employees')
+                    .concat([{ ...employees, children }]);
             }
         }
-
-        return allModules;
+        return all;
     });
 
     const projectModules = computed(() => {
-        const projectNames = ['Sentra AI', 'AI Agent', 'Chatbot', 'Orchestri'];
-        return modules.value.filter(m => projectNames.includes(m.name));
+        const moduleList = modules.value;
+        if (!moduleList.length) return [];
+        return moduleList.filter(m =>
+            m && PROJECT_MODULES.includes(m.name?.trim())
+        );
     });
 
     const accountModules = computed(() => {
-        return modules.value.filter(m => m.name === 'Manage Profile');
+        const moduleList = modules.value;
+        if (!moduleList.length) return [];
+        return moduleList.filter(m =>
+            m && m.name?.trim() === 'Manage Profile'
+        );
     });
 
-    const toggleDropdown = (moduleName) => {
-        dropdownStates.value[moduleName] = !dropdownStates.value[moduleName];
+    const getModuleRoute = (name) => {
+        if (!name) return '/admin';
+        return store.getModuleRoute(name);
     };
 
-    const getModuleRoute = (moduleName) => {
-        moduleName = moduleName.trim();
+    const isActive = (moduleName) => {
+        if (!moduleName) return false;
 
-        const routeMap = {
-            'Overview': '/admin/overview',
-            'Inbox': '/admin/inbox',
-            'Employees': '/admin/employees',
-            'Dashboard': '/admin/employees/dashboard',
-            'Attendance': '/admin/employees/attendance',
-            'Careers': '/admin/career',
-            'Salaries': '/admin/employees/salaries',
-            'Inquiries': '/admin/inquiries',
-            'Jira': '/admin/jira',
-            'Sentra AI': '/admin/projects/sentra-ai',
-            'AI Agent': '/admin/projects/ai-agent',
-            'Chatbot': '/admin/projects/chatbot',
-            'Orchestri': '/admin/projects/orchestri',
-            'Manage Profile': '/admin/profile'
-        };
+        const path = route.path.toLowerCase();
+        const modulePath = getModuleRoute(moduleName).toLowerCase();
 
-        return routeMap[moduleName] || `/admin/${moduleName.toLowerCase().replace(/ /g, '-')}`;
-    };
+        if (path === modulePath || path.startsWith(modulePath + '/')) return true;
 
-    const isActive = (moduleName, currentPath) => {
-        const path = currentPath.toLowerCase();
-        const trimmedName = moduleName.trim();
-
-        const modulePath = getModuleRoute(trimmedName).toLowerCase();
-
-        if (path === modulePath || path.startsWith(modulePath + '/')) {
-            return true;
+        const module = store.getModuleByName(moduleName);
+        if (module?.children) {
+            return module.children.some(child => {
+                const childPath = getModuleRoute(child.name).toLowerCase();
+                return path === childPath || path.startsWith(childPath + '/');
+            });
         }
-
-        if (trimmedName === 'Employees' && path === '/admin/employees/dashboard') {
-            return true;
-        }
-        if (trimmedName === 'Dashboard' && path === '/admin/employees/dashboard') {
-            return true;
-        }
-        if (trimmedName === 'Employees' && path === '/admin/employees/attendance') {
-            return true;
-        }
-        if (trimmedName === 'Attendance' && path === '/admin/employees/attendance') {
-            return true;
-        }
-        if (trimmedName === 'Employees' && path === '/admin/employees/salaries') {
-            return true;
-        }
-        if (trimmedName === 'Salaries' && path === '/admin/employees/salaries') {
-            return true;
-        }
-        if (trimmedName === 'Employees' && path === '/admin/career') {
-            return true;
-        }
-        if (trimmedName === 'Careers' && path === '/admin/career') {
-            return true;
-        }
-
         return false;
     };
+
+    const toggleDropdown = (name) => {
+        if (name) {
+            dropdownStates.value[name] = !dropdownStates.value[name];
+        }
+    };
+
+    // Handle click on Employees to drill down
+    const drillIntoEmployees = () => {
+        isDrillDown.value = true;
+        localStorage.setItem('sidebarDrillDown', 'true');
+        // Close any open dropdowns
+        Object.keys(dropdownStates.value).forEach(key => {
+            dropdownStates.value[key] = false;
+        });
+    };
+
+    // Go back from drill-down
+    const goBackFromDrillDown = () => {
+        isDrillDown.value = false;
+        localStorage.setItem('sidebarDrillDown', 'false');
+    };
+
+    // 🔥 NEW: Check if we should be in drill-down mode based on current route
+    const checkDrillDownOnRoute = () => {
+        const currentPath = route.path;
+        const childPaths = employeeChildrenModules.value.map(m => getModuleRoute(m.name));
+
+        // If current path is one of the child paths, stay in drill-down
+        if (childPaths.some(path => currentPath.startsWith(path))) {
+            isDrillDown.value = true;
+            localStorage.setItem('sidebarDrillDown', 'true');
+        }
+    };
+
+    // Watch route changes to maintain drill-down state
+    watch(() => route.path, () => {
+        checkDrillDownOnRoute();
+    });
 
     const getUserRole = () => {
         try {
             const user = JSON.parse(localStorage.getItem('user') || '{}');
-            return user.role?.name || 'Administrator';
+            return user.role?.name || user.role_name || 'Administrator';
         } catch {
             return 'Administrator';
         }
     };
 
-    onMounted(() => {
-        loadModules();
+    onMounted(async () => {
+        if (!store.hasModules) {
+            await store.fetchModules();
+        }
+        // Check if we should be in drill-down mode
+        checkDrillDownOnRoute();
     });
 
     return {
@@ -137,15 +165,20 @@ export function useAdminSidebar() {
         loading,
         error,
         dropdownStates,
-        loadModules,
+        isSidebarOpen,
+        collapsed,
+        isDrillDown,
         companyModules,
         projectModules,
         accountModules,
-        toggleDropdown,
+        employeeChildrenModules,
+        employeesParent,
         getModuleRoute,
         isActive,
+        toggleDropdown,
+        drillIntoEmployees,
+        goBackFromDrillDown,
         getUserRole,
-        isSidebarOpen,
-        collapsed
+        refreshModules: store.fetchModules,
     };
 }

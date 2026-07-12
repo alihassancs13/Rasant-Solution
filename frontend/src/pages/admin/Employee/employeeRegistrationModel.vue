@@ -83,8 +83,26 @@
               </div>
               <div>
                 <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">CNIC <span class="text-rose-500">*</span></label>
-                <input type="text" v-model="formData.cnic" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" placeholder="00000-0000000-0">
-                <span class="text-[10px] text-slate-400 mt-1 block">National identity card number</span>
+                <input
+                    type="text"
+                    v-model="formData.cnic"
+                    required
+                    :class="[
+      'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
+      (cnicError || validationError) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
+    ]"
+                    placeholder="00000-0000000-0"
+                    @input="formatCnic"
+                    @focus="validationError = ''"
+                    maxlength="15"
+                >
+                <span v-if="cnicError" class="text-xs text-rose-500 mt-1 block">
+    <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ cnicError }}
+  </span>
+                <span v-else-if="validationError" class="text-xs text-rose-500 mt-1 block">
+    <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ validationError }}
+  </span>
+                <span v-else class="text-[10px] text-slate-400 mt-1 block">National identity card number (13 digits)</span>
               </div>
             </div>
 
@@ -455,7 +473,7 @@
 
 <script>
 import { useEmployeeRegistration } from '@/composables/useEmployeeRegistration.js';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 
 export default {
@@ -464,6 +482,7 @@ export default {
     const router = useRouter();
     const isSubmitted = ref(false);
     const isDirectAccess = ref(false);
+    const validationError = ref(''); // Add this
 
     // Get token from URL
     const getTokenFromURL = () => {
@@ -498,15 +517,54 @@ export default {
       submitForm,
     } = registration;
 
+    // CNIC validation functions
+    const isCnicValid = (cnic) => {
+      if (!cnic) return false;
+      const cleanCnic = cnic.replace(/[-\s]/g, '');
+      return /^\d{13}$/.test(cleanCnic);
+    };
+
+    // Computed for CNIC error
+    const cnicError = computed(() => {
+      if (currentStep.value !== 1) return '';
+      if (!formData.value.cnic) return '';
+      if (!isCnicValid(formData.value.cnic)) {
+        return 'CNIC must be exactly 13 digits (e.g., 12345-1234567-8)';
+      }
+      return '';
+    });
+
+    // Format CNIC with dashes
+    const formatCnic = (event) => {
+      let value = event.target.value.replace(/[^0-9]/g, '');
+
+      // Limit to 13 digits
+      if (value.length > 13) {
+        value = value.slice(0, 13);
+      }
+
+      // Auto-format with dashes: 00000-0000000-0
+      let formatted = '';
+      if (value.length > 0) {
+        formatted = value.slice(0, 5);
+        if (value.length > 5) {
+          formatted += '-' + value.slice(5, 12);
+        }
+        if (value.length > 12) {
+          formatted += '-' + value.slice(12, 13);
+        }
+      }
+
+      event.target.value = formatted;
+      formData.value.cnic = formatted;
+      // Clear validation error when user types
+      validationError.value = '';
+    };
+
     // Add removeFile function
     const removeFile = (fieldName) => {
-      // Clear from fileNames
       fileNames.value[fieldName] = null;
-
-      // Clear from formData
       formData.value[fieldName] = null;
-
-      // Reset the file input
       const inputs = document.querySelectorAll(`input[data-field="${fieldName}"]`);
       inputs.forEach(input => {
         input.value = '';
@@ -531,11 +589,29 @@ export default {
     });
 
     const customNextStep = () => {
+      // Validate CNIC if on step 1
+      if (currentStep.value === 1) {
+        if (!formData.value.cnic) {
+          validationError.value = 'Please enter CNIC number';
+          const cnicInput = document.querySelector('input[v-model="formData.cnic"]');
+          if (cnicInput) cnicInput.focus();
+          return;
+        }
+        if (!isCnicValid(formData.value.cnic)) {
+          validationError.value = 'CNIC must be exactly 13 digits. Please check and try again.';
+          const cnicInput = document.querySelector('input[v-model="formData.cnic"]');
+          if (cnicInput) cnicInput.focus();
+          return;
+        }
+      }
+
+      // Clear validation error if everything is valid
+      validationError.value = '';
+
       if (currentStep.value === totalSteps) {
         submitForm(() => {
           isSubmitted.value = true;
 
-          // If in modal mode, auto-close after 4 seconds
           if (!isDirectAccess.value) {
             setTimeout(() => {
               emit('close');
@@ -544,7 +620,7 @@ export default {
         });
       } else {
         nextStep();
-        scrollToTop(); // Scroll to top when going to next step
+        scrollToTop();
       }
     };
 
@@ -552,7 +628,9 @@ export default {
     const customPrevStep = () => {
       if (currentStep.value > 1) {
         prevStep();
-        scrollToTop(); // Scroll to top when going back
+        scrollToTop();
+        // Clear validation error when going back
+        validationError.value = '';
       }
     };
 
@@ -572,13 +650,16 @@ export default {
       fileNames,
       currentProgressPercentage,
       handleFileUpload,
-      prevStep: customPrevStep, // Use custom prev step
+      prevStep: customPrevStep,
       customNextStep,
       close,
       isDirectAccess,
       isSubmitted,
       redirectToHome,
       removeFile,
+      cnicError,
+      formatCnic,
+      validationError, // Add this to return
     };
   }
 };

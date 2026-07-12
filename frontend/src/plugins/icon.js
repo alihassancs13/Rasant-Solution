@@ -1,5 +1,10 @@
 import { library } from '@fortawesome/fontawesome-svg-core'
 import {
+  faMoneyBill,
+  faRectangleList,
+  faCalendarCheck as faCalendarCheckRegular,
+  faBriefcase as faBriefcaseRegular,
+  faComment as faCommentRegular,
   faRightFromBracket,
   faUmbrellaBeach,
   faLink,
@@ -97,6 +102,10 @@ import {
 
 library.add(
     // Chevrons & arrows
+    faRectangleList,
+    faCalendarCheckRegular,
+    faBriefcaseRegular,
+    faCommentRegular,
     faRightFromBracket,
     faUmbrellaBeach,
     faLink,
@@ -209,5 +218,6 @@ library.add(
     faAnglesLeft,
     faAnglesRight,
     faPen,
-    faCheck
+    faCheck,
+    faMoneyBill,
 )

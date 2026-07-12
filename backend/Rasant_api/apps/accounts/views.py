@@ -79,7 +79,7 @@ def login_user(request):
     user_data = UserSerializer(user).data
 
     # Get modules for the user's role
-    modules = Module.objects.filter(role=user.role).values('id', 'name', 'icon') if user.role else []
+    modules = Module.objects.filter(role=user.role).values('id', 'name', 'icon','link') if user.role else []
 
     #  FIXED INDENTATION HERE
     modules_list = []
@@ -87,7 +87,8 @@ def login_user(request):
         modules_list.append({
             'id': module['id'],
             'name': module['name'],
-            'icon': module.get('icon', '')  # Use .get() to avoid KeyError
+            'icon': module.get('icon', ''),  # Use .get() to avoid KeyError
+            'link':module.get('link')
         })
 
     return Response({
@@ -109,10 +110,7 @@ def get_user_modules(request):
     Get all modules for the logged-in user based on their role
     """
     user = request.user
-
-    # ADD THIS: Debug logging
     print(f"User: {user.username}, Role: {user.role}")
-
     # Check if user has a role
     if not user.role:
         return Response({
@@ -124,7 +122,7 @@ def get_user_modules(request):
         })
 
     # Get modules for user's role
-    modules = Module.objects.filter(role=user.role).values('id', 'name', 'icon')
+    modules = Module.objects.filter(role=user.role).values('id', 'name', 'icon','link')
 
     # CHANGE THIS: Convert to list of dicts
     modules_list = []
@@ -132,7 +130,8 @@ def get_user_modules(request):
         modules_list.append({
             'id': module['id'],
             'name': module['name'],
-            'icon': module.get('icon', '')
+            'icon': module.get('icon', ''),
+            'link':module.get('link','')
         })
 
     return Response({
