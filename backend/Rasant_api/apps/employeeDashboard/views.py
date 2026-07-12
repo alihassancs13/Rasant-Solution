@@ -12,16 +12,19 @@ from django.core.mail import send_mail
 from django.db.models import Q
 from datetime import date
 from django.conf import settings
+from collections import defaultdict
+from django.db import transaction
 
 from .models import (
     Employee, CVSubmission, JobOpening, JobType, JobStatus,
-    IncrementType, IncrementPolicy, CycleTiming, ApplicationMode,
+    IncrementType, IncrementPolicy, CycleTiming, ApplicationMode, EmployeePolicyAssignment,
+    SalaryIncrementHistory
 )
 from .serializers import (
     EmployeeSerializer, EmployeeListSerializer, UpdateEmployeeSerializer,
     CVSubmissionSerializer, JobOpeningSerializer, JobTypeSerializer, JobStatusSerializer,
     IncrementTypeSerializer, CycleTimingSerializer, ApplicationModeSerializer,
-    IncrementPolicySerializer,
+    IncrementPolicySerializer, EmployeePolicyAssignmentSerializer
 )
 
 
@@ -524,3 +527,138 @@ def increment_policy_view(request, pk=None):
             return Response({"status": "error", "message": "Policy not found."}, status=status.HTTP_404_NOT_FOUND)
         policy.delete()
         return Response({"status": "success", "message": "Policy deleted successfully."}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def policy_assignments_view(request):
+    """Sab employee<->policy assignments ek call mein — taake frontend
+    'Assigned Policies' column (roster) aur 'Also assigned to' badge
+    (assign modal) N+1 calls ke bina compute kar sake."""
+    assignments = EmployeePolicyAssignment.objects.select_related('employee', 'policy').all()
+    serializer = EmployeePolicyAssignmentSerializer(assignments, many=True)
+    return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def sync_policy_assignments_view(request, policy_id):
+    try:
+        policy = IncrementPolicy.objects.get(pk=policy_id)
+    except IncrementPolicy.DoesNotExist:
+        return Response({"status": "error", "message": "Policy not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    employee_ids = request.data.get('employee_ids', [])
+    if not isinstance(employee_ids, list):
+        return Response({"status": "error", "message": "employee_ids must be a list."}, status=status.HTTP_400_BAD_REQUEST)
+
+    existing_ids = set(
+        EmployeePolicyAssignment.objects.filter(policy=policy).values_list('employee_id', flat=True)
+    )
+    new_ids = set(employee_ids)
+
+    to_remove = existing_ids - new_ids
+    to_add = new_ids - existing_ids
+
+    if to_remove:
+        EmployeePolicyAssignment.objects.filter(policy=policy, employee_id__in=to_remove).delete()
+
+    if to_add:
+        EmployeePolicyAssignment.objects.bulk_create([
+            EmployeePolicyAssignment(
+                employee_id=emp_id,
+                policy=policy,
+            )
+            for emp_id in to_add
+        ])
+
+    assignments = EmployeePolicyAssignment.objects.filter(policy=policy).select_related('employee')
+    serializer = EmployeePolicyAssignmentSerializer(assignments, many=True)
+    return Response(
+        {"status": "success", "message": "Assignments updated.", "data": serializer.data},
+        status=status.HTTP_200_OK,
+    )
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def force_increment_view(request):
+    """
+    Applies every active policy an employee is assigned to, immediately —
+    ignores next_effective_date entirely. Fixed-amount policies add a flat
+    value; percentage policies apply % of the employee's running salary
+    (so if an employee has multiple policies, each one compounds on top
+    of the previous policy's result).
+    """
+    assignments = (
+        EmployeePolicyAssignment.objects
+        .select_related('employee', 'policy', 'policy__increment_type')
+        .filter(policy__is_active=True)
+        .order_by('employee_id', 'policy_id')
+    )
+
+    by_employee = defaultdict(list)
+    for a in assignments:
+        by_employee[a.employee_id].append(a)
+
+    if not by_employee:
+        return Response(
+            {"status": "success", "message": "No employees are assigned to any active policy.", "data": []},
+            status=status.HTTP_200_OK,
+        )
+
+    results = []
+    touched_policy_ids = set()
+
+    with transaction.atomic():
+        for employee_id, emp_assignments in by_employee.items():
+            employee = emp_assignments[0].employee
+            old_salary = employee.salary
+            running_salary = old_salary
+            applied_policies = []
+
+            for a in emp_assignments:
+                policy = a.policy
+                touched_policy_ids.add(policy.id)
+
+                if policy.increment_type.code == 'percentage':
+                    increment_amount = (running_salary * policy.amount) / 100
+                else:
+                    increment_amount = policy.amount
+
+                running_salary += increment_amount
+
+                SalaryIncrementHistory.objects.create(
+                    employee=employee,
+                    policy=policy,
+                    old_salary=old_salary,
+                    increment_type=policy.increment_type.code,
+                    increment_value=policy.amount,
+                    increment_amount=increment_amount,
+                    new_salary=running_salary,
+                )
+                applied_policies.append(policy.policy_name)
+
+            employee.salary = running_salary
+            employee.current_salary = running_salary
+            employee.increment_applied_on = date.today()
+            employee.is_increment_pending = False
+            employee.save(update_fields=['salary', 'current_salary', 'increment_applied_on', 'is_increment_pending'])
+
+            results.append({
+                "employee_id": employee.id,
+                "employee_name": employee.name,
+                "old_salary": str(old_salary),
+                "new_salary": str(running_salary),
+                "policies_applied": applied_policies,
+            })
+
+        if touched_policy_ids:
+            IncrementPolicy.objects.filter(id__in=touched_policy_ids).update(last_run_date=date.today())
+
+    return Response(
+        {
+            "status": "success",
+            "message": f"Force increment applied to {len(results)} employee(s).",
+            "data": results,
+        },
+        status=status.HTTP_200_OK,
+    )

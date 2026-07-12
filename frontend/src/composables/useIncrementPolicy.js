@@ -12,7 +12,6 @@ export function useIncrementPolicy() {
         increment_type: null,
         amount: null,
         cycle_timing: null,
-        next_effective_date: '',
         application_mode: null,
         description: '',
         is_active: true,
@@ -26,7 +25,11 @@ export function useIncrementPolicy() {
     const cycleTimings     = computed(() => policyStore.cycleTimings)
     const applicationModes = computed(() => policyStore.applicationModes)
     const activePolicies   = computed(() => policies.value.filter(p => p.is_active).length)
-
+    const isTogglingActive = ref(null)
+    const assignments        = computed(() => policyStore.assignments)
+    const assignmentsLoading = computed(() => policyStore.isLoadingAssignments)
+    const showForceModal = ref(false)
+    const isForcing = ref(false)
     const formatCurrency = (amount) =>
         amount || amount === 0 ? `₨${Number(amount).toLocaleString('en-US')}` : '—'
 
@@ -169,17 +172,56 @@ export function useIncrementPolicy() {
 
         if (result.success) closeDeleteModal()
     }
+    const toggleActive = async (policy) => {
+        isTogglingActive.value = policy.id
+        const result = await policyStore.updatePolicy(policy.id, { is_active: !policy.is_active })
+        isTogglingActive.value = null
+
+        if (result.success) {
+            showToast(result.data.is_active ? 'Policy activated.' : 'Policy marked inactive.', 'success')
+        } else {
+            showToast('Failed to update policy status.', 'error')
+        }
+    }
+    const fetchAssignments = async () => {
+        const result = await policyStore.fetchAssignments()
+        if (!result.success) showToast(result.error, 'error')
+    }
+
+    const assignedPolicyNames = (employeeId) => {
+        const names = assignments.value
+            .filter(a => a.employee === employeeId)
+            .map(a => a.policy_name)
+        return names.length ? names.join(', ') : null
+    }
+    const assignedPolicyList = (employeeId) =>
+        assignments.value.filter(a => a.employee === employeeId).map(a => a.policy_name)
+    const openForceModal = () => { showForceModal.value = true }
+    const closeForceModal = () => { showForceModal.value = false }
+    const confirmForceIncrement = async () => {
+        isForcing.value = true
+        const result = await policyStore.forceIncrement()
+        isForcing.value = false
+
+        showToast(result.success ? (result.message || 'Increments applied.') : (result.error || 'Failed to force increment.'), result.success ? 'success' : 'error')
+        if (result.success) {
+            closeForceModal()
+            await policyStore.fetchPolicies() // refresh last_run_date on policy cards
+        }
+    }
+
 
     return {
         formData, formErrors, isSubmitting,
         policies, loading, incrementTypes, cycleTimings, applicationModes, activePolicies,
-        formatCurrency, formatIncrement, isOverdue, isDueSoon, cardBorderClass, dateClass,
+        formatCurrency, formatIncrement, cardBorderClass, dateClass,
         resetForm, loadIntoForm, fetchPolicies, fetchLookups, savePolicy,
-        // add/edit policy modal
+        toggleActive, isTogglingActive,
         showPolicyModal, policyModalTitle, policyModalSubtitle, policySubmitText,
         openAddPolicyModal, editPolicy, closePolicyModal, handleSavePolicy,
-        // delete modal
         showDeleteModal, policyToDelete, isDeleting, deleteModalSubtitle,
         openDeleteModal, closeDeleteModal, confirmDeletePolicy,
+        assignments, assignmentsLoading, fetchAssignments, assignedPolicyNames,assignedPolicyList,
+        showForceModal, isForcing, openForceModal, closeForceModal, confirmForceIncrement,
     }
 }

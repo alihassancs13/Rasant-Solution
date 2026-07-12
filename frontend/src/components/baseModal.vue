@@ -19,23 +19,27 @@
       <div
           class="relative w-full transform overflow-hidden rounded-2xl bg-white text-left shadow-xl transition-all duration-300 ease-out"
           :class="{
-          'max-w-md': props.mode === 'delete' || props.mode === 'toggle',
-          'max-w-2xl': props.mode === 'form' && !props.wide,
-          'max-w-4xl': props.mode === 'view',
-          'max-w-6xl': props.wide
-        }"
+            'max-w-md': props.mode === 'delete' || props.mode === 'toggle' || props.mode === 'confirm',
+            'max-w-2xl': props.mode === 'form' && !props.wide,
+            'max-w-4xl': props.mode === 'view',
+            'max-w-6xl': props.wide
+          }"
           @click.stop
       >
-        <!-- ══════════ DELETE MODE: centered confirmation layout ══════════ -->
-        <template v-if="props.mode === 'delete'">
+        <!-- ══════════ DELETE / CONFIRM MODE: centered confirmation layout ══════════ -->
+        <template v-if="props.mode === 'delete' || props.mode === 'confirm'">
           <div class="px-8 pt-8 pb-6 flex flex-col items-center text-center">
             <div class="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mb-4">
               <font-awesome-icon icon="fa-solid fa-triangle-exclamation" class="w-7 h-7 text-red-600" />
             </div>
-            <h3 id="modal-title" class="text-xl font-bold text-red-700 mb-2">
+            <h3
+                id="modal-title"
+                class="text-xl font-bold mb-2 break-words"
+                :class="props.mode === 'delete' ? 'text-red-700' : 'text-gray-800'"
+            >
               {{ props.title }}
             </h3>
-            <p v-if="props.subtitle" class="text-sm leading-relaxed max-w-sm modal-subtitle-text">
+            <p v-if="props.subtitle" class="text-sm text-gray-500 leading-relaxed max-w-sm break-words">
               {{ props.subtitle }}
             </p>
             <div v-if="$slots.default" class="w-full mt-4">
@@ -58,13 +62,16 @@
                   type="submit"
                   @click="$emit('save')"
                   :disabled="props.loading || props.disabled"
-                  class="flex-1 max-w-[160px] px-5 py-2.5 text-sm font-semibold rounded-xl shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center bg-[#F8FAFC] text-[#64748B] border border-border"
+                  class="flex-1 max-w-[160px] px-5 py-2.5 text-sm font-semibold rounded-xl text-white shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                  :class="props.mode === 'delete'
+            ? 'bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 focus:ring-red-400'
+            : 'btn-primary-gradient focus:ring-primary/40'"
               >
                 <font-awesome-icon
                     v-if="props.loading"
                     icon="fa-solid fa-spinner"
                     spin
-                    class="mr-2 h-4 w-4 text-[#64748B]"
+                    class="mr-2 h-4 w-4 text-white"
                 />
                 <span>{{ props.loading ? 'Processing...' : props.submitText }}</span>
               </button>
@@ -78,20 +85,20 @@
           <div
               class="px-6 py-4 border-b border-gray-100"
               :class="{
-              'header-base-gradient': (props.mode === 'toggle' || props.mode === 'form') && !props.title.includes('Error'),
-              'bg-gradient-to-r from-gray-50 to-gray-100': props.mode === 'view'
-            }"
+    'header-base-gradient': (props.mode === 'toggle' || props.mode === 'form') && !props.title.includes('Error'),
+    'bg-gradient-to-r from-gray-50 to-gray-100': props.mode === 'view'
+  }"
           >
-            <div class="flex items-center justify-between">
-              <div class="flex items-center space-x-3">
+            <div class="flex items-start justify-between gap-3">
+              <div class="flex items-start space-x-3 min-w-0 flex-1">
                 <!-- Icon based on mode -->
                 <div
                     class="flex-shrink-0 w-10 h-10 rounded-xl flex items-center justify-center"
                     :class="{
-                    'icon-gradient-brand': props.mode === 'toggle' || (props.mode === 'form' && !props.title.includes('Error')),
-                    'bg-rose-100 text-rose-600': props.title.includes('Error'),
-                    'bg-teal-100 text-teal-600': props.mode === 'view'
-                  }"
+          'icon-gradient-brand': props.mode === 'toggle' || (props.mode === 'form' && !props.title.includes('Error')),
+          'bg-rose-100 text-rose-600': props.title.includes('Error'),
+          'bg-teal-100 text-teal-600': props.mode === 'view'
+        }"
                 >
                   <font-awesome-icon
                       v-if="props.mode === 'toggle'"
@@ -109,26 +116,26 @@
                       class="w-5 h-5"
                   />
                 </div>
-                <div>
+                <div class="min-w-0 flex-1">
                   <h3
-                      class="text-lg font-bold leading-6"
+                      class="text-lg font-bold leading-6 break-words"
                       :class="{
-                      'text-red-700': props.title.includes('Error'),
-                      'text-gray-900': props.mode === 'view',
-                      'text-gray-800': !(props.title.includes('Error') || props.mode === 'view')
-                    }"
+            'text-red-700': props.title.includes('Error'),
+            'text-gray-900': props.mode === 'view',
+            'text-gray-800': !(props.title.includes('Error') || props.mode === 'view')
+          }"
                       id="modal-title"
                   >
                     {{ props.title }}
                   </h3>
                   <p
                       v-if="props.subtitle"
-                      class="text-sm mt-1"
+                      class="text-sm mt-1 break-words"
                       :class="{
-                      'text-red-600': props.title.includes('Error'),
-                      'text-gray-600': props.mode === 'view',
-                      'text-gray-500': !(props.title.includes('Error') || props.mode === 'view')
-                    }"
+            'text-red-600': props.title.includes('Error'),
+            'text-gray-600': props.mode === 'view',
+            'text-gray-500': !(props.title.includes('Error') || props.mode === 'view')
+          }"
                   >
                     {{ props.subtitle }}
                   </p>
@@ -136,7 +143,7 @@
               </div>
               <button
                   @click="$emit('close')"
-                  class="rounded-lg p-2 hover:bg-gray-100 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-300"
+                  class="rounded-lg p-2 hover:bg-gray-100 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-300 shrink-0"
                   aria-label="Close"
               >
                 <font-awesome-icon
@@ -217,7 +224,7 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 interface Props {
   isOpen: boolean;
-  mode?: 'form' | 'delete' | 'toggle' | 'view';
+  mode?: 'form' | 'delete' | 'toggle' | 'view' | 'confirm';
   title: string;
   submitText?: string;
   cancelText?: string;

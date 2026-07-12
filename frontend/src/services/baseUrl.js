@@ -21,4 +21,7 @@ export const API_ENDPOINTS = {
     JOB_STATUS: '/api/employeeDashboard/job-status/',
     INCREMENT_POLICIES: '/api/employeeDashboard/salaries/policies/',
     INCREMENT_LOOKUPS:  '/api/employeeDashboard/salaries/lookups/',
+    POLICY_ASSIGNMENTS: '/api/employeeDashboard/salaries/assignments/',
+    POLICY_ASSIGN: (policyId) => `/api/employeeDashboard/salaries/policies/${policyId}/assign/`,
+    FORCE_INCREMENT: '/api/employeeDashboard/salaries/force-increment/',
 };

@@ -1,29 +1,30 @@
 import { ref, computed } from 'vue'
+import { usePolicyStore } from '@/stores/policyStore.js'
 import { useToast } from './useToast.js'
 
-export function useAssignPolicy(employees) {
+export function useAssignPolicy(employees, assignments) {
+    const policyStore = usePolicyStore()
     const { showToast } = useToast()
 
     const showAssignModal     = ref(false)
     const assigningPolicy     = ref(null)
     const selectedEmployeeIds = ref([])
-    const isSaving             = ref(false)
+    const isSaving            = ref(false)
 
     const assignSubtitle = computed(() => {
         if (!assigningPolicy.value) return ''
         const p = assigningPolicy.value
-        return `POL-${String(p.id).padStart(3, '0')} · +${p.amount}${p.increment_type_code === 'percentage' ? '%' : ''} · ${p.cycle_timing_name?.toLowerCase()}`
+        return `${p.amount}${p.increment_type_code === 'percentage' ? '%' : ''} · ${p.cycle_timing_name?.toLowerCase()}`
     })
 
     const isAssigned = (emp, policy) =>
-        !!emp.policies && emp.policies.split(',').map(s => s.trim()).includes(policy.policy_name)
+        assignments.value.some(a => a.employee === emp.id && a.policy === policy.id)
 
     const otherAssignedPolicies = (emp) => {
-        if (!emp.policies || !assigningPolicy.value) return null
-        const names = emp.policies
-            .split(',')
-            .map(s => s.trim())
-            .filter(n => n && n !== assigningPolicy.value.policy_name)
+        if (!assigningPolicy.value) return null
+        const names = assignments.value
+            .filter(a => a.employee === emp.id && a.policy !== assigningPolicy.value.id)
+            .map(a => a.policy_name)
         return names.length ? names.join(', ') : null
     }
 
@@ -47,17 +48,17 @@ export function useAssignPolicy(employees) {
         selectedEmployeeIds.value = []
     }
 
-    // TODO: replace with real assignment endpoint once it exists — should send
-    // selectedEmployeeIds + assigningPolicy.value.id to backend
     const saveAssignments = async () => {
+        if (!assigningPolicy.value) return
         isSaving.value = true
-        try {
+        const result = await policyStore.syncPolicyAssignments(assigningPolicy.value.id, selectedEmployeeIds.value)
+        isSaving.value = false
+
+        if (result.success) {
             showToast('Assignments saved.', 'success')
             closeAssignModal()
-        } catch (err) {
-            showToast('Failed to save assignments.', 'error')
-        } finally {
-            isSaving.value = false
+        } else {
+            showToast(result.error || 'Failed to save assignments.', 'error')
         }
     }
 

@@ -17,6 +17,9 @@ apiClient.interceptors.request.use((config) => {
 
 export const usePolicyStore = defineStore('policy', {
     state: () => ({
+        assignments: [],
+        isLoadingAssignments: false,
+        isSavingAssignments: false,
         policies: [],
         incrementTypes: [],
         cycleTimings: [],
@@ -84,6 +87,51 @@ export const usePolicyStore = defineStore('policy', {
                 return { success: true, data: response.data.data };
             } catch (error) {
                 this.error = error.response?.data?.errors || error.response?.data?.message || 'Failed to update policy';
+                return { success: false, error: this.error };
+            } finally {
+                this.isSubmitting = false;
+            }
+        },
+        async fetchAssignments() {
+            this.isLoadingAssignments = true;
+            try {
+                const response = await apiClient.get(API_ENDPOINTS.POLICY_ASSIGNMENTS);
+                this.assignments = response?.data?.data ?? [];
+                return { success: true };
+            } catch (error) {
+                this.error = error.response?.data?.message || 'Failed to fetch assignments';
+                return { success: false, error: this.error };
+            } finally {
+                this.isLoadingAssignments = false;
+            }
+        },
+
+        async syncPolicyAssignments(policyId, employeeIds) {
+            this.isSavingAssignments = true;
+            try {
+                const response = await apiClient.post(API_ENDPOINTS.POLICY_ASSIGN(policyId), {
+                    employee_ids: employeeIds,
+                });
+                // Is policy ke purane assignments hata kar naye se replace karo,
+                // baaki policies ke assignments untouched rehte hain.
+                this.assignments = this.assignments.filter(a => a.policy !== policyId);
+                this.assignments.push(...(response?.data?.data ?? []));
+                return { success: true };
+            } catch (error) {
+                this.error = error.response?.data?.message || 'Failed to save assignments';
+                return { success: false, error: this.error };
+            } finally {
+                this.isSavingAssignments = false;
+            }
+        },
+
+        async forceIncrement() {
+            this.isSubmitting = true;
+            try {
+                const response = await apiClient.post(API_ENDPOINTS.FORCE_INCREMENT);
+                return { success: true, data: response.data.data, message: response.data.message };
+            } catch (error) {
+                this.error = error.response?.data?.message || 'Failed to force increment';
                 return { success: false, error: this.error };
             } finally {
                 this.isSubmitting = false;

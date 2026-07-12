@@ -19,4 +19,8 @@ urlpatterns = [
     path('salaries/policies/', views.increment_policy_view, name='increment-policy-list'),
     path('salaries/policies/<int:pk>/', views.increment_policy_view, name='increment-policy-detail'),
     path('salaries/lookups/', views.increment_lookups_view, name='increment-lookups'),
+    path('salaries/assignments/', views.policy_assignments_view, name='policy-assignments-list'),
+    path('salaries/policies/<int:policy_id>/assign/', views.sync_policy_assignments_view, name='policy-assign'),
+    path('salaries/force-increment/', views.force_increment_view, name='force-increment'),
+
 ]

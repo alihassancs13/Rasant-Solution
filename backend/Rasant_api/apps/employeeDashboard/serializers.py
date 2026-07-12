@@ -1,7 +1,16 @@
 from rest_framework import serializers
 from .models import (
-    Employee, CVSubmission, JobType, JobOpening, JobStatus,
-    IncrementType, IncrementPolicy, CycleTiming, ApplicationMode,
+    Employee,
+    CVSubmission,
+    JobType,
+    JobStatus,
+    JobOpening,
+    IncrementType,
+    CycleTiming,
+    ApplicationMode,
+    IncrementPolicy,
+    SalaryIncrementHistory,
+    EmployeePolicyAssignment,
 )
 class EmployeeSerializer(serializers.ModelSerializer):
     department_name = serializers.CharField(source="department.name", read_only=True)
@@ -238,3 +247,12 @@ class IncrementPolicySerializer(serializers.ModelSerializer):
         if user and user.is_authenticated:
             validated_data['created_by'] = user
         return IncrementPolicy.objects.create(**validated_data)
+
+class EmployeePolicyAssignmentSerializer(serializers.ModelSerializer):
+    employee_name = serializers.CharField(source='employee.full_name', read_only=True)  # field name confirm karna hai
+    policy_name   = serializers.CharField(source='policy.policy_name', read_only=True)
+
+    class Meta:
+        model = EmployeePolicyAssignment
+        fields = ['id', 'employee', 'employee_name', 'policy', 'policy_name', 'assigned_at']
+        read_only_fields = ['id', 'assigned_at']

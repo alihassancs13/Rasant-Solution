@@ -39,7 +39,7 @@ class Employee(models.Model):
     present_address = models.TextField(null=True, blank=True)
     permanent_address = models.TextField(null=True, blank=True)
     phone_number = models.CharField(max_length=15)
-    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES, null=True)
     department = models.CharField(max_length=100, default='Unassigned')
     designation = models.CharField(max_length=100, default='Unassigned')
     is_active = models.BooleanField(default=True)
@@ -308,3 +308,20 @@ class SalaryIncrementHistory(models.Model):
 
     class Meta:
         ordering = ["-applied_on"]
+
+class EmployeePolicyAssignment(models.Model):
+    employee = models.ForeignKey(
+        Employee, on_delete=models.CASCADE, related_name='policy_assignments'
+    )
+    policy = models.ForeignKey(
+        IncrementPolicy, on_delete=models.CASCADE, related_name='employee_assignments'
+    )
+    assigned_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'employee_policy_assignments'
+        unique_together = ('employee', 'policy')
+        ordering = ['-assigned_at']
+
+    def __str__(self):
+        return f"{self.employee} → {self.policy.policy_name}"
