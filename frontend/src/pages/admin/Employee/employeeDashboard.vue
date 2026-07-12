@@ -18,28 +18,27 @@
               icon="fa-users"
               label="Total employees"
               :value="statsSummary.total"
-              subtitle="Active roster"
           />
           <StateCard
               variant="lavender"
               icon="fa-check"
               label="In office today"
               :value="statsSummary.inOffice"
-              subtitle="Checked in via attendance"
+
           />
           <StateCard
               variant="sky"
               icon="fa-clipboard-list"
               label="Intern / probation"
               :value="statsSummary.internProbation"
-              subtitle="Onboarding pipeline"
+
           />
           <StateCard
               variant="teal"
               icon="fa-umbrella-beach"
               label="Away today"
               :value="statsSummary.awayToday"
-              subtitle="Not in office"
+
           />
         </div>
 

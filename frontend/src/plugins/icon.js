@@ -70,7 +70,8 @@ import {
   faUsersCog,           // Alternative for auto assign
   faAnglesLeft,
   faAnglesRight,
-  faPen
+  faPen,
+  faCheck
 } from '@fortawesome/free-solid-svg-icons'
 
 import {
@@ -207,5 +208,6 @@ library.add(
     faPlay,
     faAnglesLeft,
     faAnglesRight,
-    faPen
+    faPen,
+    faCheck
 )

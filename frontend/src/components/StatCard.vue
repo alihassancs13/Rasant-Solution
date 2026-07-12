@@ -2,7 +2,7 @@
   <div
       class="relative bg-white border border-slate-200 rounded-xl p-3 shadow-sm overflow-hidden"
   >
-    <!-- Top accent bar with dynamic gradient based on color prop -->
+    <!-- Top accent bar with dynamic gradient based on color/variant prop -->
     <div class="absolute top-0 left-0 right-0 h-1" :class="accent.bar"></div>
 
     <div class="flex items-start justify-between">
@@ -13,7 +13,7 @@
           class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0"
           :class="accent.iconBg"
       >
-        <font-awesome-icon :icon="icon" class="w-3.5 h-3.5" :class="accent.iconColor" />
+        <font-awesome-icon :icon="resolvedIcon" class="w-3.5 h-3.5" :class="accent.iconColor" />
       </div>
     </div>
 
@@ -37,26 +37,27 @@ const props = defineProps({
   label: { type: String, required: true },
   value: { type: [String, Number], required: true },
   subtitle: { type: String, default: '' },
-  icon: { type: Array, required: true },
-  color: { type: String, default: 'pink' },
+  icon: { type: [Array, String], required: true },
+  color: { type: String, default: null },
+  variant: { type: String, default: null }, // alias for `color` — supports new naming (peach/lavender/sky/teal)
   link: { type: String, default: null },
   linkLabel: { type: String, default: 'View more' }
 })
 
 const themes = {
-  // First card - Pink gradient
+  // First card - Pink/Peach gradient
   pink: {
     bar: 'bg-gradient-to-r from-[#FFD5B4] to-[#E8C1D9]',
     iconBg: 'bg-[rgba(255,213,180,0.35)]',
     iconColor: 'text-gray-600'
   },
-  // Second card - Purple gradient
+  // Second card - Purple/Lavender gradient
   purple: {
     bar: 'bg-gradient-to-r from-[#E8C1D9] to-[#C9C4F8]',
     iconBg: 'bg-[rgba(201,196,248,0.35)]',
     iconColor: 'text-gray-600'
   },
-  // Third card - Blue gradient
+  // Third card - Blue/Sky gradient
   blue: {
     bar: 'bg-gradient-to-r from-[#C9C4F8] to-[#8FB9F4]',
     iconBg: 'bg-[rgba(143,185,244,0.35)]',
@@ -91,5 +92,24 @@ const themes = {
   }
 }
 
-const accent = computed(() => themes[props.color] || themes.pink)
+const themeAliases = {
+  peach: 'pink',
+  lavender: 'purple',
+  sky: 'blue',
+}
+
+const accent = computed(() => {
+  const key = props.variant || props.color || 'pink'
+  const resolvedKey = themeAliases[key] || key
+  return themes[resolvedKey] || themes.pink
+})
+
+const resolvedIcon = computed(() => {
+  if (Array.isArray(props.icon)) return props.icon
+  if (typeof props.icon === 'string') {
+    const cleaned = props.icon.replace(/^fa-solid\s+/, '').replace(/^fa-/, '')
+    return ['fas', cleaned]
+  }
+  return props.icon
+})
 </script>
