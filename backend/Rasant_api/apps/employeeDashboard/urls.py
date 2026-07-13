@@ -22,5 +22,6 @@ urlpatterns = [
     path('salaries/assignments/', views.policy_assignments_view, name='policy-assignments-list'),
     path('salaries/policies/<int:policy_id>/assign/', views.sync_policy_assignments_view, name='policy-assign'),
     path('salaries/force-increment/', views.force_increment_view, name='force-increment'),
+    path('salaries/increment-due-today/', views.increments_due_today_view, name='force-increment'),
 
 ]

@@ -311,7 +311,7 @@ html, body {
 
     /* ── Status: Danger (delete buttons, error states) ── */
     --color-danger: #dc2626;
-    --color-danger-hover: #fee2e2;
+    --color-danger-hover: #b91c1c;
     --color-danger-subtle: #fef2f2;
     --color-danger-border: #fecaca;
 

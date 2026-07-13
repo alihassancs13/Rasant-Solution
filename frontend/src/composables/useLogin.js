@@ -2,12 +2,12 @@
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import { useLoginStore } from '../stores/loginStore';
-import { useToast } from 'vue-toastification'; // or your preferred toast library
+import { useToast } from '@/composables/useToast.js';
 
 export function useLogin() {
     const router = useRouter();
     const loginStore = useLoginStore();
-    const toast = useToast(); // Initialize toast
+    const { showToast } = useToast(); // Initialize toast
 
     const emailOrUsername = ref('');
     const password = ref('');
@@ -50,7 +50,7 @@ export function useLogin() {
 
         // Check 1: Both fields are filled
         if (!trimmedInput && !trimmedPassword) {
-            toast.error('Please fill in both fields.');
+            showToast('Please fill in both fields.', 'error');
             fieldErrors.value.emailOrUsername = true;
             fieldErrors.value.password = true;
             return;
@@ -58,14 +58,14 @@ export function useLogin() {
 
         // Check 2: Email/Username field is empty
         if (!trimmedInput) {
-            toast.error('Please enter your email or username.');
+            showToast('Please enter your email or username.', 'error');
             fieldErrors.value.emailOrUsername = true;
             return;
         }
 
         // Check 3: Password field is empty
         if (!trimmedPassword) {
-            toast.error('Please enter your password.');
+            showToast('Please enter your password.', 'error');
             fieldErrors.value.password = true;
             return;
         }
@@ -75,7 +75,7 @@ export function useLogin() {
 
         // If input contains @ but is not a valid email, show error and stop
         if (trimmedInput.includes('@') && !isEmail) {
-            toast.error('Please enter a valid email address (e.g., user@example.com).');
+            showToast('Please enter a valid email address (e.g., user@example.com).', 'error');
             fieldErrors.value.emailOrUsername = true;
             return;
         }
@@ -103,7 +103,7 @@ export function useLogin() {
             const result = await loginStore.login(credentials);
 
             if (result.success) {
-                toast.success('Login successful! Redirecting...');
+                showToast('Login successful! Redirecting...', 'success');
                 console.log('Login successful!');
 
                 // Handle remember me
@@ -172,7 +172,7 @@ export function useLogin() {
             }
         } catch (error) {
             console.error('Unexpected error:', error);
-            toast.error('An unexpected error occurred. Please try again.');
+            showToast('An unexpected error occurred. Please try again.', 'error');
         } finally {
             isLoading.value = false;
         }
@@ -180,7 +180,7 @@ export function useLogin() {
 
     const logout = async () => {
         await loginStore.logout();
-        toast.info('Logged out successfully');
+        showToast('Logged out successfully', 'info');
         router.push('/login');
     };
 

@@ -59,18 +59,118 @@
         {{ currentDate }}
       </div>
 
-      <button class="relative w-9 h-9 flex items-center justify-center rounded-full bg-surface border border-border hover:bg-surface-alt transition shrink-0">
-        <svg class="w-4 h-4 text-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2a2 2 0 01-.6 1.4L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-        </svg>
-        <span
-            v-if="notificationCount > 0"
-            class="absolute -top-1 -right-1 bg-danger text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none"
-        >
-          {{ notificationCount }}
-        </span>
-      </button>
+     <div ref="notifRef" class="relative">
+  <button
+      @click="toggleNotifMenu"
+      class="relative w-9 h-9 flex items-center justify-center rounded-full bg-surface border border-border hover:bg-surface-alt transition shrink-0"
+  >
+    <svg
+        class="w-4 h-4 text-text-secondary"
+        :class="{ 'animate-[wiggle_0.5s_ease-in-out]': unseenCount > 0 }"
+        fill="none" stroke="currentColor" viewBox="0 0 24 24"
+    >
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.4-1.4A2 2 0 0118 14.2V11a6 6 0 10-12 0v3.2a2 2 0 01-.6 1.4L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+    </svg>
+    <span
+        v-if="unseenCount > 0"
+        class="absolute -top-1 -right-1 flex items-center justify-center"
+    >
+      <span class="absolute inline-flex h-4 w-4 rounded-full bg-danger opacity-75 animate-ping"></span>
+      <span class="relative bg-danger text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center leading-none">
+        {{ unseenCount }}
+      </span>
+    </span>
+  </button>
 
+  <transition
+      enter-active-class="transition ease-out duration-150"
+      enter-from-class="opacity-0 -translate-y-1 scale-95"
+      enter-to-class="opacity-100 translate-y-0 scale-100"
+      leave-active-class="transition ease-in duration-100"
+      leave-from-class="opacity-100 translate-y-0 scale-100"
+      leave-to-class="opacity-0 -translate-y-1 scale-95"
+  >
+    <div
+        v-if="showNotifMenu"
+        class="absolute right-0 top-full mt-2 w-96 bg-white border border-border rounded-2xl shadow-2xl z-50 overflow-hidden"
+        style="transform-origin: top right;"
+    >
+      <!-- Header -->
+      <div class="relative px-5 py-4 bg-gradient-to-br from-primary/5 via-white to-white border-b border-border">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-danger-subtle flex items-center justify-center">
+              <font-awesome-icon :icon="['fas', 'bell']" class="w-4 h-4 text-danger" />
+            </div>
+            <div>
+              <p class="text-sm font-bold text-text-primary leading-tight">Increments due today</p>
+              <p class="text-[11px] text-text-muted">{{ currentDate }}</p>
+            </div>
+          </div>
+          <span
+              v-if="policyStore.dueTodayIncrements.length"
+              class="text-xs font-bold text-danger bg-danger-subtle px-2.5 py-1 rounded-full"
+          >
+            {{ policyStore.dueTodayIncrements.length }} pending
+          </span>
+        </div>
+      </div>
+
+      <!-- List -->
+      <div class="max-h-96 overflow-y-auto">
+        <!-- Empty state -->
+        <div
+            v-if="!policyStore.dueTodayIncrements.length"
+            class="flex flex-col items-center justify-center gap-3 px-6 py-10 text-center"
+        >
+          <div class="w-14 h-14 rounded-full bg-success-subtle flex items-center justify-center">
+            <font-awesome-icon :icon="['fas', 'check']" class="text-xl text-success" />
+          </div>
+          <div>
+            <p class="text-sm font-semibold text-text-primary">You're all caught up</p>
+            <p class="text-xs text-text-muted mt-0.5">No increments due today.</p>
+          </div>
+        </div>
+
+        <!-- Items -->
+        <button
+            v-for="(item, idx) in policyStore.dueTodayIncrements"
+            :key="`${item.employee_id}-${item.policy_id}`"
+            @click="handleNotifItemClick(item)"
+            class="group w-full flex items-center gap-3 px-5 py-3 border-b border-border last:border-0 hover:bg-primary-subtle/40 transition-colors text-left cursor-pointer"
+        >
+          <div class="relative shrink-0">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold"
+                 :class="[avatarStyle(idx).bg, avatarStyle(idx).text]">
+              {{ getInitials(item.employee_name) }}
+            </div>
+          </div>
+
+          <div class="min-w-0 flex-1">
+            <p class="text-sm font-semibold text-text-primary truncate">{{ item.employee_name }}</p>
+            <p class="text-xs text-text-muted truncate flex items-center gap-1 mt-0.5">
+              <font-awesome-icon :icon="['fas', 'file-lines']" class="w-2.5 h-2.5" />
+              {{ item.policy_name }}
+            </p>
+          </div>
+
+          <font-awesome-icon
+              :icon="['fas', 'chevron-right']"
+              class="w-3 h-3 text-text-muted opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0"
+          />
+        </button>
+      </div>
+
+      <!-- Footer -->
+      <div
+          v-if="policyStore.dueTodayIncrements.length"
+          class="px-5 py-3 bg-surface border-t border-border text-center"
+      >
+        <p class="text-xs text-text-muted">Click an employee to jump to their record</p>
+      </div>
+    </div>
+  </transition>
+</div>
       <!-- Avatar + dropdown menu -->
       <div ref="userMenuRef" class="relative">
         <button
@@ -151,8 +251,43 @@
 <script setup>
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { useOverview } from '../composables/useOverview.js'
-import { useAdminSidebar } from '../composables/useAdminsidebar.js'
+import { useOverview } from '@/composables/useOverview.js'
+import { useAdminSidebar } from '@/composables/useAdminsidebar.js'
+import { usePolicyStore } from '@/stores/policyStore'
+const policyStore = usePolicyStore()
+const showNotifMenu = ref(false)
+const notifRef = ref(null)
+// ── Notification dropdown ──────────────────────
+function toggleNotifMenu() {
+  showNotifMenu.value = !showNotifMenu.value
+  if (showNotifMenu.value) {
+    markAllAsSeen()
+  }
+}
+const avatarPalette = [
+  { bg: 'bg-teal-200', text: 'text-teal-700' },
+  { bg: 'bg-blue-200', text: 'text-blue-700' },
+  { bg: 'bg-purple-200', text: 'text-purple-700' },
+  { bg: 'bg-pink-200', text: 'text-pink-700' },
+  { bg: 'bg-amber-200', text: 'text-amber-700' },
+]
+const avatarStyle = (index) => avatarPalette[index % avatarPalette.length]
+const seenKeys = ref(new Set(JSON.parse(localStorage.getItem('seenIncrementKeys') || '[]')))
+
+function itemKey(item) {
+  return `${item.employee_id}-${item.policy_id}`
+}
+
+const unseenCount = computed(() =>
+  policyStore.dueTodayIncrements.filter(item => !seenKeys.value.has(itemKey(item))).length
+)
+
+function markAllAsSeen() {
+  policyStore.dueTodayIncrements.forEach(item => seenKeys.value.add(itemKey(item)))
+  localStorage.setItem('seenIncrementKeys', JSON.stringify([...seenKeys.value]))
+}
+
+
 
 const props = defineProps({
   userName: { type: String, default: '' },
@@ -169,10 +304,16 @@ const props = defineProps({
   showBack: { type: Boolean, default: false },
 })
 
-const emit = defineEmits(['back'])
+const emit = defineEmits(['back', 'highlight-employee'])
 
 const router = useRouter()
-
+function handleNotifItemClick(item) {
+  showNotifMenu.value = false
+  router.push({
+    path: '/admin/employees/salaries',
+    query: { highlightEmployee: item.employee_id }
+  })
+}
 const {
   showLogoutModal,
   openLogoutModal,
@@ -271,10 +412,14 @@ function handleClickOutside(event) {
   if (userMenuRef.value && !userMenuRef.value.contains(event.target)) {
     showUserMenu.value = false
   }
+  if (notifRef.value && !notifRef.value.contains(event.target)) {
+    showNotifMenu.value = false
+  }
 }
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
+   policyStore.fetchIncrementsDueToday()
 })
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)

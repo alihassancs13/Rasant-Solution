@@ -24,6 +24,8 @@ export const usePolicyStore = defineStore('policy', {
         incrementTypes: [],
         cycleTimings: [],
         applicationModes: [],
+        dueTodayIncrements: [],
+        isLoadingDueToday: false,
         isLoading: false,
         isSubmitting: false,
         error: null,
@@ -32,6 +34,8 @@ export const usePolicyStore = defineStore('policy', {
     getters: {
         getPolicyById: (state) => (id) => state.policies.find((p) => p.id === id),
         activePolicies: (state) => state.policies.filter((p) => p.is_active),
+        isPolicyAssigned: (state) => (policyId) =>
+        state.assignments.some((a) => a.policy === policyId),
     },
 
     actions: {
@@ -49,6 +53,20 @@ export const usePolicyStore = defineStore('policy', {
                 this.isLoading = false;
             }
         },
+
+        async fetchIncrementsDueToday() {
+          this.isLoadingDueToday = true;
+         try {
+            const response = await apiClient.get(API_ENDPOINTS.INCREMENTS_DUE_TODAY);
+            this.dueTodayIncrements = response?.data?.data ?? [];
+            return { success: true };
+         } catch (error) {
+            this.error = error.response?.data?.message || 'Failed to fetch due today increments';
+            return { success: false, error: this.error };
+          } finally {
+        this.isLoadingDueToday = false;
+    }
+},
 
         async fetchLookups() {
             try {

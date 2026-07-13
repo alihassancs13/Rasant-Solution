@@ -56,11 +56,11 @@
     </div>
 
     <!-- Connect Form -->
-    <div v-if=" !jiraStore.jiraConnected || jiraStore.jiraExpired " class="flex items-center justify-center">
+    <div v-if=" !jiraStore.jiraConnected || jiraStore.jiraExpired " class="flex items-start justify-center">
       <div class="bg-white  rounded-2xl border border-gray-100 shadow-sm p-8 w-full max-w-md">
 
         <!-- Logo & Header -->
-        <div class="flex flex-col items-center gap-3 mb-8">
+        <div class="flex flex-row items-center gap-3 mb-8">
           <div class="w-12 h-12 rounded-xl bg-gradient-to-r from-[#2F6FC4] via-[#4A88D8] to-[#5C97E3]
          hover:from-[#295FB0] hover:via-[#417FD0] hover:to-[#528CDB] flex items-center justify-center">
             <font-awesome-icon :icon="['fab', 'jira']" class="w-6 h-6 text-white" />
@@ -1199,7 +1199,7 @@
 
 <script setup lang="ts">
 import { defineComponent } from 'vue';
-import AdminSidebar from "../../../composables/useAdminsidebar"
+import AdminSidebar from '@/components/adminSidebar.vue'
 import TopHeader from '@/components/header.vue'
 import { useJiraConnect } from '@/composables/useJira';
 import BaseModal from '@/components/baseModal.vue';

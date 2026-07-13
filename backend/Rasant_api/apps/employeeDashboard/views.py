@@ -14,6 +14,8 @@ from datetime import date
 from django.conf import settings
 from collections import defaultdict
 from django.db import transaction
+from datetime import date
+from .serializers import calculate_next_effective_date
 
 from .models import (
     Employee, CVSubmission, JobOpening, JobType, JobStatus,
@@ -662,3 +664,54 @@ def force_increment_view(request):
         },
         status=status.HTTP_200_OK,
     )
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+
+
+def increments_due_today_view(request):
+    today = date.today()
+    print(f"\n===== increments_due_today_view CALLED =====")
+    print(f"TODAY: {today}")
+
+    assignments = (
+        EmployeePolicyAssignment.objects
+        .filter(
+            policy__is_active=True,
+            policy__application_mode__code='manual'
+        )
+        .select_related('employee', 'policy', 'policy__cycle_timing')
+    )
+
+    data = []
+
+    for a in assignments:
+        employee = a.employee
+        policy = a.policy
+        cycle_code = policy.cycle_timing.code
+
+        base_date = employee.increment_applied_on or employee.joined_date
+        print(f"  base_date={base_date}")
+
+        next_due_date = calculate_next_effective_date(cycle_code, from_date=base_date)
+        print(f"  next_due_date={next_due_date}")
+
+        is_due = next_due_date <= today
+        print(f"  is_due (next_due_date <= today): {is_due}")
+
+        if is_due:
+            data.append({
+                "employee_id": employee.id,
+                "employee_name": employee.name,
+                "policy_id": policy.id,
+                "policy_name": policy.policy_name,
+            })
+            print(f"ADDED to due list")
+        else:
+            print(f" NOT due yet")
+
+    print(f"\n===== FINAL DUE LIST ({len(data)} employees) =====")
+    print(data)
+    print("=====================================\n")
+
+    return Response({"status": "success", "data": data}, status=status.HTTP_200_OK)
