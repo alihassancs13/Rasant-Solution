@@ -105,6 +105,12 @@ class Employee(models.Model):
         blank=True,
         related_name='employees'
     )
+    password = models.CharField(
+        max_length=128,
+        null=True,
+        blank=True,
+        help_text="Hashed password using Django's PBKDF2 algorithm"
+    )
 
     # ---------- Timestamps ----------
     created_at = models.DateTimeField(auto_now_add=True)

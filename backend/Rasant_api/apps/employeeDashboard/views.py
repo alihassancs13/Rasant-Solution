@@ -16,6 +16,10 @@ from collections import defaultdict
 from django.db import transaction
 from datetime import date
 from .serializers import calculate_next_effective_date
+import random
+import string
+from django.contrib.auth.hashers import make_password
+
 
 from .models import (
     Employee, CVSubmission, JobOpening, JobType, JobStatus,
@@ -59,6 +63,10 @@ def add_employee(request):
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     employee = Employee(**serializer.validated_data)
+    # Generate random password (8 characters)
+    characters = string.ascii_letters + string.digits + "!@#$%^&*"
+    raw_password = ''.join(random.choice(characters) for _ in range(8))
+    employee.password = make_password(raw_password)
 
     file_fields = [
         ('cnic_scan', False),
@@ -74,7 +82,7 @@ def add_employee(request):
             # ---------- NEW SIZE CHECK ----------
             if uploaded_file.size > MAX_FILE_SIZE:
                 return Response(
-                    {"error": f"The file '{field_name}' exceeds the {MAX_FILE_SIZE // (1024*1024)} MB size limit."},
+                    {"error": f"The file '{field_name}' exceeds the {MAX_FILE_SIZE // (1024 * 1024)} MB size limit."},
                     status=status.HTTP_400_BAD_REQUEST
                 )
             # Proceed as before
@@ -96,7 +104,8 @@ def add_employee(request):
                 {
                     "message": "Employee added successfully.",
                     "employee_number": employee.employee_number,
-                    "name": employee.name
+                    "name": employee.name,
+                    "password": raw_password
                 },
                 status=status.HTTP_201_CREATED
             )
@@ -114,6 +123,7 @@ def list_employees(request):
     employees = Employee.objects.all().order_by('-created_at')
     serializer = EmployeeListSerializer(employees, many=True)
     return Response(serializer.data)
+
 
 @api_view(['PATCH'])
 def update_employee(request, pk):
@@ -667,8 +677,6 @@ def force_increment_view(request):
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-
-
 def increments_due_today_view(request):
     today = date.today()
     print(f"\n===== increments_due_today_view CALLED =====")

@@ -12,6 +12,21 @@ from .models import (
     SalaryIncrementHistory,
     EmployeePolicyAssignment,
 )
+import calendar
+from datetime import date
+
+
+def calculate_next_effective_date(cycle_code, from_date=None):
+    base = from_date or date.today()
+    months_to_add = {'monthly': 1, 'quarterly': 3, 'annually': 12}.get(cycle_code, 1)
+
+    month = base.month - 1 + months_to_add
+    year = base.year + month // 12
+    month = month % 12 + 1
+    day = min(base.day, calendar.monthrange(year, month)[1])
+    return date(year, month, day)
+
+
 class EmployeeSerializer(serializers.ModelSerializer):
     department_name = serializers.CharField(source="department.name", read_only=True)
 
@@ -43,6 +58,8 @@ class EmployeeListSerializer(serializers.ModelSerializer):
     """
     Used ONLY for GET /employees/ – excludes all file fields.
     """
+    raise_count = serializers.SerializerMethodField()
+
     class Meta:
         model = Employee
         fields = [
@@ -63,8 +80,20 @@ class EmployeeListSerializer(serializers.ModelSerializer):
             'bank_name',
             'branch_name',
             'account_number',
+            'raise_count',
+            # These two are written by force_increment_view but were never
+            # exposed here, so the frontend's overdue/due-date calculation
+            # (which reads employee.increment_applied_on) always saw
+            # `undefined` and kept showing the old "Overdue" status even
+            # after a successful apply + refresh.
+            'increment_applied_on',
+            'is_increment_pending',
+            'password',
         ]
         read_only_fields = ["employee_number", "created_at", "updated_at"]
+
+    def get_raise_count(self, obj):
+        return SalaryIncrementHistory.objects.filter(employee=obj).count()
 
 
 class EmployeeCreateUpdateSerializer(serializers.ModelSerializer):
@@ -79,6 +108,12 @@ class UpdateEmployeeSerializer(serializers.ModelSerializer):
     Used ONLY for updating employee text fields.
     File fields are excluded – they cannot be updated via this endpoint.
     """
+    password = serializers.CharField(
+        write_only=True,
+        required=False,
+        allow_blank=True,
+        help_text="Password to update (leave blank to keep current)"
+    )
     class Meta:
         model = Employee
         fields = [
@@ -99,9 +134,22 @@ class UpdateEmployeeSerializer(serializers.ModelSerializer):
             'branch_name',
             'branch_code',
             'account_number',
+            'password',
         ]
         read_only_fields = ['employee_number']
 
+    def validate_password(self, value):
+        """Hash password if provided and not empty"""
+        if value:
+            from django.contrib.auth.hashers import make_password
+            return make_password(value)
+        return None  # Return None to indicate no update needed
+
+    def update(self, instance, validated_data):
+        # Remove password if it's None (meaning no update needed)
+        if 'password' in validated_data and validated_data['password'] is None:
+            validated_data.pop('password', None)
+        return super().update(instance, validated_data)
 
 ALLOWED_TYPES = [
     'application/pdf',
@@ -220,6 +268,7 @@ class IncrementPolicySerializer(serializers.ModelSerializer):
     increment_type_name = serializers.CharField(source='increment_type.name', read_only=True)
     increment_type_code = serializers.CharField(source='increment_type.code', read_only=True)
     cycle_timing_name = serializers.CharField(source='cycle_timing.name', read_only=True)
+    cycle_timing_code = serializers.CharField(source='cycle_timing.code', read_only=True)
     application_mode_name = serializers.CharField(source='application_mode.name', read_only=True)
     application_mode_code = serializers.CharField(source='application_mode.code', read_only=True)
 
@@ -229,16 +278,16 @@ class IncrementPolicySerializer(serializers.ModelSerializer):
             'id', 'policy_name',
             'increment_type', 'increment_type_name', 'increment_type_code',
             'amount',
-            'cycle_timing', 'cycle_timing_name',
+            'cycle_timing', 'cycle_timing_name', 'cycle_timing_code',
             'next_effective_date',
             'application_mode', 'application_mode_name', 'application_mode_code',
             'is_active', 'description',
             'last_run_date', 'created_at', 'updated_at',
         ]
-        read_only_fields = ['id', 'last_run_date', 'created_at', 'updated_at']
+
+        read_only_fields = ['id', 'next_effective_date', 'last_run_date', 'created_at', 'updated_at']
         extra_kwargs = {
             'description': {'required': False, 'allow_null': True, 'allow_blank': True},
-            'next_effective_date': {'required': False, 'allow_null': True},
         }
 
     def create(self, validated_data):
@@ -246,11 +295,26 @@ class IncrementPolicySerializer(serializers.ModelSerializer):
         user = getattr(request, 'user', None)
         if user and user.is_authenticated:
             validated_data['created_by'] = user
+
+        cycle_timing = validated_data.get('cycle_timing')
+        validated_data['next_effective_date'] = calculate_next_effective_date(cycle_timing.code)
+
         return IncrementPolicy.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        new_cycle = validated_data.get('cycle_timing')
+        if new_cycle and new_cycle.id != instance.cycle_timing_id:
+            validated_data['next_effective_date'] = calculate_next_effective_date(new_cycle.code)
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
+
 
 class EmployeePolicyAssignmentSerializer(serializers.ModelSerializer):
     employee_name = serializers.CharField(source='employee.full_name', read_only=True)  # field name confirm karna hai
-    policy_name   = serializers.CharField(source='policy.policy_name', read_only=True)
+    policy_name = serializers.CharField(source='policy.policy_name', read_only=True)
 
     class Meta:
         model = EmployeePolicyAssignment
