@@ -116,48 +116,104 @@
             <p class="text-sm">Fetching employee records details...</p>
           </div>
 
-          <div v-else-if="employees.length > 0" class="overflow-x-auto">
-            <table class="w-full min-w-[1000px] text-left border-collapse">
-              <thead>
-              <tr class="bg-surface border-b border-border">
-                <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Employee</th>
-                <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Department</th>
-                <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Status</th>
-                <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Account</th>
-                <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Salary</th>
-                <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Joined</th>
-                <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Contact</th>
-                <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider text-center">Actions</th>
-              </tr>
-              </thead>
-              <tbody class="divide-y divide-border text-sm text-text-primary">
-              <tr v-for="emp in employees" :key="emp.id" class="hover:bg-surface/40 transition-colors">
-                <td class="p-4 whitespace-nowrap">
-                  <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-primary-subtle flex items-center justify-center font-bold text-primary overflow-hidden">
+          <!-- Table (desktop) + Cards (mobile) -->
+          <div v-else-if="employees.length > 0">
+            <!-- Desktop/Tablet: Table view -->
+            <div class="hidden md:block overflow-x-auto">
+              <table class="w-full min-w-[1000px] text-left border-collapse">
+                <thead>
+                <tr class="bg-surface border-b border-border">
+                  <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Employee</th>
+                  <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Department</th>
+                  <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Status</th>
+                  <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Account</th>
+                  <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Salary</th>
+                  <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Joined</th>
+                  <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider">Contact</th>
+                  <th class="p-4 text-xs font-bold text-text-muted uppercase tracking-wider text-center">Actions</th>
+                </tr>
+                </thead>
+                <tbody class="divide-y divide-border text-sm text-text-primary">
+                <tr v-for="emp in employees" :key="emp.id" class="hover:bg-surface/40 transition-colors">
+                  <td class="p-4 whitespace-nowrap">
+                    <div class="flex items-center gap-3">
+                      <div class="w-10 h-10 rounded-xl bg-primary-subtle flex items-center justify-center font-bold text-primary overflow-hidden">
+                        <img v-if="emp.avatar" :src="emp.avatar" alt="Avatar" class="w-full h-full object-cover" />
+                        <i class="fas fa-user text-xl text-primary"></i>
+                      </div>
+                      <div>
+                        <h4 class="font-bold text-text-primary">{{ emp.name }}</h4>
+                        <p class="text-xs text-text-muted uppercase tracking-tight">{{ emp.employee_number }}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="p-4 whitespace-nowrap text-text-secondary">{{ emp.department }}</td>
+                  <td class="p-4 whitespace-nowrap">
+                      <span :class="[
+                        'px-2.5 py-1 text-xs font-semibold rounded-lg inline-block',
+                        emp.status === 'Permanent' ? 'bg-emerald-100 text-emerald-700' : '',
+                        emp.status === 'Contract' ? 'bg-indigo-100 text-indigo-700' : '',
+                        emp.status === 'Probation' ? 'bg-amber-100 text-amber-700' : '',
+                        emp.status === 'Intern' ? 'bg-purple-100 text-purple-700' : ''
+                      ]">
+                        {{ emp.status }}
+                      </span>
+                  </td>
+                  <td class="p-4 whitespace-nowrap">
+                    <label class="relative inline-flex items-center cursor-pointer">
+                      <input
+                          type="checkbox"
+                          :checked="emp.is_active"
+                          @change="toggleActive(emp, $event)"
+                          class="sr-only peer"
+                      />
+                      <div class="w-9 h-5 bg-border rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-border after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-teal-500"></div>
+                    </label>
+                  </td>
+                  <td class="p-4 whitespace-nowrap font-medium text-text-secondary">
+                    Rs {{ Number(emp.salary).toLocaleString() }}
+                  </td>
+                  <td class="p-4 whitespace-nowrap text-text-secondary">{{ emp.joined_date }}</td>
+                  <td class="p-4 whitespace-nowrap">
+                    <button class="flex items-center cursor-pointer gap-1.5 px-3 py-1.5 bg-teal-500 text-white rounded-lg text-xs font-bold shadow-sm hover:bg-teal-600 transition-colors">
+                      <font-awesome-icon :icon="['far', 'comment']" />
+                      DM
+                    </button>
+                  </td>
+                  <td class="p-4 whitespace-nowrap text-center">
+                    <div class="flex items-center justify-center gap-2">
+                      <button @click="openEditModal(emp)" class="p-1.5 hover:bg-surface cursor-pointer rounded-lg text-text-muted hover:text-text-primary transition-colors">
+                        <font-awesome-icon :icon="['fas', 'pen']" class="text-sm" />
+                      </button>
+                      <button @click="openViewModal(emp)" class="p-1.5 hover:bg-surface cursor-pointer rounded-lg text-text-muted hover:text-text-primary transition-colors">
+                        <font-awesome-icon :icon="['fas', 'eye']" class="text-sm" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Mobile: Card view -->
+            <div class="md:hidden space-y-3 p-4">
+              <div
+                  v-for="emp in employees"
+                  :key="emp.id"
+                  class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 space-y-3"
+              >
+                <div class="flex items-start justify-between gap-2">
+                  <div class="flex items-center gap-2.5 min-w-0">
+                    <div class="w-10 h-10 rounded-xl bg-primary-subtle flex items-center justify-center font-bold text-primary overflow-hidden shrink-0">
                       <img v-if="emp.avatar" :src="emp.avatar" alt="Avatar" class="w-full h-full object-cover" />
                       <i class="fas fa-user text-xl text-primary"></i>
                     </div>
-                    <div>
-                      <h4 class="font-bold text-text-primary">{{ emp.name }}</h4>
-                      <p class="text-xs text-text-muted uppercase tracking-tight">{{ emp.employee_number }}</p>
+                    <div class="min-w-0">
+                      <h4 class="font-bold text-text-primary truncate">{{ emp.name }}</h4>
+                      <p class="text-xs text-text-muted uppercase tracking-tight truncate">{{ emp.employee_number }}</p>
                     </div>
                   </div>
-                </td>
-                <td class="p-4 whitespace-nowrap text-text-secondary">{{ emp.department }}</td>
-                <td class="p-4 whitespace-nowrap">
-                    <span :class="[
-                      'px-2.5 py-1 text-xs font-semibold rounded-lg inline-block',
-                      emp.status === 'Permanent' ? 'bg-emerald-100 text-emerald-700' : '',
-                      emp.status === 'Contract' ? 'bg-indigo-100 text-indigo-700' : '',
-                      emp.status === 'Probation' ? 'bg-amber-100 text-amber-700' : '',
-                      emp.status === 'Intern' ? 'bg-purple-100 text-purple-700' : ''
-                    ]">
-                      {{ emp.status }}
-                    </span>
-                </td>
-                <td class="p-4 whitespace-nowrap">
-                  <label class="relative inline-flex items-center cursor-pointer">
+                  <label class="relative inline-flex items-center cursor-pointer shrink-0">
                     <input
                         type="checkbox"
                         :checked="emp.is_active"
@@ -166,30 +222,55 @@
                     />
                     <div class="w-9 h-5 bg-border rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-border after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-teal-500"></div>
                   </label>
-                </td>
-                <td class="p-4 whitespace-nowrap font-medium text-text-secondary">
-                  Rs {{ Number(emp.salary).toLocaleString() }}
-                </td>
-                <td class="p-4 whitespace-nowrap text-text-secondary">{{ emp.joined_date }}</td>
-                <td class="p-4 whitespace-nowrap">
+                </div>
+
+                <div class="border-t border-gray-100"></div>
+
+                <div class="grid grid-cols-2 gap-y-2.5 gap-x-3 text-xs">
+                  <div>
+                    <p class="text-text-muted uppercase tracking-wide text-[10px] font-semibold mb-0.5">Department</p>
+                    <p class="font-semibold text-text-primary truncate">{{ emp.department }}</p>
+                  </div>
+                  <div>
+                    <p class="text-text-muted uppercase tracking-wide text-[10px] font-semibold mb-0.5">Status</p>
+                    <span :class="[
+                      'px-2 py-0.5 rounded-full text-[11px] font-semibold inline-block',
+                      emp.status === 'Permanent' ? 'bg-emerald-100 text-emerald-700' : '',
+                      emp.status === 'Contract' ? 'bg-indigo-100 text-indigo-700' : '',
+                      emp.status === 'Probation' ? 'bg-amber-100 text-amber-700' : '',
+                      emp.status === 'Intern' ? 'bg-purple-100 text-purple-700' : ''
+                    ]">
+                      {{ emp.status }}
+                    </span>
+                  </div>
+                  <div>
+                    <p class="text-text-muted uppercase tracking-wide text-[10px] font-semibold mb-0.5">Salary</p>
+                    <p class="font-semibold text-text-primary truncate">Rs {{ Number(emp.salary).toLocaleString() }}</p>
+                  </div>
+                  <div>
+                    <p class="text-text-muted uppercase tracking-wide text-[10px] font-semibold mb-0.5">Joined</p>
+                    <p class="font-semibold text-text-primary truncate">{{ emp.joined_date }}</p>
+                  </div>
+                </div>
+
+                <div class="border-t border-gray-100"></div>
+
+                <div class="flex items-center justify-between gap-2">
                   <button class="flex items-center cursor-pointer gap-1.5 px-3 py-1.5 bg-teal-500 text-white rounded-lg text-xs font-bold shadow-sm hover:bg-teal-600 transition-colors">
                     <font-awesome-icon :icon="['far', 'comment']" />
                     DM
                   </button>
-                </td>
-                <td class="p-4 whitespace-nowrap text-center">
-                  <div class="flex items-center justify-center gap-2">
-                    <button @click="openEditModal(emp)" class="p-1.5 hover:bg-surface cursor-pointer rounded-lg text-text-muted hover:text-text-primary transition-colors">
-                      <font-awesome-icon :icon="['fas', 'pen']" class="text-sm" />
+                  <div class="flex items-center gap-2">
+                    <button @click="openEditModal(emp)" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-border text-text-secondary" title="Edit">
+                      <font-awesome-icon :icon="['fas', 'pen']" class="w-3 h-3" />
                     </button>
-                    <button @click="openViewModal(emp)" class="p-1.5 hover:bg-surface cursor-pointer rounded-lg text-text-muted hover:text-text-primary transition-colors">
-                      <font-awesome-icon :icon="['fas', 'eye']" class="text-sm" />
+                    <button @click="openViewModal(emp)" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-border text-text-secondary" title="View">
+                      <font-awesome-icon :icon="['fas', 'eye']" class="w-3 h-3" />
                     </button>
                   </div>
-                </td>
-              </tr>
-              </tbody>
-            </table>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div v-else class="p-16 text-center text-text-muted">
@@ -360,42 +441,25 @@
     </CreateModal>
 
     <!-- Edit Modal -->
-    <!-- Edit Modal -->
-    <EditModal
+    <EmployeeBaseModal
         :is-open="isEditModalOpen"
-        mode="form"
-        title="Edit employee"
+        mode="edit"
+        title="Edit Employee"
         :subtitle="selectedEmployee ? selectedEmployee.employee_number : ''"
+        size="lg"
         :hide-footer="true"
+        :loading="isUpdating"
+        :show-more="showMoreEdit"
         @close="closeEditModal"
+        @cancel="closeEditModal"
+        @toggle-more="toggleMoreEdit"
+        form-id="edit-employee-form"
     >
-      <!-- Main container with relative positioning -->
-      <div class="relative w-full h-full flex flex-col" style="min-height: 500px; max-height: 90vh;">
-        <!-- Header - Fixed at top -->
-        <div class="w-full flex items-center justify-between border-b border-slate-100/50 shrink-0" style="background: linear-gradient(135deg, rgb(255, 248, 243) 0%, rgb(245, 240, 255) 50%, rgb(239, 246, 255) 100%); padding: 1.5rem 2rem;">
-          <div class="flex items-center gap-4 text-left">
-            <div class="w-10 h-10 bg-[#D1FAE5] rounded-2xl flex items-center justify-center border border-[#A7F3D0] shrink-0 shadow-sm overflow-hidden">
-              <i class="fas fa-user text-xl"></i>
-            </div>
-            <div class="flex flex-col">
-              <h2 class="text-xl font-bold text-[#1e293b] tracking-tight leading-tight">
-                Edit Employee
-              </h2>
-              <div class="text-xs font-semibold text-slate-500 mt-1 flex items-center gap-1.5">
-                <span class="tracking-wider uppercase font-bold text-[#64748b]">{{ selectedEmployee ? selectedEmployee.employee_number : '' }}</span>
-              </div>
-            </div>
-          </div>
-          <button
-              @click="closeEditModal"
-              class="w-8 h-8 flex items-center justify-center bg-white rounded-xl shadow-sm border border-slate-100 text-slate-400 hover:text-slate-600 transition shrink-0"
-          >
-            <i class="fas fa-times text-xs"></i>
-          </button>
-        </div>
+      <!-- Main container with proper height management -->
+      <div class="flex flex-col" style="height: 100%;">
 
-        <!-- Scrollable Content - Takes remaining space with padding for footer -->
-        <div class="flex-1 overflow-y-auto px-6 py-6" style="padding-bottom: 80px;">
+        <!-- Scrollable Content - Only this scrolls -->
+        <div class="flex-1 overflow-y-auto px-6 py-6 custom-scroll">
           <form
               id="edit-employee-form"
               @submit.prevent="handleUpdateEmployee"
@@ -481,19 +545,98 @@
                       class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
                   />
                 </div>
+              </div>
 
-                <div class="flex flex-col gap-1.5">
-                  <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Join Date</label>
-                  <input
-                      type="date"
-                      v-model="editFormData.joined_date"
-                      class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
-                  />
+              <!-- ACCOUNT SECURITY Section -->
+              <div class="space-y-4 pt-2">
+                <h4 class="font-bold text-[#1e293b] text-sm">ACCOUNT SECURITY</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                  <div class="flex flex-col gap-1.5">
+                    <div class="flex items-center justify-between">
+                      <label class="text-xs font-bold uppercase tracking-wider text-gray-400">
+                        New Password
+                      </label>
+                      <span v-if="editFormData.password && passwordStrength && passwordStrength !== 'Strong' && !showStrongMessage"
+                            class="text-xs font-semibold px-2 py-0.5 rounded-full border"
+                            :class="{
+                                'bg-red-100 border-red-300 text-red-600': passwordStrength === 'Weak',
+                                'bg-yellow-100 border-yellow-300 text-yellow-600': passwordStrength === 'Medium'
+                              }">
+                          {{ passwordStrength }}
+                        </span>
+                    </div>
+                    <div class="relative">
+                      <input
+                          :type="showPassword ? 'text' : 'password'"
+                          v-model="editFormData.password"
+                          placeholder="Enter new password"
+                          class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition pr-12"
+                          :class="{
+                            'border-red-500 focus:ring-red-500': passwordStrength === 'Weak' && editFormData.password && !showStrongMessage,
+                            'border-yellow-500 focus:ring-yellow-500': passwordStrength === 'Medium' && editFormData.password && !showStrongMessage,
+                            'border-green-500 focus:ring-green-500': passwordStrength === 'Strong' && editFormData.password && showStrongMessage
+                          }"
+                      />
+                      <button
+                          type="button"
+                          @click="showPassword = !showPassword"
+                          class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                      </button>
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col gap-1.5">
+                    <label class="text-xs font-bold uppercase tracking-wider text-gray-400">
+                      Confirm Password
+                    </label>
+                    <div class="relative">
+                      <input
+                          :type="showConfirmPassword ? 'text' : 'password'"
+                          v-model="editFormData.confirmPassword"
+                          placeholder="Confirm new password"
+                          class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition pr-12"
+                      />
+                      <button
+                          type="button"
+                          @click="showConfirmPassword = !showConfirmPassword"
+                          class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                      >
+                        <i :class="showConfirmPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                      </button>
+                    </div>
+                    <span v-if="passwordError" class="text-xs text-red-500 font-medium mt-1">
+                      <i class="fas fa-exclamation-circle mr-1"></i> {{ passwordError }}
+                    </span>
+                  </div>
+
+                  <div class="flex flex-col gap-1.5 md:col-span-2">
+                    <div v-if="editFormData.password && passwordStrength && passwordStrength !== 'Strong'" class="text-xs text-gray-500 space-y-0.5">
+                      <div v-for="(rule, index) in getPasswordRules(editFormData.password)" :key="index"
+                           class="flex items-center gap-1.5">
+                        <i :class="rule.passed ? 'fas fa-check-circle text-green-500' : 'fas fa-circle text-gray-300'"></i>
+                        <span :class="rule.passed ? 'text-green-600' : 'text-gray-400'">{{ rule.text }}</span>
+                      </div>
+                    </div>
+                    <div v-if="editFormData.password && passwordStrength === 'Strong' && showStrongMessage" class="text-xs text-green-600">
+                      <i class="fas fa-check-circle mr-1"></i> Strong password - all requirements met!
+                    </div>
+                  </div>
+
+                  <div class="flex flex-col gap-1.5 md:col-span-2">
+                    <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Join Date</label>
+                    <input
+                        type="date"
+                        v-model="editFormData.joined_date"
+                        class="w-95 px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
+                    />
+                  </div>
                 </div>
               </div>
 
               <!-- More Details Section (toggled) -->
-              <div v-if="showMoreEdit" class="space-y-5 animate-fadeIn mt-5 pt-5 border-t border-slate-100">
+              <div v-if="showMoreEdit" class="space-y-5 animate-fade-in-up mt-5 pt-5 border-t border-slate-100">
                 <h4 class="font-bold text-[#1e293b] text-sm">PERSONAL DETAILS</h4>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div class="flex flex-col gap-1.5">
@@ -621,9 +764,10 @@
           </form>
         </div>
 
-        <!-- Footer - Absolutely positioned at bottom -->
-        <div class="absolute bottom-0 left-0 right-0 w-full bg-white border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-end gap-2 sm:gap-3" style="padding: 1rem 2rem; border-radius: 0 0 2rem 2rem;">
+        <!-- Footer - Fixed at bottom -->
+        <div class="flex-shrink-0 w-full bg-white border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-end gap-2 sm:gap-3" style="padding: 1rem 2rem; border-radius: 0 0 2rem 2rem; background: white;">
           <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
+            <!-- Cancel Button -->
             <button
                 type="button"
                 @click="closeEditModal"
@@ -631,6 +775,8 @@
             >
               Cancel
             </button>
+
+            <!-- More details / Show less button -->
             <button
                 type="button"
                 @click="toggleMoreEdit"
@@ -640,10 +786,12 @@
               <i v-else class="fas fa-chevron-down text-xs"></i>
               {{ showMoreEdit ? 'Show less' : 'More details' }}
             </button>
+
+            <!-- Save changes button -->
             <button
                 type="submit"
                 form="edit-employee-form"
-                class="px-5 py-2.5 rounded-xl text-sm font-bold text-white shadow-sm transition bg-buttonBackground w-full sm:w-auto"
+                class="px-5 py-2.5 rounded-xl text-sm font-bold text-white shadow-sm transition bg-[#E25C1D] hover:bg-[#D9531E] w-full sm:w-auto"
                 :disabled="isUpdating"
             >
               {{ isUpdating ? 'Saving...' : 'Save changes' }}
@@ -651,173 +799,125 @@
           </div>
         </div>
       </div>
-    </EditModal>
+    </EmployeeBaseModal>
 
     <!-- View Modal -->
-    <ViewModal
+    <EmployeeBaseModal
         :is-open="isViewModalOpen"
         mode="view"
-        title=""
-        subtitle=""
+        title="Edit Employee"
+        :subtitle="viewEmployee?.employee_number || 'RS-0726-04'"
         size="lg"
         @close="closeViewModal"
-        :hide-footer="true"
-        class="employee-view-modal"
+        @toggle-more="showMore = !showMore"
+        :show-more="showMore"
     >
-      <div v-if="viewEmployee" class="text-left w-full h-full flex flex-col modal-inner-container">
-        <div class="sticky top-0 z-10 w-full flex items-center justify-between border-b border-slate-100/50" style="background: linear-gradient(135deg, rgb(255, 248, 243) 0%, rgb(245, 240, 255) 50%, rgb(239, 246, 255) 100%); padding: 1.5rem 2rem;">
-          <div class="flex items-center gap-4 text-left">
-            <div class="w-10 h-10 bg-[#D1FAE5] rounded-2xl flex items-center justify-center border border-[#A7F3D0] shrink-0 shadow-sm overflow-hidden">
-              <i class="fas fa-user text-xl"></i>
-            </div>
-
-            <div class="flex flex-col">
-              <h2 class="text-xl font-bold text-[#1e293b] tracking-tight leading-tight">
-                {{ viewEmployee.full_name || viewEmployee.name }}
-              </h2>
-              <div class="text-xs font-semibold text-slate-500 mt-1 flex items-center gap-1.5">
-                <span class="tracking-wider uppercase font-bold text-[#64748b]">{{ viewEmployee.employee_number || 'EMP-006' }}</span>
-                <span class="text-slate-300 font-bold">•</span>
-                <span class="font-medium text-[#64748b]">{{ viewEmployee.designation }}</span>
-              </div>
-            </div>
+      <div v-if="viewEmployee" class="text-left w-full h-full flex flex-col">
+        <!-- Your employee content here -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Department</span>
+            <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.department }}</span>
           </div>
 
-          <button
-              @click="closeViewModal"
-              class="w-8 h-8 flex items-center justify-center bg-white rounded-xl shadow-sm border border-slate-100 text-slate-400 hover:text-slate-600 transition shrink-0"
-          >
-            <i class="fas fa-times text-xs"></i>
-          </button>
+          <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Designation</span>
+            <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.designation }}</span>
+          </div>
+
+          <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Email</span>
+            <span class="text-sm font-bold text-[#1e293b] truncate" :title="viewEmployee.email">{{ viewEmployee.email }}</span>
+          </div>
+
+          <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Phone</span>
+            <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.phone_number }}</span>
+          </div>
+
+          <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Employment Status</span>
+            <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.status }}</span>
+          </div>
+
+          <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Monthly Salary</span>
+            <span class="text-sm font-bold text-[#1e293b] truncate">Rs {{ Number(viewEmployee.salary).toLocaleString() }}</span>
+          </div>
+
+          <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Joined Date</span>
+            <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.joined_date }}</span>
+          </div>
+
+          <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Account Status</span>
+            <span class="text-sm font-bold truncate" :class="viewEmployee.is_active ? 'text-green-600' : 'text-red-500'">
+              {{ viewEmployee.is_active ? 'Active' : 'Inactive' }}
+            </span>
+          </div>
         </div>
 
-        <div class="flex-1 overflow-y-auto px-6 py-6 custom-content-scroll">
+        <!-- More details section -->
+        <div v-if="showMore" class="space-y-5 animate-fade-in-up mt-5">
+          <h4 class="text-sm font-bold text-[#1e293b]">PERSONAL DETAILS</h4>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Department</span>
-              <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.department }}</span>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">CNIC Number</span>
+              <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.cnic || '—' }}</span>
             </div>
-
             <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Designation</span>
-              <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.designation }}</span>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Gender</span>
+              <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.gender || '—' }}</span>
             </div>
-
             <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Email</span>
-              <span class="text-sm font-bold text-[#1e293b] truncate" :title="viewEmployee.email">{{ viewEmployee.email }}</span>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Present Address</span>
+              <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.present_address || '—' }}</span>
             </div>
-
             <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Phone</span>
-              <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.phone_number }}</span>
-            </div>
-
-            <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Employment Status</span>
-              <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.status }}</span>
-            </div>
-
-            <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Monthly Salary</span>
-              <span class="text-sm font-bold text-[#1e293b] truncate">Rs {{ Number(viewEmployee.salary).toLocaleString() }}</span>
-            </div>
-
-            <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Joined Date</span>
-              <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.joined_date }}</span>
-            </div>
-
-            <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
-              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Account Status</span>
-              <span class="text-sm font-bold truncate" :class="viewEmployee.is_active ? 'text-green-600' : 'text-red-500'">
-                {{ viewEmployee.is_active ? 'Active' : 'Inactive' }}
-              </span>
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Permanent Address</span>
+              <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.permanent_address || '—' }}</span>
             </div>
           </div>
 
-          <div v-if="showMore" class="space-y-5 animate-fadeIn mt-5">
-            <h4>PERSONAL DETAILS</h4>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">CNIC Number</span>
-                <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.cnic || '—' }}</span>
-              </div>
-              <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Gender</span>
-                <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.gender || '—' }}</span>
-              </div>
-              <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Present Address</span>
-                <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.present_address || '—' }}</span>
-              </div>
-              <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Permanent Address</span>
-                <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.permanent_address || '—' }}</span>
-              </div>
+          <h4 class="text-sm font-bold text-[#1e293b]">EMERGENCY CONTACT</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Contact Name</span>
+              <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.emergency_name || '—' }}</span>
             </div>
-
-            <h4 class="text-[#1e293b] border-slate-100">EMERGENCY CONTACT</h4>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Contact Name</span>
-                <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.emergency_name || '—' }}</span>
-              </div>
-              <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Relation</span>
-                <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.emergency_relation || '—' }}</span>
-              </div>
-              <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Emergency CNIC</span>
-                <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.emergency_cnic || '—' }}</span>
-              </div>
-              <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Emergency Phone</span>
-                <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.emergency_phone || '—' }}</span>
-              </div>
-              <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center sm:col-span-2">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Emergency Address</span>
-                <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.emergency_address || '—' }}</span>
-              </div>
+            <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Relation</span>
+              <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.emergency_relation || '—' }}</span>
             </div>
-
-            <h4 class="text-[#1e293b] border-b border-slate-100">BANK INFORMATION</h4>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Bank Name</span>
-                <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.bank_name || '—' }}</span>
-              </div>
-              <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Branch Name</span>
-                <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.branch_name || '—' }}</span>
-              </div>
-              <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center sm:col-span-2">
-                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Account Number</span>
-                <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.account_number || '—' }}</span>
-              </div>
+            <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Emergency CNIC</span>
+              <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.emergency_cnic || '—' }}</span>
+            </div>
+            <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Emergency Phone</span>
+              <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.emergency_phone || '—' }}</span>
             </div>
           </div>
-        </div>
 
-        <div class="sticky bottom-0 w-full bg-white border-t border-slate-100 flex items-center justify-end gap-3" style="padding: 1rem 2rem;">
-          <button
-              @click="closeViewModal"
-              class="px-5 py-2.5 rounded-xl border border-gray-200 text-sm font-bold text-gray-600 hover:bg-gray-50 transition bg-white"
-          >
-            Close Details
-          </button>
-
-          <button
-              @click="showMore = !showMore"
-              class="px-5 py-2.5 rounded-xl text-sm font-bold text-white shadow-sm transition flex items-center gap-2 bg-[#E25C1D] hover:bg-[#D9531E]"
-          >
-            <i v-if="showMore" class="fas fa-chevron-up text-xs"></i>
-            <i v-else class="fas fa-chevron-down text-xs"></i>
-            {{ showMore ? 'Show less' : 'More details' }}
-          </button>
+          <h4 class="text-sm font-bold text-[#1e293b]">BANK INFORMATION</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Bank Name</span>
+              <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.bank_name || '—' }}</span>
+            </div>
+            <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Branch Name</span>
+              <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.branch_name || '—' }}</span>
+            </div>
+            <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center sm:col-span-2">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Account Number</span>
+              <span class="text-sm font-bold text-[#1e293b] truncate">{{ viewEmployee.account_number || '—' }}</span>
+            </div>
+          </div>
         </div>
       </div>
-    </ViewModal>
+    </EmployeeBaseModal>
   </div>
 </template>
 
@@ -826,12 +926,21 @@ import { ref, reactive, onMounted, watch } from 'vue';
 import DashboardHeader from '../../../components/header.vue';
 import StateCard from '../../../components/StatCard.vue';
 import AdminSidebar from '../../../components/adminSidebar.vue';
-import EditModal from '../../../components/baseDetailModal.vue';
 import CreateModal from '../../../components/baseModal.vue';
-import ViewModal from '../../../components/baseDetailModal.vue';
 import { useToast } from '@/composables/useToast.js';
 import EmployeeRegistrationModelForm from '@/pages/admin/Employee/employeeRegistrationModel.vue';
 import { useEmployeeDashboard } from '@/composables/useEmployeeDashboard.js';
+import EmployeeBaseModal from '@/components/employeeBaseModel.vue';
+
+// Password related refs
+const showPassword = ref(false);
+const showConfirmPassword = ref(false);
+const passwordError = ref('');
+const passwordStrength = ref('');
+const passwordStrengthColor = ref('');
+const passwordStrengthClass = ref('');
+const showStrongMessage = ref(false);
+let strongMessageTimeout = null;
 
 // Composables
 const { showToast } = useToast();
@@ -886,7 +995,7 @@ const editFormData = reactive({
   is_active: true,
   salary: '',
   joined_date: '',
-  employee_number: '', // Add this
+  employee_number: '',
   cnic: '',
   gender: '',
   present_address: '',
@@ -898,7 +1007,94 @@ const editFormData = reactive({
   emergency_address: '',
   bank_name: '',
   branch_name: '',
-  account_number: ''
+  account_number: '',
+  password: '',
+  confirmPassword: ''
+});
+
+// Password validation functions
+const validatePasswordStrength = (password) => {
+  const errors = [];
+
+  if (password.length < 8) {
+    errors.push('Password must be at least 8 characters long');
+  }
+
+  if (!/[a-z]/.test(password)) {
+    errors.push('Password must contain at least one lowercase letter');
+  }
+
+  if (!/[A-Z]/.test(password)) {
+    errors.push('Password must contain at least one uppercase letter');
+  }
+
+  if (!/[0-9]/.test(password)) {
+    errors.push('Password must contain at least one number');
+  }
+
+  if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+    errors.push('Password must contain at least one special character (!@#$%^&* etc.)');
+  }
+
+  return errors;
+};
+
+const getPasswordRules = (password) => {
+  const rules = [
+    { text: 'At least 8 characters', passed: password.length >= 8 },
+    { text: 'Contains lowercase letter', passed: /[a-z]/.test(password) },
+    { text: 'Contains uppercase letter', passed: /[A-Z]/.test(password) },
+    { text: 'Contains a number', passed: /[0-9]/.test(password) },
+    { text: 'Contains special character (!@#$%^&*)', passed: /[!@#$%^&*(),.?":{}|<>]/.test(password) }
+  ];
+  return rules;
+};
+
+// Watch password for strength validation
+watch(() => editFormData.password, (newPassword) => {
+  if (!newPassword) {
+    passwordStrength.value = '';
+    passwordStrengthColor.value = '';
+    passwordStrengthClass.value = '';
+    showStrongMessage.value = false;
+    if (strongMessageTimeout) clearTimeout(strongMessageTimeout);
+    return;
+  }
+
+  const errors = validatePasswordStrength(newPassword);
+
+  if (errors.length === 0) {
+    passwordStrength.value = 'Strong';
+    passwordStrengthColor.value = 'text-green-600';
+    passwordStrengthClass.value = 'bg-green-100 border-green-300';
+
+    showStrongMessage.value = true;
+    if (strongMessageTimeout) clearTimeout(strongMessageTimeout);
+    strongMessageTimeout = setTimeout(() => {
+      showStrongMessage.value = false;
+    }, 2000);
+  } else if (errors.length <= 2) {
+    passwordStrength.value = 'Medium';
+    passwordStrengthColor.value = 'text-yellow-600';
+    passwordStrengthClass.value = 'bg-yellow-100 border-yellow-300';
+    showStrongMessage.value = false;
+    if (strongMessageTimeout) clearTimeout(strongMessageTimeout);
+  } else {
+    passwordStrength.value = 'Weak';
+    passwordStrengthColor.value = 'text-red-600';
+    passwordStrengthClass.value = 'bg-red-100 border-red-300';
+    showStrongMessage.value = false;
+    if (strongMessageTimeout) clearTimeout(strongMessageTimeout);
+  }
+});
+
+// Watch confirm password to clear error
+watch(() => editFormData.confirmPassword, () => {
+  if (passwordError.value && passwordError.value.includes('match')) {
+    if (editFormData.password === editFormData.confirmPassword) {
+      passwordError.value = '';
+    }
+  }
 });
 
 // Modal handlers
@@ -956,17 +1152,24 @@ const handleCreateEmployee = async () => {
 
 const openEditModal = (employee) => {
   selectedEmployee.value = employee;
+  passwordError.value = '';
+  passwordStrength.value = '';
+  passwordStrengthColor.value = '';
+  passwordStrengthClass.value = '';
+  showStrongMessage.value = false;
+  if (strongMessageTimeout) clearTimeout(strongMessageTimeout);
+
   Object.assign(editFormData, {
-    name: employee.name || '',
+    name: employee.name || employee.full_name || '',
     email: employee.email || '',
     phone_number: employee.phone_number || '',
     department: employee.department || '',
     designation: employee.designation || '',
-    status: employee.status || 'Permanent',
-    is_active: employee.is_active === true || employee.is_active === 'true',
+    status: employee.status || employee.employment_status || 'Permanent',
+    is_active: employee.is_active === true || employee.is_active === 'true' || employee.account_status === 'Active',
     salary: employee.salary || '',
     joined_date: employee.joined_date || '',
-    employee_number: employee.employee_number || '', // Add this
+    employee_number: employee.employee_number || '',
     cnic: employee.cnic || '',
     gender: employee.gender || '',
     present_address: employee.present_address || '',
@@ -978,7 +1181,9 @@ const openEditModal = (employee) => {
     emergency_address: employee.emergency_address || '',
     bank_name: employee.bank_name || '',
     branch_name: employee.branch_name || '',
-    account_number: employee.account_number || ''
+    account_number: employee.account_number || '',
+    password: '',
+    confirmPassword: ''
   });
   isEditModalOpen.value = true;
 };
@@ -987,23 +1192,63 @@ const closeEditModal = () => {
   isEditModalOpen.value = false;
   selectedEmployee.value = null;
   showMoreEdit.value = false;
+  showStrongMessage.value = false;
+  if (strongMessageTimeout) clearTimeout(strongMessageTimeout);
 };
 
 const handleUpdateEmployee = async () => {
   if (!selectedEmployee.value) return;
 
+  // Password validation
+  const password = editFormData.password;
+  const confirmPassword = editFormData.confirmPassword;
+
+  // Check if both are filled or both are empty
+  if ((password && !confirmPassword) || (!password && confirmPassword)) {
+    passwordError.value = 'Both password fields must be filled or both empty.';
+    return;
+  }
+
+  if (password && confirmPassword && password !== confirmPassword) {
+    passwordError.value = 'Passwords do not match.';
+    return;
+  }
+
+  // Password strength validation (only if password is provided)
+  if (password) {
+    const strengthErrors = validatePasswordStrength(password);
+    if (strengthErrors.length > 0) {
+      passwordError.value = 'Password is too weak: ' + strengthErrors.join(', ');
+      return;
+    }
+  }
+
+  // Clear error if validation passes
+  passwordError.value = '';
+
   isUpdating.value = true;
   try {
+    // Create payload without password if empty
     const payload = { ...editFormData };
+
+    // Remove confirmPassword from payload (not needed in API)
+    delete payload.confirmPassword;
+
+    // If password is empty, remove it from payload (don't update)
+    if (!payload.password) {
+      delete payload.password;
+    }
 
     const result = await updateEmployee(selectedEmployee.value.id, payload);
     if (result.success) {
       showToast('Employee updated successfully!', 'success');
       closeEditModal();
+      await loadEmployees(); // Refresh the list
     } else {
       showToast(`Error: ${result.error || 'Update failed'}`, 'error');
     }
   } catch (error) {
+    console.error('Update error:', error);
     showToast('An error occurred while updating.', 'error');
   } finally {
     isUpdating.value = false;
@@ -1047,6 +1292,7 @@ watch(showModal, (isOpen) => {
     if (container) container.classList.remove('!overflow-y-hidden');
   }
 });
+
 const copyOnboardingLink = async () => {
   const link = `${window.location.origin}/onboarding/new`;
   try {
@@ -1058,13 +1304,20 @@ const copyOnboardingLink = async () => {
     prompt('Copy this link:', link);
   }
 };
+
 // Lifecycle
 onMounted(() => {
   loadEmployees();
 });
 
-// Watch for search query changes (handled in composable via watcher)
-// No need to duplicate watch here as it's handled in the composable
+// Expose methods to parent if needed
+defineExpose({
+  openEditModal,
+  openViewModal,
+  closeEditModal,
+  closeViewModal,
+  openCreateModal
+});
 </script>
 
 <style scoped>
@@ -1120,6 +1373,7 @@ onMounted(() => {
 @media (max-width: 560px) {
   .emp-stat-grid { grid-template-columns: 1fr; }
 }
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -1133,5 +1387,44 @@ onMounted(() => {
 
 .animate-fadeIn {
   animation: fadeIn 0.3s ease-out;
+}
+.custom-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scroll::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.custom-scroll::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Firefox */
+.custom-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 #f1f5f9;
+}
+
+/* Animation for fade in */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.3s ease-out;
 }
 </style>
