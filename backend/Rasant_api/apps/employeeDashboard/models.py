@@ -4,10 +4,7 @@ from datetime import date
 
 
 class Employee(models.Model):
-    """
-    Employee model – All file fields are converted into a 3-column
-    binary setup to store documents entirely inside XAMPP MySQL.
-    """
+
     GENDER_CHOICES = [
         ('Male', 'Male'),
         ('Female', 'Female'),

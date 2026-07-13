@@ -543,9 +543,7 @@ def increment_policy_view(request, pk=None):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def policy_assignments_view(request):
-    """Sab employee<->policy assignments ek call mein — taake frontend
-    'Assigned Policies' column (roster) aur 'Also assigned to' badge
-    (assign modal) N+1 calls ke bina compute kar sake."""
+
     assignments = EmployeePolicyAssignment.objects.select_related('employee', 'policy').all()
     serializer = EmployeePolicyAssignmentSerializer(assignments, many=True)
     return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
@@ -594,18 +592,20 @@ def sync_policy_assignments_view(request, policy_id):
 @permission_classes([IsAuthenticated])
 def force_increment_view(request):
     """
-    Applies every active policy an employee is assigned to, immediately —
-    ignores next_effective_date entirely. Fixed-amount policies add a flat
-    value; percentage policies apply % of the employee's running salary
-    (so if an employee has multiple policies, each one compounds on top
-    of the previous policy's result).
+    Applies every active policy an employee is assigned to, immediately.
+    Body (optional): { "employee_ids": [1, 2, 3] } — if provided, only
+    these employees are processed; otherwise every covered employee is.
     """
+    employee_ids = request.data.get('employee_ids')
+
     assignments = (
         EmployeePolicyAssignment.objects
         .select_related('employee', 'policy', 'policy__increment_type')
         .filter(policy__is_active=True)
         .order_by('employee_id', 'policy_id')
     )
+    if employee_ids:
+        assignments = assignments.filter(employee_id__in=employee_ids)
 
     by_employee = defaultdict(list)
     for a in assignments:
@@ -674,6 +674,37 @@ def force_increment_view(request):
         },
         status=status.HTTP_200_OK,
     )
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def increments_due_today_view(request):
+
+    today = date.today()
+    policies_due = IncrementPolicy.objects.filter(
+        is_active=True,
+        application_mode__code='manual',   # agar CharField hai to: application_mode='manual'
+        next_effective_date__lte=today,
+    )
+
+    if not policies_due.exists():
+        return Response({"status": "success", "data": []}, status=status.HTTP_200_OK)
+
+    assignments = (
+        EmployeePolicyAssignment.objects
+        .filter(policy__in=policies_due)
+        .select_related('employee', 'policy')
+    )
+
+    data = [
+        {
+            "employee_id": a.employee.id,
+            "employee_name": a.employee.name,
+            "policy_id": a.policy.id,
+            "policy_name": a.policy.policy_name,
+        }
+        for a in assignments
+    ]
+
+    return Response({"status": "success", "data": data}, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

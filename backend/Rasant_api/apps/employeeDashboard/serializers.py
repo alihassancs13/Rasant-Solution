@@ -311,7 +311,6 @@ class IncrementPolicySerializer(serializers.ModelSerializer):
         instance.save()
         return instance
 
-
 class EmployeePolicyAssignmentSerializer(serializers.ModelSerializer):
     employee_name = serializers.CharField(source='employee.full_name', read_only=True)  # field name confirm karna hai
     policy_name = serializers.CharField(source='policy.policy_name', read_only=True)

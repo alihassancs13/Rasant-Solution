@@ -105,7 +105,9 @@ const routes = [
   },
   {
     path: '/admin/career',
-    component: () => import('../pages/admin/Employee/employeeCareer.vue') },
+    component: () => import('../pages/admin/Employee/employeeCareer.vue'),
+    meta: { title: "Admin Career - Rasant Solutions", requiresAuth: true }
+  },
   {
     path: '/admin/inquiries',
     component: () => import('../pages/admin/Inquiries/Inquiries.vue'),
@@ -115,6 +117,7 @@ const routes = [
     path: '/admin/employees/salaries',
     name: 'Salaries',
     component: () => import('../pages/admin/Employee/employeeSalaries.vue'),
+    meta: { title: "Salaries - Rasant Solutions", requiresAuth: true }
   },
   {
     path: '/services/:slug',
