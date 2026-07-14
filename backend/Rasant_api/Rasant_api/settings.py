@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'accounts',
     'employeeDashboard',
     'jira',
+    'documents'
 ]
 
 MIDDLEWARE = [
@@ -109,8 +110,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'rasant_solutions',
         'USER': 'rasant_user',
-        'PASSWORD': 'PZa7mcq7DSVHY2B',
-        'HOST': '192.168.18.40',
+        'PASSWORD': 'Rasant123',
+        'HOST': '192.168.18.113',
         'PORT': '3306',
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
