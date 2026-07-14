@@ -94,7 +94,7 @@
 
           <!-- Body - Main content area that should NOT have max-height -->
           <div class="flex-1 overflow-y-auto custom-scrollbar">
-            <div class="bg-white animate-fade-in">
+            <div class="px-8 py-6 bg-white animate-fade-in">
               <slot></slot>
             </div>
           </div>
