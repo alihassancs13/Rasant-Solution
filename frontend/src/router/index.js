@@ -3,6 +3,7 @@ import Login from "../pages/Home/login.vue";
 import Contact from "../pages/Home/contactForm.vue";
 import Home from "../pages/Home/home.vue";
 import EmployeeDashboard from '../pages/admin/Employee/employeeDashboard.vue';
+import Documents from '../pages/admin/Documents/documents.vue';
 import { useLoginStore } from '../stores/loginStore.js';
 import JobDetails from '../pages/Home/jobDetails.vue';
 const routes = [
@@ -132,7 +133,13 @@ const routes = [
     path: '/admin/employees/dashboard',
     name: 'EmployeeDashboard',
     component: EmployeeDashboard,
-    meta: { requiresAuth: true, role: 'employee' }
+    meta: { requiresAuth: true, role: 'admin' }
+  },
+  {
+    path: '/admin/documents',
+    name: 'Documents',
+    component: Documents,
+    meta: { requiresAuth: true, role: 'admin' }
   },
   {
     path: '/onboarding/:token?',

@@ -25,4 +25,23 @@ export const API_ENDPOINTS = {
     POLICY_ASSIGN: (policyId) => `/api/employeeDashboard/salaries/policies/${policyId}/assign/`,
     FORCE_INCREMENT: '/api/employeeDashboard/salaries/force-increment/',
     INCREMENTS_DUE_TODAY: '/api/employeeDashboard/salaries/increment-due-today/',
+    DOCUMENTS: {
+        FOLDERS: {
+            CREATE: '/api/documents/folders/create/',
+            ROOT: '/api/documents/folders/root/',
+            CONTENTS: (id) => `/api/documents/folders/${id}/contents/`,
+            UPDATE: (id) => `/api/documents/folders/${id}/update/`,
+            DELETE: (id) => `/api/documents/folders/${id}/delete/`,
+            ALL: '/api/documents/folders/all/',
+        },
+        FILES: {
+            UPLOAD: '/api/documents/files/upload/',
+            DOWNLOAD: (id) => `/api/documents/files/${id}/download/`,
+            PREVIEW: (id) => `/api/documents/files/${id}/preview/`,
+            DELETE: (id) => `/api/documents/files/${id}/delete/`,
+            BY_EXTENSION: (ext) => `/api/documents/files/extension/${ext}/`,
+            ALL: '/api/documents/files/all/',
+        },
+        ALL: '/api/documents/all/',
+    }
 };

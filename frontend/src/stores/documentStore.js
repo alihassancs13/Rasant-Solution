@@ -1,0 +1,378 @@
+// stores/documentStore.js
+import { defineStore } from 'pinia';
+import { BASE_URL, API_ENDPOINTS } from '../services/baseUrl.js';
+
+const getAuthToken = () => localStorage.getItem('accessToken');
+
+export const useDocumentStore = defineStore('documents', {
+    state: () => ({
+        allItems: [],
+        viewItems: [],
+        currentFolderId: null,
+        isLoading: false,
+        error: null,
+        storageUsed: '0 MB',
+        storagePercentage: 0,
+    }),
+
+    getters: {
+        getItems: (state) => state.viewItems,
+        getFolders: (state) => state.viewItems.filter(item => item.isFolder),
+        getFiles: (state) => state.viewItems.filter(item => !item.isFolder),
+        folderCount: (state) => state.viewItems.filter(item => item.isFolder).length,
+        fileCount: (state) => state.viewItems.filter(item => !item.isFolder).length,
+        getCurrentFolderId: (state) => state.currentFolderId,
+    },
+
+    actions: {
+        // Helper: API request
+        async _apiRequest(endpoint, options = {}) {
+            const cleanedBaseUrl = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL;
+            let endpointPath = endpoint;
+            if (!endpointPath.startsWith('/')) endpointPath = `/${endpointPath}`;
+            const fullUrl = `${cleanedBaseUrl}${endpointPath}`;
+
+            const token = getAuthToken();
+            const isFormData = options.isFormData || false;
+
+            const headers = {};
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+            if (!isFormData) headers['Content-Type'] = 'application/json';
+
+            const requestOptions = {
+                ...options,
+                headers,
+            };
+            delete requestOptions.isFormData;
+
+            const response = await fetch(fullUrl, requestOptions);
+
+            if (!response.ok) {
+                let errorMessage = 'Request failed';
+                try {
+                    const errorData = await response.json();
+                    errorMessage = errorData.error || errorData.message || errorData.detail || 'Request failed';
+                } catch (e) {
+                    errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+                }
+                throw new Error(errorMessage);
+            }
+
+            return response.json();
+        },
+
+        async loadAllItems() {
+            this.isLoading = true;
+            this.error = null;
+            try {
+                const response = await this._apiRequest(API_ENDPOINTS.DOCUMENTS.ALL);
+                console.log('All items response:', response);
+
+                let folders = [];
+                let files = [];
+
+                if (response.folders && Array.isArray(response.folders)) {
+                    folders = response.folders;
+                } else if (response.data && response.data.folders && Array.isArray(response.data.folders)) {
+                    folders = response.data.folders;
+                }
+
+                if (response.files && Array.isArray(response.files)) {
+                    files = response.files;
+                } else if (response.data && response.data.files && Array.isArray(response.data.files)) {
+                    files = response.data.files;
+                }
+
+                const foldersData = folders.map(f => ({
+                    ...f,
+                    isFolder: true,
+                    type: 'folder',
+                    children_count: f.children_count || 0
+                }));
+
+                const filesData = files.map(f => ({
+                    ...f,
+                    isFolder: false,
+                    type: 'file'
+                }));
+
+                this.allItems = [...foldersData, ...filesData];
+                this.viewItems = [...foldersData, ...filesData];
+                this.currentFolderId = null;
+            } catch (error) {
+                this.error = error.message;
+                console.error('Load all items error:', error);
+                throw error;
+            } finally {
+                this.isLoading = false;
+            }
+        },
+
+        // ===== LOAD ALL FOLDERS (for "Folders" filter) =====
+        async loadAllFolders() {
+            this.isLoading = true;
+            this.error = null;
+            try {
+                const response = await this._apiRequest(API_ENDPOINTS.DOCUMENTS.FOLDERS.ALL);
+                console.log('All folders response:', response);
+                let data = [];
+                if (response.data && Array.isArray(response.data)) {
+                    data = response.data;
+                } else if (response.folders && Array.isArray(response.folders)) {
+                    data = response.folders;
+                } else if (Array.isArray(response)) {
+                    data = response;
+                } else if (response.results && Array.isArray(response.results)) {
+                    data = response.results;
+                }
+
+                this.viewItems = data.map(f => ({
+                    ...f,
+                    isFolder: true,
+                    type: 'folder',
+                    children_count: f.children_count || 0
+                }));
+                this.currentFolderId = null;
+            } catch (error) {
+                this.error = error.message;
+                console.error('Load all folders error:', error);
+                throw error;
+            } finally {
+                this.isLoading = false;
+            }
+        },
+
+// ===== LOAD ALL FILES (for "Files" filter) =====
+        async loadAllFiles() {
+            this.isLoading = true;
+            this.error = null;
+            try {
+                const response = await this._apiRequest(API_ENDPOINTS.DOCUMENTS.FILES.ALL);
+                console.log('All files response:', response); // Debug
+                let data = [];
+                if (response.data && Array.isArray(response.data)) {
+                    data = response.data;
+                } else if (response.files && Array.isArray(response.files)) {
+                    data = response.files;
+                } else if (Array.isArray(response)) {
+                    data = response;
+                } else if (response.results && Array.isArray(response.results)) {
+                    data = response.results;
+                }
+
+                this.viewItems = data.map(f => ({
+                    ...f,
+                    isFolder: false,
+                    type: 'file'
+                }));
+                this.currentFolderId = null;
+            } catch (error) {
+                this.error = error.message;
+                console.error('Load all files error:', error);
+                throw error;
+            } finally {
+                this.isLoading = false;
+            }
+        },
+
+        async loadFolderContents(folderId) {
+            this.isLoading = true;
+            this.error = null;
+            try {
+                const response = await this._apiRequest(
+                    API_ENDPOINTS.DOCUMENTS.FOLDERS.CONTENTS(folderId)
+                );
+                console.log('Folder contents response:', response); // Debug
+
+                const folders = (response.subfolders || []).map(f => ({
+                    ...f,
+                    isFolder: true,
+                    type: 'folder',
+                    children_count: f.children_count || 0
+                }));
+                const files = (response.files || []).map(f => ({
+                    ...f,
+                    isFolder: false,
+                    type: 'file'
+                }));
+
+                this.viewItems = [...folders, ...files];
+                this.currentFolderId = folderId;
+            } catch (error) {
+                this.error = error.message;
+                console.error('Load folder contents error:', error);
+                throw error;
+            } finally {
+                this.isLoading = false;
+            }
+        },
+
+        async createFolder(name, parentId = null) {
+            this.isLoading = true;
+            this.error = null;
+            try {
+                const response = await this._apiRequest(
+                    API_ENDPOINTS.DOCUMENTS.FOLDERS.CREATE,
+                    {
+                        method: 'POST',
+                        body: JSON.stringify({ name, parent: parentId }),
+                    }
+                );
+
+                const newFolder = {
+                    ...response.data,
+                    isFolder: true,
+                    type: 'folder',
+                    children_count: 0
+                };
+
+                this.allItems.push(newFolder);
+                this.viewItems.push(newFolder);
+                return newFolder;
+            } catch (error) {
+                this.error = error.message;
+                throw error;
+            } finally {
+                this.isLoading = false;
+            }
+        },
+
+        async uploadFile(folderId, file) {
+            if (!folderId) {
+                throw new Error('Please select a folder first');
+            }
+
+            this.isLoading = true;
+            this.error = null;
+            try {
+                const formData = new FormData();
+                formData.append('folder_id', folderId);
+                formData.append('file', file);
+
+                const response = await this._apiRequest(
+                    API_ENDPOINTS.DOCUMENTS.FILES.UPLOAD,
+                    {
+                        method: 'POST',
+                        body: formData,
+                        isFormData: true,
+                    }
+                );
+                const newFile = {
+                    ...response.data,
+                    isFolder: false,
+                    type: 'file'
+                };
+                this.allItems.push(newFile);
+                if (this.currentFolderId === folderId) {
+                    this.viewItems.push(newFile);
+                }
+                const folderInAll = this.allItems.find(item => item.id === folderId && item.isFolder);
+                if (folderInAll) {
+                    folderInAll.children_count = (folderInAll.children_count || 0) + 1;
+                }
+                const folderInView = this.viewItems.find(item => item.id === folderId && item.isFolder);
+                if (folderInView) {
+                    folderInView.children_count = (folderInView.children_count || 0) + 1;
+                }
+
+                return newFile;
+            } catch (error) {
+                this.error = error.message;
+                throw error;
+            } finally {
+                this.isLoading = false;
+            }
+        },
+
+        // ===== UPDATE FOLDER =====
+        async updateFolder(folderId, name) {
+            this.isLoading = true;
+            this.error = null;
+            try {
+                const response = await this._apiRequest(
+                    API_ENDPOINTS.DOCUMENTS.FOLDERS.UPDATE(folderId),
+                    {
+                        method: 'PUT',
+                        body: JSON.stringify({ name }),
+                    }
+                );
+
+                const foundInAll = this.allItems.find(i => i.id === folderId);
+                if (foundInAll) foundInAll.name = name;
+
+                const foundInView = this.viewItems.find(i => i.id === folderId);
+                if (foundInView) foundInView.name = name;
+
+                return response;
+            } catch (error) {
+                this.error = error.message;
+                throw error;
+            } finally {
+                this.isLoading = false;
+            }
+        },
+
+        async deleteItem(item) {
+            this.isLoading = true;
+            this.error = null;
+            try {
+                const folderId = item.isFolder ? null : item.folder_id;
+
+                if (item.isFolder) {
+                    await this._apiRequest(
+                        API_ENDPOINTS.DOCUMENTS.FOLDERS.DELETE(item.id),
+                        { method: 'DELETE' }
+                    );
+                } else {
+                    await this._apiRequest(
+                        API_ENDPOINTS.DOCUMENTS.FILES.DELETE(item.id),
+                        { method: 'DELETE' }
+                    );
+                }
+                const allIndex = this.allItems.findIndex(i => i.id === item.id);
+                if (allIndex !== -1) {
+                    this.allItems.splice(allIndex, 1);
+                }
+                const viewIndex = this.viewItems.findIndex(i => i.id === item.id);
+                if (viewIndex !== -1) {
+                    this.viewItems.splice(viewIndex, 1);
+                }
+                if (!item.isFolder && folderId) {
+                    const folderInAll = this.allItems.find(f => f.id === folderId && f.isFolder);
+                    if (folderInAll) {
+                        folderInAll.children_count = Math.max(0, (folderInAll.children_count || 0) - 1);
+                    }
+
+                    const folderInView = this.viewItems.find(f => f.id === folderId && f.isFolder);
+                    if (folderInView) {
+                        folderInView.children_count = Math.max(0, (folderInView.children_count || 0) - 1);
+                    }
+                }
+
+            } catch (error) {
+                this.error = error.message;
+                throw error;
+            } finally {
+                this.isLoading = false;
+            }
+        },
+
+        navigateTo(folderId) {
+            if (folderId === null) {
+                this.loadAllItems();
+            } else {
+                this.loadFolderContents(folderId);
+            }
+        },
+
+        init() {
+            const token = getAuthToken();
+            if (!token) {
+                console.warn('No access token found. Please login first.');
+                this.error = 'Please login to access documents';
+                return;
+            }
+            this.loadAllItems();
+        },
+    },
+});

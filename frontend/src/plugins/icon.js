@@ -64,7 +64,6 @@ import {
   faMedal,
   faSpinner,
   faPlay,
-  // ===== ADD THESE FOR THE RESPONSIBLE SIDEBAR TO WORK =====
   faBars,
   faXmark,
   faGlobe,
@@ -74,15 +73,15 @@ import {
   faPlus,
   faArrowUpRightFromSquare,
   faBell,
-  // ===== ADD THESE NEW ICONS =====
-  faScrewdriverWrench,  // For skill-based matching
-  faUsersGear,          // For auto assign all (or faUsersCog)
-  faFlag,               // For priority routing
-  faUsersCog,           // Alternative for auto assign
+  faScrewdriverWrench,
+  faUsersGear,
+  faFlag,
+  faUsersCog,
   faAnglesLeft,
   faAnglesRight,
   faPen,
-  faCheck
+  faCheck,
+  faFolder
 } from '@fortawesome/free-solid-svg-icons'
 
 import {
@@ -107,7 +106,6 @@ import {
 } from '@fortawesome/free-brands-svg-icons'
 
 library.add(
-    // Chevrons & arrows
     faRectangleList,
     faCalendarCheckRegular,
     faBriefcaseRegular,
@@ -139,7 +137,6 @@ library.add(
     faStar,
     faCode,
     faDesktop,
-    // General
     faRocket,
     faHandshake,
     faBolt,
@@ -160,20 +157,14 @@ library.add(
     faMedal,
     faBars,
     faXmark,
-
-    // Mobile
     faMobileScreen,
     faMobileScreenButton,
-
-    // Auth
     faShieldHalved,
     faUserShield,
     faUser,
     faLock,
     faEye,
     faEyeSlash,
-
-    // Contact form
     faEnvelope,
     faPhone,
     faLocationDot,
@@ -181,13 +172,9 @@ library.add(
     faSpinner,
     faCircleCheck,
     faCircleExclamation,
-
-    // Regular icons (far)
     faUserRegular,
     faEnvelopeRegular,
     faComment,
-
-    // Brands
     faReact,
     faNodeJs,
     faPython,
@@ -210,8 +197,6 @@ library.add(
     faTrash,
     faBriefcase,
     faTriangleExclamation,
-
-    // Careers / Admin Dashboard
     faGlobe,
     faInbox,
     faPenToSquare,
@@ -219,12 +204,10 @@ library.add(
     faPlus,
     faArrowUpRightFromSquare,
     faBell,
-
-    // ===== ADD THESE TO THE LIBRARY =====
     faScrewdriverWrench,
     faUsersGear,
     faFlag,
-    faUsersCog,  // Alternative
+    faUsersCog,
     faBell,
     faPlay,
     faAnglesLeft,
@@ -232,4 +215,5 @@ library.add(
     faPen,
     faCheck,
     faMoneyBill,
+    faFolder
 )

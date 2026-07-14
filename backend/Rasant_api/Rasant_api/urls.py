@@ -23,6 +23,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/accounts/', include('accounts.urls')),
     path('api/employeeDashboard/', include('employeeDashboard.urls')),
+    path('api/documents/', include('apps.documents.urls')),
     path('api/', include('jira.urls')),
 
 ]
