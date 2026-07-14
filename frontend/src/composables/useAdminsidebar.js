@@ -16,7 +16,6 @@ export function useAdminSidebar() {
     const isSidebarOpen = ref(false);
     const collapsed = ref(false);
 
-    // 🔥 FIX: Persist drill-down state in localStorage
     const isDrillDown = ref(localStorage.getItem('sidebarDrillDown') === 'true');
 
     const modules = computed(() => {
@@ -26,17 +25,14 @@ export function useAdminSidebar() {
     const loading = computed(() => store.isLoading);
     const error = computed(() => store.error);
 
-    // Get employee children modules
     const employeeChildrenModules = computed(() => {
         const moduleList = modules.value;
         if (!moduleList.length) return [];
-
         return moduleList.filter(m =>
             m && EMPLOYEE_CHILDREN.includes(m.name?.trim())
         );
     });
 
-    // Get the Employees parent module
     const employeesParent = computed(() => {
         if (isDrillDown.value) return null;
         return modules.value.find(m => m?.name?.trim() === 'Employees');
@@ -110,35 +106,42 @@ export function useAdminSidebar() {
         }
     };
 
-    // Handle click on Employees to drill down
+    // ── Sidebar toggle functions ──
+    const toggleSidebar = () => {
+        isSidebarOpen.value = !isSidebarOpen.value;
+    };
+
+    const openSidebar = () => {
+        isSidebarOpen.value = true;
+    };
+
+    const closeSidebar = () => {
+        isSidebarOpen.value = false;
+    };
+
     const drillIntoEmployees = () => {
         isDrillDown.value = true;
         localStorage.setItem('sidebarDrillDown', 'true');
-        // Close any open dropdowns
         Object.keys(dropdownStates.value).forEach(key => {
             dropdownStates.value[key] = false;
         });
     };
 
-    // Go back from drill-down
     const goBackFromDrillDown = () => {
         isDrillDown.value = false;
         localStorage.setItem('sidebarDrillDown', 'false');
     };
 
-    // 🔥 NEW: Check if we should be in drill-down mode based on current route
     const checkDrillDownOnRoute = () => {
         const currentPath = route.path;
         const childPaths = employeeChildrenModules.value.map(m => getModuleRoute(m.name));
 
-        // If current path is one of the child paths, stay in drill-down
         if (childPaths.some(path => currentPath.startsWith(path))) {
             isDrillDown.value = true;
             localStorage.setItem('sidebarDrillDown', 'true');
         }
     };
 
-    // Watch route changes to maintain drill-down state
     watch(() => route.path, () => {
         checkDrillDownOnRoute();
     });
@@ -156,7 +159,6 @@ export function useAdminSidebar() {
         if (!store.hasModules) {
             await store.fetchModules();
         }
-        // Check if we should be in drill-down mode
         checkDrillDownOnRoute();
     });
 
@@ -176,6 +178,9 @@ export function useAdminSidebar() {
         getModuleRoute,
         isActive,
         toggleDropdown,
+        toggleSidebar,
+        openSidebar,
+        closeSidebar,
         drillIntoEmployees,
         goBackFromDrillDown,
         getUserRole,

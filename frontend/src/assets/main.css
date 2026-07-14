@@ -491,14 +491,16 @@ html, body {
         border: 2px solid transparent;
         border-radius: 0.75rem;
         font-weight: 500;
-        background-image: linear-gradient(#fff, #fff), var(--gradient-brand);
+        background-image: linear-gradient(#fff, #fff),
+        conic-gradient(from 180deg, #C96E3A, #B0457A, #6B52B8, #3B73C4, #1D5AA8, #C96E3A);
         background-origin: border-box;
         background-clip: padding-box, border-box;
         box-shadow: var(--shadow-sm);
     }
 
     .btn-gradient-border:hover {
-        background-image: linear-gradient(#f9fafb, #f9fafb), var(--gradient-brand);
+        background-image: linear-gradient(#f9fafb, #f9fafb),
+        conic-gradient(from 180deg, #C96E3A, #B0457A, #6B52B8, #3B73C4, #1D5AA8, #C96E3A);
     }
 
     .btn-gradient-border:focus {

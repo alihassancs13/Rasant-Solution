@@ -452,46 +452,96 @@ watch(() => selectedApplicant.value?.id, (id) => {
             <p class="text-sm text-text-muted mt-1">Try a different keyword.</p>
           </div>
 
-          <div v-else class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead>
-              <tr class="border-t border-border-subtle">
-                <th class="text-left px-4 sm:px-5 py-3 text-[11px] font-semibold text-text-muted tracking-wide uppercase">Role</th>
-                <th class="text-left px-4 sm:px-5 py-3 text-[11px] font-semibold text-text-muted tracking-wide uppercase">Type</th>
-                <th class="text-left px-4 sm:px-5 py-3 text-[11px] font-semibold text-text-muted tracking-wide uppercase">Department</th>
-                <th class="text-left px-4 sm:px-5 py-3 text-[11px] font-semibold text-text-muted tracking-wide uppercase">Posted</th>
-                <th class="text-left px-4 sm:px-5 py-3 text-[11px] font-semibold text-text-muted tracking-wide uppercase">Status</th>
-                <th class="text-left px-4 sm:px-5 py-3 text-[11px] font-semibold text-text-muted tracking-wide uppercase">Actions</th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr v-for="job in paginatedJobs" :key="job.id" class="border-t border-border-subtle hover:bg-surface/50 transition">
-                <td class="px-4 sm:px-5 py-4">
-                  <p class="font-semibold text-text-primary">{{ job.job_title }}</p>
-                </td>
-                <td class="px-4 sm:px-5 py-4 text-text-secondary whitespace-nowrap">{{ job.job_type_name }}</td>
-                <td class="px-4 sm:px-5 py-4 text-text-secondary whitespace-nowrap">{{ job.department }}</td>
-                <td class="px-4 sm:px-5 py-4 text-text-secondary whitespace-nowrap">{{ formatDate(job.created_at) }}</td>
-                <td class="px-4 sm:px-5 py-4">
-                  <button type="button" @click.stop="toggleStatusDropdown(job.id, $event)"
-                          class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-white text-xs font-semibold text-text-primary hover:border-primary/40 transition cursor-pointer capitalize">
-                    {{ getJobStatusName(job) }}
-                    <font-awesome-icon :icon="['fas', 'chevron-down']" class="w-2.5 h-2.5 text-text-muted transition-transform" :class="{ 'rotate-180': openStatusDropdownId === job.id }" />
-                  </button>
-                </td>
-                <td class="px-4 sm:px-5 py-4">
-                  <div class="flex items-center gap-2">
-                    <button @click="handleEditJob(job)" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-border text-text-secondary hover:bg-surface transition cursor-pointer" title="Edit">
-                      <font-awesome-icon :icon="['fas', 'pen']" class="w-3 h-3" />
+          <!-- Table (desktop) + Cards (mobile) -->
+          <div v-else>
+            <!-- Desktop/Tablet: Table view -->
+            <div class="hidden md:block overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead>
+                <tr class="border-t border-border-subtle">
+                  <th class="text-left px-4 sm:px-5 py-3 text-[11px] font-semibold text-text-muted tracking-wide uppercase">Role</th>
+                  <th class="text-left px-4 sm:px-5 py-3 text-[11px] font-semibold text-text-muted tracking-wide uppercase">Type</th>
+                  <th class="text-left px-4 sm:px-5 py-3 text-[11px] font-semibold text-text-muted tracking-wide uppercase">Department</th>
+                  <th class="text-left px-4 sm:px-5 py-3 text-[11px] font-semibold text-text-muted tracking-wide uppercase">Posted</th>
+                  <th class="text-left px-4 sm:px-5 py-3 text-[11px] font-semibold text-text-muted tracking-wide uppercase">Status</th>
+                  <th class="text-left px-4 sm:px-5 py-3 text-[11px] font-semibold text-text-muted tracking-wide uppercase">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr v-for="job in paginatedJobs" :key="job.id" class="border-t border-border-subtle hover:bg-surface/50 transition">
+                  <td class="px-4 sm:px-5 py-4">
+                    <p class="font-semibold text-text-primary">{{ job.job_title }}</p>
+                  </td>
+                  <td class="px-4 sm:px-5 py-4 text-text-secondary whitespace-nowrap">{{ job.job_type_name }}</td>
+                  <td class="px-4 sm:px-5 py-4 text-text-secondary whitespace-nowrap">{{ job.department }}</td>
+                  <td class="px-4 sm:px-5 py-4 text-text-secondary whitespace-nowrap">{{ formatDate(job.created_at) }}</td>
+                  <td class="px-4 sm:px-5 py-4">
+                    <button type="button" @click.stop="toggleStatusDropdown(job.id, $event)"
+                            class="flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-white text-xs font-semibold text-text-primary hover:border-primary/40 transition cursor-pointer capitalize">
+                      {{ getJobStatusName(job) }}
+                      <font-awesome-icon :icon="['fas', 'chevron-down']" class="w-2.5 h-2.5 text-text-muted transition-transform" :class="{ 'rotate-180': openStatusDropdownId === job.id }" />
                     </button>
-                    <button @click="handleViewJob(job)" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-border text-text-secondary hover:bg-surface transition cursor-pointer" title="View">
-                      <font-awesome-icon :icon="['fas', 'eye']" class="w-3 h-3" />
+                  </td>
+                  <td class="px-4 sm:px-5 py-4">
+                    <div class="flex items-center gap-2">
+                      <button @click="handleEditJob(job)" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-border text-text-secondary hover:bg-surface transition cursor-pointer" title="Edit">
+                        <font-awesome-icon :icon="['fas', 'pen']" class="w-3 h-3" />
+                      </button>
+                      <button @click="handleViewJob(job)" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-border text-text-secondary hover:bg-surface transition cursor-pointer" title="View">
+                        <font-awesome-icon :icon="['fas', 'eye']" class="w-3 h-3" />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Mobile: Card view -->
+            <div class="md:hidden space-y-3 p-4">
+              <div
+                  v-for="job in paginatedJobs"
+                  :key="job.id"
+                  class="bg-white rounded-xl border border-gray-100 shadow-sm p-4 space-y-3"
+              >
+                <div class="flex items-start justify-between gap-2">
+                  <div class="flex items-center gap-2.5 min-w-0">
+                    <div class="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0 bg-blue-200 text-blue-700">
+                      {{ job.job_title?.slice(0, 2).toUpperCase() }}
+                    </div>
+                    <div class="min-w-0">
+                      <p class="font-semibold text-text-primary truncate">{{ job.job_title }}</p>
+                      <p class="text-xs text-text-muted truncate">{{ job.job_type_name }} · {{ job.department }}</p>
+                    </div>
+                  </div>
+                  <p class="text-xs text-text-muted whitespace-nowrap shrink-0">{{ formatDate(job.created_at) }}</p>
+                </div>
+
+                <div class="border-t border-gray-100"></div>
+
+                <div class="grid grid-cols-2 gap-y-2.5 gap-x-3 text-xs">
+                  <div>
+                    <p class="text-text-muted uppercase tracking-wide text-[10px] font-semibold mb-0.5">Status</p>
+                    <button type="button" @click.stop="toggleStatusDropdown(job.id, $event)"
+                            class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full border border-border bg-white text-[11px] font-semibold text-text-primary capitalize">
+                      {{ getJobStatusName(job) }}
+                      <font-awesome-icon :icon="['fas', 'chevron-down']" class="w-2 h-2 text-text-muted transition-transform" :class="{ 'rotate-180': openStatusDropdownId === job.id }" />
                     </button>
                   </div>
-                </td>
-              </tr>
-              </tbody>
-            </table>
+                  <div>
+                    <p class="text-text-muted uppercase tracking-wide text-[10px] font-semibold mb-0.5">Actions</p>
+                    <div class="flex items-center gap-2">
+                      <button @click="handleEditJob(job)" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-border text-text-secondary" title="Edit">
+                        <font-awesome-icon :icon="['fas', 'pen']" class="w-3 h-3" />
+                      </button>
+                      <button @click="handleViewJob(job)" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-border text-text-secondary" title="View">
+                        <font-awesome-icon :icon="['fas', 'eye']" class="w-3 h-3" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div v-if="adminJobs.length > 0" class="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 sm:px-5 py-4 border-t border-border-subtle">

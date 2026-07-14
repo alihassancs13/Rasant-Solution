@@ -314,4 +314,5 @@ defineEmits<{
   color: var(--color-text-secondary);
   font-family: var(--font-primary);
 }
+
 </style>
