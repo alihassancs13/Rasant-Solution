@@ -119,6 +119,11 @@ export function useAdminSidebar() {
         isSidebarOpen.value = false;
     };
 
+    const toggleCollapse = () => {
+        collapsed.value = !collapsed.value;
+        localStorage.setItem('sidebarCollapsed', String(collapsed.value));
+    };
+
     const drillIntoEmployees = () => {
         isDrillDown.value = true;
         localStorage.setItem('sidebarDrillDown', 'true');
@@ -156,10 +161,15 @@ export function useAdminSidebar() {
     };
 
     onMounted(async () => {
-        if (!store.hasModules) {
-            await store.fetchModules();
+        try {
+            // Check if store has modules (using computed property or direct check)
+            if (!store.modules || store.modules.length === 0) {
+                await store.fetchModules();
+            }
+            checkDrillDownOnRoute();
+        } catch (err) {
+            console.error('Failed to load sidebar modules:', err);
         }
-        checkDrillDownOnRoute();
     });
 
     return {
@@ -169,6 +179,7 @@ export function useAdminSidebar() {
         dropdownStates,
         isSidebarOpen,
         collapsed,
+        toggleCollapse, // ✅ Export toggleCollapse
         isDrillDown,
         companyModules,
         projectModules,

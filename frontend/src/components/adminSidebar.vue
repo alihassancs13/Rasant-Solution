@@ -70,7 +70,6 @@
                 :class="showCollapsed ? 'justify-center w-full' : ''"
             >
               <font-awesome-icon icon="fa-solid fa-arrow-left" class="text-sm" />
-              <!-- 🔥 Hide "Back" text when collapsed -->
               <span v-if="!showCollapsed" class="text-sm font-medium">Back</span>
             </button>
           </div>
@@ -113,7 +112,7 @@
           <template v-if="isDrillDown">
             <div>
 
-              <div class="space-y-0.5">
+              <div class="space-y-1.5">
                 <router-link
                     v-for="module in employeeChildrenModules"
                     :key="module.id"
@@ -121,7 +120,7 @@
                     @click="handleChildNavigation"
                     class="flex items-center px-4 py-2 rounded-xl text-text-muted hover:bg-primary-subtle hover:text-primary font-medium transition-all"
                     :class="[
-                      isActive(module.name, $route.path) ? 'bg-primary-subtle text-primary font-semibold shadow-sm border-l-4 border-primary' : '',
+                      isActive(module.name, $route.path) ? 'bg-primary-subtle text-primary font-semibold shadow-sm border-primary' : '',
                       showCollapsed ? 'justify-center' : 'space-x-3'
                     ]"
                     :title="showCollapsed ? module.name : null"
@@ -138,7 +137,7 @@
             <!-- Company Section -->
             <div>
               <p class="text-[11px] font-bold text-text-muted tracking-widest px-3 mb-1 uppercase" v-show="!showCollapsed">Company</p>
-              <div class="space-y-1">
+              <div class="space-y-1.5">
                 <template v-for="module in companyModules" :key="module.id">
                   <!-- Regular module -->
                   <router-link
@@ -147,7 +146,7 @@
                       @click="handleNavigation"
                       class="flex items-center px-4 py-2 rounded-xl text-text-muted hover:bg-primary-subtle hover:text-primary font-medium transition-all"
                       :class="[
-                        isActive(module.name, $route.path) ? 'bg-primary-subtle text-primary font-semibold shadow-sm border-l-4 border-primary' : '',
+                        isActive(module.name, $route.path) ? 'bg-primary-subtle text-primary font-semibold shadow-sm  border-primary' : '',
                         showCollapsed ? 'justify-center' : 'space-x-3'
                       ]"
                       :title="showCollapsed ? module.name : null"
@@ -162,7 +161,7 @@
                         @click.stop="drillIntoEmployees"
                         class="w-full flex items-center px-4 py-2 cursor-pointer rounded-xl text-text-muted hover:bg-primary-subtle hover:text-primary font-medium transition-all focus:outline-none"
                         :class="[
-                          isActive(module.name, $route.path) ? 'bg-primary-subtle text-primary font-semibold shadow-sm border-l-4 border-primary' : '',
+                          isActive(module.name, $route.path) ? 'bg-primary-subtle text-primary font-semibold shadow-sm  border-primary' : '',
                           showCollapsed ? 'justify-center' : 'justify-between'
                         ]"
                         :title="showCollapsed ? module.name : null"
@@ -185,7 +184,7 @@
             <!-- Projects Section -->
             <div>
               <p class="text-[11px] font-bold text-text-muted tracking-widest px-3 mb-1 uppercase" v-show="!showCollapsed">Projects</p>
-              <div class="space-y-0.5">
+              <div class="space-y-1.5">
                 <router-link
                     v-for="module in projectModules"
                     :key="module.id"
@@ -193,7 +192,7 @@
                     @click="handleNavigation"
                     class="flex items-center px-4 py-2 rounded-xl text-text-muted hover:bg-primary-subtle hover:text-primary font-medium transition-all"
                     :class="[
-                      isActive(module.name, $route.path) ? 'bg-primary-subtle text-primary font-semibold shadow-sm border-l-4 border-primary' : '',
+                      isActive(module.name, $route.path) ? 'bg-primary-subtle text-primary font-semibold shadow-sm  border-primary' : '',
                       showCollapsed ? 'justify-center' : 'space-x-3'
                     ]"
                     :title="showCollapsed ? module.name : null"
@@ -240,13 +239,13 @@ const toggleCollapse = () => {
   localStorage.setItem('sidebarCollapsed', String(collapsed.value));
 };
 
-// 🔥 Handle child navigation - stays in drill-down
+// Handle child navigation - stays in drill-down
 const handleChildNavigation = () => {
   // Only close sidebar on mobile
   if (window.innerWidth < 768) {
     isSidebarOpen.value = false;
   }
-  // ✅ DO NOT exit drill-down
+  //  DO NOT exit drill-down
 };
 
 // Handle navigation - only close mobile sidebar
@@ -256,7 +255,6 @@ const handleNavigation = () => {
   }
 };
 
-// 🔥 Handle back button
 const handleBackClick = () => {
   goBackFromDrillDown();
   if (window.innerWidth < 768) {

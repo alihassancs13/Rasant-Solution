@@ -79,7 +79,7 @@
               <button
                   @click="copyOnboardingLink"
                   type="button"
-                  class="flex items-center cursor-pointer transition-all duration-200 hover:-translate-y-0.5 gap-2 px-4 py-2 bg-gradient-to-br from-orange-700 via-orange-600 to-orange-500 text-white text-sm font-medium rounded-xl hover:bg-blue-600 transition-colors whitespace-nowrap"
+                  class="flex items-center cursor-pointer transition-all duration-200 hover:-translate-y-0.5 gap-2 px-4 py-2 btn-primary-gradient text-buttonTextColor text-sm font-medium rounded-xl hover:bg-blue-600 transition-colors whitespace-nowrap"
               >
                 <font-awesome-icon :icon="['fas', 'copy']" />
                 Copy form link
@@ -96,7 +96,7 @@
               <button
                   type="button"
                   @click="openCreateModal"
-                  class="flex items-center cursor-pointer gap-1 px-2 py-2 bg-gradient-to-br from-orange-700 via-orange-600 to-orange-500 text-white font-medium rounded-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg whitespace-nowrap"
+                  class="flex items-center cursor-pointer gap-1 px-2 py-2 btn-primary-gradient text-buttonTextColor font-medium rounded-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg whitespace-nowrap"
               >
                 <font-awesome-icon :icon="['fas', 'plus']" />
                 Create employee
@@ -813,7 +813,7 @@
             <button
                 type="button"
                 @click="closeEditModal"
-                class="px-5 py-2.5 rounded-xl border border-gray-200 cursor-pointer text-sm font-bold text-gray-600 hover:bg-gray-50 transition bg-white w-full sm:w-auto"
+                class="px-5 py-2.5 rounded-xl border border-gray-200 text-sm font-bold text-gray-600 hover:bg-gray-100 transition bg-white w-full sm:w-auto"
             >
               Cancel
             </button>
@@ -822,7 +822,7 @@
             <button
                 type="button"
                 @click="toggleMoreEdit"
-                class="px-5 py-2.5 rounded-xl text-sm font-bold text-white shadow-sm transition cursor-pointer flex items-center justify-center gap-2 bg-[#E25C1D] hover:bg-[#D9531E] w-full sm:w-auto"
+                class="px-5 py-2.5 rounded-xl text-sm font-bold text-buttonTextColor shadow-sm transition flex items-center justify-center gap-2 btn-primary-gradient  w-full sm:w-auto"
             >
               <i v-if="showMoreEdit" class="fas fa-chevron-up text-xs"></i>
               <i v-else class="fas fa-chevron-down text-xs"></i>
@@ -833,7 +833,7 @@
             <button
                 type="submit"
                 form="edit-employee-form"
-                class="px-5 py-2.5 rounded-xl text-sm font-bold text-white shadow-sm cursor-pointer transition bg-[#E25C1D] hover:bg-[#D9531E] w-full sm:w-auto"
+                class="px-5 py-2.5 rounded-xl text-sm font-bold text-buttonTextColor shadow-sm transition btn-primary-gradient  w-full sm:w-auto"
                 :disabled="isUpdating"
             >
               {{ isUpdating ? 'Saving...' : 'Save changes' }}
@@ -1235,9 +1235,7 @@ const openEditModal = (employee) => {
     branch_name: employee.branch_name || '',
     account_number: employee.account_number || '',
     password: '',
-    confirmPassword: '',
-    insurance_amount: employee.insurance_amount,
-    tax: employee.tax,
+    confirmPassword: ''
   });
   isEditModalOpen.value = true;
 };

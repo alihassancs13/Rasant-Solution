@@ -36,10 +36,8 @@ export const API_ENDPOINTS = {
         },
         FILES: {
             UPLOAD: '/api/documents/files/upload/',
-            DOWNLOAD: (id) => `/api/documents/files/${id}/download/`,
-            PREVIEW: (id) => `/api/documents/files/${id}/preview/`,
+            VIEW: (id) => `/api/documents/files/${id}/view/`,
             DELETE: (id) => `/api/documents/files/${id}/delete/`,
-            BY_EXTENSION: (ext) => `/api/documents/files/extension/${ext}/`,
             ALL: '/api/documents/files/all/',
         },
         ALL: '/api/documents/all/',

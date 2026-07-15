@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useDocumentStore } from '@/stores/documentStore.js'
 import { useToast } from '@/composables/useToast.js'
+import { BASE_URL } from '@/services/baseUrl.js'
 
 export default function useDocuments() {
     const store = useDocumentStore()
@@ -21,6 +22,11 @@ export default function useDocuments() {
     const isDragging = ref(false)
     const fileInput = ref(null)
     const zipInput = ref(null)
+    const selectedFileId = ref(null);
+    const showPreview = ref(false);
+    const previewData = ref(null);
+    const previewLoading = ref(false);
+    const previewError = ref(null);
 
     // Modal state - Create Folder
     const showFolderModal = ref(false)
@@ -74,7 +80,6 @@ export default function useDocuments() {
     })
 
     const breadcrumb = computed(() => {
-        // Only show breadcrumb when in a folder (not in All/Folders/Files view)
         if (currentFilter.value !== 'all' && currentFilter.value !== 'folder' && currentFilter.value !== 'file') {
             const crumbs = []
             let currentId = store.currentFolderId
@@ -104,7 +109,6 @@ export default function useDocuments() {
         return folder?.name || 'Root'
     })
 
-    // Check if we're in a folder view
     const isFolderView = computed(() => {
         return store.currentFolderId !== null
     })
@@ -352,6 +356,154 @@ export default function useDocuments() {
         return (bytes / Math.pow(1024, i)).toFixed(1) + ' ' + sizes[i]
     }
 
+    // ===== Download Function =====
+    const downloadFile = (item) => {
+        if (!item) {
+            showToast('No file to download', 'warning');
+            return;
+        }
+
+        try {
+            const token = localStorage.getItem('accessToken');
+            const cleanedBaseUrl = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL;
+            const downloadUrl = `${cleanedBaseUrl}/api/documents/files/${item.id}/download/`;
+
+            // Show loading
+            showToast('Downloading...', 'info');
+
+            // Use fetch to download with authentication
+            fetch(downloadUrl, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error('Download failed');
+                    return response.blob();
+                })
+                .then(blob => {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = item.name || 'download';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    URL.revokeObjectURL(link.href);
+                    showToast('Download started!', 'success');
+                })
+                .catch(error => {
+                    console.error('Download error:', error);
+                    // Fallback: open in new tab
+                    window.open(downloadUrl, '_blank');
+                    showToast('Opening file in new tab...', 'info');
+                });
+
+        } catch (error) {
+            console.error('Download error:', error);
+            showToast('Failed to download file', 'error');
+        }
+    }
+
+    // ===== View File Function =====
+    const viewFile = async (item) => {
+        if (item.isFolder) return;
+        try {
+            console.log('Viewing file:', item.id, item.name);
+
+            // Check if it's an office document - download directly
+            const extension = item.extension?.toLowerCase();
+            const officeExtensions = ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp'];
+
+            if (officeExtensions.includes(extension)) {
+                // Directly download office documents
+                downloadFile(item);
+                return;
+            }
+
+            // For other files - fetch and display in new tab
+            showToast('Opening file...', 'info');
+            const response = await store.viewFileContent(item.id);
+            console.log('File content response:', response);
+
+            if (response.error) {
+                throw new Error(response.error);
+            }
+
+            // Handle different file types
+            if (response.type === 'pdf') {
+                if (response.blob_url) {
+                    window.open(response.blob_url, '_blank');
+                    showToast('PDF opened in new tab', 'success');
+                } else {
+                    throw new Error('PDF preview not available');
+                }
+            }
+            else if (response.type === 'image') {
+                const win = window.open('', '_blank');
+                if (win) {
+                    win.document.write(`<img src="${response.content}" style="max-width:100%;max-height:100%;margin:auto;display:block;" />`);
+                    win.document.title = response.name;
+                }
+                showToast('Image opened in new tab', 'success');
+            }
+            else if (response.type === 'text') {
+                const win = window.open('', '_blank');
+                if (win) {
+                    win.document.write(`<pre style="padding:20px;font-family:monospace;white-space:pre-wrap;word-wrap:break-word;">${response.content}</pre>`);
+                    win.document.title = response.name;
+                }
+                showToast('Text file opened in new tab', 'success');
+            }
+            else if (response.type === 'video') {
+                const win = window.open('', '_blank');
+                if (win) {
+                    win.document.write(`
+                        <video controls style="max-width:100%;max-height:100%;margin:auto;display:block;">
+                            <source src="data:${response.mime_type};base64,${response.content}" type="${response.mime_type}">
+                            Your browser does not support the video tag.
+                        </video>
+                    `);
+                    win.document.title = response.name;
+                }
+                showToast('Video opened in new tab', 'success');
+            }
+            else if (response.type === 'audio') {
+                const win = window.open('', '_blank');
+                if (win) {
+                    win.document.write(`
+                        <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;font-family:Arial,sans-serif;">
+                            <h2>${response.name}</h2>
+                            <audio controls style="width:80%;max-width:600px;margin:20px;">
+                                <source src="data:${response.mime_type};base64,${response.content}" type="${response.mime_type}">
+                                Your browser does not support the audio tag.
+                            </audio>
+                        </div>
+                    `);
+                    win.document.title = response.name;
+                }
+                showToast('Audio opened in new tab', 'success');
+            }
+            else {
+                // For all other files - download
+                downloadFile(item);
+                showToast('Downloading file...', 'success');
+            }
+
+        } catch (error) {
+            console.error('View file error:', error);
+            showToast(error.message || 'Failed to open file', 'error');
+        }
+    }
+
+    const deleteSubtitle = computed(() => {
+        if (!deleteItemData.value) return 'Are you sure you want to delete this item?';
+        const itemName = deleteItemData.value.name || 'this item';
+        if (deleteItemData.value.isFolder) {
+            return `Are you sure you want to delete the folder "${itemName}"? This action cannot be undone and all contents will be removed.`;
+        }
+        return `Are you sure you want to delete "${itemName}"? This action cannot be undone.`;
+    })
+
     const formatDate = (date) => {
         if (!date) return ''
         return new Date(date).toLocaleDateString('en-US', {
@@ -360,6 +512,50 @@ export default function useDocuments() {
             year: 'numeric'
         })
     }
+    const handleListClick = (item) => {
+        if (item.isFolder) return;
+
+        // If clicking the same file, toggle preview
+        if (selectedFileId.value === item.id && showPreview.value) {
+            closePreview();
+            return;
+        }
+
+        // Show preview for this file
+        selectedFileId.value = item.id;
+        showPreview.value = true;
+        loadPreview(item);
+    };
+
+    const loadPreview = async (item) => {
+        previewLoading.value = true;
+        previewError.value = null;
+        previewData.value = null;
+
+        try {
+            const response = await store.viewFileContent(item.id);
+
+            if (response.error) {
+                throw new Error(response.error);
+            }
+
+            previewData.value = response;
+        } catch (error) {
+            console.error('Preview error:', error);
+            previewError.value = error.message || 'Failed to load preview';
+        } finally {
+            previewLoading.value = false;
+        }
+    };
+
+    const closePreview = () => {
+        showPreview.value = false;
+        selectedFileId.value = null;
+        previewData.value = null;
+        previewError.value = null;
+        previewLoading.value = false;
+    };
+
 
     // Init
     onMounted(() => {
@@ -385,6 +581,8 @@ export default function useDocuments() {
         folderCount: store.folderCount,
         fileCount: store.fileCount,
         currentFolderId: store.currentFolderId,
+
+        // UI state
         searchQuery,
         currentFilter,
         sortBy,
@@ -393,6 +591,8 @@ export default function useDocuments() {
         isDragging,
         fileInput,
         zipInput,
+
+        // Modal states
         showFolderModal,
         folderName,
         isSubmitting,
@@ -401,6 +601,8 @@ export default function useDocuments() {
         isEditing,
         showDeleteModal,
         isDeleting,
+
+        // Computed
         filteredItems,
         breadcrumb,
         currentFolderName,
@@ -408,6 +610,9 @@ export default function useDocuments() {
         storageUsed: store.storageUsed,
         storagePercentage: store.storagePercentage,
         filters,
+        deleteSubtitle,
+
+        // Methods
         toggleNewMenu,
         openFolderModal,
         closeFolderModal,
@@ -431,5 +636,15 @@ export default function useDocuments() {
         getFileIcon,
         formatFileSize,
         formatDate,
+        viewFile,
+        downloadFile,
+        selectedFileId,
+        showPreview,
+        previewData,
+        previewLoading,
+        previewError,
+        handleListClick,
+        closePreview,
+        loadPreview,
     }
 }

@@ -1,6 +1,7 @@
 from django.shortcuts import render
 
 # Create your views here.
+import base64
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -358,3 +359,128 @@ def get_all_items(request):
             'total': folders.count() + files.count()
         }
     }, status=status.HTTP_200_OK)
+
+
+# Rasant_api/apps/documents/views.py
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def view_file_content(request, pk):
+    """
+    View file content with proper format for display.
+    """
+    try:
+        file_obj = File.objects.get(id=pk, user=request.user)
+    except File.DoesNotExist:
+        return Response(
+            {'error': 'File not found'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    extension = file_obj.extension.lower()
+    content = file_obj.content
+    mime_type = file_obj.mime_type or 'application/octet-stream'
+    file_size = file_obj.size
+
+    # ===== TEXT FILES =====
+    text_extensions = {
+        'txt', 'py', 'js', 'html', 'css', 'json', 'xml', 'csv',
+        'md', 'log', 'sh', 'sql', 'yml', 'yaml', 'toml', 'ini',
+        'cfg', 'conf', 'config', 'env', 'rtf'
+    }
+    if extension in text_extensions:
+        try:
+            # Try UTF-8 first
+            decoded_content = content.decode('utf-8')
+        except UnicodeDecodeError:
+            try:
+                # Try Latin-1
+                decoded_content = content.decode('latin-1')
+            except:
+                # Try to detect encoding
+                try:
+                    import chardet
+                    detected = chardet.detect(content)
+                    if detected and detected['encoding']:
+                        decoded_content = content.decode(detected['encoding'])
+                    else:
+                        decoded_content = content.decode('utf-8', errors='ignore')
+                except:
+                    # Last resort - replace invalid characters
+                    decoded_content = content.decode('utf-8', errors='replace')
+
+        return Response({
+            'type': 'text',
+            'content': decoded_content,
+            'name': file_obj.full_name,
+            'size': file_obj.size_formatted,
+            'extension': extension
+        })
+
+    # ===== IMAGES =====
+    if extension in {'jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp', 'ico'}:
+        return Response({
+            'type': 'image',
+            'content': f'data:{mime_type};base64,{base64.b64encode(content).decode("utf-8")}',
+            'name': file_obj.full_name,
+            'size': file_obj.size_formatted,
+            'extension': extension
+        })
+    # ===== PDF =====
+    if extension == 'pdf':
+        if file_size > 2 * 1024 * 1024:
+            return Response({
+                'type': 'pdf_url',
+                'url': f'/api/documents/files/{pk}/preview/',
+                'name': file_obj.full_name,
+                'size': file_obj.size_formatted,
+                'extension': extension
+            })
+        return Response({
+            'type': 'pdf',
+            'content': base64.b64encode(content).decode('utf-8'),
+            'name': file_obj.full_name,
+            'size': file_obj.size_formatted,
+            'extension': extension
+        })
+    # ===== DOCUMENTS (Word, Excel, PowerPoint) - Return as base64 with office viewer =====
+    if extension in {'doc', 'docx', 'odt', 'xls', 'xlsx', 'ods', 'ppt', 'pptx', 'odp'}:
+        # For Word/Excel/PowerPoint, return base64 content and use Office Online viewer
+        return Response({
+            'type': 'office',  # Changed from 'url' to 'office'
+            'content': base64.b64encode(content).decode('utf-8'),
+            'name': file_obj.full_name,
+            'size': file_obj.size_formatted,
+            'extension': extension,
+            'mime_type': mime_type
+        })
+
+    # ===== VIDEOS =====
+    if extension in {'mp4', 'avi', 'mov', 'webm', 'mkv'}:
+        return Response({
+            'type': 'video',
+            'content': base64.b64encode(content).decode('utf-8'),
+            'name': file_obj.full_name,
+            'size': file_obj.size_formatted,
+            'extension': extension,
+            'mime_type': mime_type
+        })
+    # ===== AUDIO =====
+    if extension in {'mp3', 'wav', 'ogg', 'flac'}:
+        return Response({
+            'type': 'audio',
+            'content': base64.b64encode(content).decode('utf-8'),
+            'name': file_obj.full_name,
+            'size': file_obj.size_formatted,
+            'extension': extension,
+            'mime_type': mime_type
+        })
+    # ===== DEFAULT =====
+    return Response({
+        'type': 'download',
+        'url': f'/api/documents/files/{pk}/download/',
+        'name': file_obj.full_name,
+        'size': file_obj.size_formatted,
+        'extension': extension,
+        'message': f'Preview not available for .{extension} files.'
+    })

@@ -343,6 +343,7 @@ html, body {
     --gradient-modal-header: linear-gradient(135deg, #FFF8F3 0%, #F5F0FF 50%, #EFF6FF 100%);
     --gradient-icon-brand: linear-gradient(90deg, #2F6FC4 0%, #4A88D8 50%, #5C97E3 100%);
     --shadow-sm: 0 1px 3px rgba(74, 144, 226, 0.06);
+    --adminbuttonbackcolor:      linear-gradient(135deg, #2A5F9E, #4A90E2);
 }
 
 @layer topBarProfile {

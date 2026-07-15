@@ -93,7 +93,7 @@
                     v-if="props.mode === 'view'"
                     type="button"
                     @click="$emit('close')"
-                    class="px-5 py-2.5 rounded-xl border border-gray-200 text-sm cursor-pointer font-bold text-gray-600 hover:bg-gray-50 transition bg-white w-full sm:w-auto"
+                    class="px-5 py-2.5 rounded-xl border border-gray-200 text-sm font-bold text-gray-600 hover:bg-gray-100 transition bg-white w-full sm:w-auto"
                 >
                   Close Details
                 </button>
@@ -103,7 +103,7 @@
                     v-if="props.showMore !== undefined"
                     type="button"
                     @click="$emit('toggle-more')"
-                    class="px-5 py-2.5 rounded-xl text-sm font-bold text-white shadow-sm transition cursor-pointer flex items-center justify-center gap-2 bg-[#E25C1D] hover:bg-[#D9531E] w-full sm:w-auto"
+                    class="px-5 py-2.5 rounded-xl text-sm font-bold text-buttonTextColor shadow-sm transition flex items-center justify-center gap-2 btn-primary-gradient w-full sm:w-auto"
                 >
                   <i v-if="props.showMore" class="fas fa-chevron-up text-xs"></i>
                   <i v-else class="fas fa-chevron-down text-xs"></i>
@@ -115,7 +115,7 @@
                     v-if="props.mode === 'form' || props.mode === 'edit'"
                     type="submit"
                     :form="props.formId || 'edit-employee-form'"
-                    class="px-5 py-2.5 rounded-xl text-sm font-bold text-white shadow-sm transition cursor-pointer bg-[#E25C1D] hover:bg-[#D9531E] w-full sm:w-auto"
+                    class="px-5 py-2.5 rounded-xl text-sm font-bold text-buttonTextColor shadow-sm transition btn-primary-gradient w-full sm:w-auto"
                     :disabled="props.loading"
                 >
                   {{ props.loading ? 'Saving...' : props.submitText }}

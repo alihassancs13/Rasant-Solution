@@ -573,7 +573,9 @@ def increment_policy_view(request, pk=None):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def policy_assignments_view(request):
-
+    """Sab employee<->policy assignments ek call mein — taake frontend
+    'Assigned Policies' column (roster) aur 'Also assigned to' badge
+    (assign modal) N+1 calls ke bina compute kar sake."""
     assignments = EmployeePolicyAssignment.objects.select_related('employee', 'policy').all()
     serializer = EmployeePolicyAssignmentSerializer(assignments, many=True)
     return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)

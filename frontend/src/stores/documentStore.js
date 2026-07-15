@@ -108,7 +108,6 @@ export const useDocumentStore = defineStore('documents', {
             }
         },
 
-        // ===== LOAD ALL FOLDERS (for "Folders" filter) =====
         async loadAllFolders() {
             this.isLoading = true;
             this.error = null;
@@ -142,13 +141,12 @@ export const useDocumentStore = defineStore('documents', {
             }
         },
 
-// ===== LOAD ALL FILES (for "Files" filter) =====
         async loadAllFiles() {
             this.isLoading = true;
             this.error = null;
             try {
                 const response = await this._apiRequest(API_ENDPOINTS.DOCUMENTS.FILES.ALL);
-                console.log('All files response:', response); // Debug
+                console.log('All files response:', response);
                 let data = [];
                 if (response.data && Array.isArray(response.data)) {
                     data = response.data;
@@ -182,7 +180,7 @@ export const useDocumentStore = defineStore('documents', {
                 const response = await this._apiRequest(
                     API_ENDPOINTS.DOCUMENTS.FOLDERS.CONTENTS(folderId)
                 );
-                console.log('Folder contents response:', response); // Debug
+                console.log('Folder contents response:', response);
 
                 const folders = (response.subfolders || []).map(f => ({
                     ...f,
@@ -284,7 +282,6 @@ export const useDocumentStore = defineStore('documents', {
             }
         },
 
-        // ===== UPDATE FOLDER =====
         async updateFolder(folderId, name) {
             this.isLoading = true;
             this.error = null;
@@ -356,7 +353,99 @@ export const useDocumentStore = defineStore('documents', {
                 this.isLoading = false;
             }
         },
+        ///view file
 
+        async viewFileContent(fileId) {
+            this.isLoading = true;
+            this.error = null;
+            try {
+                const response = await this._apiRequest(
+                    API_ENDPOINTS.DOCUMENTS.FILES.VIEW(fileId)
+                );
+                console.log('View file content response:', response);
+
+                if (response.error) {
+                    throw new Error(response.error);
+                }
+
+                const cleanedBaseUrl = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL;
+                const token = localStorage.getItem('accessToken');
+
+                // Add download URL
+                if (!response.download_url) {
+                    response.download_url = `${cleanedBaseUrl}/api/documents/files/${fileId}/download/`;
+                }
+
+                // For PDFs, create blob URL
+                if (response.type === 'pdf' && response.content) {
+                    try {
+                        const binaryString = atob(response.content);
+                        const bytes = new Uint8Array(binaryString.length);
+                        for (let i = 0; i < binaryString.length; i++) {
+                            bytes[i] = binaryString.charCodeAt(i);
+                        }
+                        const blob = new Blob([bytes], { type: 'application/pdf' });
+                        response.blob_url = URL.createObjectURL(blob);
+                        console.log('PDF blob URL created successfully');
+                    } catch (error) {
+                        console.error('Error creating PDF blob:', error);
+                        response.data_uri = `data:application/pdf;base64,${response.content}`;
+                    }
+                }
+
+                // For Office documents (Word, Excel, PowerPoint) - create blob URL
+                if (response.type === 'office' && response.content) {
+                    try {
+                        const binaryString = atob(response.content);
+                        const bytes = new Uint8Array(binaryString.length);
+                        for (let i = 0; i < binaryString.length; i++) {
+                            bytes[i] = binaryString.charCodeAt(i);
+                        }
+                        const blob = new Blob([bytes], { type: response.mime_type || 'application/octet-stream' });
+                        response.blob_url = URL.createObjectURL(blob);
+                        console.log('Office document blob URL created successfully');
+
+                        // Create a viewer URL using Microsoft Office Online
+                        // This will display Word, Excel, PowerPoint files in the browser
+                        const encodedUrl = encodeURIComponent(response.blob_url);
+                        response.viewer_url = `https://view.officeapps.live.com/op/view.aspx?src=${encodedUrl}`;
+                    } catch (error) {
+                        console.error('Error creating office document blob:', error);
+                        // Fallback: try Google Docs Viewer with download URL
+                        const downloadUrl = response.download_url;
+                        const encodedDownloadUrl = encodeURIComponent(downloadUrl);
+                        response.viewer_url = `https://docs.google.com/gview?url=${encodedDownloadUrl}&embedded=true`;
+                    }
+                }
+
+                // For Word/Excel/PowerPoint documents (backward compatibility)
+                if (response.type === 'url' && response.url) {
+                    // Try to use Google Docs Viewer
+                    const downloadUrl = response.download_url || `${cleanedBaseUrl}/api/documents/files/${fileId}/download/`;
+                    const encodedUrl = encodeURIComponent(downloadUrl);
+                    response.viewer_url = `https://docs.google.com/gview?url=${encodedUrl}&embedded=true`;
+                }
+
+                // For PDF URLs (large PDFs)
+                if (response.type === 'pdf_url' && response.url) {
+                    const urlWithToken = response.url.includes('?')
+                        ? `${response.url}&token=${token}`
+                        : `${response.url}?token=${token}`;
+
+                    response.url = urlWithToken.startsWith('http')
+                        ? urlWithToken
+                        : `${cleanedBaseUrl}${urlWithToken}`;
+                }
+
+                return response;
+            } catch (error) {
+                this.error = error.message;
+                console.error('View file content error:', error);
+                throw error;
+            } finally {
+                this.isLoading = false;
+            }
+        },
         navigateTo(folderId) {
             if (folderId === null) {
                 this.loadAllItems();
