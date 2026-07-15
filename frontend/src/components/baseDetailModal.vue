@@ -81,7 +81,7 @@
               <button
                   v-if="!props.hideClose"
                   @click="$emit('close')"
-                  class="rounded-xl p-2 hover:bg-gray-100 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2"
+                  class="rounded-xl p-2 hover:bg-gray-100 cursor-pointer transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-2"
                   aria-label="Close"
               >
                 <font-awesome-icon
@@ -111,7 +111,7 @@
                   v-if="props.mode !== 'view' && props.mode !== 'info'"
                   @click="$emit('cancel')"
                   :disabled="props.loading"
-                  class="px-6 py-3 text-sm rounded-xl btn-gradient-border transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  class="px-6 py-3 text-sm rounded-xl btn-gradient-border  cursor-pointer transition-all duration-200  disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {{ props.cancelText }}
               </button>
@@ -121,7 +121,7 @@
                   v-if="props.mode === 'delete'"
                   @click="$emit('confirm')"
                   :disabled="props.loading"
-                  class="px-6 py-3 text-sm font-medium rounded-xl border border-transparent bg-gradient-to-r from-red-500 to-rose-500 text-white hover:from-red-600 hover:to-rose-600 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                  class="px-6 py-3 text-sm font-medium rounded-xl  cursor-pointer  border border-transparent bg-gradient-to-r from-red-500 to-rose-500 text-white hover:from-red-600 hover:to-rose-600 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
               >
                 <font-awesome-icon
                     v-if="props.loading"
@@ -141,7 +141,7 @@
                   v-if="props.mode === 'form'"
                   @click="$emit('save')"
                   :disabled="props.disabled || props.loading"
-                  class="px-6 py-3 text-sm font-medium rounded-xl border border-transparent bg-gradient-to-r from-[#2F6FC4] via-[#3F7FD2] to-[#4A88D8] text-white hover:from-[#295FB0] hover:via-[#386FC0] hover:to-[#417FD0] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#4A88D8] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                  class="px-6 py-3 text-sm font-medium rounded-xl  cursor-pointer  border border-transparent bg-gradient-to-r from-[#2F6FC4] via-[#3F7FD2] to-[#4A88D8] text-white hover:from-[#295FB0] hover:via-[#386FC0] hover:to-[#417FD0] hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#4A88D8] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
               >
                 <font-awesome-icon
                     v-if="props.loading"
@@ -161,7 +161,7 @@
                   v-if="props.mode === 'success'"
                   @click="$emit('confirm')"
                   :disabled="props.loading"
-                  class="px-6 py-3 text-sm font-medium rounded-xl border border-transparent bg-gradient-to-r from-green-500 to-emerald-500 text-white hover:from-green-600 hover:to-emerald-600 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                  class="px-6 py-3 text-sm font-medium rounded-xl border border-transparent  cursor-pointer  bg-gradient-to-r from-green-500 to-emerald-500 text-white cursor-pointer hover:from-green-600 hover:to-emerald-600 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
               >
                 <font-awesome-icon
                     v-if="props.loading"
@@ -181,7 +181,7 @@
                   v-if="props.mode === 'warning' || props.mode === 'error'"
                   @click="$emit('confirm')"
                   :disabled="props.loading"
-                  class="px-6 py-3 text-sm font-medium rounded-xl border border-transparent bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:from-amber-600 hover:to-orange-600 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                  class="px-6 py-3 text-sm font-medium rounded-xl border border-transparent bg-gradient-to-r from-amber-500 to-orange-500 text-white  cursor-pointer  hover:from-amber-600 hover:to-orange-600 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
               >
                 <font-awesome-icon
                     v-if="props.loading"
@@ -201,7 +201,7 @@
               <button
                   v-if="props.mode === 'view' || props.mode === 'info'"
                   @click="$emit('close')"
-                  class="px-6 py-3 text-sm rounded-xl btn-gradient-border transition-all duration-200 flex items-center"
+                  class="px-6 py-3 text-sm rounded-xl btn-gradient-border cursor-pointer transition-all duration-200 flex items-center"
               >
                 <font-awesome-icon
                     icon="fa-solid fa-times"

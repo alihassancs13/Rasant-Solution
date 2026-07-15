@@ -363,7 +363,7 @@
         </button>
        <template v-for="(p, index) in paginationRange" :key="index">
          <span v-if="p === '...'" class="w-8 h-8 flex items-center justify-center text-xs text-gray-400">…</span>
-          <button v-else @click="ticketPage = p"
+              <button v-else @click="ticketPage = (p as number)"
               :class="p === ticketPage
               ? 'bg-gradient-to-r from-[#2F6FC4] via-[#3F7FD2] to-[#4A88D8] text-white border-transparent'
               : 'bg-blue-50 text-[#2F6FC4] border-blue-200 hover:bg-blue-100 hover:border-[#4A88D8] hover:text-[#295FB0]'"
@@ -594,7 +594,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
         <!-- Space -->
-        <div class>
+        <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">
             Space <span class="text-red-500">*</span>
           </label>
@@ -1276,7 +1276,6 @@ const {
   agentProject,
   isSavingChatbot,
   isSavingAgent,
-  saveDefaultProject,
   paginationRange,
   openIssueModal,
   extractDescription,

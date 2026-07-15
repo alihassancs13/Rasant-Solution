@@ -148,7 +148,7 @@ export function useLogin() {
                     }
                 }
 
-                toast.error(errorMsg);
+               showToast(errorMsg, 'error');
 
                 // Highlight the specific field based on error type
                 if (errorType === 'email_not_found') {

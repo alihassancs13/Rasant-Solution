@@ -23,5 +23,7 @@ urlpatterns = [
     path('salaries/policies/<int:policy_id>/assign/', views.sync_policy_assignments_view, name='policy-assign'),
     path('salaries/force-increment/', views.force_increment_view, name='force-increment'),
     path('salaries/increment-due-today/', views.increments_due_today_view, name='force-increment'),
+    path('salaries/get_employee_detail/<int:pk>/', views.get_employee_detail, name='employee_detail'),
+    path('salaries/recalculate-insurance/', views.check_insurance_renewals_view, name='recalculate_insurance')
 
 ]

@@ -294,10 +294,16 @@ export const useJiraStore = defineStore('jiraStore', {
             try {
                 const isFormData = payload instanceof FormData
 
-                const response = await loginApi.post('/api/jira/create-issue/', payload, {
-                    headers: { ...this.getAuthHeader(),
-                        ...(isFormData ? {}: { 'Content-Type' : 'application/json'})}
-                });
+                const response = await loginApi.post(
+                "/api/jira/create-issue/",
+                payload,
+             {
+                   headers: {
+                 ...this.getAuthHeader(),
+                  "Content-Type": "multipart/form-data",
+               },
+               }
+                );
 
                 if (this.jiraUser?.account_id) {
                     await this.getUserIssues(this.jiraUser.account_id);

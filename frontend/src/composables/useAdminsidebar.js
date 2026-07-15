@@ -14,7 +14,7 @@ export function useAdminSidebar() {
 
     const dropdownStates = ref({});
     const isSidebarOpen = ref(false);
-    const collapsed = ref(false);
+    const collapsed = ref(localStorage.getItem('sidebarCollapsed') === 'true');
 
     const isDrillDown = ref(localStorage.getItem('sidebarDrillDown') === 'true');
 

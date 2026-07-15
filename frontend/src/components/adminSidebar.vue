@@ -138,7 +138,7 @@
             <!-- Company Section -->
             <div>
               <p class="text-[11px] font-bold text-text-muted tracking-widest px-3 mb-1 uppercase" v-show="!showCollapsed">Company</p>
-              <div class="space-y-0.5">
+              <div class="space-y-1">
                 <template v-for="module in companyModules" :key="module.id">
                   <!-- Regular module -->
                   <router-link
@@ -268,7 +268,6 @@ onMounted(() => {
   const stored = localStorage.getItem('sidebarCollapsed');
   if (stored !== null) {
     manualOverride.value = true;
-    collapsed.value = stored === 'true';
   }
   applyResponsiveState();
   window.addEventListener('resize', applyResponsiveState);

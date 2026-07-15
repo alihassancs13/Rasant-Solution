@@ -1,6 +1,7 @@
 import datetime
 from rest_framework.decorators import permission_classes
 from django.http import HttpResponse
+from dateutil.relativedelta import relativedelta
 from django.shortcuts import get_object_or_404
 from django.db import IntegrityError
 from rest_framework.decorators import api_view, parser_classes
@@ -13,8 +14,8 @@ from django.db.models import Q
 from datetime import date
 from django.conf import settings
 from collections import defaultdict
+from decimal import Decimal
 from django.db import transaction
-from datetime import date
 from .serializers import calculate_next_effective_date
 import random
 import string
@@ -24,7 +25,7 @@ from django.contrib.auth.hashers import make_password
 from .models import (
     Employee, CVSubmission, JobOpening, JobType, JobStatus,
     IncrementType, IncrementPolicy, CycleTiming, ApplicationMode, EmployeePolicyAssignment,
-    SalaryIncrementHistory
+    SalaryIncrementHistory,SalaryDeductionHistory
 )
 from .serializers import (
     EmployeeSerializer, EmployeeListSerializer, UpdateEmployeeSerializer,
@@ -63,6 +64,7 @@ def add_employee(request):
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     employee = Employee(**serializer.validated_data)
+    employee.current_salary = employee.salary
     # Generate random password (8 characters)
     characters = string.ascii_letters + string.digits + "!@#$%^&*"
     raw_password = ''.join(random.choice(characters) for _ in range(8))
@@ -100,6 +102,15 @@ def add_employee(request):
         employee.employee_number = new_number
         try:
             employee.save()
+
+            if employee.joined_date:
+                calculate_and_save_deduction(
+                    employee=employee,
+                    tax_percent=employee.tax,
+                    insurance_amount=employee.insurance_amount,
+                    deduction_month=date.today().replace(day=1),
+                )
+
             return Response(
                 {
                     "message": "Employee added successfully.",
@@ -120,8 +131,10 @@ def add_employee(request):
 
 @api_view(['GET'])
 def list_employees(request):
-    employees = Employee.objects.all().order_by('-created_at')
+    employees = Employee.objects.all().order_by('-created_at').prefetch_related('deduction_history')
     serializer = EmployeeListSerializer(employees, many=True)
+    for employee in employees:
+        renew_insurance_cycle(employee)
     return Response(serializer.data)
 
 
@@ -139,6 +152,10 @@ def update_employee(request, pk):
             status=status.HTTP_404_NOT_FOUND
         )
 
+    old_tax = employee.tax
+    old_insurance_amount = employee.insurance_amount
+    old_salary = employee.salary
+
     serializer = UpdateEmployeeSerializer(
         employee,
         data=request.data,
@@ -148,6 +165,19 @@ def update_employee(request, pk):
 
     if serializer.is_valid():
         updated_employee = serializer.save()
+        updated_employee.current_salary = updated_employee.salary
+        updated_employee.save(update_fields=['current_salary'])
+
+        if (updated_employee.salary != old_salary or
+                updated_employee.tax != old_tax or
+                updated_employee.insurance_amount != old_insurance_amount):
+            calculate_and_save_deduction(
+                employee=updated_employee,
+                tax_percent=updated_employee.tax,
+                insurance_amount=updated_employee.insurance_amount,
+                deduction_month=date.today().replace(day=1),
+            )
+
         return Response(
             {
                 "message": "Employee updated successfully.",
@@ -619,11 +649,12 @@ def force_increment_view(request):
 
     results = []
     touched_policy_ids = set()
+    deduction_month = date.today().replace(day=1)
 
     with transaction.atomic():
         for employee_id, emp_assignments in by_employee.items():
             employee = emp_assignments[0].employee
-            old_salary = employee.salary
+            old_salary = employee.current_salary or employee.salary
             running_salary = old_salary
             applied_policies = []
 
@@ -649,11 +680,17 @@ def force_increment_view(request):
                 )
                 applied_policies.append(policy.policy_name)
 
-            employee.salary = running_salary
             employee.current_salary = running_salary
             employee.increment_applied_on = date.today()
             employee.is_increment_pending = False
-            employee.save(update_fields=['salary', 'current_salary', 'increment_applied_on', 'is_increment_pending'])
+            employee.save(update_fields=[ 'current_salary', 'increment_applied_on', 'is_increment_pending'])
+
+            deduction = calculate_and_save_deduction(
+                employee=employee,
+                tax_percent=employee.tax,
+                insurance_amount=employee.insurance_amount,
+                deduction_month=deduction_month,
+            )
 
             results.append({
                 "employee_id": employee.id,
@@ -661,6 +698,10 @@ def force_increment_view(request):
                 "old_salary": str(old_salary),
                 "new_salary": str(running_salary),
                 "policies_applied": applied_policies,
+                "tax_amount": str(deduction.tax_amount),
+                "salary_after_tax": str(deduction.salary_after_tax),
+                "insurance_amount": str(deduction.insurance_amount),
+                "net_salary": str(deduction.net_salary),
             })
 
         if touched_policy_ids:
@@ -674,37 +715,7 @@ def force_increment_view(request):
         },
         status=status.HTTP_200_OK,
     )
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def increments_due_today_view(request):
 
-    today = date.today()
-    policies_due = IncrementPolicy.objects.filter(
-        is_active=True,
-        application_mode__code='manual',   # agar CharField hai to: application_mode='manual'
-        next_effective_date__lte=today,
-    )
-
-    if not policies_due.exists():
-        return Response({"status": "success", "data": []}, status=status.HTTP_200_OK)
-
-    assignments = (
-        EmployeePolicyAssignment.objects
-        .filter(policy__in=policies_due)
-        .select_related('employee', 'policy')
-    )
-
-    data = [
-        {
-            "employee_id": a.employee.id,
-            "employee_name": a.employee.name,
-            "policy_id": a.policy.id,
-            "policy_name": a.policy.policy_name,
-        }
-        for a in assignments
-    ]
-
-    return Response({"status": "success", "data": data}, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -754,3 +765,136 @@ def increments_due_today_view(request):
     print("=====================================\n")
 
     return Response({"status": "success", "data": data}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def get_employee_detail(request, pk):
+    try:
+        employee = Employee.objects.prefetch_related('deduction_history').get(pk=pk)
+    except Employee.DoesNotExist:
+        return Response(
+            {"error": "Employee not found."},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+
+    latest_deduction = employee.deduction_history.first()
+
+    data = {
+        # ---------- Basic Info ----------
+        "employee_number": employee.employee_number,
+        "name": employee.name,
+        "email": employee.email,
+        "phone_number": employee.phone_number,
+        "department": employee.department,
+        "designation": employee.designation,
+        "status": employee.status,
+        "is_active": employee.is_active,
+        "joined_date": employee.joined_date,
+        "gender": employee.gender,
+
+        # ---------- Salary & Deduction Breakdown ----------
+        "base_salary": employee.salary,
+        "current_salary": employee.current_salary,
+        "tax_percent": employee.tax,
+        "tax_amount": latest_deduction.tax_amount if latest_deduction else None,
+        "salary_after_tax": latest_deduction.salary_after_tax if latest_deduction else None,
+        "insurance_amount": latest_deduction.insurance_amount if latest_deduction else None,
+        "net_salary": latest_deduction.net_salary if latest_deduction else None,
+        "deduction_month": latest_deduction.deduction_month if latest_deduction else None,
+
+        # ---------- Bank Details ----------
+        "bank_name": employee.bank_name,
+        "branch_name": employee.branch_name,
+        "account_number": employee.account_number,
+    }
+
+    return Response(data, status=status.HTTP_200_OK)
+
+def calculate_and_save_deduction(employee, tax_percent=None, insurance_amount=None, deduction_month=None):
+    deduction_month = deduction_month or date.today().replace(day=1)
+    if employee.joined_date and not employee.next_insurance_cycle_date:
+        employee.next_insurance_cycle_date = (
+            employee.joined_date + relativedelta(months=12)
+        ).replace(day=1)
+        employee.save(update_fields=["next_insurance_cycle_date"])
+
+    gross_salary = employee.current_salary or employee.salary
+
+    if tax_percent is None:
+        tax_percent = employee.tax
+    if insurance_amount is None:
+        insurance_amount = employee.insurance_amount
+
+    tax_amount = Decimal("0")
+    if tax_percent:
+        tax_amount = gross_salary * (Decimal(str(tax_percent)) / Decimal("100"))
+    salary_after_tax = gross_salary - tax_amount
+
+    monthly_insurance = Decimal("0")
+    if employee.joined_date and insurance_amount:
+        monthly_insurance = (Decimal(str(insurance_amount)) / Decimal("2")) / Decimal("12")
+
+    net_salary = salary_after_tax - monthly_insurance
+
+    record = SalaryDeductionHistory.objects.create(
+        employee=employee,
+        deduction_month=deduction_month,
+        gross_salary=gross_salary,
+        tax_amount=tax_amount,
+        salary_after_tax=salary_after_tax,
+        insurance_amount=monthly_insurance,
+        net_salary=net_salary,
+    )
+    return record
+
+def renew_insurance_cycle(employee):
+    if not employee.joined_date:
+        return None
+
+    if employee.next_insurance_cycle_date is None:
+        employee.next_insurance_cycle_date = (
+                employee.joined_date + relativedelta(months=12)
+        ).replace(day=1)
+        employee.save(update_fields=["next_insurance_cycle_date"])
+        return calculate_and_save_deduction(
+            employee, deduction_month=date.today().replace(day=1)
+        )
+
+    today = date.today().replace(day=1)
+
+    if today < employee.next_insurance_cycle_date:
+        return None
+
+    record = calculate_and_save_deduction(
+        employee, deduction_month=employee.next_insurance_cycle_date
+    )
+
+    employee.next_insurance_cycle_date = (
+        employee.next_insurance_cycle_date + relativedelta(months=12)
+    )
+    employee.save(update_fields=["next_insurance_cycle_date"])
+
+    return record
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def check_insurance_renewals_view(request):
+    employees = Employee.objects.all()
+
+    renewed = []
+    for employee in employees:
+        record = renew_insurance_cycle(employee)
+        if record:
+            renewed.append({
+                "employee_id": employee.id,
+                "employee_name": employee.name,
+                "deduction_month": record.deduction_month,
+                "insurance_amount": str(record.insurance_amount),
+                "net_salary": str(record.net_salary),
+            })
+
+    return Response(
+        {"status": "success", "data": renewed},
+        status=status.HTTP_200_OK,
+    )

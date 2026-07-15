@@ -28,6 +28,10 @@ export function useIncrementPolicy(employees) {
     const applicationModes = computed(() => policyStore.applicationModes)
     const activePolicies   = computed(() => policies.value.filter(p => p.is_active).length)
     const isTogglingActive = ref(null)
+    const employeeDetail = computed(() => policyStore.employeeDetail)
+    const isEmployeeDetailLoading = computed(() => policyStore.isModalLoading)
+
+    const showEmployeeDetailModal = ref(false)
     const assignments        = computed(() => policyStore.assignments)
     const assignmentsLoading = computed(() => policyStore.isLoadingAssignments)
 
@@ -430,6 +434,24 @@ export function useIncrementPolicy(employees) {
         return result
     }
 
+    const fetchEmployeeDetail = async (employeeId) => {
+        try {
+            await policyStore.getEmployeeDetail(employeeId)
+        } catch (err) {
+            showToast(policyStore.error || 'Failed to fetch employee details.', 'error')
+        }
+    }
+
+    const openEmployeeDetailModal = async (employeeId) => {
+        showEmployeeDetailModal.value = true
+        await fetchEmployeeDetail(employeeId)
+    }
+
+    const closeEmployeeDetailModal = () => {
+        showEmployeeDetailModal.value = false
+        policyStore.employeeDetail = null
+    }
+
 
     return {
         formData, formErrors, isSubmitting,
@@ -450,6 +472,8 @@ export function useIncrementPolicy(employees) {
         selectedApplyIds, toggleApplySelection, toggleSelectAllApply,
         openApplyModal, closeApplyModal, confirmApplyIncrement,
         dueTodayEmployees,
-        isEmployeeDueToday,
+        isEmployeeDueToday, employeeDetail, isEmployeeDetailLoading,
+        showEmployeeDetailModal, fetchEmployeeDetail,
+        openEmployeeDetailModal, closeEmployeeDetailModal,
     }
 }

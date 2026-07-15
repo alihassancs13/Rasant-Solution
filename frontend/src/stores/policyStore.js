@@ -22,6 +22,8 @@ export const usePolicyStore = defineStore('policy', {
         isSavingAssignments: false,
         policies: [],
         incrementTypes: [],
+        isModalLoading: false,
+        employeeDetail: null,
         cycleTimings: [],
         applicationModes: [],
         dueTodayIncrements: [],
@@ -65,8 +67,22 @@ export const usePolicyStore = defineStore('policy', {
             return { success: false, error: this.error };
           } finally {
         this.isLoadingDueToday = false;
-    }
-},
+          }
+       },
+
+       async checkInsuranceRenewals() {
+          this.isCheckingInsuranceRenewals = true;
+          try {
+            const response = await apiClient.post(API_ENDPOINTS.CHECK_INSURANCE_RENEWALS);
+            this.renewedInsuranceEmployees = response?.data?.data ?? [];
+            return { success: true };
+          } catch (error) {
+            this.error = error.response?.data?.message || 'Failed to check insurance renewals';
+            return { success: false, error: this.error };
+          } finally {
+             this.isCheckingInsuranceRenewals = false;
+          }
+       },
 
         async fetchLookups() {
             try {
@@ -130,8 +146,7 @@ export const usePolicyStore = defineStore('policy', {
                 const response = await apiClient.post(API_ENDPOINTS.POLICY_ASSIGN(policyId), {
                     employee_ids: employeeIds,
                 });
-                // Is policy ke purane assignments hata kar naye se replace karo,
-                // baaki policies ke assignments untouched rehte hain.
+
                 this.assignments = this.assignments.filter(a => a.policy !== policyId);
                 this.assignments.push(...(response?.data?.data ?? []));
                 return { success: true };
@@ -166,5 +181,22 @@ export const usePolicyStore = defineStore('policy', {
                 return { success: false, error: this.error };
             }
         },
+
+        async getEmployeeDetail(employeeId) {
+            this.isModalLoading = true
+            this.error = null
+
+            try {
+             const response = await apiClient.get(`${API_ENDPOINTS.GET_EMPLOYEE_DETAIL}${employeeId}/`);
+             this.employeeDetail = response.data
+             return response.data
+
+            } catch (err) {
+                this.error = err.response?.data?.error || 'Failed to fetch employee details'
+                throw err
+            } finally {
+                 this.isModalLoading = false
+             }
+         }
     },
 });

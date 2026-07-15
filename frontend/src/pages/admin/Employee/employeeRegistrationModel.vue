@@ -12,7 +12,7 @@
   ]">
 
       <!-- Pinned Close Button - Only show in modal mode -->
-      <button v-if="!isDirectAccess" type="button" class="absolute top-5 right-6 text-slate-400 hover:text-slate-600 transition z-50" @click="close">
+      <button v-if="!isDirectAccess" type="button" class="absolute top-5 right-6 cursor-pointer text-slate-400 hover:text-slate-600 transition z-50" @click="close">
         <i class="fa-solid fa-xmark text-xl"></i>
       </button>
 
@@ -491,16 +491,16 @@
       'border-t border-slate-100 flex justify-between items-center',
       isDirectAccess ? 'px-6 md:px-8 py-4 bg-white' : 'p-6 bg-slate-50/80 shrink-0'
     ]">
-        <button type="button" @click="prevStep" :class="['px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-semibold text-sm hover:bg-slate-100 transition flex items-center bg-white', currentStep === 1 ? 'invisible' : '']">
+        <button type="button" @click="prevStep" :class="['px-5 py-2.5 rounded-xl border cursor-pointer border-slate-200 text-slate-600 font-semibold text-sm hover:bg-slate-100 transition flex items-center bg-white', currentStep === 1 ? 'invisible' : '']">
           <i class="fa-solid fa-arrow-left mr-2 mt-0.5"></i> Back
         </button>
 
         <div class="flex gap-3">
           <!-- Show Close button only in modal mode -->
-          <button v-if="!isDirectAccess" type="button" @click="close" class="px-5 py-2.5 rounded-xl border border-slate-200 text-slate-600 font-semibold text-sm hover:bg-slate-100 transition bg-white">
+          <button v-if="!isDirectAccess" type="button" @click="close" class="px-5 py-2.5 cursor-pointer rounded-xl border border-slate-200 text-slate-600 font-semibold text-sm hover:bg-slate-100 transition bg-white">
             Close
           </button>
-          <button type="button" @click="customNextStep" class="px-6 py-2.5 rounded-xl bg-orange-600 text-white font-semibold text-sm hover:bg-orange-700 shadow-lg shadow-orange-600/20 transition flex items-center">
+          <button type="button" @click="customNextStep" class="px-6 py-2.5 rounded-xl cursor-pointer bg-orange-600 text-white font-semibold text-sm hover:bg-orange-700 shadow-lg shadow-orange-600/20 transition flex items-center">
             <span v-if="currentStep === totalSteps">Submit form</span>
             <span v-else>Continue</span>
             <i v-if="currentStep === totalSteps" class="fa-solid fa-paper-plane ml-2 mt-0.5"></i>

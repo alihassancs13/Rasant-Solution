@@ -1,6 +1,7 @@
 // stores/loginStore.js
 import { defineStore } from 'pinia';
 import { authAPI } from '../services/loginApi.js';
+import { usePolicyStore } from '@/stores/policyStore';
 
 export const useLoginStore = defineStore('login', {
     state: () => ({
@@ -56,6 +57,8 @@ export const useLoginStore = defineStore('login', {
                     const { access_token, refresh_token, user } = data;
                     this.setTokens(access_token, refresh_token);
                     this.setUser(user);
+                    const policyStore = usePolicyStore();
+                    policyStore.checkInsuranceRenewals();
                     return { success: true, user, message: message || 'Login successful' };
                 } else {
                     this.error = message || 'Login failed';

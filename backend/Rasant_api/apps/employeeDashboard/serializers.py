@@ -59,6 +59,7 @@ class EmployeeListSerializer(serializers.ModelSerializer):
     Used ONLY for GET /employees/ – excludes all file fields.
     """
     raise_count = serializers.SerializerMethodField()
+    net_salary = serializers.SerializerMethodField()
 
     class Meta:
         model = Employee
@@ -69,6 +70,8 @@ class EmployeeListSerializer(serializers.ModelSerializer):
             "created_at", "updated_at",
             'name',
             'cnic',
+            "insurance_amount",
+            "tax",
             'present_address',
             'permanent_address',
             'gender',
@@ -80,6 +83,7 @@ class EmployeeListSerializer(serializers.ModelSerializer):
             'bank_name',
             'branch_name',
             'account_number',
+            'net_salary',
             'raise_count',
             # These two are written by force_increment_view but were never
             # exposed here, so the frontend's overdue/due-date calculation
@@ -94,6 +98,10 @@ class EmployeeListSerializer(serializers.ModelSerializer):
 
     def get_raise_count(self, obj):
         return SalaryIncrementHistory.objects.filter(employee=obj).count()
+
+    def get_net_salary(self, obj):
+        latest_deduction = obj.deduction_history.first()
+        return latest_deduction.net_salary if latest_deduction else None
 
 
 class EmployeeCreateUpdateSerializer(serializers.ModelSerializer):
@@ -119,7 +127,7 @@ class UpdateEmployeeSerializer(serializers.ModelSerializer):
         fields = [
             "full_name", "email", "phone_number", "department",
             "designation", "is_active", "salary", "status",
-            "joined_date",
+            "joined_date", "tax","insurance_amount",
             'name',
             'cnic',
             'present_address',
@@ -137,6 +145,17 @@ class UpdateEmployeeSerializer(serializers.ModelSerializer):
             'password',
         ]
         read_only_fields = ['employee_number']
+
+    def validate_cnic(self, value):
+        if not value:
+            return None
+
+        qs = Employee.objects.filter(cnic=value)
+        if self.instance:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise serializers.ValidationError("Employee with this CNIC already exists.")
+        return value
 
     def validate_password(self, value):
         """Hash password if provided and not empty"""

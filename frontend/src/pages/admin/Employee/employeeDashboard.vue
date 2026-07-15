@@ -416,27 +416,33 @@
 
         <div class="flex flex-col gap-1.5">
           <label class="text-xs font-bold uppercase tracking-wider text-gray-400">
-            Insurance Policy / Provider
+            Insurance Amount
           </label>
           <input
               type="text"
-              v-model="createFormData.insurance"
-              placeholder="e.g. TPL Insurance #12345"
+              v-model="createFormData.insurance_amount"
+              placeholder="e.g. Rs.23000"
               class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition-all duration-200"
           />
         </div>
 
         <div class="flex flex-col gap-1.5">
-          <label class="text-xs font-bold uppercase tracking-wider text-gray-400">
-            Text
-          </label>
-          <input
-              type="text"
-              v-model="createFormData.text"
-              placeholder="e.g. Write text here"
-              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition-all duration-200"
-          />
+        <label class="text-xs font-bold uppercase tracking-wider text-gray-400">
+         Tax (%)
+        </label>
+       <div class="relative">
+         <input
+           type="number"
+           v-model="createFormData.tax"
+           placeholder="e.g. 5"
+           min="0"
+           max="100"
+           step="0.01"
+           class="w-full px-4 py-2.5 pr-8 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition-all duration-200"
+           />
+         <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
         </div>
+      </div>
       </form>
     </CreateModal>
 
@@ -545,7 +551,43 @@
                       class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
                   />
                 </div>
-              </div>
+
+                <!-- Insurance Amount -->
+              <div class="flex flex-col gap-1.5">
+              <label class="text-xs font-bold uppercase tracking-wider text-gray-400">
+              Insurance Amount (PKR)
+             </label>
+               <input
+                   type="number"
+                   v-model="editFormData.insurance_amount"
+                   placeholder="e.g. 5000"
+                   min="0"
+                   step="100"
+                   class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
+                />
+               </div>
+
+              <!-- Tax Percentage -->
+            <div class="flex flex-col gap-1.5">
+             <label class="text-xs font-bold uppercase tracking-wider text-gray-400">
+                Tax (%)
+              </label>
+            <div class="relative">
+             <input
+                type="number"
+                v-model="editFormData.tax"
+                placeholder="e.g. 10"
+                min="0"
+                max="100"
+                step="0.01"
+                class="w-full px-4 py-2.5 pr-10 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
+               />
+             <span class="absolute inset-y-0 right-4 flex items-center text-gray-500 font-medium">
+              %
+             </span>
+            </div>
+           </div>
+          </div>
 
               <!-- ACCOUNT SECURITY Section -->
               <div class="space-y-4 pt-2">
@@ -771,7 +813,7 @@
             <button
                 type="button"
                 @click="closeEditModal"
-                class="px-5 py-2.5 rounded-xl border border-gray-200 text-sm font-bold text-gray-600 hover:bg-gray-50 transition bg-white w-full sm:w-auto"
+                class="px-5 py-2.5 rounded-xl border border-gray-200 cursor-pointer text-sm font-bold text-gray-600 hover:bg-gray-50 transition bg-white w-full sm:w-auto"
             >
               Cancel
             </button>
@@ -780,7 +822,7 @@
             <button
                 type="button"
                 @click="toggleMoreEdit"
-                class="px-5 py-2.5 rounded-xl text-sm font-bold text-white shadow-sm transition flex items-center justify-center gap-2 bg-[#E25C1D] hover:bg-[#D9531E] w-full sm:w-auto"
+                class="px-5 py-2.5 rounded-xl text-sm font-bold text-white shadow-sm transition cursor-pointer flex items-center justify-center gap-2 bg-[#E25C1D] hover:bg-[#D9531E] w-full sm:w-auto"
             >
               <i v-if="showMoreEdit" class="fas fa-chevron-up text-xs"></i>
               <i v-else class="fas fa-chevron-down text-xs"></i>
@@ -791,7 +833,7 @@
             <button
                 type="submit"
                 form="edit-employee-form"
-                class="px-5 py-2.5 rounded-xl text-sm font-bold text-white shadow-sm transition bg-[#E25C1D] hover:bg-[#D9531E] w-full sm:w-auto"
+                class="px-5 py-2.5 rounded-xl text-sm font-bold text-white shadow-sm cursor-pointer transition bg-[#E25C1D] hover:bg-[#D9531E] w-full sm:w-auto"
                 :disabled="isUpdating"
             >
               {{ isUpdating ? 'Saving...' : 'Save changes' }}
@@ -931,13 +973,14 @@ import { useToast } from '@/composables/useToast.js';
 import EmployeeRegistrationModelForm from '@/pages/admin/Employee/employeeRegistrationModel.vue';
 import { useEmployeeDashboard } from '@/composables/useEmployeeDashboard.js';
 import EmployeeBaseModal from '@/components/employeeBaseModel.vue';
-
+import { useEmployeeStore} from '@/stores/employeeStore.js'
 // Password related refs
 const showPassword = ref(false);
 const showConfirmPassword = ref(false);
 const passwordError = ref('');
 const passwordStrength = ref('');
 const passwordStrengthColor = ref('');
+const employeeStore = useEmployeeStore();
 const passwordStrengthClass = ref('');
 const showStrongMessage = ref(false);
 let strongMessageTimeout = null;
@@ -981,8 +1024,8 @@ const createFormData = reactive({
   position: '',
   salary: '',
   department: '',
-  insurance: '',
-  text: ''
+  insurance_amount: '',
+  tax: ''
 });
 
 const editFormData = reactive({
@@ -1009,7 +1052,9 @@ const editFormData = reactive({
   branch_name: '',
   account_number: '',
   password: '',
-  confirmPassword: ''
+  confirmPassword: '',
+  tax: '',
+  insurance_amount:'',
 });
 
 // Password validation functions
@@ -1106,8 +1151,8 @@ const openCreateModal = () => {
     position: '',
     salary: '',
     department: '',
-    insurance: '',
-    text: ''
+    insurance_amount: '',
+    tax: ''
   });
   isCreateModalOpen.value = true;
 };
@@ -1124,24 +1169,31 @@ const handleCreateEmployee = async () => {
 
   isCreating.value = true;
   try {
-    const payload = {
-      name: createFormData.name.trim(),
-      email: createFormData.email.trim(),
-      phone_number: createFormData.phone_number.trim(),
-      position: createFormData.position.trim(),
-      salary: createFormData.salary ? parseFloat(createFormData.salary) : null,
-      department: createFormData.department.trim(),
-      insurance: createFormData.insurance.trim(),
-      text: createFormData.text.trim()
-    };
+    const formDataPayload = new FormData();
+    formDataPayload.append('name', createFormData.name.trim());
+    formDataPayload.append('email', createFormData.email.trim());
+    formDataPayload.append('phone_number', createFormData.phone_number.trim());
+    formDataPayload.append('designation', createFormData.position.trim());
+    formDataPayload.append('department', createFormData.department.trim());
+    if (createFormData.salary) {
+      formDataPayload.append('salary', parseFloat(createFormData.salary));
+    }
+    if (createFormData.insurance_amount) {
+      formDataPayload.append('insurance_amount', parseFloat(createFormData.insurance_amount));
+    }
+    if (createFormData.tax) {
+      formDataPayload.append('tax', parseFloat(createFormData.tax));
+    }
 
-    // Simulate API call - replace with actual API
-    await new Promise((resolve) => setTimeout(resolve, 1200));
-    console.log('➡️ Creating employee:', payload);
+    const result = await employeeStore.addEmployee(formDataPayload);
 
-    showToast('Employee created successfully!', 'success');
-    closeCreateModal();
-    await loadEmployees();
+    if (result.success) {
+      showToast('Employee created successfully!', 'success');
+      closeCreateModal();
+      await loadEmployees();
+    } else {
+      showToast(`Error: ${result.error || 'Failed to create employee'}`, 'error');
+    }
   } catch (error) {
     console.error('Failed to create employee:', error);
     showToast('Failed to create employee. Please try again.', 'error');
@@ -1183,7 +1235,9 @@ const openEditModal = (employee) => {
     branch_name: employee.branch_name || '',
     account_number: employee.account_number || '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    insurance_amount: employee.insurance_amount,
+    tax: employee.tax,
   });
   isEditModalOpen.value = true;
 };
@@ -1263,7 +1317,6 @@ const openViewModal = (employee) => {
 const closeViewModal = () => {
   isViewModalOpen.value = false;
   showMore.value = false;
-  viewEmployee.value = null;
 };
 
 const toggleActive = async (employee, event) => {
@@ -1292,7 +1345,6 @@ watch(showModal, (isOpen) => {
     if (container) container.classList.remove('!overflow-y-hidden');
   }
 });
-
 const copyOnboardingLink = async () => {
   const link = `${window.location.origin}/onboarding/new`;
   try {
@@ -1304,7 +1356,6 @@ const copyOnboardingLink = async () => {
     prompt('Copy this link:', link);
   }
 };
-
 // Lifecycle
 onMounted(() => {
   loadEmployees();

@@ -143,7 +143,7 @@
               </div>
               <button
                   @click="$emit('close')"
-                  class="rounded-lg p-2 hover:bg-gray-100 transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-gray-300 shrink-0"
+                  class="rounded-lg p-2 hover:bg-gray-100 transition-colors cursor-pointer duration-150 focus:outline-none focus:ring-2 focus:ring-gray-300 shrink-0"
                   aria-label="Close"
               >
                 <font-awesome-icon
@@ -176,7 +176,7 @@
                   type="button"
                   @click="$emit('close')"
                   :disabled="props.loading"
-                  class="px-5 py-2.5 text-sm rounded-xl btn-gradient-border border border-0.125rem transition-all duration-200"
+                  class="px-5 py-2.5 text-sm rounded-xl btn-gradient-border cursor-pointer border border-0.125rem transition-all duration-200"
               >
                 {{ props.cancelText }}
               </button>
@@ -185,7 +185,7 @@
               <button
                   v-if="props.mode === 'view'"
                   @click="$emit('close')"
-                  class="px-5 py-2.5 text-sm rounded-xl btn-gradient-border transition-all duration-200"
+                  class="px-5 py-2.5 text-sm rounded-xl btn-gradient-border cursor-pointer transition-all duration-200"
               >
                 Close Details
               </button>
@@ -196,7 +196,7 @@
                   type="submit"
                   @click="$emit('save')"
                   :disabled="props.loading || props.disabled"
-                  class="px-5 py-2.5 text-sm font-medium rounded-xl text-white shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                  class="px-5 py-2.5 text-sm font-medium rounded-xl text-white cursor-pointer shadow-sm hover:shadow-md focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                   :class="{
                   'bg-gradient-to-r from-red-500 to-rose-500 hover:from-red-600 hover:to-rose-600 focus:ring-red-400': props.title.includes('Error'),
                   'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 focus:ring-emerald-400': props.mode === 'toggle',

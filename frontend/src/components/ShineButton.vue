@@ -63,6 +63,7 @@ const props = defineProps({
 defineEmits(['click'])
 
 const sizeClass = computed(() => ({
+  xs: 'px-3.5 py-2 text-[12px]',
   sm: 'px-5 py-3 text-[13px]',
   md: 'px-6 py-3.5 text-[14px]',
   lg: 'px-7 py-3.5 text-[15px]',

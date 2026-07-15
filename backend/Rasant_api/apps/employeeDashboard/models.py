@@ -41,6 +41,8 @@ class Employee(models.Model):
     designation = models.CharField(max_length=100, default='Unassigned')
     is_active = models.BooleanField(default=True)
     salary = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    tax = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    insurance_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     is_increment_pending = models.BooleanField(default=False)
     increment_applied_on = models.DateField(null=True, blank=True)
     current_salary = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
@@ -59,6 +61,7 @@ class Employee(models.Model):
 
     emergency_phone = models.CharField(max_length=15, null=True, blank=True)
     emergency_address = models.TextField(null=True, blank=True)
+    next_insurance_cycle_date = models.DateField(null=True, blank=True)
 
     # ---------- Education ----------
     # 3. MATRIC CERTIFICATE (3 Columns)
@@ -328,3 +331,26 @@ class EmployeePolicyAssignment(models.Model):
 
     def __str__(self):
         return f"{self.employee} → {self.policy.policy_name}"
+
+
+class SalaryDeductionHistory(models.Model):
+    employee = models.ForeignKey(
+        Employee, on_delete=models.CASCADE, related_name="deduction_history"
+    )
+    deduction_month = models.DateField()
+
+    gross_salary = models.DecimalField(max_digits=10, decimal_places=2)
+    tax_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    salary_after_tax = models.DecimalField(max_digits=10, decimal_places=2)
+
+    insurance_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    net_salary = models.DecimalField(max_digits=10, decimal_places=2)
+
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = "salary_deduction_history"
+        ordering = ["-deduction_month"]
+
+    def __str__(self):
+        return f"{self.employee.name} — {self.deduction_month.strftime('%b %Y')}"

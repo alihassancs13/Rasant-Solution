@@ -578,22 +578,6 @@ export function useJiraConnect() {
         }
     }
 
-    async function saveDefaultProject(type: 'chatbot' | 'agent') {
-        const id = type === 'chatbot' ? chatbotProject.value : agentProject.value
-        if (type === 'chatbot') isSavingChatbot.value = true
-        else isSavingAgent.value = true
-        try {
-           const res =  await jiraStore.saveDefaultProject(type, id)
-            showToast('Success', [res?.message || 'Default project saved successfully'], 'success')
-        } catch(err: any) {
-            const msg = err?.response?.data?.message
-            showToast('Error', [msg], 'error')
-        } finally {
-            if (type === 'chatbot') isSavingChatbot.value = false
-            else isSavingAgent.value = false
-        }
-    }
-
     watch(() => jiraStore.jiraExpired, (val) => {
         if (val) {
             showExpiredBanner.value = true
@@ -650,8 +634,6 @@ export function useJiraConnect() {
                 console.log("Projects:", jiraStore.getProjects)
                 await jiraStore.getPriority()
                 await jiraStore.getTeams()
-                chatbotProject.value = jiraStore.chatbotProjectId || ''
-                agentProject.value   = jiraStore.agentProjectId   || ''
             } finally {
                 isProjectsLoading.value = false
             }
@@ -731,7 +713,6 @@ export function useJiraConnect() {
         agentProject,
         isSavingChatbot,
         isSavingAgent,
-        saveDefaultProject,
         deleteSubtasks,
         isImageFile,
         IMAGE_EXTENSIONS,
