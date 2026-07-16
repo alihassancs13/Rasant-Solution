@@ -73,32 +73,37 @@ export const useDocumentStore = defineStore('documents', {
 
                 if (response.folders && Array.isArray(response.folders)) {
                     folders = response.folders;
-                } else if (response.data && response.data.folders && Array.isArray(response.data.folders)) {
-                    folders = response.data.folders;
                 }
 
                 if (response.files && Array.isArray(response.files)) {
                     files = response.files;
-                } else if (response.data && response.data.files && Array.isArray(response.data.files)) {
-                    files = response.data.files;
                 }
 
                 const foldersData = folders.map(f => ({
                     ...f,
                     isFolder: true,
                     type: 'folder',
-                    children_count: f.children_count || 0
+                    children_count: f.children_count || 0,
+                    parent_id: f.parent || f.parent_id || null  // CRITICAL: Set parent_id
                 }));
 
                 const filesData = files.map(f => ({
                     ...f,
                     isFolder: false,
-                    type: 'file'
+                    type: 'file',
+                    folder_id: f.folder_id || null
                 }));
 
                 this.allItems = [...foldersData, ...filesData];
                 this.viewItems = [...foldersData, ...filesData];
                 this.currentFolderId = null;
+
+                console.log('All items loaded - Folders:', foldersData.map(f => ({
+                    id: f.id,
+                    name: f.name,
+                    parent_id: f.parent_id
+                })));
+
             } catch (error) {
                 this.error = error.message;
                 console.error('Load all items error:', error);
@@ -181,21 +186,59 @@ export const useDocumentStore = defineStore('documents', {
                     API_ENDPOINTS.DOCUMENTS.FOLDERS.CONTENTS(folderId)
                 );
                 console.log('Folder contents response:', response);
-
+                const currentFolder = response.folder || response.current_folder || null;
+                if (currentFolder) {
+                    const exists = this.allItems.some(item => item.id === currentFolder.id && item.isFolder);
+                    if (!exists) {
+                        this.allItems.push({
+                            ...currentFolder,
+                            isFolder: true,
+                            type: 'folder',
+                            parent_id: currentFolder.parent || null
+                        });
+                        console.log('Added current folder to allItems:', currentFolder.name, 'ID:', currentFolder.id, 'Parent:', currentFolder.parent);
+                    } else {
+                        const existing = this.allItems.find(item => item.id === currentFolder.id && item.isFolder);
+                        if (existing) {
+                            existing.parent_id = currentFolder.parent || null;
+                        }
+                    }
+                }
                 const folders = (response.subfolders || []).map(f => ({
                     ...f,
                     isFolder: true,
                     type: 'folder',
-                    children_count: f.children_count || 0
+                    children_count: f.children_count || 0,
+                    parent_id: f.parent || f.parent_id || folderId  // Set parent_id to current folder
                 }));
+                folders.forEach(folder => {
+                    const exists = this.allItems.some(item => item.id === folder.id && item.isFolder);
+                    if (!exists) {
+                        this.allItems.push(folder);
+                        console.log('Added subfolder to allItems:', folder.name, 'ID:', folder.id, 'Parent:', folder.parent_id);
+                    } else {
+                        const existing = this.allItems.find(item => item.id === folder.id && item.isFolder);
+                        if (existing) {
+                            existing.parent_id = folder.parent_id;
+                            console.log('Updated subfolder in allItems:', folder.name, 'ID:', folder.id, 'Parent:', folder.parent_id);
+                        }
+                    }
+                });
                 const files = (response.files || []).map(f => ({
                     ...f,
                     isFolder: false,
-                    type: 'file'
+                    type: 'file',
+                    folder_id: f.folder_id || folderId
                 }));
 
                 this.viewItems = [...folders, ...files];
                 this.currentFolderId = folderId;
+                console.log('=== ALL FOLDERS IN ALLITEMS ===');
+                this.allItems.filter(item => item.isFolder).forEach(f => {
+                    console.log(`ID: ${f.id}, Name: ${f.name}, Parent: ${f.parent_id}`);
+                });
+                console.log('===============================');
+
             } catch (error) {
                 this.error = error.message;
                 console.error('Load folder contents error:', error);
@@ -461,7 +504,7 @@ export const useDocumentStore = defineStore('documents', {
                 this.error = 'Please login to access documents';
                 return;
             }
-            this.loadAllItems();
+            this.loadAllFolders();
         },
     },
 });

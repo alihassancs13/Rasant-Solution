@@ -797,7 +797,7 @@ watch(() => selectedApplicant.value?.id, (id) => {
                         <font-awesome-icon :icon="['fas', 'download']" class="w-3 h-3" />
                         Download
                       </button>
-                      <button @click="closeCvPreview" class="text-xs font-semibold text-text-muted hover:text-text-secondary cursor-pointer">Close</button>
+
                     </div>
                   </div>
 

@@ -139,13 +139,13 @@ const routes = [
     path: '/admin/employees/dashboard',
     name: 'EmployeeDashboard',
     component: EmployeeDashboard,
-    meta: { requiresAuth: true, role: 'admin' }
+    meta: { title: "Dashboard - Rasant Solutions",requiresAuth: true, role: 'admin' }
   },
   {
     path: '/admin/documents',
     name: 'Documents',
     component: Documents,
-    meta: { requiresAuth: true, role: 'admin' }
+    meta: {title: "Documents - Rasant Solutions", requiresAuth: true, role: 'admin' }
   },
   {
     path: '/onboarding/:token?',
@@ -166,17 +166,21 @@ const router = createRouter({
   routes,
 });
 
-router.beforeEach((to) => {
+router.beforeEach((to, from, next) => {
   const loginStore = useLoginStore();
-
+  loginStore.initialize();
+  // Check if route requires authentication
   if (to.meta.requiresAuth && !loginStore.isAuthenticated) {
-    return '/login';
+    next({
+      path: '/login',
+      query: { redirect: to.fullPath }
+    });
+    return;
   }
-
-  if (loginStore.isAuthenticated && (to.path === '/login' || to.path === '/register')) {
-    return loginStore.redirectBasedOnRole();
+  if (loginStore.isAuthenticated && to.path === '/login') {
+    next(loginStore.redirectBasedOnRole());
+    return;
   }
-
-  return true;
+  next();
 });
 export default router;

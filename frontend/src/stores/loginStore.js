@@ -190,11 +190,14 @@ export const useLoginStore = defineStore('login', {
         },
 
         initialize() {
-            const token = localStorage.getItem('accessToken');   //  changed
+            const token = localStorage.getItem('accessToken');
             this.accessToken = token || null;
             this.refreshToken = localStorage.getItem('refreshToken') || null;
             this.user = JSON.parse(localStorage.getItem('user')) || null;
             this.isAuthenticated = !!token;
+            if (this.isAuthenticated && this.isTokenExpired()) {
+                this.clearTokens();
+            }
             return this.isAuthenticated;
         }
     },

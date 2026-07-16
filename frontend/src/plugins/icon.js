@@ -89,6 +89,7 @@ import {
   faMicrophone,
   faComments,
   faCheckDouble,
+  faCopy
 } from '@fortawesome/free-solid-svg-icons'
 
 import {
@@ -230,4 +231,5 @@ library.add(
     faMicrophone,
     faComments,
     faCheckDouble,
+    faCopy
 )

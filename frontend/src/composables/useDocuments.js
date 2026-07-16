@@ -1,9 +1,8 @@
 // composables/useDocuments.js
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, onMounted, watch,onBeforeUnmount } from 'vue'
 import { useDocumentStore } from '@/stores/documentStore.js'
 import { useToast } from '@/composables/useToast.js'
 import { BASE_URL } from '@/services/baseUrl.js'
-
 export default function useDocuments() {
     const store = useDocumentStore()
     const toast = useToast()
@@ -12,7 +11,21 @@ export default function useDocuments() {
     const showToast = (message, type = 'success', duration = 3500) => {
         toast.showToast(message, type, duration)
     }
+// Click outside handler for new menu
+    const handleClickOutside = (event) => {
+        const newMenuContainer = event.target.closest('.new-menu-container');
+        if (!newMenuContainer && showNewMenu.value) {
+            showNewMenu.value = false;
+        }
+    };
 
+    onMounted(() => {
+        document.addEventListener('click', handleClickOutside);
+    });
+
+    onBeforeUnmount(() => {
+        document.removeEventListener('click', handleClickOutside);
+    });
     // Local UI state
     const searchQuery = ref('')
     const currentFilter = ref('all')
@@ -80,29 +93,27 @@ export default function useDocuments() {
     })
 
     const breadcrumb = computed(() => {
-        if (currentFilter.value !== 'all' && currentFilter.value !== 'folder' && currentFilter.value !== 'file') {
-            const crumbs = []
-            let currentId = store.currentFolderId
-            const allItems = store.allItems || []
-
-            if (currentId) {
-                const findFolder = (id) => {
-                    const folder = allItems.find(item => item.id === id && item.isFolder)
-                    if (folder) {
-                        crumbs.unshift(folder)
-                        const parent = allItems.find(item => item.id === folder.parent_id)
-                        if (parent) {
-                            findFolder(parent.id)
-                        }
-                    }
+        const crumbs = []
+        let currentId = store.currentFolderId
+        if (!currentId) return crumbs
+        const allItems = store.allItems || []
+        const buildPath = (folderId) => {
+            console.log('Building path for folder ID:', folderId)
+            const folder = allItems.find(item => item.id === folderId && item.isFolder)
+            if (folder) {
+                console.log('Found folder:', folder.name, 'Parent:', folder.parent_id)
+                crumbs.unshift(folder)
+                if (folder.parent_id) {
+                    buildPath(folder.parent_id)
                 }
-                findFolder(currentId)
+            } else {
+                console.warn('Folder not found in allItems:', folderId)
             }
-            return crumbs
         }
-        return []
+        buildPath(currentId)
+        console.log('Breadcrumb built:', crumbs.map(f => f.name))
+        return crumbs
     })
-
     const currentFolderName = computed(() => {
         if (!store.currentFolderId) return 'Root'
         const folder = store.allItems.find(item => item.id === store.currentFolderId && item.isFolder)
@@ -324,6 +335,11 @@ export default function useDocuments() {
     // ===== Helper Methods =====
     const editItem = (item) => {
         openEditModal(item)
+    }
+    const getCurrentFile = () => {
+        if (!selectedFileId.value) return null;
+        const file = filteredItems.value.find(item => item.id === selectedFileId.value);
+        return file || null;
     }
 
     const deleteItem = (item) => {
@@ -555,8 +571,21 @@ export default function useDocuments() {
         previewError.value = null;
         previewLoading.value = false;
     };
-
-
+    const goBack = () => {
+        console.log('Breadcrumb before back:', breadcrumb.value.map(f => f.name))
+        console.log('Breadcrumb length:', breadcrumb.value.length)
+        if (breadcrumb.value.length >= 2) {
+            const parentFolder = breadcrumb.value[breadcrumb.value.length - 2]
+            console.log('Going back to:', parentFolder.name, 'ID:', parentFolder.id)
+            navigateTo(parentFolder.id)
+        } else if (breadcrumb.value.length === 1) {
+            console.log('Going back to root')
+            navigateToRoot()
+        } else {
+            console.log('No breadcrumb, going to root')
+            navigateToRoot()
+        }
+    }
     // Init
     onMounted(() => {
         store.init()
@@ -581,7 +610,6 @@ export default function useDocuments() {
         folderCount: store.folderCount,
         fileCount: store.fileCount,
         currentFolderId: store.currentFolderId,
-
         // UI state
         searchQuery,
         currentFilter,
@@ -591,7 +619,6 @@ export default function useDocuments() {
         isDragging,
         fileInput,
         zipInput,
-
         // Modal states
         showFolderModal,
         folderName,
@@ -601,7 +628,6 @@ export default function useDocuments() {
         isEditing,
         showDeleteModal,
         isDeleting,
-
         // Computed
         filteredItems,
         breadcrumb,
@@ -611,7 +637,6 @@ export default function useDocuments() {
         storagePercentage: store.storagePercentage,
         filters,
         deleteSubtitle,
-
         // Methods
         toggleNewMenu,
         openFolderModal,
@@ -646,5 +671,8 @@ export default function useDocuments() {
         handleListClick,
         closePreview,
         loadPreview,
+        goBack,
+        getCurrentFile,
+        handleClickOutside
     }
 }
