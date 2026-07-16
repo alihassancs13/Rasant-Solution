@@ -154,10 +154,10 @@ const routes = [
     meta: { requiresAuth: false } // or true depending on your needs
   },
   {
-  path: '/admin/jira',
-  name: 'Jira',
-  component: () => import('@/pages/admin/jira/jira.vue'),
-  meta: { requiresAuth: true, role: 'employee' }
+    path: '/admin/jira',
+    name: 'Jira',
+    component: () => import('@/pages/admin/jira/jira.vue'),
+    meta: { requiresAuth: true, role: 'employee' }
   },
 ];
 

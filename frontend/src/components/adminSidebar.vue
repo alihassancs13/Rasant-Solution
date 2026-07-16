@@ -342,7 +342,7 @@ aside {
   backface-visibility: hidden;
 }
 
-
+/* Smooth transitions */
 .router-link-active {
   transition: none;
 }

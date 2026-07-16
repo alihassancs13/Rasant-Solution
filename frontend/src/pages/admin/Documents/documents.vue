@@ -119,11 +119,11 @@
                       {{ folder.name }}
                     </button>
                   </span>
-                            </nav>
-                            <span class="text-[10px] sm:text-xs text-gray-400">{{ filteredItems.length }} items</span>
-                          </div>
+              </nav>
+              <span class="text-[10px] sm:text-xs text-gray-400">{{ filteredItems.length }} items</span>
+            </div>
 
-                <!-- Dropzone -->
+            <!-- Dropzone -->
             <div class="relative border-2 border-dashed rounded-xl transition-all flex-1 min-h-[480px]"
                  :class="isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'"
                  @dragover.prevent="isDragging = true" @dragleave.prevent="isDragging = false" @drop.prevent="handleDrop">
@@ -155,7 +155,7 @@
               <div v-else class="flex flex-col sm:flex-row gap-3 h-[calc(112vh-330px)] overflow-hidden">
                 <!-- Left Side: File List - Fixed width -->
                 <div class="w-full sm:w-2/5 lg:w-1/5 overflow-y-auto" style="height: 100%;">
-                <table class="w-full text-xs sm:text-sm">
+                  <table class="w-full text-xs sm:text-sm">
                     <thead class="bg-gray-50 text-gray-600 sticky top-0 z-10">
                     <tr>
                       <th class="px-2 sm:px-4 py-2 sm:py-3 text-left">Name</th>
@@ -170,14 +170,14 @@
                       <td class="px-2 sm:px-4 py-2 sm:py-3 flex items-center gap-1 sm:gap-2">
                         <i :class="item.isFolder ? 'fas fa-folder text-yellow-500' : getFileIcon(item.extension)" class="text-base sm:text-lg"></i>
                         <span class="font-medium text-gray-800 text-xs sm:text-sm truncate max-w-[80px] sm:max-w-[150px]">{{ item.name }}</span>
-                                <span v-if="!item.isFolder && selectedFileId === item.id && showPreview" class="text-[10px] text-blue-500 ml-1">
+                        <span v-if="!item.isFolder && selectedFileId === item.id && showPreview" class="text-[10px] text-blue-500 ml-1">
                       <i class="fas fa-eye"></i>
                     </span>
-                              </td>
-                            </tr>
-                            </tbody>
-                          </table>
-                        </div>
+                      </td>
+                    </tr>
+                    </tbody>
+                  </table>
+                </div>
 
                 <!-- Right Side: Preview Panel - Takes remaining width -->
                 <div class="w-full sm:w-3/5 lg:w-1/1" style="height: 100%; overflow: hidden;">
@@ -277,12 +277,12 @@
                     <p class="text-sm">Select a file to preview</p>
                     <p class="text-xs mt-1">Click on any file in the list</p>
                   </div>
-                  </div>
                 </div>
+              </div>
 
-                <!-- Empty State -->
-                <div v-if="filteredItems.length === 0" class="py-12 sm:py-16 text-center">
-                  <div class="text-4xl sm:text-5xl text-gray-300 mb-3 sm:mb-4">
+              <!-- Empty State -->
+              <div v-if="filteredItems.length === 0" class="py-12 sm:py-16 text-center">
+                <div class="text-4xl sm:text-5xl text-gray-300 mb-3 sm:mb-4">
                   <i class="fas fa-cloud-arrow-up"></i>
                 </div>
                 <h4 class="text-base sm:text-lg font-medium text-gray-700">
@@ -294,16 +294,16 @@
                     : 'No documents found in this view.'
                   }}
                 </p>
-                </div>
+              </div>
 
-                <div v-if="isDragging" class="absolute inset-0 bg-blue-50/90 rounded-xl flex flex-col items-center justify-center z-10">
+              <div v-if="isDragging" class="absolute inset-0 bg-blue-50/90 rounded-xl flex flex-col items-center justify-center z-10">
                 <i class="fas fa-cloud-arrow-up text-4xl sm:text-5xl text-blue-500 mb-2 sm:mb-3"></i>
                 <p class="text-base sm:text-lg font-medium text-gray-700">Drop to upload</p>
                 <span class="text-xs sm:text-sm text-gray-500">Files will be added to the current folder</span>
-                </div>
-                </div>
+              </div>
+            </div>
 
-              <div class="text-[10px] sm:text-xs text-gray-400 mt-3 flex flex-wrap items-center gap-1">
+            <div class="text-[10px] sm:text-xs text-gray-400 mt-3 flex flex-wrap items-center gap-1">
               <i class="fas fa-hand-pointer"></i>
               <span>Hover a card for quick actions · double-click folders to open .</span>
             </div>
