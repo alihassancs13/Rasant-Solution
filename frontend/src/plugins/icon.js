@@ -83,7 +83,12 @@ import {
   faAnglesRight,
   faPen,
   faCheck,
-  faFolder
+  faFolder,
+  faEllipsis,
+  faImage,
+  faMicrophone,
+  faComments,
+  faCheckDouble,
 } from '@fortawesome/free-solid-svg-icons'
 
 import {
@@ -219,5 +224,10 @@ library.add(
     faPen,
     faCheck,
     faMoneyBill,
-    faFolder
+    faFolder,
+    faEllipsis,
+    faImage,
+    faMicrophone,
+    faComments,
+    faCheckDouble,
 )

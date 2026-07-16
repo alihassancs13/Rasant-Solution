@@ -121,6 +121,12 @@ const routes = [
     meta: { title: "Salaries - Rasant Solutions", requiresAuth: true }
   },
   {
+    path: '/admin/inbox',
+    name: 'Inbox',
+    component: () => import('../pages/admin/Inbox/inbox.vue'),
+    meta: { title: "Salaries - Rasant Solutions", requiresAuth: true }
+  },
+  {
     path: '/services/:slug',
     name: 'ServiceDetail',
     component: () => import('../pages/Home/ServiceDetail.vue'),

@@ -24,6 +24,7 @@ urlpatterns = [
     path('api/accounts/', include('accounts.urls')),
     path('api/employeeDashboard/', include('employeeDashboard.urls')),
     path('api/documents/', include('apps.documents.urls')),
+    path('api/inbox/', include('apps.inbox.urls')),
     path('api/', include('jira.urls')),
 
 ]

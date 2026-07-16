@@ -9,9 +9,11 @@
       <!-- Header -->
       <div class="p-3 pl-1 sm:p-4 md:pl-4">
         <TopHeader
-          userName="System Admin"
-          role="admin"
-          :notificationCount="3"
+            userName="System Admin"
+            role="admin"
+            :notificationCount="3"
+            titleOverride="Jira"
+            subtitleOverride="Manage your Jira issues and sync tickets directly from Rasant Solutions"
         />
       </div>
 

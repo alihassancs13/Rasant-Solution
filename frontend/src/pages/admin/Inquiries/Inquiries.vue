@@ -5,7 +5,13 @@
 
     <div class="flex-1 flex flex-col overflow-hidden">
       <div class="p-3 pl-1 sm:p-4 md:pl-4">
-        <TopHeader userName="System Admin" role="admin" :notificationCount="3" />
+        <AppHeader
+            userName="System Admin"
+            role="admin"
+            :notificationCount="3"
+            titleOverride="Inbox"
+            subtitleOverride="Manage your messages and notifications"
+        />
       </div>
 
       <main class="flex-1 overflow-y-auto overflow-x-hidden px-3 sm:px-4 pb-4 space-y-4">
@@ -227,7 +233,7 @@
 <script setup>
 import { onMounted } from 'vue'
 import AdminSidebar from '@/components/adminSidebar.vue'
-import TopHeader from '@/components/header.vue'
+import AppHeader from '@/components/header.vue'
 import ToastContainer from '@/components/ToastContainer.vue'
 import StatCard from '@/components/statCard.vue'
 import { useInquiries, STATUS_OPTIONS } from '@/composables/useInquiries.js'

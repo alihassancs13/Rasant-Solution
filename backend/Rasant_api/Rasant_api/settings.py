@@ -51,7 +51,8 @@ INSTALLED_APPS = [
     'accounts',
     'employeeDashboard',
     'jira',
-    'documents'
+    'documents',
+    'apps.inbox',
 ]
 
 MIDDLEWARE = [
@@ -111,7 +112,7 @@ DATABASES = {
         'NAME': 'rasant_solutions',
         'USER': 'rasant_user',
         'PASSWORD': 'Rasant123',
-        'HOST': '192.168.18.113',
+        'HOST': '192.168.18.21',
         'PORT': '3306',
         'OPTIONS': {
             'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
