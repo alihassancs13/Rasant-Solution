@@ -1,4 +1,3 @@
-// services/baseUrl.js
 export const BASE_URL = 'http://localhost:8000/';
 
 export const API_ENDPOINTS = {
@@ -6,11 +5,12 @@ export const API_ENDPOINTS = {
     REFRESH_TOKEN: '/api/accounts/token/refresh/',
     LOGOUT: '/api/accounts/logout/',
     USER_MODULES: '/api/accounts/get_user_modules/',
+    USERS_CHAT_LIST: '/api/employeeDashboard/users/chat-list/',
     CONTACT: '/api/accounts/contact/',
     PARSE_CV: '/api/employee_dashboard/parse_cv/',
     CV_SUBMIT: '/api/employeeDashboard/submit-cv/',
     JOB_OPENINGS: '/api/employeeDashboard/job-openings/',
-    GET_EMPLOYEES: 'api/employeeDashboard/get_employees/',
+    GET_EMPLOYEES: '/api/employeeDashboard/get_employees/',
     CV_LIST: '/api/employeeDashboard/submit-cv/',
     JOB_CREATE: '/api/employeeDashboard/job-openings/create/',
     JOB_ADMIN_LIST: '/api/employeeDashboard/job-openings/',
@@ -41,5 +41,18 @@ export const API_ENDPOINTS = {
             ALL: '/api/documents/files/all/',
         },
         ALL: '/api/documents/all/',
-    }
+    },
+
+    INBOX_LIST_CONVERSATIONS: '/api/inbox/conversations/',
+    INBOX_CREATE_DIRECT: '/api/inbox/conversations/direct/',
+    INBOX_LIST_USERS: '/api/inbox/users/',
+    INBOX_CREATE_GROUP: '/api/inbox/conversations/group/',
+    INBOX_SEND_MESSAGE: '/api/inbox/messages/send/',
+    INBOX_GET_MESSAGES: (conversationId) => `/api/inbox/messages/${conversationId}/`,
+    INBOX_MARK_READ: (conversationId) => `/api/inbox/messages/${conversationId}/mark-read/`,
+    INBOX_SSE_STREAM: '/api/inbox/sse/stream/',
+    INBOX_DELETE_FOR_ME: (messageId) => `/api/inbox/messages/${messageId}/delete-for-me/`,
+    INBOX_DELETE_FOR_EVERYONE: (messageId) => `/api/inbox/messages/${messageId}/delete-for-everyone/`,
+    INBOX_CLEAR_CHAT: (conversationId) => `/api/inbox/conversations/${conversationId}/clear/`,
+
 };

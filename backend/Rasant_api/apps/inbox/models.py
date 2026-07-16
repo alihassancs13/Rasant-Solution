@@ -1,8 +1,6 @@
-# models.py
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
-
 
 class Conversation(models.Model):
 
@@ -180,7 +178,7 @@ class MessageDeleteFor(models.Model):
     deleted_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = 'message_delete_for'  
+        db_table = 'message_delete_for'
         unique_together = ('message', 'user')
         indexes = [
             models.Index(fields=['message', 'user']),

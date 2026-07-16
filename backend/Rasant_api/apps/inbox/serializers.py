@@ -1,4 +1,3 @@
-# serializers.py
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
@@ -191,7 +190,7 @@ class ConversationCreateSerializer(serializers.ModelSerializer):
             )
         if conv_type == 'group' and not attrs.get('name'):
             raise serializers.ValidationError('Group conversations require a name.')
-        if conv_type == 'group' and len(member_ids) < 2:
+        if conv_type == 'group' and len(member_ids) < 1:
             raise serializers.ValidationError('At least 2 members are required for a group.')
         return attrs
 

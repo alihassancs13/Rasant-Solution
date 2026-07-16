@@ -1,19 +1,23 @@
-// composables/Admin/useAdminSidebar.js
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useSidebarStore } from '@/stores/sidebarStore.js';
+import { useInboxStore } from '@/stores/inboxStore.js';
 
 const COMPANY_MODULES = ['Overview', 'Inbox', 'Employees', 'Inquiries', 'Jira','Documents'];
 const PROJECT_MODULES = ['Sentra AI', 'AI Agent', 'Chatbot', 'Orchestri'];
 const EMPLOYEE_CHILDREN = ['Dashboard', 'Attendance', 'Careers', 'Salaries'];
-const dropdownStates = ref({});
-const isSidebarOpen = ref(false);
-const collapsed = ref(localStorage.getItem('sidebarCollapsed') === 'true');
-const isDrillDown = ref(localStorage.getItem('sidebarDrillDown') === 'true');
+
 export function useAdminSidebar() {
     const route = useRoute();
     const router = useRouter();
     const store = useSidebarStore();
+    const inboxStore = useInboxStore();
+
+    const dropdownStates = ref({});
+    const isSidebarOpen = ref(false);
+    const collapsed = ref(localStorage.getItem('sidebarCollapsed') === 'true');
+
+    const isDrillDown = ref(localStorage.getItem('sidebarDrillDown') === 'true');
 
     const modules = computed(() => {
         return Array.isArray(store.modules) ? store.modules : [];
@@ -21,6 +25,7 @@ export function useAdminSidebar() {
 
     const loading = computed(() => store.isLoading);
     const error = computed(() => store.error);
+    const unreadConversationsCount = computed(() => inboxStore.unreadConversationsCount);
 
     const employeeChildrenModules = computed(() => {
         const moduleList = modules.value;
@@ -103,7 +108,6 @@ export function useAdminSidebar() {
         }
     };
 
-    // ── Sidebar toggle functions ──
     const toggleSidebar = () => {
         isSidebarOpen.value = !isSidebarOpen.value;
     };
@@ -155,17 +159,24 @@ export function useAdminSidebar() {
         } catch {
             return 'Administrator';
         }
+
+
     };
 
     onMounted(async () => {
         try {
-            // Check if store has modules (using computed property or direct check)
             if (!store.modules || store.modules.length === 0) {
                 await store.fetchModules();
             }
             checkDrillDownOnRoute();
         } catch (err) {
             console.error('Failed to load sidebar modules:', err);
+        }
+
+        try {
+            await inboxStore.fetchConversations();
+        } catch (err) {
+            console.error('Failed to load conversations for sidebar badge:', err);
         }
     });
 
@@ -193,6 +204,6 @@ export function useAdminSidebar() {
         goBackFromDrillDown,
         getUserRole,
         refreshModules: store.fetchModules,
-
+        unreadConversationsCount,
     };
 }

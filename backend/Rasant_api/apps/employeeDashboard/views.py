@@ -1,7 +1,10 @@
+
 import datetime
 from rest_framework.decorators import permission_classes
+from accounts.models import Role
 from django.http import HttpResponse
 from dateutil.relativedelta import relativedelta
+from django.contrib.auth import get_user_model
 from django.shortcuts import get_object_or_404
 from django.db import IntegrityError
 from rest_framework.decorators import api_view, parser_classes
@@ -19,8 +22,10 @@ from django.db import transaction
 from .serializers import calculate_next_effective_date
 import random
 import string
+from apps.inbox.models import Conversation
 from django.contrib.auth.hashers import make_password
 
+User = get_user_model()
 
 from .models import (
     Employee, CVSubmission, JobOpening, JobType, JobStatus,
@@ -49,26 +54,45 @@ def generate_employee_number():
         new_seq = 1
     return f"{prefix}{new_seq:02d}"
 
-
-# ---------- Views ----------
 @api_view(['POST'])
 @parser_classes([MultiPartParser, FormParser, JSONParser])
 def add_employee(request):
-    """
-    Add a new employee. Reads files from request.FILES,
-    converts them to bytes, and saves them directly to MySQL.
-    """
-    # -------------------- FILE SIZE LIMIT --------------------
     MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
     serializer = EmployeeSerializer(data=request.data)
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     employee = Employee(**serializer.validated_data)
     employee.current_salary = employee.salary
-    # Generate random password (8 characters)
+
     characters = string.ascii_letters + string.digits + "!@#$%^&*"
     raw_password = ''.join(random.choice(characters) for _ in range(8))
     employee.password = make_password(raw_password)
+
+    employee_role, _ = Role.objects.get_or_create(name='employee')
+
+    name_parts = (employee.name or '').strip().split(' ', 1)
+    first_name = name_parts[0] if name_parts else ''
+    last_name = name_parts[1] if len(name_parts) > 1 else ''
+
+    try:
+        user_account = User.objects.create(
+            username=employee.email,
+            email=employee.email,
+            first_name=first_name,
+            last_name=last_name,
+            is_staff=False,
+            is_active=True,
+            role=employee_role,
+        )
+        user_account.password = make_password(raw_password)  # same raw_password jo Employee ko diya
+        user_account.save()
+    except IntegrityError:
+        return Response(
+            {"error": "A user account with this email already exists."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    employee.user = user_account
 
     file_fields = [
         ('cnic_scan', False),
@@ -76,7 +100,7 @@ def add_employee(request):
         ('matric_certificate', False),
         ('fsc_certificate', False),
         ('university_degree', False),
-        ('other_course', False)  # Optional field
+        ('other_course', False)
     ]
     for field_name, is_mandatory in file_fields:
         uploaded_file = request.FILES.get(field_name)
@@ -128,7 +152,6 @@ def add_employee(request):
         status=status.HTTP_500_INTERNAL_SERVER_ERROR
     )
 
-
 @api_view(['GET'])
 def list_employees(request):
     employees = Employee.objects.all().order_by('-created_at').prefetch_related('deduction_history')
@@ -140,10 +163,6 @@ def list_employees(request):
 
 @api_view(['PATCH'])
 def update_employee(request, pk):
-    """
-    Update only text fields of an employee by ID.
-    File fields are ignored and cannot be updated here.
-    """
     try:
         employee = Employee.objects.get(pk=pk)
     except Employee.DoesNotExist:
@@ -193,9 +212,7 @@ def update_employee(request, pk):
 @parser_classes([MultiPartParser, FormParser, JSONParser])
 @permission_classes([AllowAny])
 def cv_submission_view(request, pk=None):
-    # -------------------------------------------------------------
-    # GET: List CV Submissions (optionally filtered by job)
-    # -------------------------------------------------------------
+
     if request.method == "GET":
         cvs = CVSubmission.objects.select_related('job', 'application_status').all()
         job_param = request.query_params.get('job')
@@ -210,10 +227,6 @@ def cv_submission_view(request, pk=None):
             {"status": "success", "data": serializer.data},
             status=status.HTTP_200_OK,
         )
-
-    # -------------------------------------------------------------
-    # POST: Submit a new CV
-    # -------------------------------------------------------------
     elif request.method == "POST":
         serializer = CVSubmissionSerializer(data=request.data)
         if serializer.is_valid():
@@ -239,10 +252,6 @@ def cv_submission_view(request, pk=None):
                 status=status.HTTP_201_CREATED,
             )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    # -------------------------------------------------------------
-    # DELETE: Remove a specific CV submission
-    # -------------------------------------------------------------
     elif request.method == "DELETE":
         try:
             cv = CVSubmission.objects.get(pk=pk)
@@ -257,10 +266,6 @@ def cv_submission_view(request, pk=None):
             {"status": "success", "message": "CV submission deleted successfully."},
             status=status.HTTP_200_OK,
         )
-
-    # -------------------------------------------------------------
-    # PUT: Update status / re-link job (partial update)
-    # -------------------------------------------------------------
     elif request.method == "PUT":
         try:
             cv = CVSubmission.objects.get(pk=pk)
@@ -281,11 +286,6 @@ def cv_submission_view(request, pk=None):
             {"status": "error", "message": "Failed to update.", "errors": serializer.errors},
             status=status.HTTP_400_BAD_REQUEST,
         )
-
-
-# ==========================================
-# 2. Send Candidate Email View
-# ==========================================
 
 @api_view(['POST', 'GET'])
 @permission_classes([IsAuthenticated])
@@ -324,11 +324,6 @@ def send_candidate_email_view(request):
         serializer = CVSubmissionSerializer(cv, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-
-# ==========================================
-# 3. CV Download View
-# ==========================================
-
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def cv_download_view(request, pk):
@@ -337,11 +332,6 @@ def cv_download_view(request, pk):
     response = HttpResponse(bytes(cv.cv_file), content_type=cv.cv_file_type)
     response['Content-Disposition'] = f'attachment; filename="{cv.cv_file_name}"'
     return response
-
-
-# ==========================================
-# 4. Job Create View
-# ==========================================
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -360,11 +350,6 @@ def job_create_view(request):
         'errors': serializer.errors
     }, status=status.HTTP_400_BAD_REQUEST)
 
-
-# ==========================================
-# 5. Job List View
-# ==========================================
-
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def job_list_view(request):
@@ -377,11 +362,6 @@ def job_list_view(request):
         'status': 'success',
         'data': serializer.data
     }, status=status.HTTP_200_OK)
-
-
-# ==========================================
-# 6. Job Update View
-# ==========================================
 
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
@@ -426,17 +406,8 @@ def job_status_view(request):
     serializer = JobStatusSerializer(statuses, many=True)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
-
-# ==========================================
-# Email API
-# ==========================================
-
 @api_view(['POST'])
 def send_invitation_email(request):
-    """
-    Send onboarding invitation email to an employee.
-    Expects: { "employee_id": <int> }
-    """
     employee_id = request.data.get('employee_id')
     if not employee_id:
         return Response(
@@ -452,14 +423,12 @@ def send_invitation_email(request):
             status=status.HTTP_404_NOT_FOUND
         )
 
-    # ---------- Generate the onboarding link ----------
     BASE_URL = "http://localhost:8000/"
 
     onboarding_link = (
         f"{BASE_URL}/html/dashboard-admin.html"
         f"?onb=emp_{employee.employee_number}#employees"
     )
-    # ---------- Email content ----------
     subject = "Complete your employee onboarding — Rasant Solutions"
 
     html_message = f"""
@@ -482,7 +451,6 @@ def send_invitation_email(request):
     </body>
     </html>
     """
-    # ---------- Send email ----------
     try:
         send_mail(
             subject=subject,
@@ -503,16 +471,9 @@ def send_invitation_email(request):
         status=status.HTTP_200_OK
     )
 
-
-# ==========================================
-# 7. Increment Lookups View
-# ==========================================
-
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def increment_lookups_view(request):
-    """One call returns all 3 dropdown lists — powers Increment Type /
-    Cycle Timing / Application Mode selects in the Add/Edit Policy modal."""
     return Response({
         "status": "success",
         "data": {
@@ -521,11 +482,6 @@ def increment_lookups_view(request):
             "application_modes": ApplicationModeSerializer(ApplicationMode.objects.all(), many=True).data,
         }
     }, status=status.HTTP_200_OK)
-
-
-# ==========================================
-# 8. Increment Policy View (CRUD)
-# ==========================================
 
 @api_view(["GET", "POST", "PUT", "DELETE"])
 @permission_classes([IsAuthenticated])
@@ -573,9 +529,6 @@ def increment_policy_view(request, pk=None):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def policy_assignments_view(request):
-    """Sab employee<->policy assignments ek call mein — taake frontend
-    'Assigned Policies' column (roster) aur 'Also assigned to' badge
-    (assign modal) N+1 calls ke bina compute kar sake."""
     assignments = EmployeePolicyAssignment.objects.select_related('employee', 'policy').all()
     serializer = EmployeePolicyAssignmentSerializer(assignments, many=True)
     return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
@@ -623,11 +576,6 @@ def sync_policy_assignments_view(request, policy_id):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def force_increment_view(request):
-    """
-    Applies every active policy an employee is assigned to, immediately.
-    Body (optional): { "employee_ids": [1, 2, 3] } — if provided, only
-    these employees are processed; otherwise every covered employee is.
-    """
     employee_ids = request.data.get('employee_ids')
 
     assignments = (
@@ -783,7 +731,6 @@ def get_employee_detail(request, pk):
     latest_deduction = employee.deduction_history.first()
 
     data = {
-        # ---------- Basic Info ----------
         "employee_number": employee.employee_number,
         "name": employee.name,
         "email": employee.email,
@@ -795,7 +742,6 @@ def get_employee_detail(request, pk):
         "joined_date": employee.joined_date,
         "gender": employee.gender,
 
-        # ---------- Salary & Deduction Breakdown ----------
         "base_salary": employee.salary,
         "current_salary": employee.current_salary,
         "tax_percent": employee.tax,
