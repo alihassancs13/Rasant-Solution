@@ -45,11 +45,11 @@
 
           <!-- Desktop/tablet collapse toggle -->
           <button
-              @click.stop="toggleCollapse"
+              @click.stop="handleToggleClick"
               class="hidden md:flex w-9 h-9 items-center justify-center rounded-lg text-text-muted hover:text-primary hover:bg-primary-subtle transition-colors cursor-pointer shrink-0"
-              :aria-label="collapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+              :aria-label="isSidebarOpen ? 'Close sidebar' : 'Open sidebar'"
           >
-            <font-awesome-icon icon="fa-solid fa-bars" class="text-lg" />
+            <font-awesome-icon :icon="isSidebarOpen ? 'fa-solid fa-xmark' : 'fa-solid fa-bars'" class="text-lg" />
           </button>
 
           <!-- Mobile close -->
@@ -305,6 +305,13 @@ const handleClickOutside = (e) => {
     Object.keys(dropdownStates.value).forEach(key => {
       dropdownStates.value[key] = false;
     });
+  }
+};
+const handleToggleClick = () => {
+  if (window.innerWidth < 768) {
+    isSidebarOpen.value = !isSidebarOpen.value;
+  } else {
+    toggleCollapse();
   }
 };
 

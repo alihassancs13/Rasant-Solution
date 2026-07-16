@@ -6,17 +6,14 @@ import { useSidebarStore } from '@/stores/sidebarStore.js';
 const COMPANY_MODULES = ['Overview', 'Inbox', 'Employees', 'Inquiries', 'Jira','Documents'];
 const PROJECT_MODULES = ['Sentra AI', 'AI Agent', 'Chatbot', 'Orchestri'];
 const EMPLOYEE_CHILDREN = ['Dashboard', 'Attendance', 'Careers', 'Salaries'];
-
+const dropdownStates = ref({});
+const isSidebarOpen = ref(false);
+const collapsed = ref(localStorage.getItem('sidebarCollapsed') === 'true');
+const isDrillDown = ref(localStorage.getItem('sidebarDrillDown') === 'true');
 export function useAdminSidebar() {
     const route = useRoute();
     const router = useRouter();
     const store = useSidebarStore();
-
-    const dropdownStates = ref({});
-    const isSidebarOpen = ref(false);
-    const collapsed = ref(localStorage.getItem('sidebarCollapsed') === 'true');
-
-    const isDrillDown = ref(localStorage.getItem('sidebarDrillDown') === 'true');
 
     const modules = computed(() => {
         return Array.isArray(store.modules) ? store.modules : [];
@@ -179,7 +176,7 @@ export function useAdminSidebar() {
         dropdownStates,
         isSidebarOpen,
         collapsed,
-        toggleCollapse, // ✅ Export toggleCollapse
+        toggleCollapse,
         isDrillDown,
         companyModules,
         projectModules,
@@ -196,5 +193,6 @@ export function useAdminSidebar() {
         goBackFromDrillDown,
         getUserRole,
         refreshModules: store.fetchModules,
+
     };
 }

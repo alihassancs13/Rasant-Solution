@@ -302,7 +302,7 @@ def get_files_by_extension(request, extension):
 @permission_classes([IsAuthenticated])
 def get_all_folders(request):
     """Get all folders only (for "Folders" filter)."""
-    folders = Folder.objects.filter(user=request.user)
+    folders = Folder.objects.filter(user=request.user,parent__isnull=True)
 
     # Get all files to count per folder
     files = File.objects.filter(user=request.user)
@@ -338,15 +338,16 @@ def get_all_files(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_all_items(request):
-    """Get all folders and files for the user (for "All" filter)."""
-    folders = Folder.objects.filter(user=request.user)
-    files = File.objects.filter(user=request.user)
+    """Get only root-level folders for the user (for "All" filter)."""
+    folders = Folder.objects.filter(user=request.user, parent__isnull=True)
+    files = File.objects.filter(user=request.user, folder__isnull=True)
     file_count_map = {}
-    for file in files:
+    for file in File.objects.filter(user=request.user):
         file_count_map[file.folder_id] = file_count_map.get(file.folder_id, 0) + 1
 
     folders_data = FolderSerializer(folders, many=True, context={'request': request}).data
     files_data = FileSerializer(files, many=True, context={'request': request}).data
+
     for folder_data in folders_data:
         folder_data['children_count'] = file_count_map.get(folder_data['id'], 0)
 
@@ -359,9 +360,6 @@ def get_all_items(request):
             'total': folders.count() + files.count()
         }
     }, status=status.HTTP_200_OK)
-
-
-# Rasant_api/apps/documents/views.py
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

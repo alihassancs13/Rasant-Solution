@@ -14,8 +14,8 @@
         />
       </div>
 
-      <div class="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-        <div class="max-w-7xl mx-auto">
+      <div class="flex-1 pt-1 px-4 pb-4 sm:px-6 lg:px-8 overflow-hidden">
+        <div class="w-full">
           <!-- Loading -->
           <div v-if="loading" class="text-center py-10">
             <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-600 border-t-transparent"></div>
@@ -32,8 +32,8 @@
           <template v-else>
             <!-- Toolbar -->
             <div class="flex flex-wrap items-center gap-2 sm:gap-3 mb-4">
-              <div class="relative">
-                <button @click="toggleNewMenu" class="tab-active-gradient  hover:bg-blue-700 cursor-pointer text-buttonTextColor px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition flex items-center gap-2">
+              <div class="relative new-menu-container" @click.self="showNewMenu = false">
+                <button @click.stop="toggleNewMenu" class="tab-active-gradient hover:bg-blue-700 cursor-pointer text-buttonTextColor px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition flex items-center gap-2">
                   <i class="fas fa-plus"></i>
                   <span>New</span>
                 </button>
@@ -93,7 +93,7 @@
                         :class="viewMode === 'grid' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-600 hover:text-gray-800'">
                   <i class="fas fa-table-cells-large text-xs sm:text-sm"></i>
                 </button>
-                <button @click="viewMode = 'list'" class="px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-md transition"
+                <button @click="viewMode = 'list'" class="hidden sm:block px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-md transition"
                         :class="viewMode === 'list' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-600 hover:text-gray-800'">
                   <i class="fas fa-list text-xs sm:text-sm"></i>
                 </button>
@@ -106,22 +106,25 @@
             <!-- Breadcrumb - Hide when in All/Folders/Files view -->
             <div v-if="isFolderView" class="flex flex-wrap items-center justify-between text-xs sm:text-sm text-gray-600 mb-4 py-1 border-b border-gray-100">
               <nav class="flex flex-wrap items-center gap-1 sm:gap-2">
-                <button @click="navigateToRoot" class="hover:text-blue-600">
+                <button @click="navigateToRoot" class="hover:text-blue-600" title="Go to root">
                   <i class="fas fa-home"></i>
                 </button>
+                <button @click="goBack" class="hover:text-blue-600 ml-2" title="Go back">
+                  <i class="fas fa-arrow-left"></i>
+                </button>
                 <span v-for="(folder, index) in breadcrumb" :key="folder.id" class="flex items-center gap-1 sm:gap-2">
-                  <span class="text-gray-300">/</span>
-                  <button @click="navigateTo(folder.id)" class="hover:text-blue-600 text-xs sm:text-sm"
-                          :class="index === breadcrumb.length - 1 ? 'text-gray-800 font-medium' : ''">
-                    {{ folder.name }}
-                  </button>
-                </span>
-              </nav>
-              <span class="text-[10px] sm:text-xs text-gray-400">{{ filteredItems.length }} items</span>
-            </div>
+                    <span class="text-gray-300">/</span>
+                    <button @click="navigateTo(folder.id)" class="hover:text-blue-600 text-xs sm:text-sm"
+                            :class="index === breadcrumb.length - 1 ? 'text-gray-800 font-medium' : ''">
+                      {{ folder.name }}
+                    </button>
+                  </span>
+                            </nav>
+                            <span class="text-[10px] sm:text-xs text-gray-400">{{ filteredItems.length }} items</span>
+                          </div>
 
-            <!-- Dropzone -->
-            <div class="relative border-2 border-dashed rounded-xl transition-all min-h-[200px] sm:min-h-[300px]"
+                <!-- Dropzone -->
+            <div class="relative border-2 border-dashed rounded-xl transition-all flex-1 min-h-[480px]"
                  :class="isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'"
                  @dragover.prevent="isDragging = true" @dragleave.prevent="isDragging = false" @drop.prevent="handleDrop">
 
@@ -150,15 +153,12 @@
               </div>
               <!-- LIST VIEW - Split Layout -->
               <div v-else class="flex flex-col sm:flex-row gap-3 h-[calc(112vh-330px)] overflow-hidden">
-                <!-- Left Side: File List - SCROLLABLE -->
-                <div class="w-full sm:w-1/2 lg:w-2/5 overflow-y-auto" style="height: 100%;">
-                  <table class="w-full text-xs sm:text-sm">
+                <!-- Left Side: File List - Fixed width -->
+                <div class="w-full sm:w-2/5 lg:w-1/5 overflow-y-auto" style="height: 100%;">
+                <table class="w-full text-xs sm:text-sm">
                     <thead class="bg-gray-50 text-gray-600 sticky top-0 z-10">
                     <tr>
-                      <th class="px-2 sm:px-2 py-2 sm:py-3 text-left">Name</th>
-                      <th class="px-2 sm:px-2 py-2 sm:py-3 text-left hidden sm:table-cell">Type</th>
-                      <th class="px-2 sm:px-2 py-2 sm:py-3 text-left hidden md:table-cell">Size</th>
-                      <th class="px-2 sm:px-2 py-2 sm:py-3 text-right">Actions</th>
+                      <th class="px-2 sm:px-4 py-2 sm:py-3 text-left">Name</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -170,48 +170,48 @@
                       <td class="px-2 sm:px-4 py-2 sm:py-3 flex items-center gap-1 sm:gap-2">
                         <i :class="item.isFolder ? 'fas fa-folder text-yellow-500' : getFileIcon(item.extension)" class="text-base sm:text-lg"></i>
                         <span class="font-medium text-gray-800 text-xs sm:text-sm truncate max-w-[80px] sm:max-w-[150px]">{{ item.name }}</span>
-                        <span v-if="!item.isFolder && selectedFileId === item.id && showPreview" class="text-[10px] text-blue-500 ml-1">
-                            <i class="fas fa-eye"></i>
-                        </span>
-                      </td>
-                      <td class="px-2 sm:px-4 py-2 sm:py-3 text-gray-600 hidden sm:table-cell">{{ item.isFolder ? 'Folder' : (item.extension || 'File') }}</td>
-                      <td class="px-2 sm:px-4 py-2 sm:py-3 text-gray-600 hidden md:table-cell">{{ item.isFolder ? '—' : formatFileSize(item.size) }}</td>
-                      <td class="px-2 sm:px-4 py-2 sm:py-3 text-right">
-                        <button @click.stop="editItem(item)" class="text-gray-400 hover:text-blue-600 mr-1 sm:mr-2">
-                          <i class="fas fa-pen text-xs sm:text-sm"></i>
-                        </button>
-                        <button @click.stop="deleteItem(item)" class="text-gray-400 hover:text-red-500">
-                          <i class="fas fa-trash-can text-xs sm:text-sm"></i>
-                        </button>
-                      </td>
-                    </tr>
-                    </tbody>
-                  </table>
-                </div>
+                                <span v-if="!item.isFolder && selectedFileId === item.id && showPreview" class="text-[10px] text-blue-500 ml-1">
+                      <i class="fas fa-eye"></i>
+                    </span>
+                              </td>
+                            </tr>
+                            </tbody>
+                          </table>
+                        </div>
 
-                <!-- Right Side: Preview Panel - NO SCROLLBAR -->
-                <div class="w-full sm:w-1/2 lg:w-3/5" style="height: 100%; overflow: hidden;">
+                <!-- Right Side: Preview Panel - Takes remaining width -->
+                <div class="w-full sm:w-3/5 lg:w-1/1" style="height: 100%; overflow: hidden;">
                   <div v-if="showPreview && previewData" class="bg-white rounded-xl border border-gray-200 flex flex-col" style="height: 100%;">
-                    <!-- Preview Header - FIXED -->
+                    <!-- Preview Header with Action Icons -->
                     <div class="flex flex-wrap items-center justify-between gap-2 px-4 py-3 border-b border-gray-200 bg-gray-50 rounded-t-xl shrink-0">
                       <div class="flex items-center gap-2 min-w-0">
                         <i :class="getFileIcon(previewData.extension)" class="text-lg"></i>
                         <span class="font-medium text-sm text-gray-800 truncate">{{ previewData.name }}</span>
                         <span class="text-xs text-gray-400 whitespace-nowrap">{{ previewData.size }}</span>
                       </div>
-                      <div class="flex gap-2 shrink-0">
-                        <button @click.stop="downloadFile(getCurrentFile())"
-                                class="px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition flex items-center gap-1 text-xs">
-                          <i class="fas fa-download"></i> Download
+                      <div class="flex items-center gap-2 shrink-0">
+                        <!-- Delete Icon -->
+                        <button @click.stop="deleteItem(getCurrentFile())"
+                                class="w-8 h-8 flex items-center justify-center bg-red-500 text-white rounded-lg hover:bg-red-600 transition text-sm"
+                                title="Delete">
+                          <i class="fas fa-trash"></i>
                         </button>
+                        <!-- Download Icon -->
+                        <button @click.stop="downloadFile(getCurrentFile())"
+                                class="w-8 h-8 flex items-center justify-center bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm"
+                                title="Download">
+                          <i class="fas fa-download"></i>
+                        </button>
+                        <!-- Close Icon -->
                         <button @click.stop="closePreview"
-                                class="px-3 py-1.5 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-xs">
-                          <i class="fas fa-times"></i> Close
+                                class="w-8 h-8 flex items-center justify-center bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-sm"
+                                title="Close">
+                          <i class="fas fa-times"></i>
                         </button>
                       </div>
                     </div>
 
-                    <!-- Preview Content - NO SCROLLBAR -->
+                    <!-- Preview Content -->
                     <div class="flex-1 p-4" style="overflow: hidden;">
                       <div v-if="previewLoading" class="flex items-center justify-center h-full">
                         <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-600 border-t-transparent"></div>
@@ -222,11 +222,11 @@
                         <p>{{ previewError }}</p>
                       </div>
                       <div v-else class="h-full">
-                        <!-- Text Preview - content scrolls naturally -->
+                        <!-- Text Preview -->
                         <div v-if="previewData.type === 'text'" class="h-full overflow-y-auto">
                           <pre class="text-sm font-mono whitespace-pre-wrap">{{ previewData.content }}</pre>
                         </div>
-                        <!-- PDF Preview - iframe handles scroll -->
+                        <!-- PDF Preview -->
                         <div v-else-if="previewData.type === 'pdf'" class="h-full">
                           <iframe v-if="previewData.blob_url"
                                   :src="previewData.blob_url"
@@ -277,12 +277,12 @@
                     <p class="text-sm">Select a file to preview</p>
                     <p class="text-xs mt-1">Click on any file in the list</p>
                   </div>
+                  </div>
                 </div>
-              </div>
 
-              <!-- Empty State -->
-              <div v-if="filteredItems.length === 0" class="py-12 sm:py-16 text-center">
-                <div class="text-4xl sm:text-5xl text-gray-300 mb-3 sm:mb-4">
+                <!-- Empty State -->
+                <div v-if="filteredItems.length === 0" class="py-12 sm:py-16 text-center">
+                  <div class="text-4xl sm:text-5xl text-gray-300 mb-3 sm:mb-4">
                   <i class="fas fa-cloud-arrow-up"></i>
                 </div>
                 <h4 class="text-base sm:text-lg font-medium text-gray-700">
@@ -294,16 +294,16 @@
                     : 'No documents found in this view.'
                   }}
                 </p>
-              </div>
+                </div>
 
-              <div v-if="isDragging" class="absolute inset-0 bg-blue-50/90 rounded-xl flex flex-col items-center justify-center z-10">
+                <div v-if="isDragging" class="absolute inset-0 bg-blue-50/90 rounded-xl flex flex-col items-center justify-center z-10">
                 <i class="fas fa-cloud-arrow-up text-4xl sm:text-5xl text-blue-500 mb-2 sm:mb-3"></i>
                 <p class="text-base sm:text-lg font-medium text-gray-700">Drop to upload</p>
                 <span class="text-xs sm:text-sm text-gray-500">Files will be added to the current folder</span>
-              </div>
-            </div>
+                </div>
+                </div>
 
-            <div class="text-[10px] sm:text-xs text-gray-400 mt-3 flex flex-wrap items-center gap-1">
+              <div class="text-[10px] sm:text-xs text-gray-400 mt-3 flex flex-wrap items-center gap-1">
               <i class="fas fa-hand-pointer"></i>
               <span>Hover a card for quick actions · double-click folders to open .</span>
             </div>
@@ -395,7 +395,6 @@ import useDocuments from '@/composables/useDocuments.js'
 import AdminSidebar from "@/components/adminSidebar.vue";
 import DashboardHeader from '@/components/header.vue';
 import BaseModal from '@/components/baseModal.vue';
-
 export default {
   name: 'Documents',
   components: {
@@ -406,6 +405,7 @@ export default {
   setup() {
     return useDocuments()
   }
+
 }
 </script>
 
