@@ -256,10 +256,13 @@
                 <div class="border-t border-gray-100"></div>
 
                 <div class="flex items-center justify-between gap-2">
-                  <button class="flex items-center cursor-pointer gap-1.5 px-3 py-1.5 bg-teal-500 text-white rounded-lg text-xs font-bold shadow-sm hover:bg-teal-600 transition-colors">
+                  <router-link
+                      to="/admin/inbox"
+                      class="flex items-center gap-1.5 px-3 py-1.5 bg-teal-500 text-white rounded-lg text-xs font-bold shadow-sm hover:bg-teal-600 transition-colors"
+                  >
                     <font-awesome-icon :icon="['far', 'comment']" />
                     DM
-                  </button>
+                  </router-link>
                   <div class="flex items-center gap-2">
                     <button @click="openEditModal(emp)" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-border text-text-secondary" title="Edit">
                       <font-awesome-icon :icon="['fas', 'pen']" class="w-3 h-3" />
