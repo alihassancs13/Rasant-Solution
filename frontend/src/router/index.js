@@ -4,6 +4,7 @@ import Contact from "../pages/Home/contactForm.vue";
 import Home from "../pages/Home/home.vue";
 import EmployeeDashboard from '../pages/admin/Employee/employeeDashboard.vue';
 import Documents from '../pages/admin/Documents/documents.vue';
+import Vault from '../pages/admin/Vault/credentialsVault.vue';
 import { useLoginStore } from '../stores/loginStore.js';
 import JobDetails from '../pages/Home/jobDetails.vue';
 const routes = [
@@ -146,6 +147,12 @@ const routes = [
     name: 'Documents',
     component: Documents,
     meta: {title: "Documents - Rasant Solutions", requiresAuth: true, role: 'admin' }
+  },
+  {
+    path: '/admin/credentialsvault',
+    name: 'Vault',
+    component: Vault,
+    meta: {title: "credentials - Rasant Solutions", requiresAuth: true, role: 'admin' }
   },
   {
     path: '/onboarding/:token?',

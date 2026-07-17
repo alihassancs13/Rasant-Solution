@@ -3,7 +3,7 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useSidebarStore } from '@/stores/sidebarStore.js';
 
-const COMPANY_MODULES = ['Overview', 'Inbox', 'Employees', 'Inquiries', 'Jira','Documents'];
+const COMPANY_MODULES = ['Overview', 'Inbox', 'Employees', 'Inquiries', 'Jira','Documents','Vault'];
 const PROJECT_MODULES = ['Sentra AI', 'AI Agent', 'Chatbot', 'Orchestri'];
 const EMPLOYEE_CHILDREN = ['Dashboard', 'Attendance', 'Careers', 'Salaries'];
 const dropdownStates = ref({});

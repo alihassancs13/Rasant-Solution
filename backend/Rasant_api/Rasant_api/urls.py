@@ -16,14 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path,include
-from django.conf.urls.static import static
-from django.conf import settings
-# At the top of Rasant_api/urls.py, after imports
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/accounts/', include('accounts.urls')),
     path('api/employeeDashboard/', include('employeeDashboard.urls')),
     path('api/documents/', include('apps.documents.urls')),
+    path('api/credentials/', include('apps.credentialVault.urls')),
     path('api/inbox/', include('apps.inbox.urls')),
     path('api/', include('jira.urls')),
 

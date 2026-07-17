@@ -55,4 +55,8 @@ export const API_ENDPOINTS = {
     INBOX_DELETE_FOR_EVERYONE: (messageId) => `/api/inbox/messages/${messageId}/delete-for-everyone/`,
     INBOX_CLEAR_CHAT: (conversationId) => `/api/inbox/conversations/${conversationId}/clear/`,
 
+    CREDENTIALS: {
+        GET_ALL: '/api/credentials/get_all_credentials/',
+        CREATE: '/api/credentials/create/',
+    }
 };
