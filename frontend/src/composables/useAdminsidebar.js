@@ -2,6 +2,7 @@
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useSidebarStore } from '@/stores/sidebarStore.js';
+import { useInboxStore } from '@/stores/inboxStore.js';
 
 const COMPANY_MODULES = ['Overview', 'Inbox', 'Employees', 'Inquiries', 'Jira','Documents','Vault'];
 const PROJECT_MODULES = ['Sentra AI', 'AI Agent', 'Chatbot', 'Orchestri'];
@@ -14,11 +15,12 @@ export function useAdminSidebar() {
     const route = useRoute();
     const router = useRouter();
     const store = useSidebarStore();
+    const inboxStore = useInboxStore();
 
     const modules = computed(() => {
         return Array.isArray(store.modules) ? store.modules : [];
     });
-
+    const unreadConversationsCount = computed(() => inboxStore.unreadConversationsCount);
     const loading = computed(() => store.isLoading);
     const error = computed(() => store.error);
 
@@ -167,6 +169,12 @@ export function useAdminSidebar() {
         } catch (err) {
             console.error('Failed to load sidebar modules:', err);
         }
+
+        try {
+            await inboxStore.fetchConversations();
+        } catch (err) {
+            console.error('Failed to load conversations for sidebar badge:', err);
+        }
     });
 
     return {
@@ -192,6 +200,7 @@ export function useAdminSidebar() {
         drillIntoEmployees,
         goBackFromDrillDown,
         getUserRole,
+        unreadConversationsCount,
         refreshModules: store.fetchModules,
 
     };

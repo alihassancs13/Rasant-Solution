@@ -2,8 +2,9 @@
 import json
 import time
 import logging
+import hashlib
 from rest_framework import status
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.decorators import api_view, authentication_classes, permission_classes, parser_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
@@ -11,9 +12,11 @@ from django.contrib.auth import get_user_model
 from .models import Conversation, ConversationMember, Message, MessageReceipt, MessageDeleteFor
 from .serializers import ConversationSerializer,ConversationCreateSerializer, MessageSerializer
 from django.core.cache import cache
-from django.http import StreamingHttpResponse, HttpResponseForbidden
+from django.http import StreamingHttpResponse, HttpResponseForbidden, HttpResponse
 from django.views.decorators.http import require_GET
 from django.utils import timezone
+from rest_framework.parsers import MultiPartParser, FormParser
+
 
 logger = logging.getLogger(__name__)
 
@@ -55,6 +58,9 @@ def create_direct_conversation(request):
     ).distinct().first()
 
     if existing:
+        ConversationMember.objects.filter(
+            conversation=existing, user=sender, is_deleted=True
+        ).update(is_deleted=False)
         return Response(
             {
                 'message': 'Conversation already exists',
@@ -105,6 +111,7 @@ def list_chat_users(request):
             'username': user.username,
             'email': user.email,
             'role': user.role.name if hasattr(user, 'role') and user.role else None,
+            'has_avatar': bool(user.avatar),
         })
 
     return Response(data)
@@ -114,8 +121,11 @@ def list_chat_users(request):
 @permission_classes([IsAuthenticated])
 def list_conversations(request):
     conversations = Conversation.objects.filter(
-        members__user=request.user, members__left_at__isnull=True
+        members__user=request.user,
+        members__left_at__isnull=True,
+        members__is_deleted=False,
     ).distinct().order_by('-created_at')
+
     return Response(
         ConversationSerializer(conversations, many=True, context={'request': request}).data
     )
@@ -182,6 +192,10 @@ def send_message(request):
 
     if receipts_to_create:
         MessageReceipt.objects.bulk_create(receipts_to_create)
+
+    ConversationMember.objects.filter(
+        conversation=conv, is_deleted=True
+    ).update(is_deleted=False)
 
     return Response(
         MessageSerializer(msg, context={'request': request}).data,
@@ -337,9 +351,11 @@ def clear_chat(request, conversation_id):
     if membership.left_at is not None:
         return Response({'error': 'You have left this conversation'}, status=status.HTTP_403_FORBIDDEN)
 
-    membership.clear_chat()
+    delete_chat = request.data.get('delete_chat', False)
+    membership.clear_chat(delete_chat=delete_chat)
 
-    return Response({'status': True, 'message': 'Chat cleared'}, status=status.HTTP_200_OK)
+    message = 'Chat deleted' if delete_chat else 'Chat cleared'
+    return Response({'status': True, 'message': message}, status=status.HTTP_200_OK)
 
 def _mark_user_online(user_id):
     cache.set(f'inbox_sse_active_{user_id}', True, timeout=60)
@@ -351,6 +367,33 @@ def _mark_user_offline(user_id):
 
 def _is_user_online(user_id):
     return bool(cache.get(f'inbox_sse_active_{user_id}'))
+
+
+def _avatar_hash(avatar_bytes):
+    if not avatar_bytes:
+        return None
+    return hashlib.md5(bytes(avatar_bytes)).hexdigest()
+
+
+def _avatar_hash(avatar_bytes):
+    if not avatar_bytes:
+        return None
+    return hashlib.md5(bytes(avatar_bytes)).hexdigest()
+
+
+def _members_hash(conv):
+    rows = ConversationMember.objects.filter(conversation=conv).order_by('user_id').values_list(
+        'user_id', 'role', 'left_at'
+    )
+    normalized = [(uid, role, left_at.isoformat() if left_at else None) for uid, role, left_at in rows]
+    return hashlib.md5(json.dumps(normalized).encode()).hexdigest()
+
+
+def _current_member_avatars(conv):
+    members = ConversationMember.objects.filter(
+        conversation=conv, left_at__isnull=True
+    ).select_related('user')
+    return {m.user_id: _avatar_hash(m.user.avatar) for m in members}
 
 
 @require_GET
@@ -365,6 +408,7 @@ def inbox_sse_stream(request):
         user = jwt_auth.get_user(validated)
     except Exception:
         return HttpResponseForbidden('Invalid token')
+    request.user = user
 
     generation = f"{time.time()}-{id(request)}"
     cache.set(f'inbox_sse_generation_{user.id}', generation, timeout=3600)
@@ -379,7 +423,10 @@ def inbox_sse_stream(request):
         last_message_ids = {}
         sent_receipt_updates = set()
         sent_delivery_updates = set()
-        sent_deletion_updates = set()   # NAYA
+        sent_deletion_updates = set()
+        last_avatar_hashes = {}
+        last_members_hash = {}
+        last_member_avatar_hashes = {}
         heartbeat = 0
 
         member_conv_ids = list(
@@ -387,11 +434,19 @@ def inbox_sse_stream(request):
                 user=user, left_at__isnull=True
             ).values_list('conversation_id', flat=True)
         )
+        known_conv_ids = set(member_conv_ids)
 
         for conv_id in member_conv_ids:
             last_msg = Message.objects.filter(conversation_id=conv_id).order_by('-id').first()
             if last_msg:
                 last_message_ids[conv_id] = last_msg.id
+
+        initial_convs = Conversation.objects.filter(id__in=member_conv_ids).only('id', 'avatar')
+        for conv in initial_convs:
+            last_avatar_hashes[conv.id] = _avatar_hash(conv.avatar)
+            last_members_hash[conv.id] = _members_hash(conv)
+            last_member_avatar_hashes[conv.id] = _current_member_avatars(conv)
+
         already_deleted_ids = set(
             Message.objects.filter(
                 conversation_id__in=member_conv_ids, deleted_for_everyone=True
@@ -408,6 +463,31 @@ def inbox_sse_stream(request):
 
                 _mark_user_online(user.id)
 
+                current_conv_ids = set(
+                    ConversationMember.objects.filter(
+                        user=user, left_at__isnull=True
+                    ).values_list('conversation_id', flat=True)
+                )
+                newly_added_ids = current_conv_ids - known_conv_ids
+                for new_conv_id in newly_added_ids:
+                    known_conv_ids.add(new_conv_id)
+                    try:
+                        new_conv = Conversation.objects.get(id=new_conv_id)
+                        last_msg = Message.objects.filter(conversation_id=new_conv_id).order_by('-id').first()
+                        last_message_ids[new_conv_id] = last_msg.id if last_msg else 0
+                        last_avatar_hashes[new_conv_id] = _avatar_hash(new_conv.avatar)
+                        last_members_hash[new_conv_id] = _members_hash(new_conv)
+                        last_member_avatar_hashes[new_conv_id] = _current_member_avatars(new_conv)
+                        data = {
+                            'type': 'added_to_conversation',
+                            'conversation_id': new_conv_id,
+                        }
+                        yield f"data: {json.dumps(data)}\n\n"
+                    except Conversation.DoesNotExist:
+                        continue
+                    except Exception:
+                        logger.exception('added_to_conversation event failed for conversation %s (user %s)', new_conv_id, user.id)
+
                 member_qs = ConversationMember.objects.filter(
                     user=user, left_at__isnull=True
                 ).select_related('conversation')
@@ -415,6 +495,48 @@ def inbox_sse_stream(request):
                 for membership in member_qs:
                     conv = membership.conversation
                     last_id = last_message_ids.get(conv.id, 0)
+
+                    try:
+                        current_members_hash = _members_hash(conv)
+                        previous_members_hash = last_members_hash.get(conv.id)
+                        if current_members_hash != previous_members_hash:
+                            last_members_hash[conv.id] = current_members_hash
+                            members_payload = ConversationSerializer(conv, context={'request': request}).data.get('members', [])
+                            data = {
+                                'type': 'members_updated',
+                                'conversation_id': conv.id,
+                                'members': members_payload,
+                            }
+                            yield f"data: {json.dumps(data)}\n\n"
+                    except Exception:
+                        logger.exception('members_updated event failed for conversation %s (user %s)', conv.id, user.id)
+
+                    current_hash = _avatar_hash(conv.avatar)
+                    previous_hash = last_avatar_hashes.get(conv.id)
+                    if current_hash != previous_hash:
+                        last_avatar_hashes[conv.id] = current_hash
+                        data = {
+                            'type': 'group_avatar_updated',
+                            'conversation_id': conv.id,
+                            'has_avatar': bool(conv.avatar),
+                        }
+                        yield f"data: {json.dumps(data)}\n\n"
+
+                    try:
+                        current_member_avatars = _current_member_avatars(conv)
+                        prev_member_avatars = last_member_avatar_hashes.get(conv.id, {})
+                        for uid, h in current_member_avatars.items():
+                            if prev_member_avatars.get(uid) != h:
+                                data = {
+                                    'type': 'member_avatar_updated',
+                                    'conversation_id': conv.id,
+                                    'user_id': uid,
+                                    'has_avatar': bool(h),
+                                }
+                                yield f"data: {json.dumps(data)}\n\n"
+                        last_member_avatar_hashes[conv.id] = current_member_avatars
+                    except Exception:
+                        logger.exception('member_avatar_updated event failed for conversation %s (user %s)', conv.id, user.id)
 
                     new_msgs = Message.objects.filter(
                         conversation=conv,
@@ -424,7 +546,7 @@ def inbox_sse_stream(request):
                     for msg in new_msgs:
                         last_message_ids[conv.id] = msg.id
                         if msg.deleted_for_everyone:
-                            sent_deletion_updates.add(msg.id)  # duplicate event se bacho
+                            sent_deletion_updates.add(msg.id)
 
                         if msg.sender_id != user.id:
                             receipt, _ = MessageReceipt.objects.get_or_create(
@@ -443,6 +565,7 @@ def inbox_sse_stream(request):
                             'deleted_for_everyone': msg.deleted_for_everyone,
                         }
                         yield f"data: {json.dumps(data)}\n\n"
+
                     newly_deleted = Message.objects.filter(
                         conversation=conv, deleted_for_everyone=True
                     ).exclude(id__in=sent_deletion_updates)
@@ -453,7 +576,7 @@ def inbox_sse_stream(request):
                             'type': 'message_deleted',
                             'id': msg.id,
                             'conversation_id': conv.id,
-                            'content': msg.content,  # already "This message was deleted"
+                            'content': msg.content,
                             'deleted_for_everyone': True,
                         }
                         yield f"data: {json.dumps(data)}\n\n"
@@ -514,3 +637,146 @@ def inbox_sse_stream(request):
     response['Cache-Control'] = 'no-cache'
     response['X-Accel-Buffering'] = 'no'
     return response
+
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+@parser_classes([MultiPartParser, FormParser])
+def update_group_avatar(request, conversation_id):
+    try:
+        conv = Conversation.objects.get(id=conversation_id)
+    except Conversation.DoesNotExist:
+        return Response({'error': 'Conversation not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    if conv.type != 'group':
+        return Response(
+            {'error': 'Only group conversations can have a photo'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    membership = ConversationMember.objects.filter(
+        conversation=conv, user=request.user
+    ).first()
+
+    if not membership:
+        return Response({'error': "You don't have access to this chat"}, status=status.HTTP_403_FORBIDDEN)
+    if membership.left_at is not None:
+        return Response({'error': 'You have left this conversation'}, status=status.HTTP_403_FORBIDDEN)
+
+
+    avatar_file = request.FILES.get('avatar')
+    if not avatar_file:
+        return Response({'error': 'No image file provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+    if not avatar_file.content_type.startswith('image/'):
+        return Response({'error': 'File must be an image'}, status=status.HTTP_400_BAD_REQUEST)
+
+    max_size = 10 * 1024 * 1024
+    if avatar_file.size > max_size:
+        return Response({'error': 'Image too large (max 2MB)'}, status=status.HTTP_400_BAD_REQUEST)
+
+    conv.avatar = avatar_file.read()
+    conv.avatar_content_type = avatar_file.content_type
+    conv.save(update_fields=['avatar', 'avatar_content_type'])
+
+    return Response(
+        ConversationSerializer(conv, context={'request': request}).data,
+        status=status.HTTP_200_OK
+    )
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def get_group_avatar(request, conversation_id):
+    try:
+        conv = Conversation.objects.get(id=conversation_id)
+    except Conversation.DoesNotExist:
+        return Response({'error': 'Conversation not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    membership = ConversationMember.objects.filter(
+        conversation=conv, user=request.user
+    ).first()
+    if not membership:
+        return Response({'error': "You don't have access to this chat"}, status=status.HTTP_403_FORBIDDEN)
+
+    if not conv.avatar:
+        return Response({'error': 'No avatar set'}, status=status.HTTP_404_NOT_FOUND)
+
+    return HttpResponse(bytes(conv.avatar), content_type=conv.avatar_content_type or 'image/png')
+
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def leave_group(request, conversation_id):
+    try:
+        conv = Conversation.objects.get(id=conversation_id)
+    except Conversation.DoesNotExist:
+        return Response({'error': 'Conversation not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    if conv.type != 'group':
+        return Response({'error': 'Only group conversations can be left'}, status=status.HTTP_400_BAD_REQUEST)
+
+    membership = ConversationMember.objects.filter(
+        conversation=conv, user=request.user
+    ).first()
+
+    if not membership:
+        return Response({'error': "You don't have access to this chat"}, status=status.HTTP_403_FORBIDDEN)
+    if membership.left_at is not None:
+        return Response({'error': 'You have already left this group'}, status=status.HTTP_400_BAD_REQUEST)
+
+    membership.leave()
+
+    return Response({'status': True, 'message': 'You have left the group'}, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def add_group_members(request, conversation_id):
+    try:
+        conv = Conversation.objects.get(id=conversation_id)
+    except Conversation.DoesNotExist:
+        return Response({'error': 'Conversation not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    if conv.type != 'group':
+        return Response({'error': 'Only group conversations support adding members'}, status=status.HTTP_400_BAD_REQUEST)
+
+    requester_membership = ConversationMember.objects.filter(
+        conversation=conv, user=request.user, left_at__isnull=True
+    ).first()
+
+    if not requester_membership:
+        return Response({'error': "You don't have access to this chat"}, status=status.HTTP_403_FORBIDDEN)
+
+    if requester_membership.role != 'admin':
+        return Response({'error': 'Only group admins can add members'}, status=status.HTTP_403_FORBIDDEN)
+
+    member_ids = request.data.get('member_ids', [])
+    if not member_ids or not isinstance(member_ids, list):
+        return Response({'error': 'member_ids must be a non-empty list'}, status=status.HTTP_400_BAD_REQUEST)
+
+    added_users = []
+
+    for user_id in member_ids:
+        try:
+            target_user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            continue
+
+        existing = ConversationMember.objects.filter(conversation=conv, user=target_user).first()
+
+        if existing:
+            if existing.left_at is not None:
+                existing.rejoin()
+                added_users.append(target_user.id)
+        else:
+            ConversationMember.objects.create(conversation=conv, user=target_user, role='member')
+            added_users.append(target_user.id)
+
+    return Response(
+        {
+            'status': True,
+            'added_user_ids': added_users,
+            'conversation': ConversationSerializer(conv, context={'request': request}).data,
+        },
+        status=status.HTTP_200_OK
+    )

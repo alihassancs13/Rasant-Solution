@@ -15,11 +15,14 @@ User = get_user_model()
 class UserBriefSerializer(serializers.ModelSerializer):
 
     role_name = serializers.CharField(source='role.name', read_only=True, default=None)
+    has_avatar = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'first_name', 'last_name', 'role_name']
+        fields = ['id', 'username', 'first_name', 'last_name', 'role_name', 'has_avatar']
 
+    def get_has_avatar(self, obj):
+        return bool(obj.avatar)
 
 class ConversationMemberSerializer(serializers.ModelSerializer):
     user = UserBriefSerializer(read_only=True)
@@ -113,6 +116,7 @@ class ConversationSerializer(serializers.ModelSerializer):
     display_name = serializers.SerializerMethodField()
     last_message = serializers.SerializerMethodField()
     unread_count = serializers.SerializerMethodField()
+    has_avatar = serializers.SerializerMethodField()
 
     class Meta:
         model = Conversation
@@ -126,6 +130,7 @@ class ConversationSerializer(serializers.ModelSerializer):
             'display_name',
             'last_message',
             'unread_count',
+            'has_avatar',
         ]
         read_only_fields = ['created_by', 'created_at', 'members']
 
@@ -167,6 +172,9 @@ class ConversationSerializer(serializers.ModelSerializer):
         ).exclude(
             receipts__user=request.user, receipts__is_read=True
         ).count()
+
+    def get_has_avatar(self, obj):
+        return bool(obj.avatar)
 
 
 class ConversationCreateSerializer(serializers.ModelSerializer):

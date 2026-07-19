@@ -23,11 +23,10 @@ export const useInboxStore = defineStore('inbox', {
         loadingMessages: false,
         eventSource: null,
         sseConnected: false,
+        userAvatars: {},
     }),
 
     getters: {
-        // Sirf un CONVERSATIONS ki tadaad ginta hai jinme kam se kam 1 unread
-        // message hai — messages ka total sum nahi (jaisa pehle tha)
         unreadConversationsCount: (state) => {
             return state.conversations.filter((c) => (c.unread_count || 0) > 0).length;
         },
@@ -88,7 +87,6 @@ export const useInboxStore = defineStore('inbox', {
             return response.data;
         },
 
-        // ---------- Sidebar badge ke liye sync helpers ----------
         incrementConversationUnread(conversationId) {
             const conv = this.conversations.find((c) => c.id === conversationId);
             if (conv) conv.unread_count = (conv.unread_count || 0) + 1;
@@ -107,6 +105,7 @@ export const useInboxStore = defineStore('inbox', {
                 this.conversations.unshift(conversation);
             }
         },
+
         async deleteMessageForMe(messageId) {
             const response = await apiClient.post(API_ENDPOINTS.INBOX_DELETE_FOR_ME(messageId));
             return response.data;
@@ -117,13 +116,79 @@ export const useInboxStore = defineStore('inbox', {
             return response.data;
         },
 
-        async clearChat(conversationId) {
-            const response = await apiClient.post(API_ENDPOINTS.INBOX_CLEAR_CHAT(conversationId));
+        async clearChat(conversationId, deleteChat = false) {
+            const response = await apiClient.post(API_ENDPOINTS.INBOX_CLEAR_CHAT(conversationId), {
+                delete_chat: deleteChat,
+            });
             return response.data;
         },
+
+        // ---------- Group avatar ----------
+        async updateGroupAvatar(conversationId, formData) {
+            const response = await apiClient.post(
+                API_ENDPOINTS.INBOX_UPDATE_GROUP_AVATAR(conversationId),
+                formData,
+                { headers: { 'Content-Type': 'multipart/form-data' } }
+            );
+            return response.data;
+        },
+
+        async fetchGroupAvatarBlob(conversationId) {
+            try {
+                const response = await apiClient.get(
+                    API_ENDPOINTS.INBOX_GET_GROUP_AVATAR(conversationId),
+                    { responseType: 'blob' }
+                );
+                return URL.createObjectURL(response.data);
+            } catch (err) {
+                console.error('Failed to fetch group avatar:', err);
+                return null;
+            }
+        },
+
+        async leaveGroup(conversationId) {
+            const response = await apiClient.post(API_ENDPOINTS.INBOX_LEAVE_GROUP(conversationId));
+            return response.data;
+        },
+
+        async addGroupMembers(conversationId, memberIds) {
+            const response = await apiClient.post(API_ENDPOINTS.INBOX_ADD_MEMBERS(conversationId), {
+                member_ids: memberIds,
+            });
+            return response.data;
+        },
+
+        async updateMyAvatar(formData) {
+            const response = await apiClient.post(API_ENDPOINTS.ACCOUNTS_UPDATE_MY_AVATAR, formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+            return response.data;
+        },
+
+        async fetchUserAvatarBlob(userId) {
+            if (this.userAvatars[userId]) return this.userAvatars[userId];
+            try {
+                const response = await apiClient.get(API_ENDPOINTS.ACCOUNTS_GET_USER_AVATAR(userId), { responseType: 'blob' });
+                const url = URL.createObjectURL(response.data);
+                this.userAvatars[userId] = url;
+                return url;
+            } catch {
+                return null;
+            }
+        },
+
+        clearUserAvatar(userId) {
+            if (this.userAvatars[userId]) {
+                URL.revokeObjectURL(this.userAvatars[userId]);
+                delete this.userAvatars[userId];
+            }
+        },
+
+        removeConversation(conversationId) {
+            this.conversations = this.conversations.filter((c) => c.id !== conversationId);
+        },
+
         connectSSE(onMessage) {
-            // Purana connection agar zinda ho to pehle explicitly band karo,
-            // taake kabhi bhi 2 sockets ek sath active na rahein frontend side pe
             if (this.eventSource) {
                 this.eventSource.close();
                 this.eventSource = null;

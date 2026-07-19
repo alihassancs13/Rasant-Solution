@@ -14,4 +14,8 @@ urlpatterns = [
     path('messages/<int:message_id>/delete-for-me/', views.delete_message_for_me, name='delete-message-for-me'),
     path('messages/<int:message_id>/delete-for-everyone/', views.delete_message_for_everyone, name='delete-message-for-everyone'),
     path('conversations/<int:conversation_id>/clear/', views.clear_chat, name='clear-chat'),
+    path('conversations/<int:conversation_id>/avatar/', views.update_group_avatar, name='update-group-avatar'),
+    path('conversations/<int:conversation_id>/avatar/image/', views.get_group_avatar, name='get-group-avatar'),
+    path('conversations/<int:conversation_id>/leave/', views.leave_group, name='leave-group'),
+    path('conversations/<int:conversation_id>/add-members/', views.add_group_members, name='add-group-members'),
 ]

@@ -11,6 +11,8 @@ class Conversation(models.Model):
 
     type = models.CharField(max_length=10, choices=TYPE_CHOICES)
     name = models.CharField(max_length=100, blank=True, null=True)
+    avatar = models.BinaryField(null=True, blank=True)
+    avatar_content_type = models.CharField(max_length=50, null=True, blank=True)
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -58,6 +60,7 @@ class ConversationMember(models.Model):
     joined_at = models.DateTimeField(auto_now_add=True)
     left_at = models.DateTimeField(null=True, blank=True)
     cleared_at = models.DateTimeField(null=True, blank=True)
+    is_deleted = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'conversation_members'  # Table name
@@ -88,9 +91,15 @@ class ConversationMember(models.Model):
         self.joined_at = timezone.now()
         self.save(update_fields=['left_at', 'joined_at'])
 
-    def clear_chat(self):
+    def clear_chat(self,delete_chat=False):
         self.cleared_at = timezone.now()
-        self.save(update_fields=['cleared_at'])
+        self.is_deleted = delete_chat
+        self.save(update_fields=['cleared_at','is_deleted'])
+
+    def unhide(self):
+        if self.is_deleted:
+            self.is_deleted = False
+            self.save(update_fields=['is_deleted'])
 
 
 class Message(models.Model):

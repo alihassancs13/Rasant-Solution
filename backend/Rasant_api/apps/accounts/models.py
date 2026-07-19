@@ -12,6 +12,8 @@ class Role(models.Model):
 
 class User(AbstractUser):
     email = models.EmailField(max_length=255,unique=True, blank=True, null=True,)
+    avatar = models.BinaryField(null=True, blank=True)  
+    avatar_content_type = models.CharField(max_length=100, null=True, blank=True)
     role = models.ForeignKey(
         Role,
         on_delete=models.SET_NULL,

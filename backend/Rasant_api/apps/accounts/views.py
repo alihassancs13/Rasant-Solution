@@ -1,12 +1,15 @@
 # Create your views here.
 
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, parser_classes
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User, Module,ContactMessage
 from .serializer import LoginSerializer, UserSerializer,ContactMessageSerializer
+from django.http import StreamingHttpResponse, HttpResponseForbidden, HttpResponse
+
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -155,3 +158,33 @@ def contact_message_view(request):
         messages = ContactMessage.objects.all()
         serializer = ContactMessageSerializer(messages, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@parser_classes([MultiPartParser, FormParser])
+@permission_classes([IsAuthenticated])
+def update_my_avatar(request):
+    avatar_file = request.FILES.get('avatar')
+    if not avatar_file:
+        return Response({'error': 'No image file provided'}, status=400)
+    if not avatar_file.content_type.startswith('image/'):
+        return Response({'error': 'File must be an image'}, status=400)
+    if avatar_file.size > 5 * 1024 * 1024:
+        return Response({'error': 'Image too large (max 5MB)'}, status=400)
+
+    user = request.user
+    user.avatar = avatar_file.read()
+    user.avatar_content_type = avatar_file.content_type
+    user.save(update_fields=['avatar', 'avatar_content_type'])
+    return Response({'status': True, 'has_avatar': True})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user_avatar(request, user_id):
+    try:
+        user = User.objects.get(id=user_id)
+    except User.DoesNotExist:
+        return Response({'error': 'User not found'}, status=404)
+    if not user.avatar:
+        return Response({'error': 'No avatar set'}, status=404)
+    return HttpResponse(bytes(user.avatar), content_type=user.avatar_content_type or 'image/png')

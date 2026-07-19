@@ -144,15 +144,29 @@
                       v-if="!module.children"
                       :to="getModuleRoute(module.name)"
                       @click="handleNavigation"
-                      class="flex items-center px-4 py-2 rounded-xl text-text-muted hover:bg-primary-subtle hover:text-primary font-medium transition-all"
+                      class="relative flex items-center px-4 py-2 rounded-xl text-text-muted hover:bg-primary-subtle hover:text-primary font-medium transition-all"
                       :class="[
-                        isActive(module.name, $route.path) ? 'bg-primary-subtle text-primary font-semibold shadow-sm  border-primary' : '',
-                        showCollapsed ? 'justify-center' : 'space-x-3'
-                      ]"
+      isActive(module.name, $route.path) ? 'bg-primary-subtle text-primary font-semibold shadow-sm  border-primary' : '',
+      showCollapsed ? 'justify-center' : 'space-x-3'
+    ]"
                       :title="showCollapsed ? module.name : null"
                   >
-                    <font-awesome-icon :icon="module.icon" class="text-lg w-5 shrink-0" />
-                    <span v-show="!showCollapsed" class="transition-opacity duration-150">{{ module.name }}</span>
+  <span class="relative shrink-0">
+    <font-awesome-icon :icon="module.icon" class="text-lg w-5" />
+    <span
+        v-if="module.name === 'Inbox' && unreadConversationsCount > 0 && showCollapsed"
+        class="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-danger border-2 border-surface"
+    ></span>
+  </span>
+
+                    <span v-show="!showCollapsed" class="transition-opacity duration-150 flex-1">{{ module.name }}</span>
+
+                    <span
+                        v-if="module.name === 'Inbox' && unreadConversationsCount > 0 && !showCollapsed"
+                        class="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-danger px-1 text-[10px] font-semibold text-white"
+                    >
+    {{ unreadConversationsCount }}
+  </span>
                   </router-link>
 
                   <!-- Module with dropdown (Employees) - Drills down -->
@@ -276,7 +290,8 @@ const {
   isActive,
   getUserRole,
   isSidebarOpen,
-  collapsed
+  collapsed,
+  unreadConversationsCount,
 } = useAdminSidebar();
 
 const userRole = getUserRole();

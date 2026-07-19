@@ -54,7 +54,12 @@ export const API_ENDPOINTS = {
     INBOX_DELETE_FOR_ME: (messageId) => `/api/inbox/messages/${messageId}/delete-for-me/`,
     INBOX_DELETE_FOR_EVERYONE: (messageId) => `/api/inbox/messages/${messageId}/delete-for-everyone/`,
     INBOX_CLEAR_CHAT: (conversationId) => `/api/inbox/conversations/${conversationId}/clear/`,
-
+    INBOX_UPDATE_GROUP_AVATAR: (conversationId) => `/api/inbox/conversations/${conversationId}/avatar/`,
+    INBOX_GET_GROUP_AVATAR: (conversationId) => `/api/inbox/conversations/${conversationId}/avatar/image/`,
+    INBOX_LEAVE_GROUP: (conversationId) => `/api/inbox/conversations/${conversationId}/leave/`,
+    INBOX_ADD_MEMBERS: (conversationId) => `/api/inbox/conversations/${conversationId}/add-members/`,
+    ACCOUNTS_UPDATE_MY_AVATAR: '/api/accounts/profile/avatar/',
+    ACCOUNTS_GET_USER_AVATAR: (userId) => `/api/accounts/users/${userId}/avatar/`,
     CREDENTIALS: {
         GET_ALL: '/api/credentials/get_all_credentials/',
         CREATE: '/api/credentials/create/',
