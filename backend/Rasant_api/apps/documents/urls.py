@@ -18,4 +18,5 @@ urlpatterns = [
     path('folders/all/', views.get_all_folders, name='all-folders'),
     path('files/all/', views.get_all_files, name='all-files'),
     path('files/<int:pk>/view/', views.view_file_content, name='view-file-content'),
+    path('share_document/', views.share_document, name='share_document'),
 ]

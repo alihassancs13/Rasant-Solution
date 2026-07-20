@@ -9,8 +9,9 @@
             userName="System Admin"
             role="admin"
             :notificationCount="3"
-            titleOverride="Inbox"
+            titleOverride="Inquiries"
             subtitleOverride="Manage your messages and notifications"
+            :iconOverride="['fas', 'paper-plane']"
         />
       </div>
 

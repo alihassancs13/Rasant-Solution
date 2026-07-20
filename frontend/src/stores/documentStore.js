@@ -396,6 +396,38 @@ export const useDocumentStore = defineStore('documents', {
                 this.isLoading = false;
             }
         },
+        async shareDocument(folderId, fileId, employeeIds) {
+            this.isLoading = true;
+            this.error = null;
+            try {
+                const payload = {
+                    employee_id: employeeIds
+                };
+
+                if (folderId) {
+                    payload.folder_id = folderId;
+                } else if (fileId) {
+                    payload.file_id = fileId;
+                } else {
+                    throw new Error('Either folder_id or file_id is required');
+                }
+
+                const response = await this._apiRequest(
+                    API_ENDPOINTS.DOCUMENTS.SHARE,
+                    {
+                        method: 'POST',
+                        body: JSON.stringify(payload),
+                    }
+                );
+                return response;
+            } catch (error) {
+                this.error = error.message;
+                console.error('Share document error:', error);
+                throw error;
+            } finally {
+                this.isLoading = false;
+            }
+        },
         ///view file
 
         async viewFileContent(fileId) {

@@ -228,6 +228,7 @@ watch(() => route.query.highlightEmployee, (newVal) => {
             titleOverride="Salaries"
             subtitleOverride="Compensation, policies & increments"
             @highlight-employee="handleHighlightEmployee"
+            :iconOverride="['fas', 'money-bill']"
         />
       </div>
 

@@ -379,6 +379,7 @@ watch(() => selectedApplicant.value?.id, (id) => {
             :subtitleOverride="headerSubtitle"
             :showBack="activeTab === 'cv-applications' && !!selectedJobForCVs"
             @back="handleBackToJobs"
+            :iconOverride="['fas', 'briefcase']"
         />
       </div>
 

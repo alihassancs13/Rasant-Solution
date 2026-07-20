@@ -2,9 +2,11 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useCredentialsVaultStore } from '@/stores/credentialsVaultStore.js'
 import { storeToRefs } from 'pinia'
 import { useToast } from '@/composables/useToast.js'
+import { useEmployeeStore } from '@/stores/employeeStore.js'
 
 export default function useCredentialsVault() {
     const store = useCredentialsVaultStore()
+    const employeeStore = useEmployeeStore()
     const { credentials, loading, error, uniqueProjects, staleCredentials, totalCount } = storeToRefs(store)
     const { showToast } = useToast()
 
@@ -13,9 +15,19 @@ export default function useCredentialsVault() {
     const currentPage = ref(1)
     const pageSize = ref(5)
     const showModal = ref(false)
+    const showShareModal = ref(false)  // NEW: Share modal state
     const isEditing = ref(false)
     const isSaving = ref(false)
+    const isSharing = ref(false)  // NEW: Sharing state
     const fieldErrors = ref({})
+    const selectedCredential = ref(null)  // NEW: Store selected credential for sharing
+
+    // NEW: Share modal state
+    const shareSearchQuery = ref('')
+    const shareCurrentPage = ref(1)
+    const sharePageSize = ref(5)
+    const selectedEmployees = ref([])
+
     const form = ref({
         id: null,
         name: '',
@@ -60,6 +72,41 @@ export default function useCredentialsVault() {
 
     const paginatedCredentials = computed(() => {
         return filteredCredentials.value.slice(startIndex.value, endIndex.value)
+    })
+
+    // NEW: Share modal computed properties
+    const shareFilteredEmployees = computed(() => {
+        if (!employeeStore.employees || employeeStore.employees.length === 0) return []
+
+        let result = employeeStore.employees
+
+        if (shareSearchQuery.value) {
+            const query = shareSearchQuery.value.toLowerCase()
+            result = result.filter(emp =>
+                emp.username?.toLowerCase().includes(query) ||
+                emp.email?.toLowerCase().includes(query) ||
+                emp.first_name?.toLowerCase().includes(query) ||
+                emp.last_name?.toLowerCase().includes(query)
+            )
+        }
+
+        return result
+    })
+
+    const shareTotalPages = computed(() => {
+        return Math.ceil(shareFilteredEmployees.value.length / sharePageSize.value) || 1
+    })
+
+    const shareStartIndex = computed(() => {
+        return (shareCurrentPage.value - 1) * sharePageSize.value
+    })
+
+    const shareEndIndex = computed(() => {
+        return shareStartIndex.value + sharePageSize.value
+    })
+
+    const sharePaginatedEmployees = computed(() => {
+        return shareFilteredEmployees.value.slice(shareStartIndex.value, shareEndIndex.value)
     })
 
     const passwordStrength = computed(() => {
@@ -135,7 +182,6 @@ export default function useCredentialsVault() {
         const cred = credentials.value.find(c => c.id === id)
         if (cred) {
             cred.showPassword = !cred.showPassword
-            console.log('Toggled password for:', cred.name, 'showPassword:', cred.showPassword)
         }
     }
 
@@ -169,6 +215,90 @@ export default function useCredentialsVault() {
             project: 'sentra'
         }
     }
+
+    // NEW: Share modal functions
+    const openShareModal = async (credential) => {
+        selectedCredential.value = credential
+        selectedEmployees.value = []  // Reset selection
+        shareSearchQuery.value = ''
+
+        if (employeeStore.employees.length === 0) {
+            await employeeStore.fetchEmployees({ page: 1, page_size: 100 })
+        }
+
+        showShareModal.value = true
+    }
+
+    const closeShareModal = () => {
+        showShareModal.value = false
+        selectedCredential.value = null
+        selectedEmployees.value = []
+        shareSearchQuery.value = ''
+        shareCurrentPage.value = 1
+    }
+
+    const sharePrevPage = () => {
+        if (shareCurrentPage.value > 1) {
+            shareCurrentPage.value--
+        }
+    }
+
+    const shareNextPage = () => {
+        if (shareCurrentPage.value < shareTotalPages.value) {
+            shareCurrentPage.value++
+        }
+    }
+
+    const shareGoToPage = (page) => {
+        shareCurrentPage.value = page
+    }
+
+    const toggleEmployee = (employee) => {
+        const index = selectedEmployees.value.findIndex(e => e.id === employee.id)
+        if (index > -1) {
+            selectedEmployees.value.splice(index, 1)
+        } else {
+            selectedEmployees.value.push(employee)
+        }
+    }
+
+    const isEmployeeSelected = (employeeId) => {
+        return selectedEmployees.value.some(e => e.id === employeeId)
+    }
+
+    const confirmShare = async () => {
+        if (selectedEmployees.value.length === 0) {
+            showToast('Please select at least one employee', 'warning', 3000)
+            return
+        }
+
+        if (!selectedCredential.value) {
+            showToast('No credential selected', 'error', 3000)
+            return
+        }
+
+        isSharing.value = true
+        try {
+            const employeeIds = selectedEmployees.value.map(e => e.id)
+            const result = await store.shareCredential(
+                selectedCredential.value.id,
+                employeeIds  // Send array of IDs
+            )
+
+            if (result.success) {
+                showToast(`Credential shared with ${selectedEmployees.value.length} employee(s) successfully!`, 'success', 3000)
+                closeShareModal()
+            } else {
+                showToast(result.error || 'Failed to share credential', 'error', 3000)
+            }
+        } catch (error) {
+            console.error('Error sharing credential:', error)
+            showToast('Error sharing credential', 'error', 3000)
+        } finally {
+            isSharing.value = false
+        }
+    }
+
 
     const saveCredential = async () => {
         if (isSaving.value) return
@@ -219,8 +349,73 @@ export default function useCredentialsVault() {
         currentPage.value = page
     }
 
+    // NEW: Displayed pages for share modal
+    const shareDisplayedPages = computed(() => {
+        const total = shareTotalPages.value
+        const current = shareCurrentPage.value
+        const pages = []
+        const maxVisible = 5
+
+        if (total <= maxVisible) {
+            for (let i = 1; i <= total; i++) {
+                pages.push(i)
+            }
+        } else {
+            if (current <= 3) {
+                for (let i = 1; i <= 3; i++) pages.push(i)
+                pages.push('...')
+                for (let i = total - 1; i <= total; i++) pages.push(i)
+            } else if (current >= total - 2) {
+                for (let i = 1; i <= 2; i++) pages.push(i)
+                pages.push('...')
+                for (let i = total - 2; i <= total; i++) pages.push(i)
+            } else {
+                pages.push(1)
+                pages.push('...')
+                for (let i = current - 1; i <= current + 1; i++) pages.push(i)
+                pages.push('...')
+                pages.push(total)
+            }
+        }
+        return pages
+    })
+// Add this after shareDisplayedPages computed (around line 200)
+    const displayedPages = computed(() => {
+        const total = totalPages.value
+        const current = currentPage.value
+        const pages = []
+        const maxVisible = 5
+
+        if (total <= maxVisible) {
+            for (let i = 1; i <= total; i++) {
+                pages.push(i)
+            }
+        } else {
+            if (current <= 3) {
+                for (let i = 1; i <= 3; i++) pages.push(i)
+                pages.push('...')
+                for (let i = total - 1; i <= total; i++) pages.push(i)
+            } else if (current >= total - 2) {
+                for (let i = 1; i <= 2; i++) pages.push(i)
+                pages.push('...')
+                for (let i = total - 2; i <= total; i++) pages.push(i)
+            } else {
+                pages.push(1)
+                pages.push('...')
+                for (let i = current - 1; i <= current + 1; i++) pages.push(i)
+                pages.push('...')
+                pages.push(total)
+            }
+        }
+        return pages
+    })
+    // Watch search query to reset page
     watch([searchQuery], () => {
         currentPage.value = 1
+    })
+
+    watch([shareSearchQuery], () => {
+        shareCurrentPage.value = 1
     })
 
     onMounted(async () => {
@@ -240,6 +435,7 @@ export default function useCredentialsVault() {
         currentPage,
         pageSize,
         showModal,
+        showShareModal,
         isEditing,
         form,
         filteredCredentials,
@@ -250,16 +446,39 @@ export default function useCredentialsVault() {
         passwordStrength,
         passwordMismatch,
         fieldErrors,
+        // Share modal
+        selectedCredential,
+        shareSearchQuery,
+        shareCurrentPage,
+        sharePageSize,
+        selectedEmployees,
+        shareFilteredEmployees,
+        shareTotalPages,
+        shareStartIndex,
+        shareEndIndex,
+        sharePaginatedEmployees,
+        displayedPages,
+        shareDisplayedPages,
         getInitials,
         getProjectColor,
         getProjectIcon,
         togglePassword,
         openAddModal,
         closeModal,
+        openShareModal,
+        closeShareModal,
+        toggleEmployee,
+        isEmployeeSelected,
+        confirmShare,
+        sharePrevPage,
+        shareNextPage,
+        shareGoToPage,
         saveCredential,
         prevPage,
         nextPage,
         goToPage,
-        fetchCredentials: store.fetchCredentials
+        fetchCredentials: store.fetchCredentials,
+        isSharing,
+        employeeStore
     }
 }

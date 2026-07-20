@@ -14,6 +14,7 @@
             :notificationCount="3"
             titleOverride="Jira"
             subtitleOverride="Manage your Jira issues and sync tickets directly from Rasant Solutions"
+            :iconOverride="['fab', 'jira']"
         />
       </div>
 

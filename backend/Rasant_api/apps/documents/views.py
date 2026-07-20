@@ -8,8 +8,9 @@ from rest_framework.response import Response
 from django.http import HttpResponse
 from rest_framework import status
 from django.shortcuts import get_object_or_404
-from .models import Folder
+from .models import Folder,File,SharedDocument
 import  os
+from employeeDashboard.models import Employee
 from .serializers import FolderSerializer,FileSerializer,File
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -482,3 +483,124 @@ def view_file_content(request, pk):
         'extension': extension,
         'message': f'Preview not available for .{extension} files.'
     })
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def share_document(request):
+    """
+    Share a folder or file with one or multiple employees
+    """
+    try:
+        # Get data from request
+        folder_id = request.data.get('folder_id')
+        file_id = request.data.get('file_id')
+        employee_ids = request.data.get('employee_id')
+
+        # Validate: either folder_id or file_id must be provided
+        if not folder_id and not file_id:
+            return Response(
+                {'error': 'folder_id  is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if folder_id and file_id:
+            return Response(
+                {'error': 'Cannot share both folder and file at the same time'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Validate employee_ids
+        if not employee_ids:
+            return Response(
+                {'error': 'employee_id is required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Convert single employee_id to list
+        if not isinstance(employee_ids, list):
+            employee_ids = [employee_ids]
+
+        # Remove duplicates
+        employee_ids = list(set(employee_ids))
+
+        # Check if folder or file exists
+        document = None
+        document_type = None
+
+        if folder_id:
+            document = get_object_or_404(Folder, id=folder_id)
+            document_type = 'folder'
+        else:
+            document = get_object_or_404(File, id=file_id)
+            document_type = 'file'
+
+        # Get all employees that exist
+        employees = Employee.objects.filter(id__in=employee_ids)
+        found_ids = set(employees.values_list('id', flat=True))
+        invalid_ids = set(employee_ids) - found_ids
+
+        if invalid_ids:
+            return Response(
+                {'error': f'Invalid employee IDs: {list(invalid_ids)}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Check for already shared documents
+        already_shared = []
+        for employee in employees:
+            existing_share = SharedDocument.objects.filter(
+                employee_id=employee.id
+            )
+
+            if folder_id:
+                existing_share = existing_share.filter(folder_id=folder_id)
+            else:
+                existing_share = existing_share.filter(file_id=file_id)
+
+            if existing_share.exists():
+                already_shared.append(employee.id)
+
+        if already_shared:
+            return Response(
+                {'error': f'Document already shared with employee(s): {already_shared}'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Create shares for all employees
+        created_shares = []
+        for employee in employees:
+            share_data = {
+                'employee_id': employee.id
+            }
+
+            if folder_id:
+                share_data['folder_id'] = folder_id
+            else:
+                share_data['file_id'] = file_id
+
+            shared_document = SharedDocument.objects.create(**share_data)
+
+            created_shares.append({
+                'share_id': shared_document.id,
+                'employee_id': employee.id,
+                'employee_name': employee.name,
+                'employee_email': employee.email,
+                'document_name': document.name if hasattr(document, 'name') else str(document),
+                'document_type': document_type,
+                'shared_at': shared_document.shared_at
+            })
+
+        # Return response
+        return Response({
+            'message': f'Document shared with {len(created_shares)} employee(s)',
+            'document_type': document_type,
+            'document_name': document.name if hasattr(document, 'name') else str(document),
+            'shared': created_shares
+        }, status=status.HTTP_201_CREATED)
+
+    except Exception as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

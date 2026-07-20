@@ -33,6 +33,7 @@ export const API_ENDPOINTS = {
             UPDATE: (id) => `/api/documents/folders/${id}/update/`,
             DELETE: (id) => `/api/documents/folders/${id}/delete/`,
             ALL: '/api/documents/folders/all/',
+
         },
         FILES: {
             UPLOAD: '/api/documents/files/upload/',
@@ -41,6 +42,7 @@ export const API_ENDPOINTS = {
             ALL: '/api/documents/files/all/',
         },
         ALL: '/api/documents/all/',
+        SHARE: '/api/documents/share_document/',
     },
 
     INBOX_LIST_CONVERSATIONS: '/api/inbox/conversations/',
@@ -63,5 +65,6 @@ export const API_ENDPOINTS = {
     CREDENTIALS: {
         GET_ALL: '/api/credentials/get_all_credentials/',
         CREATE: '/api/credentials/create/',
+        SHARE: '/api/credentials/share_credentials/',
     }
 };

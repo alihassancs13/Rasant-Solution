@@ -23,7 +23,6 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
 
     // Helper to get token
     const getAuthToken = () => {
-        // Try multiple ways to get the token
         const token = localStorage.getItem('access_token') ||
             localStorage.getItem('accessToken') ||
             localStorage.getItem('token')
@@ -42,7 +41,7 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
             }
 
             const url = `${BASE_URL}${API_ENDPOINTS.CREDENTIALS.GET_ALL}`
-            console.log('Fetching credentials from:', url) // Debug log
+            console.log('Fetching credentials from:', url)
 
             const response = await fetch(url, {
                 method: 'GET',
@@ -53,11 +52,9 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
             })
 
             if (response.status === 401) {
-                // Token expired or invalid - redirect to login
                 localStorage.removeItem('access_token')
                 localStorage.removeItem('accessToken')
                 localStorage.removeItem('token')
-                // Redirect to login page
                 window.location.href = '/login'
                 throw new Error('Session expired. Please login again.')
             }
@@ -67,9 +64,8 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
             }
 
             const data = await response.json()
-            console.log('API Response:', data) // Debug log
+            console.log('API Response:', data)
 
-            // Handle different response formats
             let credentialsData = []
             if (data.data && Array.isArray(data.data)) {
                 credentialsData = data.data
@@ -81,15 +77,13 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
                 credentialsData = []
             }
 
-            // Map API response to our format
-            // In fetchCredentials function - update the mapping
             credentials.value = credentialsData.map(item => ({
                 id: item.id,
                 name: item.name || item.credential_name || 'Untitled',
                 link: item.link || '',
                 username: item.username || '',
                 email: item.email || '',
-                password: item.password || '',  // Keep for backward compatibility
+                password: item.password || '',
                 password_display: item.password_display || item.password || '',
                 project: item.project || item.project_name || 'Uncategorized',
                 showPassword: false,
@@ -118,7 +112,6 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
             }
 
             const url = `${BASE_URL}${API_ENDPOINTS.CREDENTIALS.CREATE}`
-            console.log('Creating credential at:', url) // Debug log
 
             const response = await fetch(url, {
                 method: 'POST',
@@ -143,9 +136,7 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
             }
 
             const data = await response.json()
-            console.log('Create response:', data) // Debug log
 
-            // Extract created credential
             let newCred = {}
             if (data.data) {
                 newCred = data.data
@@ -153,7 +144,6 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
                 newCred = data
             }
 
-            // Add new credential to store
             const addedCred = {
                 id: newCred.id || Date.now(),
                 name: newCred.name || credentialData.name || 'Untitled',
@@ -181,6 +171,56 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
         }
     }
 
+    // NEW: Share credential action
+    const shareCredential = async (credentialId, employeeIds) => {
+        loading.value = true
+        error.value = null
+        try {
+            const token = getAuthToken()
+
+            if (!token) {
+                throw new Error('No authentication token found. Please login again.')
+            }
+
+            const url = `${BASE_URL}${API_ENDPOINTS.CREDENTIALS.SHARE}`
+
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    credential_id: credentialId,
+                    employee_id: employeeIds
+                })
+            })
+
+            if (response.status === 401) {
+                localStorage.removeItem('access_token')
+                localStorage.removeItem('accessToken')
+                localStorage.removeItem('token')
+                window.location.href = '/login'
+                throw new Error('Session expired. Please login again.')
+            }
+
+            const data = await response.json()
+
+            if (!response.ok) {
+                throw new Error(data.error || `Failed to share credential: ${response.status}`)
+            }
+
+            return { success: true, data }
+
+        } catch (err) {
+            error.value = err.message
+            console.error('Error sharing credential:', err)
+            return { success: false, error: err.message }
+        } finally {
+            loading.value = false
+        }
+    }
+
     const clearError = () => {
         error.value = null
     }
@@ -194,6 +234,7 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
         staleCredentials,
         fetchCredentials,
         createCredential,
+        shareCredential,
         clearError
     }
 })

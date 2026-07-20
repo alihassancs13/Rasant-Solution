@@ -35,7 +35,8 @@ const {
     <div class="flex-1 flex flex-col overflow-hidden">
       <div class="p-3 pl-1 sm:p-4 md:pl-4">
         <AppHeader class="w-full" userName="System Admin" role="admin" :notificationCount="1"
-                   titleOverride="Inbox" subtitleOverride="Manage your messages and notifications" />
+                   titleOverride="Inbox" subtitleOverride="Manage your messages and notifications"
+                   :iconOverride="['fas', 'envelope']" />
       </div>
 
       <div class="flex-1 min-h-0 overflow-hidden px-3 sm:px-4 pb-4">

@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-screen bg-gray-50">
+  <div class="flex h-screen overflow-hidden bg-gray-50">
     <ToastContainer />
     <!-- Sidebar (Desktop) -->
     <div class="flex-shrink-0 hidden md:block">
@@ -13,7 +13,7 @@
       </button>
     </div>
 
-    <!-- Mobile Sidebar Drawer (overlay, does not push page content) -->
+    <!-- Mobile Sidebar Drawer -->
     <div v-if="isSidebarOpen" class="md:hidden fixed inset-0 z-50">
       <div class="fixed inset-0 bg-black/50" @click="isSidebarOpen = false"></div>
       <div class="fixed top-0 left-0 h-full w-64 bg-white shadow-xl overflow-y-auto">
@@ -28,8 +28,9 @@
     </div>
 
     <!-- Main Content -->
-    <div class="flex-1 overflow-y-auto w-full">
-      <div class="p-4 sm:p-6">
+    <div class="flex-1 flex flex-col overflow-hidden bg-gray-50">
+      <!-- Header with proper spacing -->
+      <div class="p-3 pl-1 sm:p-4 md:pl-4">
         <DashboardHeader
             class="w-full"
             userName="System Admin"
@@ -37,230 +38,246 @@
             :notificationCount="1"
             titleOverride="Vault"
             subtitleOverride="Admin login and access keys"
+            :iconOverride="['fas', 'shield-alt']"
         />
-        <!-- Loading State -->
-        <div v-if="loading" class="flex justify-center items-center h-64">
-          <div class="text-center">
-            <i class="fas fa-spinner fa-spin text-4xl text-indigo-600 mb-4"></i>
-            <p class="text-gray-600">Loading credentials...</p>
-          </div>
-        </div>
+      </div>
 
-        <!-- Error State -->
-        <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-          <div class="flex items-center gap-3">
-            <i class="fas fa-exclamation-circle text-red-500 text-xl"></i>
-            <div>
-              <h4 class="text-red-800 font-medium">Error loading credentials</h4>
-              <p class="text-red-600 text-sm">{{ error }}</p>
-              <button
-                  @click="fetchCredentials"
-                  class="mt-2 text-sm text-red-600 hover:text-red-800 underline"
-              >
-                Try again
-              </button>
+      <!-- Scrollable Content -->
+      <div class="flex-1 pt-1 px-4 pb-4 sm:px-6 lg:px-8 overflow-hidden">
+        <div class="w-full h-full">
+          <!-- Loading State -->
+          <div v-if="loading" class="flex justify-center items-center h-64">
+            <div class="text-center">
+              <i class="fas fa-spinner fa-spin text-4xl text-indigo-600 mb-4"></i>
+              <p class="text-gray-600">Loading credentials...</p>
             </div>
           </div>
-        </div>
 
-        <!-- Content -->
-        <template v-else>
-          <!-- Main Panel -->
-          <div class="bg-white mt-4 sm:mt-7 rounded-xl shadow-lg border border-gray-200 overflow-hidden">
-            <!-- Toolbar -->
-            <div class="p-3 sm:p-4 border-b border-gray-200">
-              <div class="flex flex-col sm:flex-row flex-wrap items-start sm:items-center justify-between gap-3 sm:gap-4">
-                <!-- Total Credentials -->
-                <div class="flex items-center gap-4 bg-gradient-to-br from-[#2A5F9E] to-[#4A90E2] rounded-lg w-full sm:w-auto">
-                  <div class="px-3 sm:px-4 py-2 rounded-lg border border-indigo-100 w-full sm:w-auto text-center sm:text-left">
-                    <span class="text-base sm:text-lg font-bold text-buttonTextColor">Total Credentials :</span>
-                    <span class="ml-2 text-base sm:text-lg font-bold text-buttonTextColor">{{ totalCount || 0 }}</span>
-                  </div>
-                </div>
+          <!-- Error State -->
+          <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+            <div class="flex items-center gap-3">
+              <i class="fas fa-exclamation-circle text-red-500 text-xl"></i>
+              <div>
+                <h4 class="text-red-800 font-medium">Error loading credentials</h4>
+                <p class="text-red-600 text-sm">{{ error }}</p>
+                <button
+                    @click="fetchCredentials"
+                    class="mt-2 text-sm text-red-600 hover:text-red-800 underline"
+                >
+                  Try again
+                </button>
+              </div>
+            </div>
+          </div>
 
-                <!-- Right Toolbar -->
-                <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto">
-                  <div class="relative flex-1 sm:flex-none min-w-0">
+          <!-- Content -->
+          <template v-else>
+            <!-- Main Panel -->
+            <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden flex flex-col h-full">
+              <!-- Toolbar -->
+              <div class="flex-shrink-0 p-3 sm:p-4 border-b border-gray-200">
+                <div class="flex flex-col sm:flex-row flex-wrap items-start sm:items-center justify-between gap-3 sm:gap-4">
+                  <!-- Left Side - Search -->
+                  <div class="relative flex-1 sm:flex-none min-w-0 w-full sm:w-48 md:w-60">
                     <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
                     <input
                         type="search"
                         v-model="searchQuery"
-                        placeholder="Search..."
-                        class="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none w-full sm:w-48 md:w-60"
+                        placeholder="Search by name ... "
+                        class="pl-10 pr-4 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none w-full"
                     />
                   </div>
 
-                  <div class="flex items-center gap-2 flex-shrink-0">
-                    <span class="text-sm text-gray-600 hidden sm:inline">Show</span>
-                    <select
-                        v-model="pageSize"
-                        class="px-2 sm:px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-sm"
-                    >
-                      <option value="5">5</option>
-                      <option value="10">10</option>
-                      <option value="20">20</option>
-                      <option value="50">50</option>
-                    </select>
-                    <span class="text-sm text-gray-600 hidden sm:inline">per page</span>
-                  </div>
+                  <!-- Right Side - Page Size + Add Button -->
+                  <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full sm:w-auto justify-end">
+                    <div class="flex items-center gap-2 flex-shrink-0">
+                      <span class="text-sm text-gray-600 hidden sm:inline">Show</span>
+                      <select
+                          v-model="pageSize"
+                          class="px-2 sm:px-3 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-sm"
+                      >
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                      </select>
+                      <span class="text-sm text-gray-600 hidden sm:inline">per page</span>
+                    </div>
 
-                  <button
-                      @click="openAddModal"
-                      class="px-3 sm:px-4 py-2 btn-primary-gradient cursor-pointer text-buttonTextColor rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2 text-sm sm:text-base flex-shrink-0"
-                  >
-                    <i class="fas fa-plus"></i>
-                    <span class="hidden sm:inline">Add credential</span>
-                    <span class="sm:hidden">Add</span>
-                  </button>
+                    <button
+                        @click="openAddModal"
+                        class="px-3 sm:px-4 py-2 btn-primary-gradient cursor-pointer text-buttonTextColor rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2 text-sm sm:text-base flex-shrink-0"
+                    >
+                      <i class="fas fa-plus"></i>
+                      <span class="hidden sm:inline">Add credential</span>
+                      <span class="sm:hidden">Add</span>
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
+              <!-- Table - Desktop View -->
+              <div class="hidden md:block overflow-y-auto flex-1">
+                <table class="w-full min-w-[700px] lg:min-w-[800px]">
+                  <thead class="bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
+                  <tr>
+                    <th class="px-4 sm:px-6 py-3 text-left font-bold text-xs text-gray-500 uppercase tracking-wider">Project name</th>
+                    <th class="px-4 sm:px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Username</th>
+                    <th class="px-4 sm:px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Email</th>
+                    <th class="px-4 sm:px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Password</th>
+                    <th class="px-4 sm:px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Action</th>
+                  </tr>
+                  </thead>
+                  <tbody class="bg-white divide-y divide-gray-200">
+                  <!-- No Data -->
+                  <tr v-if="paginatedCredentials && paginatedCredentials.length === 0">
+                    <td colspan="5" class="px-6 py-12 text-center">
+                      <div class="flex flex-col items-center">
+                        <i class="fas fa-lock text-4xl text-gray-300 mb-3"></i>
+                        <h4 class="text-lg font-medium text-gray-700">No credentials found</h4>
+                        <p class="text-sm text-gray-500">Try a different search, or add a new credential for this project.</p>
+                      </div>
+                    </td>
+                  </tr>
+                  <!-- Data Rows -->
+                  <tr v-for="cred in paginatedCredentials" :key="cred.id" class="hover:bg-gray-50 transition-colors">
+                    <td class="px-4 sm:px-6 py-4">
+                      <div class="flex items-center gap-2 sm:gap-3">
+                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center text-white font-bold text-xs sm:text-sm flex-shrink-0"
+                             :style="{ backgroundColor: '#3B82F6' }">
+                          {{ getInitials(cred.name) }}
+                        </div>
+                        <div class="min-w-0">
+                          <strong class="text-xs sm:text-sm block truncate max-w-[120px] sm:max-w-[200px]">{{ cred.name }}</strong>
+                          <a :href="cred.link" target="_blank" rel="noopener" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 truncate max-w-[120px] sm:max-w-[200px]">
+                            {{ cred.link }}
+                            <i class="fas fa-arrow-up-right-from-square text-[10px] flex-shrink-0"></i>
+                          </a>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-4 sm:px-6 py-4">
+                      <span class="text-xs sm:text-sm truncate block max-w-[150px]">{{ cred.username }}</span>
+                    </td>
+                    <td class="px-4 sm:px-6 py-4">
+                      <span class="text-xs sm:text-sm truncate block max-w-[120px] sm:max-w-[200px]">{{ cred.email }}</span>
+                    </td>
+                    <td class="px-4 sm:px-6 py-4">
+                      <div class="flex items-center gap-2 whitespace-nowrap">
+                        <span class="text-xs sm:text-sm font-mono inline-block min-w-[85px] sm:min-w-[95px]">{{ cred.showPassword ? cred.password_display : '••••••••' }}</span>
+                        <button @click="togglePassword(cred.id)" class="text-gray-400 cursor-pointer hover:text-gray-600 transition-colors flex-shrink-0">
+                          <i :class="cred.showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                        </button>
+                      </div>
+                    </td>
+                    <td class="px-4 sm:px-6 py-4 text-center">
+                      <button
+                          @click="openShareModal(cred)"
+                          class="text-indigo-600 hover:text-indigo-800 cursor-pointer transition-colors p-1.5 rounded-lg hover:bg-indigo-50"
+                          title="Share credential"
+                      >
+                        <i class="fas fa-share-alt text-sm sm:text-base"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+              </div>
 
-            <!-- Table - Desktop View -->
-            <div class="hidden md:block overflow-x-auto">
-              <table class="w-full min-w-[700px] lg:min-w-[800px]">
-                <thead class="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th class="px-4 sm:px-6 py-3 text-left font-bold text-xs text-gray-500 uppercase tracking-wider">Project name</th>
-                  <th class="px-4 sm:px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Username</th>
-                  <th class="px-4 sm:px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Email</th>
-                  <th class="px-4 sm:px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Password</th>
-                </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                <!-- No Data -->
-                <tr v-if="paginatedCredentials && paginatedCredentials.length === 0">
-                  <td colspan="4" class="px-6 py-12 text-center">
-                    <div class="flex flex-col items-center">
-                      <i class="fas fa-lock text-4xl text-gray-300 mb-3"></i>
-                      <h4 class="text-lg font-medium text-gray-700">No credentials found</h4>
-                      <p class="text-sm text-gray-500">Try a different search, or add a new credential for this project.</p>
-                    </div>
-                  </td>
-                </tr>
-                <!-- Data Rows -->
-                <tr v-for="cred in paginatedCredentials" :key="cred.id" class="hover:bg-gray-50 transition-colors">
-                  <td class="px-4 sm:px-6 py-4">
-                    <div class="flex items-center gap-2 sm:gap-3">
-                      <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center text-white font-bold text-xs sm:text-sm flex-shrink-0"
+              <!-- Mobile Card View -->
+              <div class="md:hidden overflow-y-auto flex-1 space-y-3 p-3">
+                <div v-if="paginatedCredentials && paginatedCredentials.length === 0" class="text-center py-12">
+                  <i class="fas fa-lock text-4xl text-gray-300 mb-3"></i>
+                  <h4 class="text-lg font-medium text-gray-700">No credentials found</h4>
+                  <p class="text-sm text-gray-500">Try a different search, or add a new credential.</p>
+                </div>
+                <div
+                    v-for="cred in paginatedCredentials"
+                    :key="cred.id"
+                    class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 hover:shadow-md transition-shadow"
+                >
+                  <div class="flex items-start justify-between gap-2">
+                    <div class="flex items-center gap-3 min-w-0">
+                      <div class="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
                            :style="{ backgroundColor: '#3B82F6' }">
                         {{ getInitials(cred.name) }}
                       </div>
                       <div class="min-w-0">
-                        <strong class="text-xs sm:text-sm block truncate max-w-[120px] sm:max-w-[200px]">{{ cred.name }}</strong>
-                        <a :href="cred.link" target="_blank" rel="noopener" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 truncate max-w-[120px] sm:max-w-[200px]">
+                        <strong class="text-sm block truncate">{{ cred.name }}</strong>
+                        <a :href="cred.link" target="_blank" rel="noopener" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 truncate">
                           {{ cred.link }}
                           <i class="fas fa-arrow-up-right-from-square text-[10px] flex-shrink-0"></i>
                         </a>
                       </div>
                     </div>
-                  </td>
-                  <td class="px-4 sm:px-6 py-4">
-                    <span class="text-xs sm:text-sm truncate block max-w-[150px]">{{ cred.username }}</span>
-                  </td>
-                  <td class="px-4 sm:px-6 py-4">
-                    <span class="text-xs sm:text-sm truncate block max-w-[120px] sm:max-w-[200px]">{{ cred.email }}</span>
-                  </td>
-                  <td class="px-4 sm:px-6 py-4">
-                    <div class="flex items-center gap-2 whitespace-nowrap">
-                      <span class="text-xs sm:text-sm font-mono inline-block min-w-[85px] sm:min-w-[95px]">{{ cred.showPassword ? cred.password_display : '••••••••' }}</span>
-                      <button @click="togglePassword(cred.id)" class="text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0">
-                        <i :class="cred.showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                </tbody>
-              </table>
-            </div>
+                    <button
+                        @click="openShareModal(cred)"
+                        class="text-indigo-600 hover:text-indigo-800 transition-colors p-2 rounded-lg hover:bg-indigo-50 flex-shrink-0"
+                        title="Share credential"
+                    >
+                      <i class="fas fa-share-alt"></i>
+                    </button>
+                  </div>
 
-            <!-- Mobile Card View -->
-            <div class="md:hidden space-y-3 p-3">
-              <div v-if="paginatedCredentials && paginatedCredentials.length === 0" class="text-center py-12">
-                <i class="fas fa-lock text-4xl text-gray-300 mb-3"></i>
-                <h4 class="text-lg font-medium text-gray-700">No credentials found</h4>
-                <p class="text-sm text-gray-500">Try a different search, or add a new credential.</p>
-              </div>
-              <div
-                  v-for="cred in paginatedCredentials"
-                  :key="cred.id"
-                  class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 hover:shadow-md transition-shadow"
-              >
-                <div class="flex items-start justify-between gap-2">
-                  <div class="flex items-center gap-3 min-w-0">
-                    <div class="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
-                         :style="{ backgroundColor: '#3B82F6' }">
-                      {{ getInitials(cred.name) }}
+                  <div class="mt-3 grid grid-cols-2 gap-3 text-sm border-t border-gray-100 pt-3">
+                    <div class="min-w-0">
+                      <p class="text-xs text-gray-500 font-medium">Username</p>
+                      <p class="font-medium text-gray-800 truncate">{{ cred.username }}</p>
                     </div>
                     <div class="min-w-0">
-                      <strong class="text-sm block truncate">{{ cred.name }}</strong>
-                      <a :href="cred.link" target="_blank" rel="noopener" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 truncate">
-                        {{ cred.link }}
-                        <i class="fas fa-arrow-up-right-from-square text-[10px] flex-shrink-0"></i>
-                      </a>
+                      <p class="text-xs text-gray-500 font-medium">Email</p>
+                      <p class="font-medium text-gray-800 truncate">{{ cred.email }}</p>
                     </div>
-                  </div>
-                </div>
-
-                <div class="mt-3 grid grid-cols-2 gap-3 text-sm border-t border-gray-100 pt-3">
-                  <div class="min-w-0">
-                    <p class="text-xs text-gray-500 font-medium">Username</p>
-                    <p class="font-medium text-gray-800 truncate">{{ cred.username }}</p>
-                  </div>
-                  <div class="min-w-0">
-                    <p class="text-xs text-gray-500 font-medium">Email</p>
-                    <p class="font-medium text-gray-800 truncate">{{ cred.email }}</p>
-                  </div>
-                  <div class="col-span-2">
-                    <p class="text-xs text-gray-500 font-medium">Password</p>
-                    <div class="flex items-center gap-2">
-                      <span class="font-mono text-sm inline-block min-w-[85px]">{{ cred.showPassword ? cred.password_display : '••••••••' }}</span>
-                      <button @click="togglePassword(cred.id)" class="text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0">
-                        <i :class="cred.showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
-                      </button>
+                    <div class="col-span-2">
+                      <p class="text-xs text-gray-500 font-medium">Password</p>
+                      <div class="flex items-center gap-2">
+                        <span class="font-mono text-sm inline-block min-w-[85px]">{{ cred.showPassword ? cred.password_display : '••••••••' }}</span>
+                        <button @click="togglePassword(cred.id)" class="text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0">
+                          <i :class="cred.showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
 
-            <!-- Pagination -->
-            <div class="px-3 sm:px-6 py-4 border-t border-gray-200 flex flex-wrap items-center justify-center sm:justify-between gap-3">
-              <div class="text-xs sm:text-sm text-gray-600 w-full sm:w-auto text-center sm:text-left order-2 sm:order-1">
-                Showing {{ startIndex + 1 }}–{{ Math.min(endIndex, filteredCredentials?.length || 0) }} of {{ filteredCredentials?.length || 0 }}
-              </div>
-              <div class="flex items-center gap-2 order-1 sm:order-2 flex-wrap justify-center">
-                <button
-                    @click="prevPage"
-                    :disabled="currentPage === 1"
-                    class="px-2 sm:px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                >
-                  <i class="fas fa-chevron-left"></i>
-                </button>
-                <div class="flex gap-1 flex-wrap justify-center">
+              <!-- Pagination -->
+              <div class="flex-shrink-0 px-3 sm:px-6 py-4 border-t border-gray-200 flex flex-wrap items-center justify-between gap-3">
+                <div class="text-xs sm:text-sm text-gray-600">
+                  Showing {{ startIndex + 1 }}–{{ Math.min(endIndex, filteredCredentials?.length || 0) }} of {{ filteredCredentials?.length || 0 }}
+                </div>
+                <div class="flex items-center gap-2 flex-wrap justify-center">
                   <button
-                      v-for="page in totalPages"
-                      :key="page"
-                      @click="goToPage(page)"
-                      class="px-2 sm:px-3 py-2 rounded-lg transition-colors text-sm"
-                      :class="currentPage === page
-                      ? 'dash-topbar-profile text-buttonTextColor'
-                      : 'hover:bg-gray-100 text-gray-700'"
+                      @click="prevPage"
+                      :disabled="currentPage === 1"
+                      class="px-2 sm:px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
                   >
-                    {{ page }}
+                    <i class="fas fa-chevron-left"></i>
+                  </button>
+                  <div class="flex gap-1">
+                    <button
+                        v-for="page in displayedPages"
+                        :key="page"
+                        @click="typeof page === 'number' ? goToPage(page) : null"
+                        class="px-2 sm:px-3 py-2 rounded-lg transition-colors text-sm min-w-[32px]"
+                        :class="page === '...' ? 'cursor-default text-gray-400' :
+                                currentPage === page ? 'dash-topbar-profile text-buttonTextColor' : 'hover:bg-gray-100 text-gray-700'"
+                        :disabled="page === '...'"
+                    >
+                      {{ page }}
+                    </button>
+                  </div>
+                  <button
+                      @click="nextPage"
+                      :disabled="currentPage === totalPages"
+                      class="px-2 sm:px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                  >
+                    <i class="fas fa-chevron-right"></i>
                   </button>
                 </div>
-                <button
-                    @click="nextPage"
-                    :disabled="currentPage === totalPages"
-                    class="px-2 sm:px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-                >
-                  <i class="fas fa-chevron-right"></i>
-                </button>
               </div>
             </div>
-          </div>
-        </template>
+          </template>
+        </div>
       </div>
     </div>
 
@@ -339,7 +356,6 @@
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
                   required
               />
-              <!-- Missing-field error takes priority over the strength hint -->
               <p v-if="fieldErrors.password" class="text-xs mt-1 text-red-500">{{ fieldErrors.password }}</p>
               <p
                   v-else-if="passwordStrength && passwordStrength !== 'strong'"
@@ -364,9 +380,108 @@
               </p>
             </div>
           </div>
-
         </div>
       </form>
+    </BaseModal>
+
+
+    <!-- Share Modal using BaseModal -->
+
+    <BaseModal
+        :isOpen="showShareModal"
+        mode="form"
+        title="Share Credential"
+        :subtitle="`Share '${selectedCredential?.name || ''}' with employees`"
+        :submitText="isSharing ? 'Sharing...' : 'Share'"
+        :cancelText="'Cancel'"
+        :loading="isSharing"
+        @close="closeShareModal"
+        @save="confirmShare"
+    >
+      <div class="space-y-4">
+        <!-- Search Bar -->
+        <div class="relative">
+          <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+          <input
+              type="search"
+              v-model="shareSearchQuery"
+              placeholder="Search employees by name or email..."
+              class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+          />
+        </div>
+
+        <!-- Selected Count -->
+        <div v-if="selectedEmployees.length > 0" class="text-sm text-indigo-600">
+          <i class="fas fa-check-circle mr-1"></i>
+          {{ selectedEmployees.length }} employee(s) selected
+        </div>
+
+        <!-- Employee List - Grid View with 2 columns -->
+        <div class="border border-gray-200 rounded-lg overflow-y-auto max-h-[400px]">
+          <!-- Loading State -->
+          <div v-if="employeeStore.isLoading" class="flex justify-center items-center py-12">
+            <i class="fas fa-spinner fa-spin text-2xl text-indigo-600"></i>
+          </div>
+
+          <!-- No Employees -->
+          <div v-else-if="shareFilteredEmployees.length === 0" class="text-center py-12">
+            <i class="fas fa-users text-4xl text-gray-300 mb-3"></i>
+            <h4 class="text-lg font-medium text-gray-700">No employees found</h4>
+            <p class="text-sm text-gray-500">Try adjusting your search</p>
+          </div>
+
+          <!-- Employee Grid - 2 columns -->
+          <div v-else class="grid grid-cols-2 gap-2 p-3">
+            <div
+                v-for="emp in shareFilteredEmployees"
+                :key="emp.id"
+                @click="toggleEmployee(emp)"
+                class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors border border-gray-100"
+                :class="isEmployeeSelected(emp.id) ? 'bg-indigo-50 border-indigo-200' : ''"
+            >
+              <div class="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold text-xs">
+                {{ getInitials(emp.full_name || emp.email || 'U') }}
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-medium text-gray-800 truncate">
+                  {{ emp.full_name || emp.email || 'No name' }}
+                </p>
+                <p class="text-[10px] text-gray-500 truncate">{{ emp.email }}</p>
+              </div>
+              <div class="flex-shrink-0">
+                <div
+                    class="w-4 h-4 rounded-full border-2 flex items-center justify-center"
+                    :class="isEmployeeSelected(emp.id) ? 'border-indigo-600 bg-indigo-600' : 'border-gray-300'"
+                >
+                  <i v-if="isEmployeeSelected(emp.id)" class="fas fa-check text-white text-[8px]"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Selected Employees List -->
+        <div v-if="selectedEmployees.length > 0" class="bg-green-50 border border-green-200 rounded-lg p-3 max-h-[100px] overflow-y-auto">
+          <p class="text-xs text-green-800 font-medium mb-1">Selected employees:</p>
+          <div class="flex flex-wrap gap-1">
+                <span
+                    v-for="emp in selectedEmployees"
+                    :key="emp.id"
+                    class="inline-flex items-center gap-1 bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full"
+                >
+                    {{ emp.full_name || emp.email }}
+                    <button @click="toggleEmployee(emp)" class="hover:text-red-600">
+                        <i class="fas fa-times text-[10px]"></i>
+                    </button>
+                </span>
+          </div>
+        </div>
+
+        <!-- Share button disabled state info -->
+        <div v-if="selectedEmployees.length === 0" class="text-sm text-gray-500 text-center">
+          Please select at least one employee to share
+        </div>
+      </div>
     </BaseModal>
   </div>
 </template>

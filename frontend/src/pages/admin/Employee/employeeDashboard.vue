@@ -3,11 +3,12 @@
     <AdminSidebar />
 
     <div class="flex-1 flex flex-col overflow-hidden">
-      <div class="p-4 md:p-6 pb-0">
+      <div class="p-3 pl-1 sm:p-4 md:pl-4">
         <DashboardHeader
             :user-name="userName"
             role="employee"
             :notification-count="5"
+            :iconOverride="['fas', 'rectangle-list']"
         />
       </div>
 

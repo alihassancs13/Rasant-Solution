@@ -10,6 +10,7 @@
             :userName="'Admin User'"
             role="admin"
             :notificationCount="3"
+            :iconOverride="['fas', 'house']"
         />
       </div>
 

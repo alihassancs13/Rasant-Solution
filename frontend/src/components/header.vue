@@ -24,7 +24,8 @@
 
       <!-- Avatar with dash-topbar-profile class - Text centered -->
       <div class="dash-topbar-profile flex items-center justify-center">
-        {{ initials }}
+        <font-awesome-icon v-if="iconOverride" :icon="iconOverride" class="text-sm" />
+        <template v-else>{{ initials }}</template>
       </div>
 
       <div class="min-w-0">
@@ -305,6 +306,7 @@ const props = defineProps({
   titleOverride: { type: String, default: null },
   subtitleOverride: { type: String, default: null },
   showBack: { type: Boolean, default: false },
+  iconOverride: { type: Array, default: null },
 })
 
 const emit = defineEmits(['back', 'highlight-employee'])
@@ -429,6 +431,7 @@ onMounted(() => {
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
 })
+
 </script>
 
 <style scoped>

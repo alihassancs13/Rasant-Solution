@@ -11,6 +11,7 @@
             :notificationCount="1"
             titleOverride="Documents"
             subtitleOverride="Files, folders & shared storage"
+            :iconOverride="['fas', 'folder']"
         />
       </div>
 
@@ -120,7 +121,7 @@
                     </button>
                   </span>
               </nav>
-              <span class="text-[10px] sm:text-xs text-gray-400">{{ filteredItems.length }} items</span>
+              <span class="text-[10px] sm:text-xs text-gray-400">{{ filteredItems ? filteredItems.length : 0 }} items</span>
             </div>
 
             <!-- Dropzone -->
@@ -130,13 +131,18 @@
 
               <!-- GRID VIEW -->
               <div v-if="viewMode === 'grid'" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 p-3 sm:p-4">
-                <div v-for="item in filteredItems" :key="item.id" @click="!item.isFolder ? viewFile(item) : null" @dblclick="openItem(item)"
+                <div v-for="item in (filteredItems || [])" :key="item.id" @click="!item.isFolder ? viewFile(item) : null" @dblclick="openItem(item)"
                      class="group relative bg-gray-50 hover:bg-gray-100 rounded-xl p-3 sm:p-4 text-center transition cursor-pointer border-2 border-transparent hover:border-blue-200">
                   <div class="absolute top-1 right-1 sm:top-2 sm:right-2 opacity-0 group-hover:opacity-100 transition flex gap-0.5 sm:gap-1">
-                    <button @click.stop="editItem(item)" class="w-5 h-5 sm:w-7 sm:h-7 bg-white rounded-full shadow hover:bg-gray-50 text-[8px] sm:text-xs text-gray-600">
+                    <button @click.stop="openShareModal(item)"
+                            class="w-5 h-5 sm:w-7 sm:h-7 cursor-pointer bg-white rounded-full shadow hover:bg-green-50 text-[8px] sm:text-xs text-green-600"
+                            title="Share">
+                      <i class="fas fa-share-alt"></i>
+                    </button>
+                    <button @click.stop="editItem(item)" class="w-5 h-5 cursor-pointer sm:w-7 sm:h-7 bg-white rounded-full shadow hover:bg-gray-50 text-[8px] sm:text-xs text-gray-600">
                       <i class="fas fa-pen"></i>
                     </button>
-                    <button @click.stop="deleteItem(item)" class="w-5 h-5 sm:w-7 sm:h-7 bg-white rounded-full shadow hover:bg-red-50 text-[8px] sm:text-xs text-red-500">
+                    <button @click.stop="deleteItem(item)" class="w-5 h-5 cursor-pointer sm:w-7 sm:h-7 bg-white rounded-full shadow hover:bg-red-50 text-[8px] sm:text-xs text-red-500">
                       <i class="fas fa-trash-can"></i>
                     </button>
                   </div>
@@ -162,7 +168,7 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr v-for="item in filteredItems" :key="item.id"
+                    <tr v-for="item in (filteredItems || [])" :key="item.id"
                         @click="!item.isFolder ? handleListClick(item) : null"
                         @dblclick="openItem(item)"
                         class="border-t border-gray-100 hover:bg-gray-50 cursor-pointer"
@@ -190,6 +196,12 @@
                         <span class="text-xs text-gray-400 whitespace-nowrap">{{ previewData.size }}</span>
                       </div>
                       <div class="flex items-center gap-2 shrink-0">
+                        <!-- Share Icon -->
+                        <button @click.stop="openShareModal(getCurrentFile())"
+                                class="w-8 h-8 flex items-center justify-center bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm"
+                                title="Share">
+                          <i class="fas fa-share-alt"></i>
+                        </button>
                         <!-- Delete Icon -->
                         <button @click.stop="deleteItem(getCurrentFile())"
                                 class="w-8 h-8 flex items-center justify-center bg-red-500 text-white rounded-lg hover:bg-red-600 transition text-sm"
@@ -281,7 +293,7 @@
               </div>
 
               <!-- Empty State -->
-              <div v-if="filteredItems.length === 0" class="py-12 sm:py-16 text-center">
+              <div v-if="!filteredItems || filteredItems.length === 0" class="py-12 sm:py-16 text-center">
                 <div class="text-4xl sm:text-5xl text-gray-300 mb-3 sm:mb-4">
                   <i class="fas fa-cloud-arrow-up"></i>
                 </div>
@@ -387,6 +399,100 @@
         @close="closeDeleteModal"
         @save="submitDelete"
     />
+
+    <!-- ===== SHARE MODAL ===== -->
+    <BaseModal
+        :isOpen="showShareModal"
+        mode="form"
+        title="Share Document"
+        :subtitle="`Share '${selectedDocument?.name || ''}' with employees`"
+        :submitText="isSharing ? 'Sharing...' : 'Share'"
+        :cancelText="'Cancel'"
+        :loading="isSharing"
+        @close="closeShareModal"
+        @save="confirmShare"
+    >
+      <div class="space-y-4">
+        <!-- Search Bar -->
+        <div class="relative">
+          <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+          <input
+              type="search"
+              v-model="shareSearchQuery"
+              placeholder="Search employees by name or email..."
+              class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+          />
+        </div>
+
+        <!-- Selected Count -->
+        <div v-if="selectedEmployees.length > 0" class="text-sm text-indigo-600">
+          <i class="fas fa-check-circle mr-1"></i>
+          {{ selectedEmployees.length }} employee(s) selected
+        </div>
+
+        <!-- Employee Grid -->
+        <div class="border border-gray-200 rounded-lg overflow-y-auto max-h-[400px]">
+          <div v-if="employeeStore.isLoading" class="flex justify-center items-center py-12">
+            <i class="fas fa-spinner fa-spin text-2xl text-indigo-600"></i>
+          </div>
+
+          <div v-else-if="shareFilteredEmployees.length === 0" class="text-center py-12">
+            <i class="fas fa-users text-4xl text-gray-300 mb-3"></i>
+            <h4 class="text-lg font-medium text-gray-700">No employees found</h4>
+            <p class="text-sm text-gray-500">Try adjusting your search</p>
+          </div>
+
+          <div v-else class="grid grid-cols-2 gap-2 p-3">
+            <div
+                v-for="emp in shareFilteredEmployees"
+                :key="emp.id"
+                @click="toggleEmployee(emp)"
+                class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors border border-gray-100"
+                :class="isEmployeeSelected(emp.id) ? 'bg-indigo-50 border-indigo-200' : ''"
+            >
+              <div class="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold text-xs">
+                {{ getInitials(emp.full_name || emp.email || 'U') }}
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-medium text-gray-800 truncate">
+                  {{ emp.full_name || emp.email || 'No name' }}
+                </p>
+                <p class="text-[10px] text-gray-500 truncate">{{ emp.email }}</p>
+              </div>
+              <div class="flex-shrink-0">
+                <div
+                    class="w-4 h-4 rounded-full border-2 flex items-center justify-center"
+                    :class="isEmployeeSelected(emp.id) ? 'border-indigo-600 bg-indigo-600' : 'border-gray-300'"
+                >
+                  <i v-if="isEmployeeSelected(emp.id)" class="fas fa-check text-white text-[8px]"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Selected Employees Tags -->
+        <div v-if="selectedEmployees.length > 0" class="bg-green-50 border border-green-200 rounded-lg p-3 max-h-[100px] overflow-y-auto">
+          <p class="text-xs text-green-800 font-medium mb-1">Selected employees:</p>
+          <div class="flex flex-wrap gap-1">
+            <span
+                v-for="emp in selectedEmployees"
+                :key="emp.id"
+                class="inline-flex items-center gap-1 bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full"
+            >
+              {{ emp.full_name || emp.email }}
+              <button @click="toggleEmployee(emp)" class="hover:text-red-600">
+                <i class="fas fa-times text-[10px]"></i>
+              </button>
+            </span>
+          </div>
+        </div>
+
+        <div v-if="selectedEmployees.length === 0" class="text-sm text-gray-500 text-center">
+          Please select at least one employee to share
+        </div>
+      </div>
+    </BaseModal>
   </div>
 </template>
 
@@ -395,6 +501,7 @@ import useDocuments from '@/composables/useDocuments.js'
 import AdminSidebar from "@/components/adminSidebar.vue";
 import DashboardHeader from '@/components/header.vue';
 import BaseModal from '@/components/baseModal.vue';
+
 export default {
   name: 'Documents',
   components: {
@@ -405,7 +512,6 @@ export default {
   setup() {
     return useDocuments()
   }
-
 }
 </script>
 

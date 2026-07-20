@@ -85,11 +85,6 @@ class EmployeeListSerializer(serializers.ModelSerializer):
             'account_number',
             'net_salary',
             'raise_count',
-            # These two are written by force_increment_view but were never
-            # exposed here, so the frontend's overdue/due-date calculation
-            # (which reads employee.increment_applied_on) always saw
-            # `undefined` and kept showing the old "Overdue" status even
-            # after a successful apply + refresh.
             'increment_applied_on',
             'is_increment_pending',
             'password',

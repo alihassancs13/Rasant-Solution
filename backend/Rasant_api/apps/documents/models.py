@@ -4,6 +4,8 @@ from django.db import models
 
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
+from django.db.models import Q
 User = get_user_model()
 
 class Folder(models.Model):
@@ -105,3 +107,89 @@ class File(models.Model):
         """Check if file is an archive"""
         archive_extensions = ['zip', 'rar', '7z', 'tar', 'gz']
         return self.extension.lower() in archive_extensions
+
+class SharedDocument(models.Model):
+    """
+    Model to track document sharing with employees.
+    Can share either a folder or an individual file.
+    """
+    folder = models.ForeignKey(
+        'Folder',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='shared_documents',
+        help_text="Folder being shared (if sharing a folder)"
+    )
+    file = models.ForeignKey(
+        'File',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='shared_documents',
+        help_text="File being shared (if sharing a file)"
+    )
+    employee_id = models.IntegerField(
+        help_text="Employee ID from EmployeeDashboard table"
+    )
+    shared_at = models.DateTimeField(
+        auto_now_add=True,
+        help_text="Date and time when document was shared"
+    )
+
+    class Meta:
+        db_table = 'shared_documents'
+        verbose_name = 'Shared Document'
+        verbose_name_plural = 'Shared Documents'
+        ordering = ['-shared_at']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['folder', 'employee_id'],
+                condition=Q(folder__isnull=False),
+                name='unique_shared_folder_per_employee'
+            ),
+            models.UniqueConstraint(
+                fields=['file', 'employee_id'],
+                condition=Q(file__isnull=False),
+                name='unique_shared_file_per_employee'
+            ),
+            models.CheckConstraint(
+                check=(
+                    Q(folder__isnull=False, file__isnull=True) |
+                    Q(folder__isnull=True, file__isnull=False)
+                ),
+                name='either_folder_or_file_required'
+            ),
+        ]
+
+    def clean(self):
+        """Validate that either folder or file is provided, but not both"""
+        if not self.folder and not self.file:
+            raise ValidationError('Either folder or file must be provided.')
+        if self.folder and self.file:
+            raise ValidationError('Cannot share both folder and file at the same time.')
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
+
+    @property
+    def shared_item_name(self):
+        """Get the name of the shared item"""
+        if self.folder:
+            return self.folder.name
+        if self.file:
+            return self.file.full_name
+        return 'Unknown'
+
+    @property
+    def shared_item_type(self):
+        """Get the type of the shared item"""
+        if self.folder:
+            return 'folder'
+        if self.file:
+            return 'file'
+        return 'unknown'
+
+    def __str__(self):
+        return f"{self.shared_item_name} → Employee #{self.employee_id}"

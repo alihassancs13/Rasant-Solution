@@ -1,17 +1,21 @@
 // composables/useDocuments.js
-import { ref, computed, onMounted, watch,onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, watch, onBeforeUnmount } from 'vue'
 import { useDocumentStore } from '@/stores/documentStore.js'
 import { useToast } from '@/composables/useToast.js'
 import { BASE_URL } from '@/services/baseUrl.js'
+import { useEmployeeStore } from '@/stores/employeeStore.js'
+
 export default function useDocuments() {
     const store = useDocumentStore()
     const toast = useToast()
+    const employeeStore = useEmployeeStore()
 
     // Helper: Show toast messages
     const showToast = (message, type = 'success', duration = 3500) => {
         toast.showToast(message, type, duration)
     }
-// Click outside handler for new menu
+
+    // Click outside handler for new menu
     const handleClickOutside = (event) => {
         const newMenuContainer = event.target.closest('.new-menu-container');
         if (!newMenuContainer && showNewMenu.value) {
@@ -26,6 +30,7 @@ export default function useDocuments() {
     onBeforeUnmount(() => {
         document.removeEventListener('click', handleClickOutside);
     });
+
     // Local UI state
     const searchQuery = ref('')
     const currentFilter = ref('all')
@@ -40,6 +45,13 @@ export default function useDocuments() {
     const previewData = ref(null);
     const previewLoading = ref(false);
     const previewError = ref(null);
+
+    // Share modal state
+    const showShareModal = ref(false)
+    const shareSearchQuery = ref('')
+    const selectedEmployees = ref([])
+    const isSharing = ref(false)
+    const selectedDocument = ref(null)
 
     // Modal state - Create Folder
     const showFolderModal = ref(false)
@@ -92,6 +104,25 @@ export default function useDocuments() {
         return result
     })
 
+    // Share modal computed
+    const shareFilteredEmployees = computed(() => {
+        if (!employeeStore.employees || employeeStore.employees.length === 0) return []
+
+        let result = employeeStore.employees
+
+        if (shareSearchQuery.value) {
+            const query = shareSearchQuery.value.toLowerCase()
+            result = result.filter(emp =>
+                emp.username?.toLowerCase().includes(query) ||
+                emp.email?.toLowerCase().includes(query) ||
+                emp.first_name?.toLowerCase().includes(query) ||
+                emp.last_name?.toLowerCase().includes(query)
+            )
+        }
+
+        return result
+    })
+
     const breadcrumb = computed(() => {
         const crumbs = []
         let currentId = store.currentFolderId
@@ -114,6 +145,7 @@ export default function useDocuments() {
         console.log('Breadcrumb built:', crumbs.map(f => f.name))
         return crumbs
     })
+
     const currentFolderName = computed(() => {
         if (!store.currentFolderId) return 'Root'
         const folder = store.allItems.find(item => item.id === store.currentFolderId && item.isFolder)
@@ -233,6 +265,86 @@ export default function useDocuments() {
         }
     }
 
+    // ===== Share Methods =====
+    const openShareModal = async (item) => {
+        selectedDocument.value = item
+        selectedEmployees.value = []
+        shareSearchQuery.value = ''
+
+        if (employeeStore.employees.length === 0) {
+            await employeeStore.fetchEmployees({ page: 1, page_size: 100 })
+        }
+
+        showShareModal.value = true
+    }
+
+    const closeShareModal = () => {
+        showShareModal.value = false
+        selectedDocument.value = null
+        selectedEmployees.value = []
+        shareSearchQuery.value = ''
+        isSharing.value = false
+    }
+
+    const toggleEmployee = (employee) => {
+        const index = selectedEmployees.value.findIndex(e => e.id === employee.id)
+        if (index > -1) {
+            selectedEmployees.value.splice(index, 1)
+        } else {
+            selectedEmployees.value.push(employee)
+        }
+    }
+
+    const isEmployeeSelected = (employeeId) => {
+        return selectedEmployees.value.some(e => e.id === employeeId)
+    }
+
+    const confirmShare = async () => {
+        if (selectedEmployees.value.length === 0) {
+            showToast('Please select at least one employee', 'warning')
+            return
+        }
+
+        if (!selectedDocument.value) {
+            showToast('No document selected', 'error')
+            return
+        }
+
+        isSharing.value = true
+        try {
+            const employeeIds = selectedEmployees.value.map(e => e.id)
+            const isFolder = selectedDocument.value.isFolder
+
+            let result
+            if (isFolder) {
+                result = await store.shareDocument(selectedDocument.value.id, null, employeeIds)
+            } else {
+                result = await store.shareDocument(null, selectedDocument.value.id, employeeIds)
+            }
+
+            if (result && result.message) {
+                showToast(`Document shared with ${selectedEmployees.value.length} employee(s) successfully!`, 'success')
+                closeShareModal()
+            } else {
+                showToast(result?.error || 'Failed to share document', 'error')
+            }
+        } catch (error) {
+            console.error('Error sharing document:', error)
+            showToast(error.message || 'Error sharing document', 'error')
+        } finally {
+            isSharing.value = false
+        }
+    }
+
+    const getInitials = (name) => {
+        if (!name) return '?'
+        const words = name.split(' ')
+        if (words.length === 1) {
+            return name.charAt(0).toUpperCase()
+        }
+        return (words[0].charAt(0) + words[1].charAt(0)).toUpperCase()
+    }
+
     // ===== File Upload Methods =====
     const uploadFile = () => {
         if (!store.currentFolderId) {
@@ -336,6 +448,7 @@ export default function useDocuments() {
     const editItem = (item) => {
         openEditModal(item)
     }
+
     const getCurrentFile = () => {
         if (!selectedFileId.value) return null;
         const file = filteredItems.value.find(item => item.id === selectedFileId.value);
@@ -384,10 +497,8 @@ export default function useDocuments() {
             const cleanedBaseUrl = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL;
             const downloadUrl = `${cleanedBaseUrl}/api/documents/files/${item.id}/download/`;
 
-            // Show loading
             showToast('Downloading...', 'info');
 
-            // Use fetch to download with authentication
             fetch(downloadUrl, {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -409,7 +520,6 @@ export default function useDocuments() {
                 })
                 .catch(error => {
                     console.error('Download error:', error);
-                    // Fallback: open in new tab
                     window.open(downloadUrl, '_blank');
                     showToast('Opening file in new tab...', 'info');
                 });
@@ -426,17 +536,14 @@ export default function useDocuments() {
         try {
             console.log('Viewing file:', item.id, item.name);
 
-            // Check if it's an office document - download directly
             const extension = item.extension?.toLowerCase();
             const officeExtensions = ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp'];
 
             if (officeExtensions.includes(extension)) {
-                // Directly download office documents
                 downloadFile(item);
                 return;
             }
 
-            // For other files - fetch and display in new tab
             showToast('Opening file...', 'info');
             const response = await store.viewFileContent(item.id);
             console.log('File content response:', response);
@@ -445,7 +552,6 @@ export default function useDocuments() {
                 throw new Error(response.error);
             }
 
-            // Handle different file types
             if (response.type === 'pdf') {
                 if (response.blob_url) {
                     window.open(response.blob_url, '_blank');
@@ -500,7 +606,6 @@ export default function useDocuments() {
                 showToast('Audio opened in new tab', 'success');
             }
             else {
-                // For all other files - download
                 downloadFile(item);
                 showToast('Downloading file...', 'success');
             }
@@ -528,16 +633,15 @@ export default function useDocuments() {
             year: 'numeric'
         })
     }
+
     const handleListClick = (item) => {
         if (item.isFolder) return;
 
-        // If clicking the same file, toggle preview
         if (selectedFileId.value === item.id && showPreview.value) {
             closePreview();
             return;
         }
 
-        // Show preview for this file
         selectedFileId.value = item.id;
         showPreview.value = true;
         loadPreview(item);
@@ -571,6 +675,7 @@ export default function useDocuments() {
         previewError.value = null;
         previewLoading.value = false;
     };
+
     const goBack = () => {
         console.log('Breadcrumb before back:', breadcrumb.value.map(f => f.name))
         console.log('Breadcrumb length:', breadcrumb.value.length)
@@ -586,6 +691,7 @@ export default function useDocuments() {
             navigateToRoot()
         }
     }
+
     // Init
     onMounted(() => {
         store.init()
@@ -628,8 +734,15 @@ export default function useDocuments() {
         isEditing,
         showDeleteModal,
         isDeleting,
+        // Share modal states
+        showShareModal,
+        shareSearchQuery,
+        selectedEmployees,
+        isSharing,
+        selectedDocument,
         // Computed
         filteredItems,
+        shareFilteredEmployees,
         breadcrumb,
         currentFolderName,
         isFolderView,
@@ -648,6 +761,11 @@ export default function useDocuments() {
         openDeleteModal,
         closeDeleteModal,
         submitDelete,
+        openShareModal,
+        closeShareModal,
+        toggleEmployee,
+        isEmployeeSelected,
+        confirmShare,
         uploadFile,
         uploadZip,
         handleFileUpload,
@@ -673,6 +791,8 @@ export default function useDocuments() {
         loadPreview,
         goBack,
         getCurrentFile,
-        handleClickOutside
+        handleClickOutside,
+        getInitials,
+        employeeStore
     }
 }

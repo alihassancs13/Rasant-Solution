@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import CredentialStore
+from .models import CredentialStore,SharedCredential
+from accounts.models import User
 import base64
 class CredentialSerializer(serializers.ModelSerializer):
     # Override password field to handle encoding/decoding
@@ -43,3 +44,30 @@ class CredentialSerializer(serializers.ModelSerializer):
             return base64.b64decode(obj.password).decode()
         except:
             return obj.password
+
+
+class SharedCredentialSerializer(serializers.ModelSerializer):
+    credential_name = serializers.CharField(source='credential.name', read_only=True)
+    employee_username = serializers.CharField(source='employee.username', read_only=True)
+    employee_email = serializers.CharField(source='employee.email', read_only=True)
+
+    class Meta:
+        model = SharedCredential
+        fields = [
+            'id',
+            'credential',
+            'credential_name',
+            'employee',
+            'employee_username',
+            'employee_email',
+            'shared_at'
+        ]
+        read_only_fields = ['shared_at']
+
+
+class ShareCredentialSerializer(serializers.Serializer):
+    credential_id = serializers.IntegerField()
+    employee_ids = serializers.ListField(
+        child=serializers.IntegerField(),
+        allow_empty=False
+    )

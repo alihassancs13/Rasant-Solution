@@ -2,6 +2,7 @@ from django.db import models
 
 # Create your models here.
 from django.db import models
+from accounts.models import User
 
 class CredentialStore(models.Model):
     name = models.CharField(max_length=200, help_text="Credential/Label name")
@@ -19,3 +20,27 @@ class CredentialStore(models.Model):
 
     def __str__(self):
         return self.name
+
+
+
+class SharedCredential(models.Model):
+    credential = models.ForeignKey(
+        CredentialStore,
+        on_delete=models.CASCADE,
+        related_name='shared_credentials',
+        help_text="Reference to the credential being shared"
+    )
+    employee_id = models.IntegerField(
+        help_text="Employee ID from EmployeeDashboard table"
+    )
+    shared_at = models.DateTimeField(auto_now_add=True, help_text="Date/Time when shared")
+
+    class Meta:
+        db_table = 'shared_credentials'
+        verbose_name = 'Shared Credential'
+        verbose_name_plural = 'Shared Credentials'
+        ordering = ['-shared_at']
+        unique_together = ['credential', 'employee_id']  # Prevent duplicate shares
+
+    def __str__(self):
+        return f"{self.credential.name} → Employee #{self.employee_id}"
