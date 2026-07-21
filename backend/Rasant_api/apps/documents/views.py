@@ -604,3 +604,66 @@ def share_document(request):
             {'error': str(e)},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+
+# documents/views.py
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_employee_documents(request, employee_id):
+    try:
+
+        shared_folders = SharedDocument.objects.filter(
+            employee_id=employee_id,
+            folder__isnull=False
+        ).select_related('folder')
+
+        documents = []
+
+        for shared in shared_folders:
+            folder = shared.folder
+            files = File.objects.filter(folder=folder)
+            folder_data = {
+                'type': 'folder',
+                'id': folder.id,
+                'name': folder.name,
+                'shared_at': shared.shared_at,
+                'parent_id': folder.parent_id,
+                'created_at': folder.created_at,
+                'updated_at': folder.updated_at,
+                'file_count': files.count(),
+                'files': []
+            }
+            for file in files:
+                folder_data['files'].append({
+                    'id': file.id,
+                    'name': file.full_name,
+                    'extension': file.extension,
+                    'size': file.size,
+                    'size_formatted': file.size_formatted,
+                    'mime_type': file.mime_type,
+                    'created_at': file.created_at,
+                    'updated_at': file.updated_at,
+                    'is_image': file.is_image,
+                    'is_document': file.is_document,
+                    'is_spreadsheet': file.is_spreadsheet,
+                    'is_presentation': file.is_presentation,
+                    'is_archive': file.is_archive,
+                    'folder_id': file.folder_id,
+                    # Convert content to base64 for viewing
+                    'content': base64.b64encode(file.content).decode('utf-8') if file.content else None,
+                })
+
+            documents.append(folder_data)
+
+        return Response({
+            'status': 'success',
+            'employee_id': employee_id,
+            'count': len(documents),
+            'documents': documents
+        }, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response({
+            'status': 'error',
+            'message': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

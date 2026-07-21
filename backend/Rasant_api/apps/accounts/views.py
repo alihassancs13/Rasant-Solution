@@ -1,15 +1,15 @@
 # Create your views here.
 
 from rest_framework.decorators import api_view, permission_classes, parser_classes
-from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User, Module,ContactMessage
 from .serializer import LoginSerializer, UserSerializer,ContactMessageSerializer
-from django.http import StreamingHttpResponse, HttpResponseForbidden, HttpResponse
-
+from django.http import  HttpResponse
+from employeeDashboard.models import Employee
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -27,33 +27,26 @@ def login_user(request):
     email = serializer.validated_data.get('email')
     username = serializer.validated_data.get('username')
     password = serializer.validated_data['password']
-
-    # Determine what type of login attempt this is
     is_email_login = email is not None
     is_username_login = username is not None
 
-    # Try to get user by email OR username
     try:
         if is_email_login:
-            # Check if email exists in database
             if not User.objects.filter(email=email).exists():
                 return Response({
                     "status": False,
                     "message": f"Email '{email}' not found in our system",
                     "error_type": "email_not_found"
                 }, status=status.HTTP_404_NOT_FOUND)
-
             user = User.objects.get(email=email)
 
         elif is_username_login:
-            # Check if username exists in database
             if not User.objects.filter(username=username).exists():
                 return Response({
                     "status": False,
                     "message": f"Username '{username}' not found in our system",
                     "error_type": "username_not_found"
                 }, status=status.HTTP_404_NOT_FOUND)
-
             user = User.objects.get(username=username)
         else:
             return Response({
@@ -78,20 +71,50 @@ def login_user(request):
     # Generate JWT tokens
     refresh = RefreshToken.for_user(user)
 
-    # Serialize user data
     user_data = UserSerializer(user).data
 
-    # Get modules for the user's role
-    modules = Module.objects.filter(role=user.role).values('id', 'name', 'icon','link') if user.role else []
+    try:
+        # Try to get employee from the Employee model
+        employee = Employee.objects.get(user=user)
+        user_data['employee_id'] = employee.id
 
-    #  FIXED INDENTATION HERE
+        # Only add employee fields if they exist
+        employee_data = {'id': employee.id}
+
+        # Safely add fields if they exist
+        if hasattr(employee, 'name'):
+            employee_data['name'] = employee.name
+        if hasattr(employee, 'email'):
+            employee_data['email'] = employee.email
+        if hasattr(employee, 'employee_number'):
+            employee_data['employee_number'] = employee.employee_number
+        if hasattr(employee, 'department'):
+            employee_data['department'] = employee.department
+        if hasattr(employee, 'designation'):
+            employee_data['designation'] = employee.designation
+
+        user_data['employee'] = employee_data
+
+    except Employee.DoesNotExist:
+        # User is not an employee (admin or other role)
+        user_data['employee_id'] = None
+        user_data['employee'] = None
+    except Exception as e:
+        # If any other error occurs, fallback to user.id
+        print(f"Error getting employee: {e}")
+        user_data['employee_id'] = user.id
+        user_data['employee'] = None
+
+    # Get modules for the user's role
+    modules = Module.objects.filter(role=user.role).values('id', 'name', 'icon', 'link') if user.role else []
+
     modules_list = []
     for module in modules:
         modules_list.append({
             'id': module['id'],
             'name': module['name'],
-            'icon': module.get('icon', ''),  # Use .get() to avoid KeyError
-            'link':module.get('link')
+            'icon': module.get('icon', ''),
+            'link': module.get('link')
         })
 
     return Response({
@@ -101,7 +124,7 @@ def login_user(request):
             "access_token": str(refresh.access_token),
             "refresh_token": str(refresh),
             "user": user_data,
-            "modules": modules_list  # Add modules list here
+            "modules": modules_list
         }
     }, status=status.HTTP_200_OK)
 
@@ -125,7 +148,7 @@ def get_user_modules(request):
         })
 
     # Get modules for user's role
-    modules = Module.objects.filter(role=user.role).values('id', 'name', 'icon','link')
+    modules = Module.objects.filter(role=user.role).values('id', 'name', 'icon','link','role_id')
 
     # CHANGE THIS: Convert to list of dicts
     modules_list = []
@@ -134,7 +157,8 @@ def get_user_modules(request):
             'id': module['id'],
             'name': module['name'],
             'icon': module.get('icon', ''),
-            'link':module.get('link','')
+            'link':module.get('link',''),
+            'role_id': module.get('role_id', None)
         })
 
     return Response({

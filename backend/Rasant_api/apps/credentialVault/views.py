@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from accounts.models import User
+import base64
 from rest_framework import status
 from .models import CredentialStore,SharedCredential
 from .serializer import CredentialSerializer
@@ -59,9 +60,6 @@ def get_all_credentials(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def share_credential(request):
-    """
-    Share a credential with one or multiple employees
-    """
     try:
         # Get data from request
         credential_id = request.data.get('credential_id')
@@ -73,18 +71,13 @@ def share_credential(request):
                 {'error': 'credential_id and employee_id are required'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-
-        # Check if credential exists
         credential = get_object_or_404(CredentialStore, id=credential_id)
 
         # Convert single employee_id to list
         if not isinstance(employee_ids, list):
             employee_ids = [employee_ids]
-
-        # Remove duplicates
         employee_ids = list(set(employee_ids))
 
-        # Get all employees that exist
         employees = Employee.objects.filter(id__in=employee_ids)
         found_ids = set(employees.values_list('id', flat=True))
         invalid_ids = set(employee_ids) - found_ids
@@ -136,3 +129,47 @@ def share_credential(request):
             {'error': str(e)},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_employee_credentials(request, employee_id):
+    try:
+        shared_credentials = SharedCredential.objects.filter(
+            employee_id=employee_id
+        ).select_related('credential')
+
+        credentials = []
+        for shared in shared_credentials:
+            cred = shared.credential
+
+            # Decode password from Base64
+            try:
+                decoded_password = base64.b64decode(cred.password).decode('utf-8')
+            except:
+                decoded_password = cred.password  # Fallback if not Base64
+
+            credentials.append({
+                'id': cred.id,
+                'name': cred.name,
+                'link': cred.link,
+                'username': cred.username,
+                'email': cred.email,
+                'password': decoded_password,
+                'shared_at': shared.shared_at,
+                'created_at': cred.created_at,
+
+            })
+
+        return Response({
+            'status': 'success',
+            'employee_id': employee_id,
+            'count': len(credentials),
+            'credentials': credentials
+        }, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response({
+            'status': 'error',
+            'message': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

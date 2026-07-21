@@ -34,6 +34,7 @@ export const API_ENDPOINTS = {
             DELETE: (id) => `/api/documents/folders/${id}/delete/`,
             ALL: '/api/documents/folders/all/',
 
+
         },
         FILES: {
             UPLOAD: '/api/documents/files/upload/',
@@ -43,6 +44,7 @@ export const API_ENDPOINTS = {
         },
         ALL: '/api/documents/all/',
         SHARE: '/api/documents/share_document/',
+        GET_EMPLOYEE_DOCUMENTS: (employeeId) => `/api/documents/get_employee_document/${employeeId}/`,
     },
 
     INBOX_LIST_CONVERSATIONS: '/api/inbox/conversations/',
@@ -66,5 +68,6 @@ export const API_ENDPOINTS = {
         GET_ALL: '/api/credentials/get_all_credentials/',
         CREATE: '/api/credentials/create/',
         SHARE: '/api/credentials/share_credentials/',
+        GET_EMPLOYEE_CREDENTIALS: (employeeId) => `/api/credentials/get_credentials/${employeeId}/`,
     }
 };

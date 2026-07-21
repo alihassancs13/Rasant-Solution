@@ -15,23 +15,31 @@ export default function useDocuments() {
         toast.showToast(message, type, duration)
     }
 
+    // Check if user is admin - using store state
+    const isAdmin = computed(() => {
+        return store.userRole === 'admin' || store.isEmployeeView === false
+    })
+
+    // Check if user is employee - using store state
+    const isEmployee = computed(() => {
+        return store.userRole === 'employee' || store.isEmployeeView === true
+    })
+
     // Click outside handler for new menu
     const handleClickOutside = (event) => {
-        const newMenuContainer = event.target.closest('.new-menu-container');
+        const newMenuContainer = event.target.closest('.new-menu-container')
         if (!newMenuContainer && showNewMenu.value) {
-            showNewMenu.value = false;
+            showNewMenu.value = false
         }
-    };
+    }
 
     onMounted(() => {
-        document.addEventListener('click', handleClickOutside);
-    });
+        document.addEventListener('click', handleClickOutside)
+    })
 
     onBeforeUnmount(() => {
-        document.removeEventListener('click', handleClickOutside);
-    });
-
-    // Local UI state
+        document.removeEventListener('click', handleClickOutside)
+    })
     const searchQuery = ref('')
     const currentFilter = ref('all')
     const sortBy = ref('name')
@@ -40,31 +48,23 @@ export default function useDocuments() {
     const isDragging = ref(false)
     const fileInput = ref(null)
     const zipInput = ref(null)
-    const selectedFileId = ref(null);
-    const showPreview = ref(false);
-    const previewData = ref(null);
-    const previewLoading = ref(false);
-    const previewError = ref(null);
-
-    // Share modal state
+    const selectedFileId = ref(null)
+    const showPreview = ref(false)
+    const previewData = ref(null)
+    const previewLoading = ref(false)
+    const previewError = ref(null)
     const showShareModal = ref(false)
     const shareSearchQuery = ref('')
     const selectedEmployees = ref([])
     const isSharing = ref(false)
     const selectedDocument = ref(null)
-
-    // Modal state - Create Folder
     const showFolderModal = ref(false)
     const folderName = ref('')
     const isSubmitting = ref(false)
-
-    // Modal state - Edit Folder
     const showEditModal = ref(false)
     const editFolderId = ref(null)
     const editFolderName = ref('')
     const isEditing = ref(false)
-
-    // Modal state - Delete
     const showDeleteModal = ref(false)
     const deleteItemData = ref(null)
     const isDeleting = ref(false)
@@ -75,7 +75,6 @@ export default function useDocuments() {
         { value: 'file', label: 'Files' }
     ]
 
-    // Computed
     const filteredItems = computed(() => {
         let result = store.viewItems || []
 
@@ -126,42 +125,45 @@ export default function useDocuments() {
     const breadcrumb = computed(() => {
         const crumbs = []
         let currentId = store.currentFolderId
-        if (!currentId) return crumbs
+        if (!currentId || store.isEmployeeView) return crumbs
         const allItems = store.allItems || []
         const buildPath = (folderId) => {
-            console.log('Building path for folder ID:', folderId)
             const folder = allItems.find(item => item.id === folderId && item.isFolder)
             if (folder) {
-                console.log('Found folder:', folder.name, 'Parent:', folder.parent_id)
                 crumbs.unshift(folder)
                 if (folder.parent_id) {
                     buildPath(folder.parent_id)
                 }
-            } else {
-                console.warn('Folder not found in allItems:', folderId)
             }
         }
         buildPath(currentId)
-        console.log('Breadcrumb built:', crumbs.map(f => f.name))
         return crumbs
     })
-
+    const showEmployeeBackButton = computed(() => isEmployee.value && store.currentFolderId !== null)
     const currentFolderName = computed(() => {
-        if (!store.currentFolderId) return 'Root'
+        if (!store.currentFolderId) return store.isEmployeeView ? 'Shared Documents' : 'Root'
         const folder = store.allItems.find(item => item.id === store.currentFolderId && item.isFolder)
-        return folder?.name || 'Root'
+        return folder?.name || (store.isEmployeeView ? 'Shared Documents' : 'Root')
     })
 
     const isFolderView = computed(() => {
-        return store.currentFolderId !== null
+        return store.currentFolderId !== null && !store.isEmployeeView
     })
 
     // ===== Create Folder Methods =====
     const toggleNewMenu = () => {
+        if (isEmployee.value) {
+            showToast('You do not have permission to create folders', 'error')
+            return
+        }
         showNewMenu.value = !showNewMenu.value
     }
 
     const openFolderModal = () => {
+        if (isEmployee.value) {
+            showToast('You do not have permission to create folders', 'error')
+            return
+        }
         showNewMenu.value = false
         folderName.value = ''
         showFolderModal.value = true
@@ -174,6 +176,10 @@ export default function useDocuments() {
     }
 
     const submitFolder = async () => {
+        if (isEmployee.value) {
+            showToast('You do not have permission to create folders', 'error')
+            return
+        }
         if (!folderName.value || !folderName.value.trim()) {
             showToast('Please enter a folder name', 'error')
             return
@@ -193,6 +199,10 @@ export default function useDocuments() {
 
     // ===== Edit Folder Methods =====
     const openEditModal = (item) => {
+        if (isEmployee.value) {
+            showToast('You do not have permission to edit folders', 'error')
+            return
+        }
         if (!item.isFolder) {
             showToast('Only folders can be renamed', 'warning')
             return
@@ -210,6 +220,10 @@ export default function useDocuments() {
     }
 
     const submitEdit = async () => {
+        if (isEmployee.value) {
+            showToast('You do not have permission to edit folders', 'error')
+            return
+        }
         if (!editFolderName.value || !editFolderName.value.trim()) {
             showToast('Please enter a folder name', 'error')
             return
@@ -239,6 +253,10 @@ export default function useDocuments() {
 
     // ===== Delete Methods =====
     const openDeleteModal = (item) => {
+        if (isEmployee.value) {
+            showToast('You do not have permission to delete items', 'error')
+            return
+        }
         deleteItemData.value = item
         showDeleteModal.value = true
     }
@@ -250,6 +268,10 @@ export default function useDocuments() {
     }
 
     const submitDelete = async () => {
+        if (isEmployee.value) {
+            showToast('You do not have permission to delete items', 'error')
+            return
+        }
         if (!deleteItemData.value) return
 
         isDeleting.value = true
@@ -267,6 +289,10 @@ export default function useDocuments() {
 
     // ===== Share Methods =====
     const openShareModal = async (item) => {
+        if (isEmployee.value) {
+            showToast('You do not have permission to share documents', 'error')
+            return
+        }
         selectedDocument.value = item
         selectedEmployees.value = []
         shareSearchQuery.value = ''
@@ -300,6 +326,10 @@ export default function useDocuments() {
     }
 
     const confirmShare = async () => {
+        if (isEmployee.value) {
+            showToast('You do not have permission to share documents', 'error')
+            return
+        }
         if (selectedEmployees.value.length === 0) {
             showToast('Please select at least one employee', 'warning')
             return
@@ -347,6 +377,10 @@ export default function useDocuments() {
 
     // ===== File Upload Methods =====
     const uploadFile = () => {
+        if (isEmployee.value) {
+            showToast('You do not have permission to upload files', 'error')
+            return
+        }
         if (!store.currentFolderId) {
             showToast('Please open a folder first before uploading files.', 'warning')
             return
@@ -356,6 +390,10 @@ export default function useDocuments() {
     }
 
     const uploadZip = () => {
+        if (isEmployee.value) {
+            showToast('You do not have permission to upload files', 'error')
+            return
+        }
         if (!store.currentFolderId) {
             showToast('Please open a folder first before uploading files.', 'warning')
             return
@@ -409,6 +447,10 @@ export default function useDocuments() {
     }
 
     const handleDrop = async (event) => {
+        if (isEmployee.value) {
+            showToast('You do not have permission to upload files', 'error')
+            return
+        }
         isDragging.value = false
         const files = event.dataTransfer.files
         if (!files.length) return
@@ -432,15 +474,55 @@ export default function useDocuments() {
     // ===== Navigation Methods =====
     const openItem = (item) => {
         if (item.isFolder) {
-            store.navigateTo(item.id)
+            // For employee, when they click a folder, show files inside it
+            if (isEmployee.value) {
+                console.log(' Employee clicked folder:', item.name, 'ID:', item.id);
+
+                // Find the folder in allItems with its nested files
+                const folder = store.allItems.find(f => f.id === item.id && f.isFolder);
+                console.log(' Found folder in allItems:', folder);
+
+                if (folder && folder.files && folder.files.length > 0) {
+                    // Show files as separate items in the view
+                    const filesToShow = folder.files.map(file => ({
+                        ...file,
+                        isFolder: false,
+                        type: 'file',
+                        parent_folder_name: folder.name,
+                        parent_folder_id: folder.id,
+                    }));
+                    store.viewItems = filesToShow;
+                    store.currentFolderId = item.id;
+                    console.log(' Showing files in folder:', item.name, filesToShow);
+                } else {
+                    // No files in this folder
+                    store.viewItems = [];
+                    store.currentFolderId = item.id;
+                    showToast('This folder is empty', 'info');
+                    console.log('Folder is empty:', item.name);
+                }
+                return;
+            }
+            store.navigateTo(item.id);
         }
     }
-
     const navigateTo = (folderId) => {
+        if (isEmployee.value) {
+            return
+        }
         store.navigateTo(folderId)
     }
 
+    // composables/useDocuments.js - Update navigateToRoot
+
     const navigateToRoot = () => {
+        if (isEmployee.value) {
+            // Reset to show all items (folders with their files nested)
+            store.viewItems = store.allItems;
+            store.currentFolderId = null;
+            console.log('🔙 Employee going back to all items');
+            return
+        }
         store.navigateTo(null)
     }
 
@@ -450,9 +532,9 @@ export default function useDocuments() {
     }
 
     const getCurrentFile = () => {
-        if (!selectedFileId.value) return null;
-        const file = filteredItems.value.find(item => item.id === selectedFileId.value);
-        return file || null;
+        if (!selectedFileId.value) return null
+        const file = filteredItems.value.find(item => item.id === selectedFileId.value)
+        return file || null
     }
 
     const deleteItem = (item) => {
@@ -488,16 +570,45 @@ export default function useDocuments() {
     // ===== Download Function =====
     const downloadFile = (item) => {
         if (!item) {
-            showToast('No file to download', 'warning');
-            return;
+            showToast('No file to download', 'warning')
+            return
         }
 
-        try {
-            const token = localStorage.getItem('accessToken');
-            const cleanedBaseUrl = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL;
-            const downloadUrl = `${cleanedBaseUrl}/api/documents/files/${item.id}/download/`;
+        // Employee: file content is already embedded (base64) — build blob locally
+        if (isEmployee.value) {
+            if (!item.content) {
+                showToast('File content not available for download', 'error')
+                return
+            }
+            try {
+                const binaryString = atob(item.content)
+                const bytes = new Uint8Array(binaryString.length)
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i)
+                }
+                const blob = new Blob([bytes], { type: item.mime_type || 'application/octet-stream' })
+                const link = document.createElement('a')
+                link.href = URL.createObjectURL(blob)
+                link.download = item.name || 'download'
+                document.body.appendChild(link)
+                link.click()
+                document.body.removeChild(link)
+                URL.revokeObjectURL(link.href)
+                showToast('Download started!', 'success')
+            } catch (error) {
+                console.error('Employee download error:', error)
+                showToast('Failed to download file', 'error')
+            }
+            return
+        }
 
-            showToast('Downloading...', 'info');
+        // Admin: existing API-based download
+        try {
+            const token = localStorage.getItem('accessToken')
+            const cleanedBaseUrl = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL
+            const downloadUrl = `${cleanedBaseUrl}/api/documents/files/${item.id}/download/`
+
+            showToast('Downloading...', 'info')
 
             fetch(downloadUrl, {
                 headers: {
@@ -505,92 +616,140 @@ export default function useDocuments() {
                 }
             })
                 .then(response => {
-                    if (!response.ok) throw new Error('Download failed');
-                    return response.blob();
+                    if (!response.ok) throw new Error('Download failed')
+                    return response.blob()
                 })
                 .then(blob => {
-                    const link = document.createElement('a');
-                    link.href = URL.createObjectURL(blob);
-                    link.download = item.name || 'download';
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    URL.revokeObjectURL(link.href);
-                    showToast('Download started!', 'success');
+                    const link = document.createElement('a')
+                    link.href = URL.createObjectURL(blob)
+                    link.download = item.name || 'download'
+                    document.body.appendChild(link)
+                    link.click()
+                    document.body.removeChild(link)
+                    URL.revokeObjectURL(link.href)
+                    showToast('Download started!', 'success')
                 })
                 .catch(error => {
-                    console.error('Download error:', error);
-                    window.open(downloadUrl, '_blank');
-                    showToast('Opening file in new tab...', 'info');
-                });
+                    console.error('Download error:', error)
+                    showToast('Failed to download file — please check your permissions', 'error')
+                })
 
         } catch (error) {
-            console.error('Download error:', error);
-            showToast('Failed to download file', 'error');
+            console.error('Download error:', error)
+            showToast('Failed to download file', 'error')
+        }
+    }
+
+    // Helper function to show file content
+    const showFileContent = (response) => {
+        if (response.type === 'pdf' || response.extension === 'pdf') {
+            // For PDF, create a blob URL
+            try {
+                const binaryString = atob(response.content)
+                const bytes = new Uint8Array(binaryString.length)
+                for (let i = 0; i < binaryString.length; i++) {
+                    bytes[i] = binaryString.charCodeAt(i)
+                }
+                const blob = new Blob([bytes], { type: 'application/pdf' })
+                const blobUrl = URL.createObjectURL(blob)
+                window.open(blobUrl, '_blank')
+                showToast('PDF opened in new tab', 'success')
+            } catch (error) {
+                console.error('Error creating PDF:', error)
+                showToast('Error opening PDF', 'error')
+            }
+        } else if (response.type === 'image' || response.is_image) {
+            const win = window.open('', '_blank')
+            if (win) {
+                win.document.write(`<img src="data:${response.mime_type || 'image/png'};base64,${response.content}" style="max-width:100%;max-height:100%;margin:auto;display:block;" />`)
+                win.document.title = response.name
+            }
+            showToast('Image opened in new tab', 'success')
+        } else if (response.type === 'text') {
+            const win = window.open('', '_blank')
+            if (win) {
+                win.document.write(`<pre style="padding:20px;font-family:monospace;white-space:pre-wrap;word-wrap:break-word;">${atob(response.content)}</pre>`)
+                win.document.title = response.name
+            }
+            showToast('Text file opened in new tab', 'success')
+        } else {
+            // For other files, download
+            downloadFile(response)
         }
     }
 
     // ===== View File Function =====
     const viewFile = async (item) => {
-        if (item.isFolder) return;
+        if (item.isFolder) return
         try {
-            console.log('Viewing file:', item.id, item.name);
+            console.log('Viewing file:', item.id, item.name)
 
-            const extension = item.extension?.toLowerCase();
-            const officeExtensions = ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp'];
-
-            if (officeExtensions.includes(extension)) {
-                downloadFile(item);
-                return;
+            // Check if this is an employee viewing a file from a shared folder
+            if (isEmployee.value) {
+                if (item.content) {
+                    showFileContent(item)
+                } else {
+                    downloadFile(item)
+                }
+                return
             }
 
-            showToast('Opening file...', 'info');
-            const response = await store.viewFileContent(item.id);
-            console.log('File content response:', response);
+            // Admin view
+            const extension = item.extension?.toLowerCase()
+            const officeExtensions = ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp']
+
+            if (officeExtensions.includes(extension)) {
+                downloadFile(item)
+                return
+            }
+
+            showToast('Opening file...', 'info')
+            const response = await store.viewFileContent(item.id)
+            console.log('File content response:', response)
 
             if (response.error) {
-                throw new Error(response.error);
+                throw new Error(response.error)
             }
 
             if (response.type === 'pdf') {
                 if (response.blob_url) {
-                    window.open(response.blob_url, '_blank');
-                    showToast('PDF opened in new tab', 'success');
+                    window.open(response.blob_url, '_blank')
+                    showToast('PDF opened in new tab', 'success')
                 } else {
-                    throw new Error('PDF preview not available');
+                    throw new Error('PDF preview not available')
                 }
             }
             else if (response.type === 'image') {
-                const win = window.open('', '_blank');
+                const win = window.open('', '_blank')
                 if (win) {
-                    win.document.write(`<img src="${response.content}" style="max-width:100%;max-height:100%;margin:auto;display:block;" />`);
-                    win.document.title = response.name;
+                    win.document.write(`<img src="${response.content}" style="max-width:100%;max-height:100%;margin:auto;display:block;" />`)
+                    win.document.title = response.name
                 }
-                showToast('Image opened in new tab', 'success');
+                showToast('Image opened in new tab', 'success')
             }
             else if (response.type === 'text') {
-                const win = window.open('', '_blank');
+                const win = window.open('', '_blank')
                 if (win) {
-                    win.document.write(`<pre style="padding:20px;font-family:monospace;white-space:pre-wrap;word-wrap:break-word;">${response.content}</pre>`);
-                    win.document.title = response.name;
+                    win.document.write(`<pre style="padding:20px;font-family:monospace;white-space:pre-wrap;word-wrap:break-word;">${response.content}</pre>`)
+                    win.document.title = response.name
                 }
-                showToast('Text file opened in new tab', 'success');
+                showToast('Text file opened in new tab', 'success')
             }
             else if (response.type === 'video') {
-                const win = window.open('', '_blank');
+                const win = window.open('', '_blank')
                 if (win) {
                     win.document.write(`
                         <video controls style="max-width:100%;max-height:100%;margin:auto;display:block;">
                             <source src="data:${response.mime_type};base64,${response.content}" type="${response.mime_type}">
                             Your browser does not support the video tag.
                         </video>
-                    `);
-                    win.document.title = response.name;
+                    `)
+                    win.document.title = response.name
                 }
-                showToast('Video opened in new tab', 'success');
+                showToast('Video opened in new tab', 'success')
             }
             else if (response.type === 'audio') {
-                const win = window.open('', '_blank');
+                const win = window.open('', '_blank')
                 if (win) {
                     win.document.write(`
                         <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;font-family:Arial,sans-serif;">
@@ -600,29 +759,29 @@ export default function useDocuments() {
                                 Your browser does not support the audio tag.
                             </audio>
                         </div>
-                    `);
-                    win.document.title = response.name;
+                    `)
+                    win.document.title = response.name
                 }
-                showToast('Audio opened in new tab', 'success');
+                showToast('Audio opened in new tab', 'success')
             }
             else {
-                downloadFile(item);
-                showToast('Downloading file...', 'success');
+                downloadFile(item)
+                showToast('Downloading file...', 'success')
             }
 
         } catch (error) {
-            console.error('View file error:', error);
-            showToast(error.message || 'Failed to open file', 'error');
+            console.error('View file error:', error)
+            showToast(error.message || 'Failed to open file', 'error')
         }
     }
 
     const deleteSubtitle = computed(() => {
-        if (!deleteItemData.value) return 'Are you sure you want to delete this item?';
-        const itemName = deleteItemData.value.name || 'this item';
+        if (!deleteItemData.value) return 'Are you sure you want to delete this item?'
+        const itemName = deleteItemData.value.name || 'this item'
         if (deleteItemData.value.isFolder) {
-            return `Are you sure you want to delete the folder "${itemName}"? This action cannot be undone and all contents will be removed.`;
+            return `Are you sure you want to delete the folder "${itemName}"? This action cannot be undone and all contents will be removed.`
         }
-        return `Are you sure you want to delete "${itemName}"? This action cannot be undone.`;
+        return `Are you sure you want to delete "${itemName}"? This action cannot be undone.`
     })
 
     const formatDate = (date) => {
@@ -635,48 +794,111 @@ export default function useDocuments() {
     }
 
     const handleListClick = (item) => {
-        if (item.isFolder) return;
+        if (item.isFolder) return
 
         if (selectedFileId.value === item.id && showPreview.value) {
-            closePreview();
-            return;
+            closePreview()
+            return
         }
 
-        selectedFileId.value = item.id;
-        showPreview.value = true;
-        loadPreview(item);
-    };
+        selectedFileId.value = item.id
+        showPreview.value = true
+        loadPreview(item)
+    }
 
     const loadPreview = async (item) => {
-        previewLoading.value = true;
-        previewError.value = null;
-        previewData.value = null;
+        previewLoading.value = true
+        previewError.value = null
+        previewData.value = null
 
         try {
-            const response = await store.viewFileContent(item.id);
-
-            if (response.error) {
-                throw new Error(response.error);
+            if (isEmployee.value) {
+                if (!item.content) {
+                    throw new Error('File content not available')
+                }
+                previewData.value = buildEmployeePreviewData(item)
+                return
             }
 
-            previewData.value = response;
+            const response = await store.viewFileContent(item.id)
+            if (response.error) {
+                throw new Error(response.error)
+            }
+            previewData.value = response
         } catch (error) {
-            console.error('Preview error:', error);
-            previewError.value = error.message || 'Failed to load preview';
+            console.error('Preview error:', error)
+            previewError.value = error.message || 'Failed to load preview'
         } finally {
-            previewLoading.value = false;
+            previewLoading.value = false
         }
-    };
+    }
 
     const closePreview = () => {
-        showPreview.value = false;
-        selectedFileId.value = null;
-        previewData.value = null;
-        previewError.value = null;
-        previewLoading.value = false;
-    };
+        showPreview.value = false
+        selectedFileId.value = null
+        previewData.value = null
+        previewError.value = null
+        previewLoading.value = false
+    }
+
+    const buildEmployeePreviewData = (item) => {
+        const extension = (item.extension || '').toLowerCase()
+        const mimeType = item.mime_type || 'application/octet-stream'
+        const base = {
+            id: item.id,
+            name: item.name,
+            extension,
+            mime_type: mimeType,
+            size: item.size_formatted || formatFileSize(item.size),
+        }
+
+        const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg']
+        const videoExts = ['mp4', 'webm', 'ogg', 'mov']
+        const audioExts = ['mp3', 'wav', 'm4a']
+        const textExts = ['txt', 'md', 'csv', 'json', 'log', 'js', 'css', 'html', 'xml', 'py']
+
+        if (!item.content) {
+            return { ...base, type: 'other' }
+        }
+
+        if (item.is_image || imageExts.includes(extension)) {
+            return { ...base, type: 'image', content: `data:${mimeType};base64,${item.content}` }
+        }
+        if (extension === 'pdf') {
+            try {
+                const binaryString = atob(item.content)
+                const bytes = new Uint8Array(binaryString.length)
+                for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i)
+                const blob = new Blob([bytes], { type: 'application/pdf' })
+                return { ...base, type: 'pdf', blob_url: URL.createObjectURL(blob) }
+            } catch (e) {
+                return { ...base, type: 'pdf', blob_url: null }
+            }
+        }
+        if (videoExts.includes(extension)) {
+            return { ...base, type: 'video', content: item.content }
+        }
+        if (audioExts.includes(extension)) {
+            return { ...base, type: 'audio', content: item.content }
+        }
+        if (textExts.includes(extension)) {
+            try {
+                return { ...base, type: 'text', content: atob(item.content) }
+            } catch (e) {
+                return { ...base, type: 'text', content: '' }
+            }
+        }
+        return { ...base, type: 'other' }
+    }
 
     const goBack = () => {
+        if (isEmployee.value) {
+            // For employee, go back to showing all items
+            store.viewItems = store.allItems;
+            store.currentFolderId = null;
+            console.log('🔙 Employee going back to all items');
+            return
+        }
         console.log('Breadcrumb before back:', breadcrumb.value.map(f => f.name))
         console.log('Breadcrumb length:', breadcrumb.value.length)
         if (breadcrumb.value.length >= 2) {
@@ -699,6 +921,10 @@ export default function useDocuments() {
 
     // Update the filter watcher
     watch(currentFilter, (newFilter) => {
+        if (store.isEmployeeView) {
+            // For employee view, just filter what we already have
+            return
+        }
         if (newFilter === 'all') {
             store.loadAllItems()
         } else if (newFilter === 'folder') {
@@ -716,6 +942,10 @@ export default function useDocuments() {
         folderCount: store.folderCount,
         fileCount: store.fileCount,
         currentFolderId: store.currentFolderId,
+        isEmployeeView: store.isEmployeeView,
+        // Role checks
+        isAdmin,
+        isEmployee,
         // UI state
         searchQuery,
         currentFilter,
@@ -750,7 +980,6 @@ export default function useDocuments() {
         storagePercentage: store.storagePercentage,
         filters,
         deleteSubtitle,
-        // Methods
         toggleNewMenu,
         openFolderModal,
         closeFolderModal,
@@ -793,6 +1022,7 @@ export default function useDocuments() {
         getCurrentFile,
         handleClickOutside,
         getInitials,
-        employeeStore
+        employeeStore,
+        showEmployeeBackButton
     }
 }

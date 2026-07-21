@@ -151,7 +151,7 @@ export const useLoginStore = defineStore('login', {
             const role = this.getUserRole?.toLowerCase() || 'client';
             const roleMap = {
                 'admin': '/admin/overview',
-                'superuser': '/',
+                'superuser': '/employee/credentialsvault',
                 'employee': '/',
                 'staff': '/',
                 'client': '/',

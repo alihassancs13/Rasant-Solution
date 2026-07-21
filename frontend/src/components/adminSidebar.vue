@@ -139,25 +139,30 @@
               <p class="text-[11px] font-bold text-text-muted tracking-widest px-3 mb-1 uppercase" v-show="!showCollapsed">Company</p>
               <div class="space-y-1.5">
                 <template v-for="module in companyModules" :key="module.id">
+                  <!-- 🔥 Skip rendering "Employees" module for non-admin users -->
+                  <template v-if="module.name === 'Employees' && currentUserRole !== 'admin'">
+                    <!-- Don't render Employees for non-admins -->
+                  </template>
+
                   <!-- Regular module -->
                   <router-link
-                      v-if="!module.children"
+                      v-else-if="!module.children"
                       :to="getModuleRoute(module.name)"
                       @click="handleNavigation"
                       class="relative flex items-center px-4 py-2 rounded-xl text-text-muted hover:bg-primary-subtle hover:text-primary font-medium transition-all"
                       :class="[
-      isActive(module.name, $route.path) ? 'bg-primary-subtle text-primary font-semibold shadow-sm  border-primary' : '',
-      showCollapsed ? 'justify-center' : 'space-x-3'
-    ]"
+            isActive(module.name, $route.path) ? 'bg-primary-subtle text-primary font-semibold shadow-sm border-primary' : '',
+            showCollapsed ? 'justify-center' : 'space-x-3'
+          ]"
                       :title="showCollapsed ? module.name : null"
                   >
-  <span class="relative shrink-0">
-    <font-awesome-icon :icon="module.icon" class="text-lg w-5" />
-    <span
-        v-if="module.name === 'Inbox' && unreadConversationsCount > 0 && showCollapsed"
-        class="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-danger border-2 border-surface"
-    ></span>
-  </span>
+          <span class="relative shrink-0">
+            <font-awesome-icon :icon="module.icon" class="text-lg w-5" />
+            <span
+                v-if="module.name === 'Inbox' && unreadConversationsCount > 0 && showCollapsed"
+                class="absolute -top-1 -right-1 h-2.5 w-2.5 rounded-full bg-danger border-2 border-surface"
+            ></span>
+          </span>
 
                     <span v-show="!showCollapsed" class="transition-opacity duration-150 flex-1">{{ module.name }}</span>
 
@@ -165,19 +170,19 @@
                         v-if="module.name === 'Inbox' && unreadConversationsCount > 0 && !showCollapsed"
                         class="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-danger px-1 text-[10px] font-semibold text-white"
                     >
-    {{ unreadConversationsCount }}
-  </span>
+            {{ unreadConversationsCount }}
+          </span>
                   </router-link>
 
-                  <!-- Module with dropdown (Employees) - Drills down -->
-                  <div v-else class="relative sidebar-dropdown">
+                  <!-- Module with dropdown (Employees) - Only for admin -->
+                  <div v-else-if="module.children && currentUserRole === 'admin'" class="relative sidebar-dropdown">
                     <button
                         @click.stop="drillIntoEmployees"
                         class="w-full flex items-center px-4 py-2 cursor-pointer rounded-xl text-text-muted hover:bg-primary-subtle hover:text-primary font-medium transition-all focus:outline-none"
                         :class="[
-                          isActive(module.name, $route.path) ? 'bg-primary-subtle text-primary font-semibold shadow-sm  border-primary' : '',
-                          showCollapsed ? 'justify-center' : 'justify-between'
-                        ]"
+              isActive(module.name, $route.path) ? 'bg-primary-subtle text-primary font-semibold shadow-sm border-primary' : '',
+              showCollapsed ? 'justify-center' : 'justify-between'
+            ]"
                         :title="showCollapsed ? module.name : null"
                     >
                       <div class="flex items-center" :class="showCollapsed ? '' : 'space-x-3'">
@@ -278,12 +283,8 @@ const {
   dropdownStates,
   loadModules,
   companyModules,
-  projectModules,
-  accountModules,
   employeeChildrenModules,
-  employeesParent,
   isDrillDown,
-  toggleDropdown,
   drillIntoEmployees,
   goBackFromDrillDown,
   getModuleRoute,
@@ -291,6 +292,7 @@ const {
   getUserRole,
   isSidebarOpen,
   collapsed,
+  currentUserRole,
   unreadConversationsCount,
 } = useAdminSidebar();
 

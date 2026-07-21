@@ -22,7 +22,6 @@ from django.db import transaction
 from .serializers import calculate_next_effective_date
 import random
 import string
-from apps.inbox.models import Conversation
 from django.contrib.auth.hashers import make_password
 
 User = get_user_model()
@@ -77,10 +76,8 @@ def add_employee(request):
 
     try:
         user_account = User.objects.create(
-            username=employee.email,
+            username=employee.name,
             email=employee.email,
-            first_name=first_name,
-            last_name=last_name,
             is_staff=False,
             is_active=True,
             role=employee_role,
@@ -175,6 +172,7 @@ def update_employee(request, pk):
     old_tax = employee.tax
     old_insurance_amount = employee.insurance_amount
     old_salary = employee.salary
+    old_password = employee.password
 
     serializer = UpdateEmployeeSerializer(
         employee,
@@ -187,6 +185,45 @@ def update_employee(request, pk):
         updated_employee = serializer.save()
         updated_employee.current_salary = updated_employee.salary
         updated_employee.save(update_fields=['current_salary'])
+
+        if 'password' in request.data and request.data['password'] != old_password:
+            new_password = request.data['password']
+
+            # Hash password for Employee table
+            from django.contrib.auth.hashers import make_password
+            from accounts.models import User
+
+            hashed_password = make_password(new_password)
+            updated_employee.password = hashed_password
+            updated_employee.save(update_fields=['password'])
+
+            # Update or create User with name as username
+            try:
+                # Try to find user by username (name)
+                user = User.objects.get(username=updated_employee.name)
+                user.set_password(new_password)
+                user.save()
+                print(f" User updated by username: {user.username}")
+
+            except User.DoesNotExist:
+                # User not found by username, try email
+                try:
+                    user = User.objects.get(email=updated_employee.email)
+                    user.username = updated_employee.name
+                    user.set_password(new_password)
+                    user.save()
+                    print(f" User updated and username changed to: {user.username}")
+
+                except User.DoesNotExist:
+                    # Create new user with name as username
+                    user = User.objects.create_user(
+                        username=updated_employee.name,
+                        email=updated_employee.email or f"{updated_employee.employee_number}@example.com",
+                        password=new_password,
+                        first_name=updated_employee.name.split()[0] if updated_employee.name else '',
+                        last_name=' '.join(updated_employee.name.split()[1:]) if updated_employee.name else ''
+                    )
+                    print(f" New user created: {user.username}")
 
         if (updated_employee.salary != old_salary or
                 updated_employee.tax != old_tax or
@@ -207,7 +244,6 @@ def update_employee(request, pk):
             status=status.HTTP_200_OK
         )
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 @api_view(["GET", "POST", "DELETE", "PUT"])
 @parser_classes([MultiPartParser, FormParser, JSONParser])

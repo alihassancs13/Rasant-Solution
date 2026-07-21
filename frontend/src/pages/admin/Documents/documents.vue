@@ -1,4 +1,3 @@
-<!-- pages/admin/Documents/documents.vue -->
 <template>
   <div class="flex h-screen overflow-hidden">
     <AdminSidebar />
@@ -6,11 +5,11 @@
       <div class="p-3 pl-1 sm:p-4 md:pl-4">
         <DashboardHeader
             class="w-full"
-            userName="System Admin"
-            role="admin"
+            :userName="isEmployee ? 'Employee' : 'System Admin'"
+            :role="isEmployee ? 'employee' : 'admin'"
             :notificationCount="1"
             titleOverride="Documents"
-            subtitleOverride="Files, folders & shared storage"
+            :subtitleOverride="isEmployee ? 'Shared documents' : 'Files, folders & shared storage'"
             :iconOverride="['fas', 'folder']"
         />
       </div>
@@ -33,7 +32,8 @@
           <template v-else>
             <!-- Toolbar -->
             <div class="flex flex-wrap items-center gap-2 sm:gap-3 mb-4">
-              <div class="relative new-menu-container" @click.self="showNewMenu = false">
+              <!-- NEW: Only show New button for Admin -->
+              <div v-if="isAdmin" class="relative new-menu-container" @click.self="showNewMenu = false">
                 <button @click.stop="toggleNewMenu" class="tab-active-gradient hover:bg-blue-700 cursor-pointer text-buttonTextColor px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-medium transition flex items-center gap-2">
                   <i class="fas fa-plus"></i>
                   <span>New</span>
@@ -100,12 +100,13 @@
                 </button>
               </div>
 
-              <input type="file" ref="fileInput" @change="handleFileUpload" multiple hidden />
-              <input type="file" ref="zipInput" @change="handleZipUpload" accept=".zip,.rar,.7zip" multiple hidden />
+              <!-- NEW: Only show file inputs for Admin -->
+              <input v-if="isAdmin" type="file" ref="fileInput" @change="handleFileUpload" multiple hidden />
+              <input v-if="isAdmin" type="file" ref="zipInput" @change="handleZipUpload" accept=".zip,.rar,.7zip" multiple hidden />
             </div>
 
-            <!-- Breadcrumb - Hide when in All/Folders/Files view -->
-            <div v-if="isFolderView" class="flex flex-wrap items-center justify-between text-xs sm:text-sm text-gray-600 mb-4 py-1 border-b border-gray-100">
+            <!-- Breadcrumb - Hide for Employee or when not in folder view -->
+            <div v-if="isFolderView && isAdmin" class="flex flex-wrap items-center justify-between text-xs sm:text-sm text-gray-600 mb-4 py-1 border-b border-gray-100">
               <nav class="flex flex-wrap items-center gap-1 sm:gap-2">
                 <button @click="navigateToRoot" class="hover:text-blue-600" title="Go to root">
                   <i class="fas fa-home"></i>
@@ -124,16 +125,40 @@
               <span class="text-[10px] sm:text-xs text-gray-400">{{ filteredItems ? filteredItems.length : 0 }} items</span>
             </div>
 
-            <!-- Dropzone -->
+            <!-- NEW: Employee view header -->
+            <div v-if="isEmployee" class="flex flex-wrap items-center justify-between text-xs sm:text-sm text-gray-600 mb-4 py-1 border-b border-gray-100">
+              <nav class="flex flex-wrap items-center gap-1 sm:gap-2">
+                <button @click="navigateToRoot" class="hover:text-blue-600" title="Go to root">
+                  <i class="fas fa-home"></i>
+                </button>
+                <button v-if="showEmployeeBackButton" @click="goBack" class="hover:text-blue-600 ml-2" title="Go back">
+                  <i class="fas fa-arrow-left"></i>
+                </button>
+                <span v-if="showEmployeeBackButton" class="text-gray-300">/</span>
+                <span class="text-gray-800 font-medium">
+      {{ showEmployeeBackButton ? currentFolderName : 'Shared Documents' }}
+    </span>
+              </nav>
+              <span class="text-[10px] sm:text-xs text-gray-400">{{ filteredItems ? filteredItems.length : 0 }} items</span>
+            </div>
+
+            <!-- Dropzone - Only enable drag & drop for Admin -->
             <div class="relative border-2 border-dashed rounded-xl transition-all flex-1 min-h-[480px]"
-                 :class="isDragging ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'"
-                 @dragover.prevent="isDragging = true" @dragleave.prevent="isDragging = false" @drop.prevent="handleDrop">
+                 :class="isDragging && isAdmin ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-white'"
+                 @dragover.prevent="isAdmin ? isDragging = true : null"
+                 @dragleave.prevent="isAdmin ? isDragging = false : null"
+                 @drop.prevent="isAdmin ? handleDrop : null">
 
               <!-- GRID VIEW -->
               <div v-if="viewMode === 'grid'" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 p-3 sm:p-4">
-                <div v-for="item in (filteredItems || [])" :key="item.id" @click="!item.isFolder ? viewFile(item) : null" @dblclick="openItem(item)"
+                <div
+                    v-for="item in (filteredItems || [])"
+                    :key="item.id"
+                    @click="!item.isFolder ? viewFile(item) : null"
+                    @dblclick="openItem(item)"
                      class="group relative bg-gray-50 hover:bg-gray-100 rounded-xl p-3 sm:p-4 text-center transition cursor-pointer border-2 border-transparent hover:border-blue-200">
-                  <div class="absolute top-1 right-1 sm:top-2 sm:right-2 opacity-0 group-hover:opacity-100 transition flex gap-0.5 sm:gap-1">
+                  <!-- NEW: Only show action buttons for Admin -->
+                  <div v-if="isAdmin" class="absolute top-1 right-1 sm:top-2 sm:right-2 opacity-0 group-hover:opacity-100 transition flex gap-0.5 sm:gap-1">
                     <button @click.stop="openShareModal(item)"
                             class="w-5 h-5 sm:w-7 sm:h-7 cursor-pointer bg-white rounded-full shadow hover:bg-green-50 text-[8px] sm:text-xs text-green-600"
                             title="Share">
@@ -155,8 +180,13 @@
                     <span v-else>{{ formatFileSize(item.size) }}</span>
                   </div>
                   <div class="text-[8px] sm:text-xs text-gray-300 mt-0.5">{{ formatDate(item.created_at) }}</div>
+                  <!-- NEW: Show "Shared" badge for employee view -->
+                  <div v-if="isEmployee && item.shared_at" class="text-[8px] text-green-500 mt-1">
+                    <i class="fas fa-share-alt"></i> Shared
+                  </div>
                 </div>
               </div>
+
               <!-- LIST VIEW - Split Layout -->
               <div v-else class="flex flex-col sm:flex-row gap-3 h-[calc(112vh-330px)] overflow-hidden">
                 <!-- Left Side: File List - Fixed width -->
@@ -168,7 +198,9 @@
                     </tr>
                     </thead>
                     <tbody>
-                    <tr v-for="item in (filteredItems || [])" :key="item.id"
+                    <tr
+                        v-for="item in (filteredItems || [])"
+                        :key="item.id"
                         @click="!item.isFolder ? handleListClick(item) : null"
                         @dblclick="openItem(item)"
                         class="border-t border-gray-100 hover:bg-gray-50 cursor-pointer"
@@ -177,8 +209,12 @@
                         <i :class="item.isFolder ? 'fas fa-folder text-yellow-500' : getFileIcon(item.extension)" class="text-base sm:text-lg"></i>
                         <span class="font-medium text-gray-800 text-xs sm:text-sm truncate max-w-[80px] sm:max-w-[150px]">{{ item.name }}</span>
                         <span v-if="!item.isFolder && selectedFileId === item.id && showPreview" class="text-[10px] text-blue-500 ml-1">
-                      <i class="fas fa-eye"></i>
-                    </span>
+                          <i class="fas fa-eye"></i>
+                        </span>
+                        <!-- NEW: Show "Shared" badge for employee view -->
+                        <span v-if="isEmployee && item.shared_at" class="text-[8px] text-green-500 ml-1">
+                          <i class="fas fa-share-alt"></i>
+                        </span>
                       </td>
                     </tr>
                     </tbody>
@@ -195,7 +231,8 @@
                         <span class="font-medium text-sm text-gray-800 truncate">{{ previewData.name }}</span>
                         <span class="text-xs text-gray-400 whitespace-nowrap">{{ previewData.size }}</span>
                       </div>
-                      <div class="flex items-center gap-2 shrink-0">
+                      <!-- NEW: Only show action buttons for Admin -->
+                      <div v-if="isAdmin" class="flex items-center gap-2 shrink-0">
                         <!-- Share Icon -->
                         <button @click.stop="openShareModal(getCurrentFile())"
                                 class="w-8 h-8 flex items-center justify-center bg-green-600 text-white rounded-lg hover:bg-green-700 transition text-sm"
@@ -208,6 +245,21 @@
                                 title="Delete">
                           <i class="fas fa-trash"></i>
                         </button>
+                        <!-- Download Icon - Show for both admin and employee -->
+                        <button @click.stop="downloadFile(getCurrentFile())"
+                                class="w-8 h-8 flex items-center justify-center bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm"
+                                title="Download">
+                          <i class="fas fa-download"></i>
+                        </button>
+                        <!-- Close Icon -->
+                        <button @click.stop="closePreview"
+                                class="w-8 h-8 flex items-center justify-center bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition text-sm"
+                                title="Close">
+                          <i class="fas fa-times"></i>
+                        </button>
+                      </div>
+                      <!-- NEW: Employee view - only Download and Close -->
+                      <div v-else class="flex items-center gap-2 shrink-0">
                         <!-- Download Icon -->
                         <button @click.stop="downloadFile(getCurrentFile())"
                                 class="w-8 h-8 flex items-center justify-center bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm"
@@ -298,17 +350,21 @@
                   <i class="fas fa-cloud-arrow-up"></i>
                 </div>
                 <h4 class="text-base sm:text-lg font-medium text-gray-700">
-                  {{ isFolderView ? 'This folder is empty' : 'No items found' }}
+                  {{ isEmployee ? 'No documents shared with you' : (isFolderView ? 'This folder is empty' : 'No items found') }}
                 </h4>
                 <p class="text-xs sm:text-sm text-gray-400 mt-1 px-4">
-                  {{ isFolderView
-                    ? 'Drag & drop files here, or use the New button to upload documents or create a folder.'
-                    : 'No documents found in this view.'
+                  {{ isEmployee
+                    ? 'Your admin will share documents with you as needed.'
+                    : (isFolderView
+                            ? 'Drag & drop files here, or use the New button to upload documents or create a folder.'
+                            : 'No documents found in this view.'
+                    )
                   }}
                 </p>
               </div>
 
-              <div v-if="isDragging" class="absolute inset-0 bg-blue-50/90 rounded-xl flex flex-col items-center justify-center z-10">
+              <!-- NEW: Only show drag & drop overlay for Admin -->
+              <div v-if="isDragging && isAdmin" class="absolute inset-0 bg-blue-50/90 rounded-xl flex flex-col items-center justify-center z-10">
                 <i class="fas fa-cloud-arrow-up text-4xl sm:text-5xl text-blue-500 mb-2 sm:mb-3"></i>
                 <p class="text-base sm:text-lg font-medium text-gray-700">Drop to upload</p>
                 <span class="text-xs sm:text-sm text-gray-500">Files will be added to the current folder</span>

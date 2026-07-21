@@ -45,7 +45,7 @@ class User(AbstractUser):
         return self.username
 
 class Module(models.Model):
-    name = models.CharField(max_length=255,unique=True)
+    name = models.CharField(max_length=255,)
     icon = models.CharField(max_length=50, blank=True, null=True)
     role = models.ForeignKey(
         'Role',

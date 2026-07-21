@@ -5,8 +5,8 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { useToast } from '@/composables/useToast'
 import AdminSidebar from '../../../components/adminSidebar.vue'
 import DashboardHeader from '../../../components/header.vue'
-import BaseModal from '../../../components/BaseModal.vue'
-import BaseDetailModal from '../../../components/BaseDetailModal.vue'
+import BaseModal from '@/components/baseModal.vue'
+import BaseDetailModal from '@/components/baseDetailModal.vue'
 
 const { showToast } = useToast()
 const employees = ref([

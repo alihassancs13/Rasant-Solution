@@ -5,6 +5,7 @@ import Home from "../pages/Home/home.vue";
 import EmployeeDashboard from '../pages/admin/Employee/employeeDashboard.vue';
 import Documents from '../pages/admin/Documents/documents.vue';
 import Vault from '../pages/admin/Vault/credentialsVault.vue';
+import Credential from '../pages/Employee/employeeCredentials.vue';
 import EmployeeAttendance from '../pages/admin/Attendance/attendance.vue';
 import { useLoginStore } from '../stores/loginStore.js';
 import JobDetails from '../pages/Home/jobDetails.vue';
@@ -160,6 +161,12 @@ const routes = [
     name: 'Vault',
     component: Vault,
     meta: {title: "credentials - Rasant Solutions", requiresAuth: true, role: 'admin' }
+  },
+  {
+    path: '/employee/credentialsvault',
+    name: 'Credential',
+    component: Credential,
+    meta: {title: "employee-credentials - Rasant Solutions", requiresAuth: true, role: 'employee' }
   },
   {
     path: '/onboarding/:token?',

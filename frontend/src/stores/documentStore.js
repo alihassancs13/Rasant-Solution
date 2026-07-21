@@ -13,6 +13,8 @@ export const useDocumentStore = defineStore('documents', {
         error: null,
         storageUsed: '0 MB',
         storagePercentage: 0,
+        isEmployeeView: false,
+        userRole: null, // Track user role
     }),
 
     getters: {
@@ -61,9 +63,73 @@ export const useDocumentStore = defineStore('documents', {
             return response.json();
         },
 
-        async loadAllItems() {
+        // Fetch employee documents
+        async fetchEmployeeDocuments(employeeId) {
             this.isLoading = true;
             this.error = null;
+            this.isEmployeeView = true;
+            this.userRole = 'employee';
+
+            try {
+                const response = await this._apiRequest(
+                    API_ENDPOINTS.DOCUMENTS.GET_EMPLOYEE_DOCUMENTS(employeeId)
+                );
+                console.log('Employee documents response:', response);
+
+                let documents = [];
+                if (response.status === 'success' && response.documents) {
+                    documents = response.documents;
+                }
+                const processedItems = [];
+
+                for (const item of documents) {
+                    if (item.type === 'folder') {
+                        const folderItem = {
+                            ...item,
+                            isFolder: true,
+                            type: 'folder',
+                            children_count: item.file_count || 0,
+                            shared_at: item.shared_at,
+                            // IMPORTANT: Keep files nested inside the folder
+                            files: item.files || [],
+                        };
+                        processedItems.push(folderItem);
+                    } else if (item.type === 'file') {
+                        processedItems.push({
+                            ...item,
+                            isFolder: false,
+                            type: 'file',
+                            shared_at: item.shared_at,
+                        });
+                    }
+                }
+
+                this.allItems = processedItems;
+                this.viewItems = processedItems;
+                this.currentFolderId = null;
+
+                console.log(' Employee documents loaded:', processedItems.length);
+                console.log(' Processed items with nested files:', processedItems);
+
+                return { success: true, data: processedItems };
+
+            } catch (error) {
+                this.error = error.message;
+                console.error('Fetch employee documents error:', error);
+                return { success: false, error: error.message };
+            } finally {
+                this.isLoading = false;
+            }
+        },
+        async loadAllItems() {
+            // If employee view, don't load all items
+            if (this.isEmployeeView) {
+                return;
+            }
+
+            this.isLoading = true;
+            this.error = null;
+            this.userRole = 'admin';
             try {
                 const response = await this._apiRequest(API_ENDPOINTS.DOCUMENTS.ALL);
                 console.log('All items response:', response);
@@ -84,7 +150,7 @@ export const useDocumentStore = defineStore('documents', {
                     isFolder: true,
                     type: 'folder',
                     children_count: f.children_count || 0,
-                    parent_id: f.parent || f.parent_id || null  // CRITICAL: Set parent_id
+                    parent_id: f.parent || f.parent_id || null
                 }));
 
                 const filesData = files.map(f => ({
@@ -98,11 +164,7 @@ export const useDocumentStore = defineStore('documents', {
                 this.viewItems = [...foldersData, ...filesData];
                 this.currentFolderId = null;
 
-                console.log('All items loaded - Folders:', foldersData.map(f => ({
-                    id: f.id,
-                    name: f.name,
-                    parent_id: f.parent_id
-                })));
+                console.log('Admin all items loaded:', this.allItems.length);
 
             } catch (error) {
                 this.error = error.message;
@@ -114,8 +176,13 @@ export const useDocumentStore = defineStore('documents', {
         },
 
         async loadAllFolders() {
+            if (this.isEmployeeView) {
+                return;
+            }
+
             this.isLoading = true;
             this.error = null;
+            this.userRole = 'admin';
             try {
                 const response = await this._apiRequest(API_ENDPOINTS.DOCUMENTS.FOLDERS.ALL);
                 console.log('All folders response:', response);
@@ -130,12 +197,16 @@ export const useDocumentStore = defineStore('documents', {
                     data = response.results;
                 }
 
-                this.viewItems = data.map(f => ({
+                const foldersData = data.map(f => ({
                     ...f,
                     isFolder: true,
                     type: 'folder',
-                    children_count: f.children_count || 0
+                    children_count: f.children_count || 0,
+                    parent_id: f.parent || f.parent_id || null
                 }));
+
+                this.allItems = foldersData;
+                this.viewItems = foldersData;
                 this.currentFolderId = null;
             } catch (error) {
                 this.error = error.message;
@@ -147,8 +218,13 @@ export const useDocumentStore = defineStore('documents', {
         },
 
         async loadAllFiles() {
+            if (this.isEmployeeView) {
+                return;
+            }
+
             this.isLoading = true;
             this.error = null;
+            this.userRole = 'admin';
             try {
                 const response = await this._apiRequest(API_ENDPOINTS.DOCUMENTS.FILES.ALL);
                 console.log('All files response:', response);
@@ -163,11 +239,15 @@ export const useDocumentStore = defineStore('documents', {
                     data = response.results;
                 }
 
-                this.viewItems = data.map(f => ({
+                const filesData = data.map(f => ({
                     ...f,
                     isFolder: false,
-                    type: 'file'
+                    type: 'file',
+                    folder_id: f.folder_id || null
                 }));
+
+                this.allItems = filesData;
+                this.viewItems = filesData;
                 this.currentFolderId = null;
             } catch (error) {
                 this.error = error.message;
@@ -179,8 +259,13 @@ export const useDocumentStore = defineStore('documents', {
         },
 
         async loadFolderContents(folderId) {
+            if (this.isEmployeeView) {
+                return;
+            }
+
             this.isLoading = true;
             this.error = null;
+            this.userRole = 'admin';
             try {
                 const response = await this._apiRequest(
                     API_ENDPOINTS.DOCUMENTS.FOLDERS.CONTENTS(folderId)
@@ -196,7 +281,6 @@ export const useDocumentStore = defineStore('documents', {
                             type: 'folder',
                             parent_id: currentFolder.parent || null
                         });
-                        console.log('Added current folder to allItems:', currentFolder.name, 'ID:', currentFolder.id, 'Parent:', currentFolder.parent);
                     } else {
                         const existing = this.allItems.find(item => item.id === currentFolder.id && item.isFolder);
                         if (existing) {
@@ -209,18 +293,16 @@ export const useDocumentStore = defineStore('documents', {
                     isFolder: true,
                     type: 'folder',
                     children_count: f.children_count || 0,
-                    parent_id: f.parent || f.parent_id || folderId  // Set parent_id to current folder
+                    parent_id: f.parent || f.parent_id || folderId
                 }));
                 folders.forEach(folder => {
                     const exists = this.allItems.some(item => item.id === folder.id && item.isFolder);
                     if (!exists) {
                         this.allItems.push(folder);
-                        console.log('Added subfolder to allItems:', folder.name, 'ID:', folder.id, 'Parent:', folder.parent_id);
                     } else {
                         const existing = this.allItems.find(item => item.id === folder.id && item.isFolder);
                         if (existing) {
                             existing.parent_id = folder.parent_id;
-                            console.log('Updated subfolder in allItems:', folder.name, 'ID:', folder.id, 'Parent:', folder.parent_id);
                         }
                     }
                 });
@@ -233,11 +315,6 @@ export const useDocumentStore = defineStore('documents', {
 
                 this.viewItems = [...folders, ...files];
                 this.currentFolderId = folderId;
-                console.log('=== ALL FOLDERS IN ALLITEMS ===');
-                this.allItems.filter(item => item.isFolder).forEach(f => {
-                    console.log(`ID: ${f.id}, Name: ${f.name}, Parent: ${f.parent_id}`);
-                });
-                console.log('===============================');
 
             } catch (error) {
                 this.error = error.message;
@@ -249,6 +326,10 @@ export const useDocumentStore = defineStore('documents', {
         },
 
         async createFolder(name, parentId = null) {
+            if (this.isEmployeeView) {
+                throw new Error('Employees cannot create folders');
+            }
+
             this.isLoading = true;
             this.error = null;
             try {
@@ -279,6 +360,10 @@ export const useDocumentStore = defineStore('documents', {
         },
 
         async uploadFile(folderId, file) {
+            if (this.isEmployeeView) {
+                throw new Error('Employees cannot upload files');
+            }
+
             if (!folderId) {
                 throw new Error('Please select a folder first');
             }
@@ -326,6 +411,10 @@ export const useDocumentStore = defineStore('documents', {
         },
 
         async updateFolder(folderId, name) {
+            if (this.isEmployeeView) {
+                throw new Error('Employees cannot edit folders');
+            }
+
             this.isLoading = true;
             this.error = null;
             try {
@@ -353,6 +442,10 @@ export const useDocumentStore = defineStore('documents', {
         },
 
         async deleteItem(item) {
+            if (this.isEmployeeView) {
+                throw new Error('Employees cannot delete items');
+            }
+
             this.isLoading = true;
             this.error = null;
             try {
@@ -396,7 +489,12 @@ export const useDocumentStore = defineStore('documents', {
                 this.isLoading = false;
             }
         },
+
         async shareDocument(folderId, fileId, employeeIds) {
+            if (this.isEmployeeView) {
+                throw new Error('Employees cannot share documents');
+            }
+
             this.isLoading = true;
             this.error = null;
             try {
@@ -428,7 +526,6 @@ export const useDocumentStore = defineStore('documents', {
                 this.isLoading = false;
             }
         },
-        ///view file
 
         async viewFileContent(fileId) {
             this.isLoading = true;
@@ -446,12 +543,10 @@ export const useDocumentStore = defineStore('documents', {
                 const cleanedBaseUrl = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL;
                 const token = localStorage.getItem('accessToken');
 
-                // Add download URL
                 if (!response.download_url) {
                     response.download_url = `${cleanedBaseUrl}/api/documents/files/${fileId}/download/`;
                 }
 
-                // For PDFs, create blob URL
                 if (response.type === 'pdf' && response.content) {
                     try {
                         const binaryString = atob(response.content);
@@ -461,14 +556,12 @@ export const useDocumentStore = defineStore('documents', {
                         }
                         const blob = new Blob([bytes], { type: 'application/pdf' });
                         response.blob_url = URL.createObjectURL(blob);
-                        console.log('PDF blob URL created successfully');
                     } catch (error) {
                         console.error('Error creating PDF blob:', error);
                         response.data_uri = `data:application/pdf;base64,${response.content}`;
                     }
                 }
 
-                // For Office documents (Word, Excel, PowerPoint) - create blob URL
                 if (response.type === 'office' && response.content) {
                     try {
                         const binaryString = atob(response.content);
@@ -478,30 +571,22 @@ export const useDocumentStore = defineStore('documents', {
                         }
                         const blob = new Blob([bytes], { type: response.mime_type || 'application/octet-stream' });
                         response.blob_url = URL.createObjectURL(blob);
-                        console.log('Office document blob URL created successfully');
-
-                        // Create a viewer URL using Microsoft Office Online
-                        // This will display Word, Excel, PowerPoint files in the browser
                         const encodedUrl = encodeURIComponent(response.blob_url);
                         response.viewer_url = `https://view.officeapps.live.com/op/view.aspx?src=${encodedUrl}`;
                     } catch (error) {
                         console.error('Error creating office document blob:', error);
-                        // Fallback: try Google Docs Viewer with download URL
                         const downloadUrl = response.download_url;
                         const encodedDownloadUrl = encodeURIComponent(downloadUrl);
                         response.viewer_url = `https://docs.google.com/gview?url=${encodedDownloadUrl}&embedded=true`;
                     }
                 }
 
-                // For Word/Excel/PowerPoint documents (backward compatibility)
                 if (response.type === 'url' && response.url) {
-                    // Try to use Google Docs Viewer
                     const downloadUrl = response.download_url || `${cleanedBaseUrl}/api/documents/files/${fileId}/download/`;
                     const encodedUrl = encodeURIComponent(downloadUrl);
                     response.viewer_url = `https://docs.google.com/gview?url=${encodedUrl}&embedded=true`;
                 }
 
-                // For PDF URLs (large PDFs)
                 if (response.type === 'pdf_url' && response.url) {
                     const urlWithToken = response.url.includes('?')
                         ? `${response.url}&token=${token}`
@@ -521,7 +606,11 @@ export const useDocumentStore = defineStore('documents', {
                 this.isLoading = false;
             }
         },
+
         navigateTo(folderId) {
+            if (this.isEmployeeView) {
+                return;
+            }
             if (folderId === null) {
                 this.loadAllItems();
             } else {
@@ -536,7 +625,61 @@ export const useDocumentStore = defineStore('documents', {
                 this.error = 'Please login to access documents';
                 return;
             }
-            this.loadAllFolders();
+
+            // Get user data from localStorage
+            const userStr = localStorage.getItem('user');
+            if (!userStr) {
+                console.warn('No user data found');
+                return;
+            }
+
+            try {
+                const user = JSON.parse(userStr);
+
+                const roleId = user.role_id || user.role?.id || user.roleId || null;
+                const roleName = user.role?.name || user.role_name || user.role || '';
+
+                console.log(' User object:', user);
+                console.log(' Role ID found:', roleId);
+                console.log(' Role name found:', roleName);
+                console.log(' All available keys:', Object.keys(user));
+                const isEmployee = roleId === 2 ||
+                    roleName.toLowerCase() === 'employee' ||
+                    user.is_employee === true ||
+                    user.role === 'employee';
+
+                console.log(' Is employee?', isEmployee);
+
+                if (isEmployee) {
+                    // Employee - fetch shared documents
+                    const employeeId = user.employee_id || user.id || user.employee?.id;
+                    console.log(' Employee ID to fetch:', employeeId);
+
+                    if (employeeId) {
+                        this.isEmployeeView = true;
+                        this.userRole = 'employee';
+                        console.log(' Fetching employee documents for ID:', employeeId);
+                        this.fetchEmployeeDocuments(employeeId);
+                    } else {
+                        console.error(' No employee ID found for employee user');
+                        this.error = 'Employee ID not found';
+                        // Fallback: try using user.id
+                        if (user.id) {
+                            console.log(' Trying with user.id as fallback:', user.id);
+                            this.fetchEmployeeDocuments(user.id);
+                        }
+                    }
+                } else {
+                    // Admin - load all folders
+                    console.log(' Admin user - loading all items');
+                    this.isEmployeeView = false;
+                    this.userRole = 'admin';
+                    this.loadAllItems();
+                }
+            } catch (error) {
+                console.error(' Error parsing user data:', error);
+                this.error = 'Error loading user data';
+            }
         },
     },
 });

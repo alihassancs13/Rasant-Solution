@@ -93,11 +93,73 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
 
             totalCount.value = data.count || credentials.value.length
 
+            return { success: true, data: credentials.value }
+
         } catch (err) {
             error.value = err.message
             console.error('Error fetching credentials:', err)
+            return { success: false, error: err.message }
         } finally {
             loading.value = false
+        }
+    }
+
+    // Fetch employee credentials
+    const fetchEmployeeCredentials = async (employeeId) => {
+        loading.value = true
+        error.value = null
+
+        try {
+            const cleanedBaseUrl = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL;
+            const endpoint = API_ENDPOINTS.CREDENTIALS.GET_EMPLOYEE_CREDENTIALS(employeeId);
+            const fullUrl = `${cleanedBaseUrl}${endpoint}`;
+
+            console.log('🔵 Fetching employee credentials from:', fullUrl);
+
+            const token = getAuthToken();
+            const headers = { 'Content-Type': 'application/json' };
+            if (token) headers['Authorization'] = `Bearer ${token}`;
+
+            const response = await fetch(fullUrl, { method: 'GET', headers });
+
+            if (response.status === 401) {
+                localStorage.removeItem('access_token')
+                localStorage.removeItem('accessToken')
+                localStorage.removeItem('token')
+                window.location.href = '/login'
+                throw new Error('Session expired. Please login again.')
+            }
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || `HTTP Error: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log(' Employee credentials response:', data);
+
+            if (data.status === 'success' && data.credentials) {
+                credentials.value = data.credentials.map(cred => ({
+                    ...cred,
+                    showPassword: false,
+                }));
+                totalCount.value = credentials.value.length;
+                console.log(' Credentials loaded:', credentials.value.length);
+            } else {
+                credentials.value = [];
+                totalCount.value = 0;
+                throw new Error(data.message || 'Failed to fetch credentials');
+            }
+
+            return { success: true, data: credentials.value };
+        } catch (error) {
+            error.value = error.message || 'Failed to fetch employee credentials';
+            credentials.value = [];
+            totalCount.value = 0;
+            console.error(' Error fetching employee credentials:', error);
+            return { success: false, error: error.value };
+        } finally {
+            loading.value = false;
         }
     }
 
@@ -171,7 +233,6 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
         }
     }
 
-    // NEW: Share credential action
     const shareCredential = async (credentialId, employeeIds) => {
         loading.value = true
         error.value = null
@@ -220,6 +281,12 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
             loading.value = false
         }
     }
+    const togglePassword = (credentialId) => {
+        const cred = credentials.value.find(c => c.id === credentialId);
+        if (cred) {
+            cred.showPassword = !cred.showPassword;
+        }
+    }
 
     const clearError = () => {
         error.value = null
@@ -233,8 +300,10 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
         uniqueProjects,
         staleCredentials,
         fetchCredentials,
+        fetchEmployeeCredentials,
         createCredential,
         shareCredential,
+        togglePassword,
         clearError
     }
 })
