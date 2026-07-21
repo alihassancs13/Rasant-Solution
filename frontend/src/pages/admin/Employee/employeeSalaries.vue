@@ -83,9 +83,41 @@ const {
 const tabs = [
   { key: 'employee-roster', label: 'Employee roster', icon: ['fas', 'users'] },
   { key: 'policies',        label: 'Policies',        icon: ['fas', 'file-lines'] },
+  { key: 'payroll-settings', label: 'Payroll Settings', icon: ['fas', 'sliders'] },
 ]
 const activeTab = ref('employee-roster')
+const payrollSettings = ref({
+  grace_minutes: 10,
+  allowed_leaves_per_month: 2,
+  allowed_absents_per_month: 0,
+  overtime_rate_per_hour: 0,
+  late_penalty_mode: 'half_day',
+  late_count_threshold: 3,
+  late_fixed_penalty_amount: null,
+  standard_days_per_month: 30,
+})
+const isSavingPayrollSettings = ref(false)
+const payrollSettingsLoading = ref(false)
 
+const fetchPayrollSettings = async () => {
+  payrollSettingsLoading.value = true
+  try {
+    const { data } = await axios.get('/api/payroll-settings/')
+    payrollSettings.value = data
+  } finally {
+    payrollSettingsLoading.value = false
+  }
+}
+
+const savePayrollSettings = async () => {
+  isSavingPayrollSettings.value = true
+  try {
+    const { data } = await axios.put('/api/payroll-settings/', payrollSettings.value)
+    payrollSettings.value = data
+  } finally {
+    isSavingPayrollSettings.value = false
+  }
+}
 const formatDate = (dateStr) => {
   if (!dateStr) return '—'
   return new Date(dateStr).toLocaleDateString('en-US', {
@@ -199,6 +231,7 @@ const nextPolicyPage = () => {
 
 // ── Lifecycle ──
 onMounted(async () => {
+
   fetchPolicies()
   fetchLookups()
   fetchAssignments()
@@ -206,6 +239,8 @@ onMounted(async () => {
   if (route.query.highlightEmployee) {
     handleHighlightEmployee(Number(route.query.highlightEmployee))
   }
+  fetchPayrollSettings()
+
 })
 
 watch(() => route.query.highlightEmployee, (newVal) => {
@@ -629,6 +664,79 @@ watch(() => route.query.highlightEmployee, (newVal) => {
                 <font-awesome-icon :icon="['fas', 'chevron-right']" class="w-4 h-4 text-text-secondary" />
               </button>
             </div>
+          </div>
+        </div>
+        <!-- ══════════ Payroll Settings Tab ══════════ -->
+        <div v-if="activeTab === 'payroll-settings'" class="bg-white border border-border rounded-xl shadow-sm overflow-hidden">
+          <div class="p-4 sm:p-5">
+            <h2 class="text-lg font-bold text-text-primary">Payroll Settings</h2>
+            <p class="text-sm text-text-muted mt-0.5">
+              Global rules used to calculate attendance-based deductions and overtime. Changes apply to future payroll runs only.
+            </p>
+          </div>
+
+          <div v-if="payrollSettingsLoading" class="text-center py-16">
+            <font-awesome-icon icon="fa-solid fa-spinner" spin class="text-text-muted text-2xl" />
+          </div>
+
+          <div v-else class="px-4 sm:px-5 pb-5 grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-4">
+
+            <div class="dash-field">
+              <label>Grace Minutes</label>
+              <input v-model.number="payrollSettings.grace_minutes" type="number" min="0"
+                     class="w-full mt-1 px-3.5 py-2.5 rounded-md border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              <p class="text-xs text-text-muted mt-1">Late arrival window with no deduction (minutes).</p>
+            </div>
+
+            <div class="dash-field">
+              <label>Standard Days Per Month</label>
+              <input v-model.number="payrollSettings.standard_days_per_month" type="number" min="1"
+                     class="w-full mt-1 px-3.5 py-2.5 rounded-md border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+            </div>
+
+            <div class="dash-field">
+              <label>Allowed Absents / Month</label>
+              <input v-model.number="payrollSettings.allowed_leaves_per_month" type="number" min="0"
+                     class="w-full mt-1 px-3.5 py-2.5 rounded-md border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+            </div>
+
+
+            <div class="dash-field">
+              <label>Overtime Rate / Hour</label>
+              <input v-model.number="payrollSettings.overtime_rate_per_hour" type="number" step="0.01" min="0"
+                     class="w-full mt-1 px-3.5 py-2.5 rounded-md border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+            </div>
+
+            <div class="dash-field">
+              <label>Late Penalty Mode</label>
+              <select v-model="payrollSettings.late_penalty_mode"
+                      class="w-full mt-1 px-3.5 py-2.5 rounded-md border border-border text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/30">
+                <option value="half_day">Convert to Half-Day Deduction</option>
+                <option value="fixed">Fixed Amount Penalty</option>
+                <option value="none">No Penalty</option>
+              </select>
+            </div>
+
+            <div class="dash-field" v-if="payrollSettings.late_penalty_mode === 'half_day'">
+              <label>Late Count Threshold</label>
+              <input v-model.number="payrollSettings.late_count_threshold" type="number" min="1"
+                     class="w-full mt-1 px-3.5 py-2.5 rounded-md border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              <p class="text-xs text-text-muted mt-1">e.g. every N lates = 1 half-day deduction.</p>
+            </div>
+
+            <div class="dash-field" v-if="payrollSettings.late_penalty_mode === 'fixed'">
+              <label>Fixed Penalty Amount</label>
+              <input v-model.number="payrollSettings.late_fixed_penalty_amount" type="number" step="0.01" min="0"
+                     class="w-full mt-1 px-3.5 py-2.5 rounded-md border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+            </div>
+
+            <div class="sm:col-span-2 flex justify-end pt-2">
+              <ShineButton variant="teal" shape="xl" size="sm" :loading="isSavingPayrollSettings" @click="savePayrollSettings">
+                <font-awesome-icon :icon="['fas', 'floppy-disk']" class="w-3 h-3" />
+                Save Settings
+              </ShineButton>
+            </div>
+
           </div>
         </div>
       </main>

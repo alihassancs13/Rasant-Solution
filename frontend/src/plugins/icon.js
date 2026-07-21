@@ -89,7 +89,9 @@ import {
   faMicrophone,
   faComments,
   faCheckDouble,
-  faCopy
+  faCopy,
+  faTimesCircle,
+  faCalendarDay,
 } from '@fortawesome/free-solid-svg-icons'
 
 import {
@@ -231,5 +233,7 @@ library.add(
     faMicrophone,
     faComments,
     faCheckDouble,
-    faCopy
+    faCopy,
+    faTimesCircle,
+    faCalendarDay,
 )

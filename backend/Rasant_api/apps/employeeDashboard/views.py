@@ -896,23 +896,30 @@ def attendance_bulk_upload(request):
         )
     saved_records = []
     failed_records = []
-    with transaction.atomic():
-        for index, single_row in enumerate(all_rows):
-            row_checker = AttendanceBulkRowSerializer(data=single_row)
-            if row_checker.is_valid():
-                saved_attendance = row_checker.save()
+    for index, single_row in enumerate(all_rows):
+        row_checker = AttendanceBulkRowSerializer(data=single_row)
+        if row_checker.is_valid():
+            try:
+                with transaction.atomic():
+                    saved_attendance = row_checker.save()
                 saved_records.append({
                     'row_number': index + 1,
                     'employee_name': saved_attendance.employee.name,
                     'date': str(saved_attendance.date),
                     'status': saved_attendance.status,
                 })
-            else:
+            except Exception as e:
                 failed_records.append({
                     'row_number': index + 1,
                     'emp_no': single_row.get('emp_no'),
-                    'reason': row_checker.errors,
+                    'reason': str(e),
                 })
+        else:
+            failed_records.append({
+                'row_number': index + 1,
+                'emp_no': single_row.get('emp_no'),
+                'reason': row_checker.errors,
+            })
     return Response({
         'total_rows': len(all_rows),
         'successfully_saved': len(saved_records),

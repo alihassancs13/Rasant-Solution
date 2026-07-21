@@ -370,10 +370,18 @@ class AttendanceBulkRowSerializer(serializers.Serializer):
         queryset=Employee.objects.all(),
         error_messages={'does_not_exist': 'No employee found with attendance ID {value}.'},
     )
-    date = serializers.DateField()
+    date = serializers.DateField(input_formats=[
+        '%m/%d/%Y',
+        '%d-%m-%Y',
+        '%m/%d/%y',
+        '%d-%m-%y',
+        '%d/%m/%Y',
+        '%Y-%m-%d',
+        'iso-8601',
+    ],)
     timetable = serializers.CharField(required=False, allow_blank=True)
-    clock_in = serializers.TimeField(required=False, allow_null=True)
-    clock_out = serializers.TimeField(required=False, allow_null=True)
+    clock_in = serializers.TimeField(required=False, allow_null=True,input_formats=['%I:%M %p', '%H:%M:%S', '%H:%M', 'iso-8601'],)
+    clock_out = serializers.TimeField(required=False, allow_null=True, input_formats=['%I:%M %p', '%H:%M:%S', '%H:%M', 'iso-8601'],)
 
     def to_internal_value(self, data):
         data = data.copy()
@@ -387,6 +395,7 @@ class AttendanceBulkRowSerializer(serializers.Serializer):
         employee = validated_data['employee']
         timetable_text = validated_data.get('timetable', '')
         clock_in = validated_data.get('clock_in')
+        clock_out = validated_data.get('clock_out')
 
         attendance, _ = Attendance.objects.update_or_create(
             employee=employee,
@@ -394,8 +403,8 @@ class AttendanceBulkRowSerializer(serializers.Serializer):
             defaults={
                 'timetable': timetable_text,
                 'clock_in': clock_in,
-                'clock_out': validated_data.get('clock_out'),
-                'status': calculate_status(clock_in, timetable_text),
+                'clock_out': clock_out,
+                'status': calculate_status(clock_in, clock_out, timetable_text),
             },
         )
         return attendance

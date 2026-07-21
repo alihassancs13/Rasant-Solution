@@ -187,7 +187,7 @@ export const usePolicyStore = defineStore('policy', {
             this.error = null
 
             try {
-             const response = await apiClient.get(`${API_ENDPOINTS.GET_EMPLOYEE_DETAIL}${employeeId}/`);
+             const response = await apiClient.get(API_ENDPOINTS.GET_EMPLOYEE_DETAIL(employeeId));
              this.employeeDetail = response.data
              return response.data
 

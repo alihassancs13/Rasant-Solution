@@ -144,11 +144,6 @@ export function useEmployeeCareer() {
             c.desired_position?.toLowerCase().includes(q),
         )
     })
-
-    // ─── Job selection (drives STEP 1 -> STEP 2 drill-down in CV tab) ──
-    // selectedJobForCVs can be:
-    //   - a real JobOpening object   -> normal per-job view
-    //   - the GENERAL_APPLICATIONS sentinel below -> CVs with job = null
     const GENERAL_APPLICATIONS = Object.freeze({
         id: null,
         job_title: 'General Applications',
@@ -158,12 +153,6 @@ export function useEmployeeCareer() {
     })
 
     const selectedJobForCVs = ref(null)
-
-    // NOTE: previously this matched cv.desired_position against job.job_title
-    // as free text, so renaming a job (or a candidate typing the position
-    // slightly differently) silently broke the link. Now every CV carries a
-    // real `job` foreign key (the JobOpening id, or null for a general
-    // application), so matching is done by id — exact and rename-proof.
     function cvCountForJob(job) {
         if (!Array.isArray(cvSubmissions.value)) return 0
         if (job?.isGeneral) {
@@ -185,9 +174,6 @@ export function useEmployeeCareer() {
     function backToJobsList() {
         selectedJobForCVs.value = null
     }
-
-    // filteredCVs (search-filtered) narrowed further to the selected job,
-    // by id — same rename-proof matching as cvCountForJob above.
     const jobFilteredCVs = computed(() => {
         if (!selectedJobForCVs.value) return []
         if (selectedJobForCVs.value.isGeneral) {

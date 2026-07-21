@@ -27,7 +27,7 @@ def parse_shift_range(timetable_text: str):
     return time(start_hour_24, start_min), time(end_hour_24 % 24, end_min)
 
 
-def calculate_status(clock_in, timetable_text, grace_minutes=25):
+def calculate_status(clock_in, clock_out, timetable_text, grace_minutes=25):
     if not clock_in and not clock_out:
         return 'absent'
     if not clock_in or not clock_out:

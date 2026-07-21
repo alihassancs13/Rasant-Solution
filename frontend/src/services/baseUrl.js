@@ -25,6 +25,15 @@ export const API_ENDPOINTS = {
     POLICY_ASSIGN: (policyId) => `/api/employeeDashboard/salaries/policies/${policyId}/assign/`,
     FORCE_INCREMENT: '/api/employeeDashboard/salaries/force-increment/',
     INCREMENTS_DUE_TODAY: '/api/employeeDashboard/salaries/increment-due-today/',
+    GET_EMPLOYEE_DETAIL: (pk) => `/api/employeeDashboard/salaries/get_employee_detail/${pk}/`,
+
+    ATTENDANCE: {
+        LIST: '/api/employeeDashboard/attendance/employees/',
+        HISTORY: (id) => `/api/employeeDashboard/attendance/employees/${id}/history/`,
+        BULK_UPLOAD: '/api/employeeDashboard/attendance/bulk-upload/',
+        RECORD_UPDATE: (id) => `/api/employeeDashboard/attendance/${id}/`,
+    },
+
     DOCUMENTS: {
         FOLDERS: {
             CREATE: '/api/documents/folders/create/',

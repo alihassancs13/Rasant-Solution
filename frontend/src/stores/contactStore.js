@@ -4,7 +4,6 @@ import { BASE_URL, API_ENDPOINTS } from '../services/baseUrl.js';
 
 const getAuthToken = () => localStorage.getItem('accessToken');
 
-// Admin calls need auth
 const apiClient = axios.create({
     baseURL: BASE_URL,
     headers: { 'Content-Type': 'application/json' },
@@ -16,7 +15,6 @@ apiClient.interceptors.request.use((config) => {
     return config;
 });
 
-// Public contact form submit — no auth needed
 const publicClient = axios.create({
     baseURL: BASE_URL,
     headers: { 'Content-Type': 'application/json' },
