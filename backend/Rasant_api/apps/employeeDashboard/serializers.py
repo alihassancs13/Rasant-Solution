@@ -11,10 +11,11 @@ from .models import (
     IncrementPolicy,
     SalaryIncrementHistory,
     EmployeePolicyAssignment,
+    Attendance,
 )
 import calendar
 from datetime import date
-
+from .utils import calculate_status
 
 def calculate_next_effective_date(cycle_code, from_date=None):
     base = from_date or date.today()
@@ -333,3 +334,82 @@ class EmployeePolicyAssignmentSerializer(serializers.ModelSerializer):
         model = EmployeePolicyAssignment
         fields = ['id', 'employee', 'employee_name', 'policy', 'policy_name', 'assigned_at']
         read_only_fields = ['id', 'assigned_at']
+
+class EmployeeAttendanceSerializer(serializers.ModelSerializer):
+    emp_no = serializers.IntegerField(source='attendance_id', read_only=True)
+    dept = serializers.CharField(source='department', read_only=True)
+    pct = serializers.SerializerMethodField()
+    synced = serializers.SerializerMethodField()
+    status = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Employee
+        fields = ['id', 'name', 'emp_no', 'dept', 'pct', 'synced', 'status']
+
+    def get_pct(self, employee):
+        records = employee.attendance_records.all()
+        total = records.count()
+        if total == 0:
+            return 0
+        present_count = records.filter(status__in=['present', 'late']).count()
+        return round((present_count / total) * 100)
+
+    def get_synced(self, employee):
+        latest = employee.attendance_records.order_by('-date').first()
+        return str(latest.date) if latest else None
+
+    def get_status(self, employee):
+        latest = employee.attendance_records.order_by('-date').first()
+        return latest.status if latest else None
+
+
+class AttendanceBulkRowSerializer(serializers.Serializer):
+    emp_no = serializers.SlugRelatedField(
+        source='employee',
+        slug_field='attendance_id',
+        queryset=Employee.objects.all(),
+        error_messages={'does_not_exist': 'No employee found with attendance ID {value}.'},
+    )
+    date = serializers.DateField()
+    timetable = serializers.CharField(required=False, allow_blank=True)
+    clock_in = serializers.TimeField(required=False, allow_null=True)
+    clock_out = serializers.TimeField(required=False, allow_null=True)
+
+    def to_internal_value(self, data):
+        data = data.copy()
+        if data.get('clock_in') == '':
+            data['clock_in'] = None
+        if data.get('clock_out') == '':
+            data['clock_out'] = None
+        return super().to_internal_value(data)
+
+    def create(self, validated_data):
+        employee = validated_data['employee']
+        timetable_text = validated_data.get('timetable', '')
+        clock_in = validated_data.get('clock_in')
+
+        attendance, _ = Attendance.objects.update_or_create(
+            employee=employee,
+            date=validated_data['date'],
+            defaults={
+                'timetable': timetable_text,
+                'clock_in': clock_in,
+                'clock_out': validated_data.get('clock_out'),
+                'status': calculate_status(clock_in, timetable_text),
+            },
+        )
+        return attendance
+
+
+class AttendanceBulkUploadSerializer(serializers.Serializer):
+    rows = AttendanceBulkRowSerializer(many=True)
+
+    def validate_rows(self, value):
+        if not value:
+            raise serializers.ValidationError("No rows to upload.")
+        return value
+class AttendanceHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Attendance
+        fields = ['id', 'date', 'timetable', 'clock_in', 'clock_out', 'status']
+        read_only_fields = ['id', 'date']

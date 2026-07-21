@@ -63,7 +63,7 @@ class ConversationMember(models.Model):
     is_deleted = models.BooleanField(default=False)
 
     class Meta:
-        db_table = 'conversation_members'  # Table name
+        db_table = 'conversation_members'  
         unique_together = ('conversation', 'user')
         indexes = [
             models.Index(fields=['conversation', 'user']),

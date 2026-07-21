@@ -28,7 +28,6 @@ class Employee(models.Model):
     email = models.EmailField(unique=True)
     cnic = models.CharField(max_length=15, unique=True, null=True, blank=True)
 
-    # 1. CNIC SCAN (3 Columns)
     cnic_scan_data = models.BinaryField(null=True, blank=True)
     cnic_scan_name = models.CharField(max_length=255, null=True, blank=True)
     cnic_scan_mimetype = models.CharField(max_length=100, null=True, blank=True)
@@ -89,6 +88,12 @@ class Employee(models.Model):
     branch_name = models.CharField(max_length=255, null=True, blank=True)
     branch_code = models.CharField(max_length=50, null=True, blank=True)
     account_number = models.CharField(max_length=50, null=True, blank=True)
+    attendance_id = models.IntegerField(
+        unique=True,
+        null=True,
+        blank=True,
+        help_text="Numeric ID used to match bulk attendance CSV uploads to this employee"
+    )
 
     # ---------- User Relation ----------
     user = models.ForeignKey(
@@ -354,3 +359,30 @@ class SalaryDeductionHistory(models.Model):
 
     def __str__(self):
         return f"{self.employee.name} — {self.deduction_month.strftime('%b %Y')}"
+
+class Attendance(models.Model):
+
+    STATUS_CHOICES = [
+        ('present', 'Present'),
+        ('late', 'Late'),
+        ('absent', 'Absent'),
+        ('on_leave', 'On leave'),
+    ]
+
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='attendance_records')
+    date = models.DateField()
+    timetable = models.CharField(max_length=100, blank=True, null=True)
+    clock_in = models.TimeField(null=True, blank=True)
+    clock_out = models.TimeField(null=True, blank=True)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='present')
+
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'attendance'
+        ordering = ['-date']
+        unique_together = ('employee', 'date')
+
+    def __str__(self):
+        return f"{self.employee.name} — {self.date} ({self.status})"

@@ -24,6 +24,10 @@ urlpatterns = [
     path('salaries/force-increment/', views.force_increment_view, name='force-increment'),
     path('salaries/increment-due-today/', views.increments_due_today_view, name='force-increment'),
     path('salaries/get_employee_detail/<int:pk>/', views.get_employee_detail, name='employee_detail'),
-    path('salaries/recalculate-insurance/', views.check_insurance_renewals_view, name='recalculate_insurance')
+    path('salaries/recalculate-insurance/', views.check_insurance_renewals_view, name='recalculate_insurance'),
 
+    path('attendance/bulk-upload/', views.attendance_bulk_upload, name='attendance-bulk-upload'),
+    path('attendance/employees/', views.employee_attendance_list, name='employee-attendance-list'),
+    path('attendance/employees/<int:id>/history/', views.employee_attendance_history, name='employee-attendance-history'),
+    path('attendance/<int:id>/', views.attendance_record_update, name='attendance-record-update'),
 ]

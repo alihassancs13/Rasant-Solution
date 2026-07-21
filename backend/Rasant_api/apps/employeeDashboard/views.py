@@ -30,13 +30,14 @@ User = get_user_model()
 from .models import (
     Employee, CVSubmission, JobOpening, JobType, JobStatus,
     IncrementType, IncrementPolicy, CycleTiming, ApplicationMode, EmployeePolicyAssignment,
-    SalaryIncrementHistory,SalaryDeductionHistory
+    SalaryIncrementHistory,SalaryDeductionHistory, Attendance,
 )
 from .serializers import (
     EmployeeSerializer, EmployeeListSerializer, UpdateEmployeeSerializer,
     CVSubmissionSerializer, JobOpeningSerializer, JobTypeSerializer, JobStatusSerializer,
     IncrementTypeSerializer, CycleTimingSerializer, ApplicationModeSerializer,
-    IncrementPolicySerializer, EmployeePolicyAssignmentSerializer
+    IncrementPolicySerializer, EmployeePolicyAssignmentSerializer, EmployeeAttendanceSerializer, AttendanceBulkRowSerializer,
+    AttendanceHistorySerializer
 )
 
 
@@ -846,3 +847,116 @@ def check_insurance_renewals_view(request):
         {"status": "success", "data": renewed},
         status=status.HTTP_200_OK,
     )
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def attendance_bulk_upload(request):
+    all_rows = request.data.get('rows', [])
+    if not all_rows:
+        return Response(
+            {'error': 'No rows found in the uploaded file.'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+    saved_records = []
+    failed_records = []
+    with transaction.atomic():
+        for index, single_row in enumerate(all_rows):
+            row_checker = AttendanceBulkRowSerializer(data=single_row)
+            if row_checker.is_valid():
+                saved_attendance = row_checker.save()
+                saved_records.append({
+                    'row_number': index + 1,
+                    'employee_name': saved_attendance.employee.name,
+                    'date': str(saved_attendance.date),
+                    'status': saved_attendance.status,
+                })
+            else:
+                failed_records.append({
+                    'row_number': index + 1,
+                    'emp_no': single_row.get('emp_no'),
+                    'reason': row_checker.errors,
+                })
+    return Response({
+        'total_rows': len(all_rows),
+        'successfully_saved': len(saved_records),
+        'failed': len(failed_records),
+        'saved_records': saved_records,
+        'failed_records': failed_records,
+    }, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def employee_attendance_list(request):
+    employees = Employee.objects.filter(attendance_id__isnull=False).prefetch_related('attendance_records')
+
+    search = request.query_params.get('search', '').strip()
+    if search:
+        employees = employees.filter(
+            Q(name__icontains=search) | Q(attendance_id__icontains=search)
+        )
+    serializer = EmployeeAttendanceSerializer(employees, many=True)
+    data = serializer.data
+    status_filter = request.query_params.get('status')
+    if status_filter and status_filter != 'all':
+        data = [row for row in data if row['status'] == status_filter]
+
+    return Response(data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def employee_attendance_history(request, id):
+    employee = get_object_or_404(Employee, id=id)
+    records = employee.attendance_records.all()
+
+    date_from = request.query_params.get('date_from')
+    date_to = request.query_params.get('date_to')
+    status_filter = request.query_params.get('status')
+
+    if date_from:
+        records = records.filter(date__gte=date_from)
+    if date_to:
+        records = records.filter(date__lte=date_to)
+
+    history_stats = {
+        'present': records.filter(status='present').count(),
+        'late': records.filter(status='late').count(),
+        'absent': records.filter(status='absent').count(),
+        'on_leave': records.filter(status='on_leave').count(),
+    }
+
+    if status_filter and status_filter != 'all':
+        records = records.filter(status=status_filter)
+
+    serializer = AttendanceHistorySerializer(records.order_by('-date'), many=True)
+
+    return Response({
+        'employee': {
+            'id': employee.id,
+            'name': employee.name,
+            'emp_no': employee.attendance_id,
+            'dept': employee.department,
+        },
+        'history': serializer.data,
+        'historyStats': history_stats,
+    }, status=status.HTTP_200_OK)
+
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def attendance_record_update(request, id):
+    attendance = get_object_or_404(Attendance, id=id)
+
+    serializer = AttendanceHistorySerializer(attendance, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response({
+            'message': 'Attendance record updated successfully.',
+            'record': {
+                'id': attendance.id,
+                'employee_name': attendance.employee.name,
+                'date': str(attendance.date),
+                'status': attendance.status,
+            }
+        }, status=status.HTTP_200_OK)
+
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

@@ -5,6 +5,7 @@ import Home from "../pages/Home/home.vue";
 import EmployeeDashboard from '../pages/admin/Employee/employeeDashboard.vue';
 import Documents from '../pages/admin/Documents/documents.vue';
 import Vault from '../pages/admin/Vault/credentialsVault.vue';
+import EmployeeAttendance from '../pages/admin/Attendance/attendance.vue';
 import { useLoginStore } from '../stores/loginStore.js';
 import JobDetails from '../pages/Home/jobDetails.vue';
 const routes = [
@@ -141,6 +142,12 @@ const routes = [
     name: 'EmployeeDashboard',
     component: EmployeeDashboard,
     meta: { title: "Dashboard - Rasant Solutions",requiresAuth: true, role: 'admin' }
+  },
+  {
+    path: '/admin/employees/attendance',
+    name: 'EmployeeAttendance',
+    component: EmployeeAttendance,
+    meta: { title: "Attendance - Rasant Solutions",requiresAuth: true, role: 'admin' }
   },
   {
     path: '/admin/documents',
