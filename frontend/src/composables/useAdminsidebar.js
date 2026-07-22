@@ -1,8 +1,9 @@
+// composables/Admin/useAdminSidebar.js
 import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useSidebarStore } from '@/stores/sidebarStore.js';
 import { useInboxStore } from '@/stores/inboxStore.js';
-const COMPANY_MODULES = ['Overview', 'Inbox', 'Employees', 'Inquiries', 'Jira', 'Documents', 'Vault'];
+const COMPANY_MODULES = ['Overview', 'Inbox', 'Employees', 'Inquiries', 'Jira', 'Documents', 'Vault','Worklogs'];
 const PROJECT_MODULES = ['Sentra AI', 'AI Agent', 'Chatbot', 'Orchestri'];
 const EMPLOYEE_CHILDREN = ['Dashboard', 'Attendance', 'Careers', 'Salaries'];
 const dropdownStates = ref({});

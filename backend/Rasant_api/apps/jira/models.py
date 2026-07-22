@@ -65,3 +65,38 @@ class JiraTask(models.Model):
     def __str__(self):
         source_name = self.source.name if self.source else 'N/A'
         return f"{self.issue_key} — {self.jira_credential.email} — {self.source_name}"
+
+
+class Worklog(models.Model):
+    jira_credential = models.ForeignKey(
+        JiraCredential,
+        on_delete=models.CASCADE,
+        related_name='worklogs',
+    )
+    worklog_id = models.CharField(max_length=100)  # Jira's worklog ID, returned after create
+    issue_key = models.CharField(max_length=100)
+    issue_id = models.CharField(max_length=100, null=True, blank=True)
+    summary = models.TextField(null=True, blank=True)
+
+    started = models.DateTimeField()  # worklog start datetime, sent to Jira
+    ended = models.DateTimeField(null=True, blank=True)
+    time_spent_seconds = models.PositiveIntegerField()
+    comment = models.TextField(null=True, blank=True)
+
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='created_worklogs',
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'worklog'
+        ordering = ['-started']
+        unique_together = ('jira_credential', 'worklog_id')
+
+    def __str__(self):
+        return f"{self.issue_key} — {self.worklog_id} — {self.jira_credential.email}"

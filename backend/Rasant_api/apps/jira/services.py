@@ -1,5 +1,8 @@
 import requests
 import base64
+import calendar
+from datetime import date,timedelta,datetime
+from dateutil.relativedelta import relativedelta
 from .models import JiraCredential, JiraTask, Source
 from django.http import JsonResponse, HttpResponse,StreamingHttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -272,3 +275,351 @@ def get_issue_detail_service(user, issue_key):
 
     return {'success': True, 'issue': result}, 200
 
+
+def _get_current_account_id(user):
+    try:
+        cred = JiraCredential.objects.get(auth_user_id=user)
+        return cred.account_id
+    except JiraCredential.DoesNotExist:
+        return None
+
+
+def _fetch_all_worklogs_for_issue(domain, headers, issue_key):
+    r = requests.get(
+        f'{domain}/rest/api/3/issue/{issue_key}/worklog',
+        headers=headers,
+        params={'maxResults': 1000}
+    )
+    if r.status_code != 200:
+        return []
+    return r.json().get('worklogs', [])
+
+# Get last years whole work logs
+
+def fetch_worklogs(user, month=None, year=None):
+    domain, headers = get_jira_creds(user)
+
+    if not domain:
+        raise ValueError("Jira not connected. Please connect first.")
+
+    today = date.today()
+
+    # -------------------------
+    # If no filter is provided
+    # use current month
+    # -------------------------
+    if not month:
+        month = today.month
+    else:
+        month = int(month)
+
+    if not year:
+        year = today.year
+    else:
+        year = int(year)
+
+    start_date = date(year, month, 1)
+    end_date = date(year, month, calendar.monthrange(year, month)[1])
+
+    jql = (
+        f'worklogAuthor = currentUser() '
+        f'AND worklogDate >= "{start_date}" '
+        f'AND worklogDate <= "{end_date}"'
+    )
+
+    account_id = _get_current_account_id(user)
+
+    logs_by_date = {}
+    next_page_token = None
+
+    while True:
+        params = {
+            "jql": jql,
+            "fields": "summary,worklog,issuetype",
+            "maxResults": 100,
+        }
+
+        if next_page_token:
+            params["nextPageToken"] = next_page_token
+
+        r = requests.get(
+            f"{domain}/rest/api/3/search/jql",
+            headers=headers,
+            params=params,
+        )
+
+        if r.status_code != 200:
+            try:
+                raise Exception(r.json())
+            except Exception:
+                raise Exception(r.text)
+
+        data = r.json()
+
+        for issue in data.get("issues", []):
+
+            issue_key = issue.get("key")
+            summary = issue["fields"].get("summary")
+
+            issue_type = issue["fields"].get("issuetype", {})
+            issue_type_icon = issue_type.get("iconUrl")
+
+            worklog_data = issue["fields"].get("worklog", {})
+            worklogs = worklog_data.get("worklogs", [])
+
+            if worklog_data.get("total", 0) > len(worklogs):
+                worklogs = _fetch_all_worklogs_for_issue(
+                    domain,
+                    headers,
+                    issue_key,
+                )
+
+            for wl in worklogs:
+
+                if wl.get("author", {}).get("accountId") != account_id:
+                    continue
+
+                date_str = wl.get("started", "")[:10]
+
+                if not (str(start_date) <= date_str <= str(end_date)):
+                    continue
+
+                started_str = wl.get("started")
+
+                started_dt = datetime.strptime(
+                    started_str,
+                    "%Y-%m-%dT%H:%M:%S.000%z",
+                )
+
+                ended_dt = started_dt + timedelta(
+                    seconds=wl.get("timeSpentSeconds", 0)
+                )
+
+                logs_by_date.setdefault(date_str, []).append({
+                    "worklog_id": wl.get("id"),
+                    "issue_key": issue_key,
+                    "issue_id": issue.get("id"),
+                    "summary": summary,
+                    "issue_type_icon": issue_type_icon,
+                    "time_spent": wl.get("timeSpent"),
+                    "time_spent_seconds": wl.get("timeSpentSeconds"),
+                    "comment": _extract_text_from_adf(
+                        wl.get("comment")
+                    ),
+                    "started": started_str,
+                    "ended": ended_dt.strftime(
+                        "%Y-%m-%dT%H:%M:%S.000%z"
+                    ),
+                })
+
+        if data.get("isLast", True):
+            break
+
+        next_page_token = data.get("nextPageToken")
+
+        if not next_page_token:
+            break
+
+    return logs_by_date
+
+
+def create_jira_worklog(user, issue_key, started, time_spent_seconds, comment=""):
+    domain, headers = get_jira_creds(user)
+    if not domain:
+        return {
+            "success": False,
+            "status": 400,
+            "message": "Jira is not connected."
+        }
+
+    url = f"{domain}/rest/api/3/issue/{issue_key}/worklog"
+
+    payload = {
+        "started": started,
+        "timeSpentSeconds": time_spent_seconds,
+    }
+
+    if comment:
+        payload["comment"] = {
+            "type": "doc",
+            "version": 1,
+            "content": [
+                {
+                    "type": "paragraph",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": comment
+                        }
+                    ]
+                }
+            ]
+        }
+
+    try:
+        response = requests.post(url, headers=headers, json=payload)
+
+        data = response.json() if response.content else {}
+
+        if response.status_code in (200, 201):
+            return {
+                "success": True,
+                "status": response.status_code,
+                "message": "Worklog created successfully.",
+                "data": data
+            }
+
+        return {
+            "success": False,
+            "status": response.status_code,
+            "message": data.get("errorMessages", ["Failed to create worklog."])[0],
+            "errors": data
+        }
+
+    except requests.RequestException as e:
+        return {
+            "success": False,
+            "status": 500,
+            "message": str(e)
+        }
+
+
+def update_jira_worklog(user, issue_key, worklog_id, started, time_spent_seconds, comment=""):
+    domain, headers = get_jira_creds(user)
+    if not domain:
+        return {
+            "success": False,
+            "status": 400,
+            "message": "Jira is not connected."
+        }
+
+    url = f"{domain}/rest/api/3/issue/{issue_key}/worklog/{worklog_id}"
+
+    payload = {
+        "started": started,
+        "timeSpentSeconds": time_spent_seconds,
+    }
+
+    if comment:
+        payload["comment"] = {
+            "type": "doc",
+            "version": 1,
+            "content": [
+                {
+                    "type": "paragraph",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": comment
+                        }
+                    ]
+                }
+            ]
+        }
+
+    try:
+        response = requests.put(url, headers=headers, json=payload)
+        data = response.json() if response.content else {}
+
+        if response.status_code == 200:
+            return {
+                "success": True,
+                "status": response.status_code,
+                "message": "Worklog updated successfully.",
+                "data": data
+            }
+
+        return {
+            "success": False,
+            "status": response.status_code,
+            "message": data.get("errorMessages", ["Failed to update worklog."])[0],
+            "errors": data
+        }
+
+    except requests.RequestException as e:
+        return {
+            "success": False,
+            "status": 500,
+            "message": str(e)
+        }
+
+
+def delete_jira_worklog(user, issue_key, worklog_id):
+    domain, headers = get_jira_creds(user)
+    if not domain:
+        return {
+            "success": False,
+            "status": 400,
+            "message": "Jira is not connected."
+        }
+
+    url = f"{domain}/rest/api/3/issue/{issue_key}/worklog/{worklog_id}"
+
+    try:
+        response = requests.delete(url, headers=headers)
+
+        if response.status_code == 204:
+            return {
+                "success": True,
+                "status": 200,  # override 204 -> 200 so the success message body isn't stripped
+                "message": "Worklog deleted successfully."
+            }
+
+        if response.status_code == 404:
+            return {
+                "success": False,
+                "status": 404,
+                "message": "Worklog already deleted or does not exist."
+            }
+
+        data = response.json() if response.content else {}
+        return {
+            "success": False,
+            "status": response.status_code,
+            "message": data.get("errorMessages", ["Failed to delete worklog."])[0],
+            "errors": data
+        }
+
+    except requests.RequestException as e:
+        return {
+            "success": False,
+            "status": 500,
+            "message": str(e)
+        }
+
+
+def get_jira_worklog(user, issue_key, worklog_id):
+    domain, headers = get_jira_creds(user)
+
+    if not domain:
+        return {
+            "success": False,
+            "status": 400,
+            "message": "Jira is not connected."
+        }
+
+    url = f"{domain}/rest/api/3/issue/{issue_key}/worklog/{worklog_id}"
+
+    response = requests.get(url, headers=headers)
+
+    try:
+        data = response.json()
+    except Exception:
+        data = response.text
+
+    if response.status_code == 200:
+        return {
+            "success": True,
+            "status": 200,
+            "message": "Worklog fetched successfully.",
+            "data": data,
+        }
+
+    return {
+        "success": False,
+        "status": response.status_code,
+        "message": data.get("errorMessages", ["Failed to fetch worklog."])[0]
+        if isinstance(data, dict)
+        else "Failed to fetch worklog.",
+        "data": data,
+    }

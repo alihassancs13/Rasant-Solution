@@ -24,7 +24,7 @@ sys.path.insert(0, str(BASE_DIR / 'apps'))
 SECRET_KEY = 'django-insecure-bl(nt1ho&7i6ghvks2q4!g&roai^fk^!+k31r#_!odplt=@ty^'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -52,7 +52,7 @@ INSTALLED_APPS = [
     'employeeDashboard',
     'jira',
     'documents',
-    'inbox',
+    'apps.inbox',
     'credentialVault'
 ]
 
