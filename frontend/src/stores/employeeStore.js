@@ -81,14 +81,16 @@ export const useEmployeeStore = defineStore('employee', {
                 const cleanedBaseUrl = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL;
                 let endpoint = API_ENDPOINTS.UPDATE_EMPLOYEE;
 
-                // Ensure endpoint structure fits: baseUrl/api/employeeDashboard/update_employee/{id}/
                 if (!endpoint.startsWith('/')) endpoint = `/${endpoint}`;
                 if (!endpoint.endsWith('/')) endpoint = `${endpoint}/`;
 
                 const fullUrl = `${cleanedBaseUrl}${endpoint}${employeeId}/`;
 
                 const token = getAuthToken();
-                const headers = { 'Content-Type': 'application/json' };
+                const headers = {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json' // Important: Tell server we want JSON
+                };
                 if (token) headers['Authorization'] = `Bearer ${token}`;
 
                 const response = await fetch(fullUrl, {
@@ -96,29 +98,67 @@ export const useEmployeeStore = defineStore('employee', {
                     headers,
                     body: JSON.stringify(updatedData)
                 });
+                const contentType = response.headers.get('content-type');
+                let responseData;
+                const text = await response.text();
+                if (text.trim().startsWith('<!DOCTYPE') || text.trim().startsWith('<html')) {
+                    console.error('Received HTML error page:', text.substring(0, 500));
+                    throw new Error('Server error occurred. Please try again later.');
+                }
 
-                const data = await response.json();
+                try {
+                    responseData = JSON.parse(text);
+                } catch (parseError) {
+                    console.error('Failed to parse JSON:', text);
+                    throw new Error('Invalid response from server');
+                }
 
                 if (!response.ok) {
-                    throw new Error(data.error || `HTTP Error: ${response.status}`);
+                    let errorMsg = `HTTP Error: ${response.status}`;
+                    if (responseData && responseData.error) {
+                        errorMsg = responseData.error;
+                    } else if (responseData && responseData.message) {
+                        errorMsg = responseData.message;
+                    } else if (responseData && typeof responseData === 'object') {
+                        // Handle Django field errors
+                        const errors = Object.entries(responseData)
+                            .map(([field, msgs]) => {
+                                if (Array.isArray(msgs)) {
+                                    return `${field}: ${msgs.join(', ')}`;
+                                }
+                                return `${field}: ${msgs}`;
+                            })
+                            .join('; ');
+                        if (errors) errorMsg = errors;
+                    }
+                    throw new Error(errorMsg);
+                }
+                // Success - update local state
+                if (responseData && responseData.success !== false) {
+                    const index = this.employees.findIndex(emp => emp.id === employeeId);
+                    if (index !== -1) {
+                        // Merge updated data with existing employee data
+                        this.employees[index] = {
+                            ...this.employees[index],
+                            ...updatedData,
+                            ...responseData
+                        };
+                    }
                 }
 
-                // Update the state locally so UI updates instantaneously without an additional heavy fetch
-                const index = this.employees.findIndex(emp => emp.id === employeeId);
-                if (index !== -1) {
-                    this.employees[index] = { ...this.employees[index], ...updatedData };
-                }
+                return { success: true, data: responseData };
 
-                return { success: true, data };
             } catch (error) {
+                console.error('Update employee error:', error);
                 this.error = error.message || 'Failed to update employee details';
-                return { success: false, error: this.error };
+                return {
+                    success: false,
+                    error: this.error,
+                    data: null
+                };
             } finally {
                 this.isLoading = false;
             }
-        },
-        setSearch(query) {
-            this.searchQuery = query;
         },
         async addEmployee(formDataPayload) {
             this.isLoading = true;
@@ -132,7 +172,6 @@ export const useEmployeeStore = defineStore('employee', {
                 const token = getAuthToken();
                 const headers = {};
                 if (token) headers['Authorization'] = `Bearer ${token}`;
-                // No Content-Type header - let browser set for FormData
 
                 const response = await fetch(fullUrl, {
                     method: 'POST',
@@ -142,47 +181,83 @@ export const useEmployeeStore = defineStore('employee', {
 
                 let responseData;
                 const contentType = response.headers.get('content-type');
-                if (contentType && contentType.includes('application/json')) {
-                    responseData = await response.json();
-                } else {
-                    responseData = await response.text();
+
+                try {
+                    if (contentType && contentType.includes('application/json')) {
+                        responseData = await response.json();
+                    } else {
+                        responseData = await response.text();
+
+                        try {
+                            responseData = JSON.parse(responseData);
+                        } catch {
+
+                        }
+                    }
+                } catch (parseError) {
+                    responseData = { error: 'Failed to parse response' };
                 }
 
                 if (!response.ok) {
                     let errorMsg = 'Failed to add employee';
+
                     if (responseData && typeof responseData === 'object') {
-                        // Extract error message - could be 'error' field or field errors
-                        if (responseData.error) errorMsg = responseData.error;
-                        else if (responseData.message) errorMsg = responseData.message;
+                        if (responseData.error) {
+                            errorMsg = responseData.error;
+                        }
+                        else if (responseData.message) {
+                            errorMsg = responseData.message;
+                        }
                         else {
-                            // Concatenate field errors
-                            const errs = Object.values(responseData).flat().join(' ');
-                            if (errs) errorMsg = errs;
+                            const errorMessages = [];
+                            for (const [field, errors] of Object.entries(responseData)) {
+                                if (Array.isArray(errors)) {
+                                    errorMessages.push(`${field}: ${errors.join(', ')}`);
+                                } else if (typeof errors === 'string') {
+                                    errorMessages.push(`${field}: ${errors}`);
+                                } else if (typeof errors === 'object') {
+                                    errorMessages.push(`${field}: ${JSON.stringify(errors)}`);
+                                }
+                            }
+                            if (errorMessages.length > 0) {
+                                errorMsg = errorMessages.join('; ');
+                            }
                         }
                     } else if (typeof responseData === 'string') {
                         errorMsg = responseData;
                     }
+
                     throw new Error(errorMsg);
                 }
 
-                // If employee added successfully, optionally add to local state? We could refresh or just return.
-                // Optionally we could push to employees list if we have the data
-                if (responseData && responseData.employee_number) {
-                    // We could add to employees list, but we might not have all fields.
-                    // Better to refetch or just return.
-                    // For now, we just return success.
+                // Success case
+                if (responseData && (responseData.success || responseData.message)) {
+                    if (responseData.deduction_warning) {
+                        console.warn('Deduction warning:', responseData.deduction_warning);
+                    }
+                    return {
+                        success: true,
+                        data: responseData,
+                        warning: responseData.deduction_warning || null
+                    };
                 }
+                return {
+                    success: true,
+                    data: responseData || { message: 'Employee added successfully' }
+                };
 
-                return { success: true, data: responseData };
             } catch (error) {
+                console.error('Add employee error:', error);
                 this.error = error.message || 'Failed to add employee';
-                return { success: false, error: this.error };
+                return {
+                    success: false,
+                    error: this.error,
+                    data: null
+                };
             } finally {
                 this.isLoading = false;
             }
         },
-        setPage(page) {
-            this.currentPage = page;
-        },
+
     },
 });

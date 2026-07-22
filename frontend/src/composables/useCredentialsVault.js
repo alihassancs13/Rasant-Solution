@@ -15,14 +15,12 @@ export default function useCredentialsVault() {
     const currentPage = ref(1)
     const pageSize = ref(5)
     const showModal = ref(false)
-    const showShareModal = ref(false)  // NEW: Share modal state
+    const showShareModal = ref(false)
     const isEditing = ref(false)
     const isSaving = ref(false)
-    const isSharing = ref(false)  // NEW: Sharing state
+    const isSharing = ref(false)
     const fieldErrors = ref({})
-    const selectedCredential = ref(null)  // NEW: Store selected credential for sharing
-
-    // NEW: Share modal state
+    const selectedCredential = ref(null)
     const shareSearchQuery = ref('')
     const shareCurrentPage = ref(1)
     const sharePageSize = ref(5)
@@ -38,8 +36,10 @@ export default function useCredentialsVault() {
         confirmPassword: '',
         project: 'sentra'
     })
-
-    // Computed
+    const isAlreadyShared = (employeeId) => {
+        if (!selectedCredential.value?.shared_with) return false
+        return selectedCredential.value.shared_with.includes(employeeId)
+    }
     const filteredCredentials = computed(() => {
         if (!credentials.value) return []
 
@@ -74,7 +74,6 @@ export default function useCredentialsVault() {
         return filteredCredentials.value.slice(startIndex.value, endIndex.value)
     })
 
-    // NEW: Share modal computed properties
     const shareFilteredEmployees = computed(() => {
         if (!employeeStore.employees || employeeStore.employees.length === 0) return []
 
@@ -216,7 +215,7 @@ export default function useCredentialsVault() {
         }
     }
 
-    // NEW: Share modal functions
+    //  Share modal functions
     const openShareModal = async (credential) => {
         selectedCredential.value = credential
         selectedEmployees.value = []  // Reset selection
@@ -254,6 +253,10 @@ export default function useCredentialsVault() {
     }
 
     const toggleEmployee = (employee) => {
+        if (isAlreadyShared(employee.id)) {
+            showToast('This credential is already shared with this employee', 'info', 2500)
+            return
+        }
         const index = selectedEmployees.value.findIndex(e => e.id === employee.id)
         if (index > -1) {
             selectedEmployees.value.splice(index, 1)
@@ -282,11 +285,12 @@ export default function useCredentialsVault() {
             const employeeIds = selectedEmployees.value.map(e => e.id)
             const result = await store.shareCredential(
                 selectedCredential.value.id,
-                employeeIds  // Send array of IDs
+                employeeIds
             )
 
             if (result.success) {
                 showToast(`Credential shared with ${selectedEmployees.value.length} employee(s) successfully!`, 'success', 3000)
+                await store.fetchCredentials()   // NEW: refresh so shared_with is current
                 closeShareModal()
             } else {
                 showToast(result.error || 'Failed to share credential', 'error', 3000)
@@ -348,8 +352,6 @@ export default function useCredentialsVault() {
     const goToPage = (page) => {
         currentPage.value = page
     }
-
-    // NEW: Displayed pages for share modal
     const shareDisplayedPages = computed(() => {
         const total = shareTotalPages.value
         const current = shareCurrentPage.value
@@ -379,7 +381,6 @@ export default function useCredentialsVault() {
         }
         return pages
     })
-// Add this after shareDisplayedPages computed (around line 200)
     const displayedPages = computed(() => {
         const total = totalPages.value
         const current = currentPage.value
@@ -409,7 +410,6 @@ export default function useCredentialsVault() {
         }
         return pages
     })
-    // Watch search query to reset page
     watch([searchQuery], () => {
         currentPage.value = 1
     })
@@ -446,7 +446,6 @@ export default function useCredentialsVault() {
         passwordStrength,
         passwordMismatch,
         fieldErrors,
-        // Share modal
         selectedCredential,
         shareSearchQuery,
         shareCurrentPage,
@@ -479,6 +478,7 @@ export default function useCredentialsVault() {
         goToPage,
         fetchCredentials: store.fetchCredentials,
         isSharing,
-        employeeStore
+        employeeStore,
+        isAlreadyShared,
     }
 }

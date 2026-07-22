@@ -38,9 +38,7 @@ from .serializers import (
     IncrementPolicySerializer, EmployeePolicyAssignmentSerializer, EmployeeAttendanceSerializer, AttendanceBulkRowSerializer,
     AttendanceHistorySerializer
 )
-
-
-# ---------- Helper function for employee number generation ----------
+# ---------- GENRERATE EMPLOYEE NUMBER ----------
 def generate_employee_number():
     now = datetime.datetime.now()
     prefix = f"RS-{now.strftime('%m%y')}-"
@@ -54,6 +52,7 @@ def generate_employee_number():
         new_seq = 1
     return f"{prefix}{new_seq:02d}"
 
+
 @api_view(['POST'])
 @parser_classes([MultiPartParser, FormParser, JSONParser])
 def add_employee(request):
@@ -61,6 +60,7 @@ def add_employee(request):
     serializer = EmployeeSerializer(data=request.data)
     if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
     employee = Employee(**serializer.validated_data)
     employee.current_salary = employee.salary
 
@@ -69,24 +69,26 @@ def add_employee(request):
     employee.password = make_password(raw_password)
 
     employee_role, _ = Role.objects.get_or_create(name='employee')
-
-    name_parts = (employee.name or '').strip().split(' ', 1)
-    first_name = name_parts[0] if name_parts else ''
-    last_name = name_parts[1] if len(name_parts) > 1 else ''
+    # Generate unique username
+    base_username = employee.name.replace(' ', '_').lower()
+    username = base_username
+    counter = 1
+    while User.objects.filter(username=username).exists():
+        username = f"{base_username}_{counter}"
+        counter += 1
 
     try:
         user_account = User.objects.create(
-            username=employee.name,
+            username=username,
             email=employee.email,
             is_staff=False,
             is_active=True,
-            role=employee_role,
         )
-        user_account.password = make_password(raw_password)  # same raw_password jo Employee ko diya
+        user_account.set_password(raw_password)
         user_account.save()
-    except IntegrityError:
+    except IntegrityError as e:
         return Response(
-            {"error": "A user account with this email already exists."},
+            {"error": f"User creation failed: {str(e)}"},
             status=status.HTTP_400_BAD_REQUEST
         )
 
@@ -100,16 +102,15 @@ def add_employee(request):
         ('university_degree', False),
         ('other_course', False)
     ]
+
     for field_name, is_mandatory in file_fields:
         uploaded_file = request.FILES.get(field_name)
         if uploaded_file:
-            # ---------- NEW SIZE CHECK ----------
             if uploaded_file.size > MAX_FILE_SIZE:
                 return Response(
                     {"error": f"The file '{field_name}' exceeds the {MAX_FILE_SIZE // (1024 * 1024)} MB size limit."},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-            # Proceed as before
             setattr(employee, f"{field_name}_data", uploaded_file.read())
             setattr(employee, f"{field_name}_name", uploaded_file.name)
             setattr(employee, f"{field_name}_mimetype", uploaded_file.content_type)
@@ -124,17 +125,22 @@ def add_employee(request):
         employee.employee_number = new_number
         try:
             employee.save()
-
-            if employee.joined_date:
-                calculate_and_save_deduction(
-                    employee=employee,
-                    tax_percent=employee.tax,
-                    insurance_amount=employee.insurance_amount,
-                    deduction_month=date.today().replace(day=1),
-                )
+            try:
+                if employee.joined_date:
+                    calculate_and_save_deduction(
+                        employee=employee,
+                        tax_percent=employee.tax,
+                        insurance_amount=employee.insurance_amount,
+                        deduction_month=date.today().replace(day=1),
+                    )
+            except Exception as e:
+                # Log the error but don't fail the request
+                print(f" Deduction calculation failed: {e}")
+                # You can also log to a file here
 
             return Response(
                 {
+                    "success": True,
                     "message": "Employee added successfully.",
                     "employee_number": employee.employee_number,
                     "name": employee.name,
@@ -168,7 +174,6 @@ def update_employee(request, pk):
             {"error": "Employee not found."},
             status=status.HTTP_404_NOT_FOUND
         )
-
     old_tax = employee.tax
     old_insurance_amount = employee.insurance_amount
     old_salary = employee.salary
@@ -186,10 +191,9 @@ def update_employee(request, pk):
         updated_employee.current_salary = updated_employee.salary
         updated_employee.save(update_fields=['current_salary'])
 
+        # Handle password update
         if 'password' in request.data and request.data['password'] != old_password:
             new_password = request.data['password']
-
-            # Hash password for Employee table
             from django.contrib.auth.hashers import make_password
             from accounts.models import User
 
@@ -197,25 +201,19 @@ def update_employee(request, pk):
             updated_employee.password = hashed_password
             updated_employee.save(update_fields=['password'])
 
-            # Update or create User with name as username
             try:
-                # Try to find user by username (name)
                 user = User.objects.get(username=updated_employee.name)
                 user.set_password(new_password)
                 user.save()
-                print(f" User updated by username: {user.username}")
-
+                print(f"User updated by username: {user.username}")
             except User.DoesNotExist:
-                # User not found by username, try email
                 try:
                     user = User.objects.get(email=updated_employee.email)
                     user.username = updated_employee.name
                     user.set_password(new_password)
                     user.save()
-                    print(f" User updated and username changed to: {user.username}")
-
+                    print(f"User updated and username changed to: {user.username}")
                 except User.DoesNotExist:
-                    # Create new user with name as username
                     user = User.objects.create_user(
                         username=updated_employee.name,
                         email=updated_employee.email or f"{updated_employee.employee_number}@example.com",
@@ -223,26 +221,48 @@ def update_employee(request, pk):
                         first_name=updated_employee.name.split()[0] if updated_employee.name else '',
                         last_name=' '.join(updated_employee.name.split()[1:]) if updated_employee.name else ''
                     )
-                    print(f" New user created: {user.username}")
+                    print(f"New user created: {user.username}")
+        try:
+            salary_changed = updated_employee.salary != old_salary
+            tax_changed = updated_employee.tax != old_tax
+            insurance_changed = updated_employee.insurance_amount != old_insurance_amount
+            if (salary_changed or tax_changed or insurance_changed):
+                tax_percent = updated_employee.tax or 0
+                insurance_amount = updated_employee.insurance_amount or 0
 
-        if (updated_employee.salary != old_salary or
-                updated_employee.tax != old_tax or
-                updated_employee.insurance_amount != old_insurance_amount):
-            calculate_and_save_deduction(
-                employee=updated_employee,
-                tax_percent=updated_employee.tax,
-                insurance_amount=updated_employee.insurance_amount,
-                deduction_month=date.today().replace(day=1),
-            )
+                print(
+                    f" Recalculating deductions: Salary={updated_employee.salary}, Tax={tax_percent}%, Insurance={insurance_amount}")
 
+                calculate_and_save_deduction(
+                    employee=updated_employee,
+                    tax_percent=tax_percent,
+                    insurance_amount=insurance_amount,
+                    deduction_month=date.today().replace(day=1),
+                )
+        except Exception as e:
+            # Log the error but don't fail the response
+            import traceback
+            print(f" Deduction calculation failed: {e}")
+            print(traceback.format_exc())
+
+        # Return success response with proper data
         return Response(
             {
+                "success": True,
                 "message": "Employee updated successfully.",
                 "employee_number": updated_employee.employee_number,
-                "name": updated_employee.name
+                "name": updated_employee.name,
+                "id": updated_employee.id,
+                "email": updated_employee.email,
+                "department": updated_employee.department,
+                "designation": updated_employee.designation,
+                "salary": updated_employee.salary,
+                "status": updated_employee.status
             },
             status=status.HTTP_200_OK
         )
+
+    # Return validation errors
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(["GET", "POST", "DELETE", "PUT"])

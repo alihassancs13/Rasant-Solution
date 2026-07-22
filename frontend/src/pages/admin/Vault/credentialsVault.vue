@@ -5,14 +5,12 @@
     <div class="flex-shrink-0 hidden md:block">
       <AdminSidebar />
     </div>
-
     <!-- Mobile Sidebar Toggle -->
     <div class="md:hidden fixed top-4 left-4 z-50">
       <button @click="isSidebarOpen = true" class="p-2 bg-white rounded-lg shadow-lg">
         <i class="fas fa-bars"></i>
       </button>
     </div>
-
     <!-- Mobile Sidebar Drawer -->
     <div v-if="isSidebarOpen" class="md:hidden fixed inset-0 z-50">
       <div class="fixed inset-0 bg-black/50" @click="isSidebarOpen = false"></div>
@@ -26,7 +24,6 @@
         <AdminSidebar />
       </div>
     </div>
-
     <!-- Main Content -->
     <div class="flex-1 flex flex-col overflow-hidden bg-gray-50">
       <!-- Header with proper spacing -->
@@ -41,7 +38,6 @@
             :iconOverride="['fas', 'shield-alt']"
         />
       </div>
-
       <!-- Scrollable Content -->
       <div class="flex-1 pt-1 px-4 pb-4 sm:px-6 lg:px-8 overflow-hidden">
         <div class="w-full h-full">
@@ -383,10 +379,7 @@
         </div>
       </form>
     </BaseModal>
-
-
     <!-- Share Modal using BaseModal -->
-
     <BaseModal
         :isOpen="showShareModal"
         mode="form"
@@ -397,7 +390,7 @@
         :loading="isSharing"
         @close="closeShareModal"
         @save="confirmShare"
-    >
+     >
       <div class="space-y-4">
         <!-- Search Bar -->
         <div class="relative">
@@ -417,7 +410,7 @@
         </div>
 
         <!-- Employee List - Grid View with 2 columns -->
-        <div class="border border-gray-200 rounded-lg overflow-y-auto max-h-[400px]">
+        <div class="border border-gray-200 rounded-lg">
           <!-- Loading State -->
           <div v-if="employeeStore.isLoading" class="flex justify-center items-center py-12">
             <i class="fas fa-spinner fa-spin text-2xl text-indigo-600"></i>
@@ -436,8 +429,13 @@
                 v-for="emp in shareFilteredEmployees"
                 :key="emp.id"
                 @click="toggleEmployee(emp)"
-                class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors border border-gray-100"
-                :class="isEmployeeSelected(emp.id) ? 'bg-indigo-50 border-indigo-200' : ''"
+                class="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors border"
+                :class="[
+        isAlreadyShared(emp.id)
+            ? 'bg-gray-50 border-gray-100 opacity-60 cursor-not-allowed'
+            : 'hover:bg-gray-50 border-gray-100 cursor-pointer',
+        isEmployeeSelected(emp.id) ? 'bg-indigo-50 border-indigo-200' : ''
+     ]"
             >
               <div class="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold text-xs">
                 {{ getInitials(emp.full_name || emp.email || 'U') }}
@@ -447,9 +445,16 @@
                   {{ emp.full_name || emp.email || 'No name' }}
                 </p>
                 <p class="text-[10px] text-gray-500 truncate">{{ emp.email }}</p>
+                <p v-if="isAlreadyShared(emp.id)" class="text-[10px] text-green-600 font-medium mt-0.5">
+                  <i class="fas fa-check-circle"></i> Already shared
+                </p>
               </div>
               <div class="flex-shrink-0">
+                <div v-if="isAlreadyShared(emp.id)" class="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center">
+                  <i class="fas fa-check text-green-600 text-[8px]"></i>
+                </div>
                 <div
+                    v-else
                     class="w-4 h-4 rounded-full border-2 flex items-center justify-center"
                     :class="isEmployeeSelected(emp.id) ? 'border-indigo-600 bg-indigo-600' : 'border-gray-300'"
                 >

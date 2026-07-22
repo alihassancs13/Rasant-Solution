@@ -1,23 +1,20 @@
 from rest_framework import serializers
 from .models import CredentialStore,SharedCredential
-from accounts.models import User
+from employeeDashboard.models import Employee
 import base64
 class CredentialSerializer(serializers.ModelSerializer):
-    # Override password field to handle encoding/decoding
     password = serializers.CharField(write_only=True, required=True)
     password_display = serializers.SerializerMethodField(read_only=True)
+    shared_with = serializers.SerializerMethodField(read_only=True)   # NEW
 
     class Meta:
         model = CredentialStore
-        fields = ['id', 'name', 'link', 'username', 'email', 'password', 'password_display', 'created_at']
+        fields = ['id', 'name', 'link', 'username', 'email', 'password', 'password_display', 'shared_with', 'created_at']  # added shared_with
         read_only_fields = ['id', 'created_at']
 
     def create(self, validated_data):
-        # Get password and encode it
         password = validated_data.pop('password')
         encoded_password = base64.b64encode(password.encode()).decode()
-
-        # Create credential with encoded password
         credential = CredentialStore.objects.create(
             password=encoded_password,
             **validated_data
@@ -25,13 +22,11 @@ class CredentialSerializer(serializers.ModelSerializer):
         return credential
 
     def update(self, instance, validated_data):
-        # Update password if provided
         if 'password' in validated_data:
             password = validated_data.pop('password')
             encoded_password = base64.b64encode(password.encode()).decode()
             instance.password = encoded_password
 
-        # Update other fields
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
 
@@ -39,11 +34,30 @@ class CredentialSerializer(serializers.ModelSerializer):
         return instance
 
     def get_password_display(self, obj):
-        """Return decoded password for display"""
         try:
             return base64.b64decode(obj.password).decode()
         except:
             return obj.password
+
+    def get_shared_with(self, obj):
+        shares = SharedCredential.objects.filter(credential=obj)
+        employee_ids = [s.employee_id for s in shares]
+
+        if not employee_ids:
+            return []
+
+        employees = Employee.objects.filter(id__in=employee_ids)
+        employee_map = {emp.id: emp for emp in employees}
+
+        result = []
+        for share in shares:
+            emp = employee_map.get(share.employee_id)
+            result.append({
+                'employee_id': share.employee_id,
+                'employee_username': getattr(emp, 'username', None) if emp else None,
+                'employee_email': getattr(emp, 'email', None) if emp else None,
+            })
+        return result
 
 
 class SharedCredentialSerializer(serializers.ModelSerializer):

@@ -379,7 +379,6 @@
         </div>
       </div>
     </div>
-
     <!-- ===== CREATE FOLDER MODAL ===== -->
     <BaseModal
         :is-open="showFolderModal"
@@ -487,7 +486,7 @@
         </div>
 
         <!-- Employee Grid -->
-        <div class="border border-gray-200 rounded-lg overflow-y-auto max-h-[400px]">
+        <div class="border border-gray-200 rounded-lg ">
           <div v-if="employeeStore.isLoading" class="flex justify-center items-center py-12">
             <i class="fas fa-spinner fa-spin text-2xl text-indigo-600"></i>
           </div>
@@ -503,8 +502,13 @@
                 v-for="emp in shareFilteredEmployees"
                 :key="emp.id"
                 @click="toggleEmployee(emp)"
-                class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors border border-gray-100"
-                :class="isEmployeeSelected(emp.id) ? 'bg-indigo-50 border-indigo-200' : ''"
+                class="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors border"
+                :class="[
+        isAlreadyShared(emp.id)
+            ? 'bg-gray-50 border-gray-100 opacity-60 cursor-not-allowed'
+            : 'hover:bg-gray-50 border-gray-100 cursor-pointer',
+        isEmployeeSelected(emp.id) ? 'bg-indigo-50 border-indigo-200' : ''
+    ]"
             >
               <div class="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold text-xs">
                 {{ getInitials(emp.full_name || emp.email || 'U') }}
@@ -514,9 +518,16 @@
                   {{ emp.full_name || emp.email || 'No name' }}
                 </p>
                 <p class="text-[10px] text-gray-500 truncate">{{ emp.email }}</p>
+                <p v-if="isAlreadyShared(emp.id)" class="text-[10px] text-green-600 font-medium mt-0.5">
+                  <i class="fas fa-check-circle"></i> Already shared
+                </p>
               </div>
               <div class="flex-shrink-0">
+                <div v-if="isAlreadyShared(emp.id)" class="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center">
+                  <i class="fas fa-check text-green-600 text-[8px]"></i>
+                </div>
                 <div
+                    v-else
                     class="w-4 h-4 rounded-full border-2 flex items-center justify-center"
                     :class="isEmployeeSelected(emp.id) ? 'border-indigo-600 bg-indigo-600' : 'border-gray-300'"
                 >

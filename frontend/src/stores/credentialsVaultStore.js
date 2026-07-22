@@ -3,7 +3,6 @@ import { ref, computed } from 'vue'
 import { BASE_URL, API_ENDPOINTS } from '@/services/baseUrl.js'
 
 export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
-    // State
     const credentials = ref([])
     const loading = ref(false)
     const error = ref(null)
@@ -20,15 +19,12 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
         if (!credentials.value) return 0
         return credentials.value.filter(c => c.needsRotation).length
     })
-
-    // Helper to get token
     const getAuthToken = () => {
         const token = localStorage.getItem('access_token') ||
             localStorage.getItem('accessToken') ||
             localStorage.getItem('token')
         return token
     }
-
     // Actions
     const fetchCredentials = async () => {
         loading.value = true
@@ -88,7 +84,8 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
                 project: item.project || item.project_name || 'Uncategorized',
                 showPassword: false,
                 needsRotation: item.needsRotation || false,
-                created_at: item.created_at || item.createdAt || new Date().toISOString()
+                created_at: item.created_at || item.createdAt || new Date().toISOString(),
+                shared_with: (item.shared_with || []).map(s => s.employee_id),
             }))
 
             totalCount.value = data.count || credentials.value.length
@@ -103,18 +100,16 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
             loading.value = false
         }
     }
-
     // Fetch employee credentials
     const fetchEmployeeCredentials = async (employeeId) => {
         loading.value = true
         error.value = null
-
         try {
             const cleanedBaseUrl = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL;
             const endpoint = API_ENDPOINTS.CREDENTIALS.GET_EMPLOYEE_CREDENTIALS(employeeId);
             const fullUrl = `${cleanedBaseUrl}${endpoint}`;
 
-            console.log('🔵 Fetching employee credentials from:', fullUrl);
+            console.log('Fetching employee credentials from:', fullUrl);
 
             const token = getAuthToken();
             const headers = { 'Content-Type': 'application/json' };
@@ -172,7 +167,6 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
             if (!token) {
                 throw new Error('No authentication token found. Please login again.')
             }
-
             const url = `${BASE_URL}${API_ENDPOINTS.CREDENTIALS.CREATE}`
 
             const response = await fetch(url, {
@@ -216,7 +210,8 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
                 project: newCred.project || credentialData.project || 'Uncategorized',
                 showPassword: false,
                 needsRotation: false,
-                created_at: newCred.created_at || new Date().toISOString()
+                created_at: newCred.created_at || new Date().toISOString(),
+                shared_with: [],
             }
 
             credentials.value.unshift(addedCred)

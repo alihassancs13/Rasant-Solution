@@ -9,23 +9,15 @@ export default function useDocuments() {
     const store = useDocumentStore()
     const toast = useToast()
     const employeeStore = useEmployeeStore()
-
-    // Helper: Show toast messages
     const showToast = (message, type = 'success', duration = 3500) => {
         toast.showToast(message, type, duration)
     }
-
-    // Check if user is admin - using store state
     const isAdmin = computed(() => {
         return store.userRole === 'admin' || store.isEmployeeView === false
     })
-
-    // Check if user is employee - using store state
     const isEmployee = computed(() => {
         return store.userRole === 'employee' || store.isEmployeeView === true
     })
-
-    // Click outside handler for new menu
     const handleClickOutside = (event) => {
         const newMenuContainer = event.target.closest('.new-menu-container')
         if (!newMenuContainer && showNewMenu.value) {
@@ -313,6 +305,10 @@ export default function useDocuments() {
     }
 
     const toggleEmployee = (employee) => {
+        if (isAlreadyShared(employee.id)) {
+            showToast('This item is already shared with this employee', 'info')
+            return
+        }
         const index = selectedEmployees.value.findIndex(e => e.id === employee.id)
         if (index > -1) {
             selectedEmployees.value.splice(index, 1)
@@ -354,6 +350,12 @@ export default function useDocuments() {
 
             if (result && result.message) {
                 showToast(`Document shared with ${selectedEmployees.value.length} employee(s) successfully!`, 'success')
+                // NEW: refresh so shared_with is current
+                if (store.currentFolderId) {
+                    await store.loadFolderContents(store.currentFolderId)
+                } else {
+                    await store.loadAllItems()
+                }
                 closeShareModal()
             } else {
                 showToast(result?.error || 'Failed to share document', 'error')
@@ -474,16 +476,12 @@ export default function useDocuments() {
     // ===== Navigation Methods =====
     const openItem = (item) => {
         if (item.isFolder) {
-            // For employee, when they click a folder, show files inside it
             if (isEmployee.value) {
                 console.log(' Employee clicked folder:', item.name, 'ID:', item.id);
-
-                // Find the folder in allItems with its nested files
                 const folder = store.allItems.find(f => f.id === item.id && f.isFolder);
                 console.log(' Found folder in allItems:', folder);
 
                 if (folder && folder.files && folder.files.length > 0) {
-                    // Show files as separate items in the view
                     const filesToShow = folder.files.map(file => ({
                         ...file,
                         isFolder: false,
@@ -495,7 +493,6 @@ export default function useDocuments() {
                     store.currentFolderId = item.id;
                     console.log(' Showing files in folder:', item.name, filesToShow);
                 } else {
-                    // No files in this folder
                     store.viewItems = [];
                     store.currentFolderId = item.id;
                     showToast('This folder is empty', 'info');
@@ -513,8 +510,6 @@ export default function useDocuments() {
         store.navigateTo(folderId)
     }
 
-    // composables/useDocuments.js - Update navigateToRoot
-
     const navigateToRoot = () => {
         if (isEmployee.value) {
             // Reset to show all items (folders with their files nested)
@@ -525,8 +520,6 @@ export default function useDocuments() {
         }
         store.navigateTo(null)
     }
-
-    // ===== Helper Methods =====
     const editItem = (item) => {
         openEditModal(item)
     }
@@ -540,7 +533,6 @@ export default function useDocuments() {
     const deleteItem = (item) => {
         openDeleteModal(item)
     }
-
     const getFileIcon = (extension) => {
         const icons = {
             pdf: 'fas fa-file-pdf text-red-500',
@@ -573,8 +565,6 @@ export default function useDocuments() {
             showToast('No file to download', 'warning')
             return
         }
-
-        // Employee: file content is already embedded (base64) — build blob locally
         if (isEmployee.value) {
             if (!item.content) {
                 showToast('File content not available for download', 'error')
@@ -601,7 +591,6 @@ export default function useDocuments() {
             }
             return
         }
-
         // Admin: existing API-based download
         try {
             const token = localStorage.getItem('accessToken')
@@ -639,8 +628,6 @@ export default function useDocuments() {
             showToast('Failed to download file', 'error')
         }
     }
-
-    // Helper function to show file content
     const showFileContent = (response) => {
         if (response.type === 'pdf' || response.extension === 'pdf') {
             // For PDF, create a blob URL
@@ -677,14 +664,15 @@ export default function useDocuments() {
             downloadFile(response)
         }
     }
-
+    const isAlreadyShared = (employeeId) => {
+        if (!selectedDocument.value?.shared_with) return false
+        return selectedDocument.value.shared_with.includes(employeeId)
+    }
     // ===== View File Function =====
     const viewFile = async (item) => {
         if (item.isFolder) return
         try {
             console.log('Viewing file:', item.id, item.name)
-
-            // Check if this is an employee viewing a file from a shared folder
             if (isEmployee.value) {
                 if (item.content) {
                     showFileContent(item)
@@ -913,16 +901,12 @@ export default function useDocuments() {
             navigateToRoot()
         }
     }
-
-    // Init
     onMounted(() => {
         store.init()
     })
 
-    // Update the filter watcher
     watch(currentFilter, (newFilter) => {
         if (store.isEmployeeView) {
-            // For employee view, just filter what we already have
             return
         }
         if (newFilter === 'all') {
@@ -935,7 +919,6 @@ export default function useDocuments() {
     })
 
     return {
-        // From store
         items: store.viewItems,
         loading: store.isLoading,
         error: store.error,
@@ -943,10 +926,8 @@ export default function useDocuments() {
         fileCount: store.fileCount,
         currentFolderId: store.currentFolderId,
         isEmployeeView: store.isEmployeeView,
-        // Role checks
         isAdmin,
         isEmployee,
-        // UI state
         searchQuery,
         currentFilter,
         sortBy,
@@ -955,7 +936,6 @@ export default function useDocuments() {
         isDragging,
         fileInput,
         zipInput,
-        // Modal states
         showFolderModal,
         folderName,
         isSubmitting,
@@ -964,13 +944,11 @@ export default function useDocuments() {
         isEditing,
         showDeleteModal,
         isDeleting,
-        // Share modal states
         showShareModal,
         shareSearchQuery,
         selectedEmployees,
         isSharing,
         selectedDocument,
-        // Computed
         filteredItems,
         shareFilteredEmployees,
         breadcrumb,
@@ -1023,6 +1001,7 @@ export default function useDocuments() {
         handleClickOutside,
         getInitials,
         employeeStore,
-        showEmployeeBackButton
+        showEmployeeBackButton,
+        isAlreadyShared
     }
 }

@@ -27,7 +27,6 @@ export const useDocumentStore = defineStore('documents', {
     },
 
     actions: {
-        // Helper: API request
         async _apiRequest(endpoint, options = {}) {
             const cleanedBaseUrl = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL;
             let endpointPath = endpoint;
@@ -90,7 +89,6 @@ export const useDocumentStore = defineStore('documents', {
                             type: 'folder',
                             children_count: item.file_count || 0,
                             shared_at: item.shared_at,
-                            // IMPORTANT: Keep files nested inside the folder
                             files: item.files || [],
                         };
                         processedItems.push(folderItem);
@@ -122,7 +120,6 @@ export const useDocumentStore = defineStore('documents', {
             }
         },
         async loadAllItems() {
-            // If employee view, don't load all items
             if (this.isEmployeeView) {
                 return;
             }
@@ -150,14 +147,16 @@ export const useDocumentStore = defineStore('documents', {
                     isFolder: true,
                     type: 'folder',
                     children_count: f.children_count || 0,
-                    parent_id: f.parent || f.parent_id || null
+                    parent_id: f.parent || f.parent_id || null,
+                    shared_with: (f.shared_with || []).map(s => s.employee_id),   // NEW
                 }));
 
                 const filesData = files.map(f => ({
                     ...f,
                     isFolder: false,
                     type: 'file',
-                    folder_id: f.folder_id || null
+                    folder_id: f.folder_id || null,
+                    shared_with: (f.shared_with || []).map(s => s.employee_id),   // NEW
                 }));
 
                 this.allItems = [...foldersData, ...filesData];
@@ -202,7 +201,8 @@ export const useDocumentStore = defineStore('documents', {
                     isFolder: true,
                     type: 'folder',
                     children_count: f.children_count || 0,
-                    parent_id: f.parent || f.parent_id || null
+                    parent_id: f.parent || f.parent_id || null,
+                    shared_with: (f.shared_with || []).map(s => s.employee_id),   // NEW
                 }));
 
                 this.allItems = foldersData;
@@ -243,7 +243,8 @@ export const useDocumentStore = defineStore('documents', {
                     ...f,
                     isFolder: false,
                     type: 'file',
-                    folder_id: f.folder_id || null
+                    folder_id: f.folder_id || null,
+                    shared_with: (f.shared_with || []).map(s => s.employee_id),   // NEW
                 }));
 
                 this.allItems = filesData;
@@ -279,7 +280,8 @@ export const useDocumentStore = defineStore('documents', {
                             ...currentFolder,
                             isFolder: true,
                             type: 'folder',
-                            parent_id: currentFolder.parent || null
+                            parent_id: currentFolder.parent || null,
+                            shared_with: (currentFolder.shared_with || []).map(s => s.employee_id),   // NEW
                         });
                     } else {
                         const existing = this.allItems.find(item => item.id === currentFolder.id && item.isFolder);
@@ -293,7 +295,8 @@ export const useDocumentStore = defineStore('documents', {
                     isFolder: true,
                     type: 'folder',
                     children_count: f.children_count || 0,
-                    parent_id: f.parent || f.parent_id || folderId
+                    parent_id: f.parent || f.parent_id || folderId,
+                    shared_with: (f.shared_with || []).map(s => s.employee_id),   // NEW
                 }));
                 folders.forEach(folder => {
                     const exists = this.allItems.some(item => item.id === folder.id && item.isFolder);
@@ -310,7 +313,8 @@ export const useDocumentStore = defineStore('documents', {
                     ...f,
                     isFolder: false,
                     type: 'file',
-                    folder_id: f.folder_id || folderId
+                    folder_id: f.folder_id || folderId,
+                    shared_with: (f.shared_with || []).map(s => s.employee_id),   // NEW
                 }));
 
                 this.viewItems = [...folders, ...files];
@@ -345,7 +349,8 @@ export const useDocumentStore = defineStore('documents', {
                     ...response.data,
                     isFolder: true,
                     type: 'folder',
-                    children_count: 0
+                    children_count: 0,
+                    shared_with: [],
                 };
 
                 this.allItems.push(newFolder);
@@ -386,7 +391,8 @@ export const useDocumentStore = defineStore('documents', {
                 const newFile = {
                     ...response.data,
                     isFolder: false,
-                    type: 'file'
+                    type: 'file',
+                    shared_with: [],
                 };
                 this.allItems.push(newFile);
                 if (this.currentFolderId === folderId) {
@@ -626,7 +632,6 @@ export const useDocumentStore = defineStore('documents', {
                 return;
             }
 
-            // Get user data from localStorage
             const userStr = localStorage.getItem('user');
             if (!userStr) {
                 console.warn('No user data found');
@@ -651,7 +656,6 @@ export const useDocumentStore = defineStore('documents', {
                 console.log(' Is employee?', isEmployee);
 
                 if (isEmployee) {
-                    // Employee - fetch shared documents
                     const employeeId = user.employee_id || user.id || user.employee?.id;
                     console.log(' Employee ID to fetch:', employeeId);
 
@@ -670,7 +674,6 @@ export const useDocumentStore = defineStore('documents', {
                         }
                     }
                 } else {
-                    // Admin - load all folders
                     console.log(' Admin user - loading all items');
                     this.isEmployeeView = false;
                     this.userRole = 'admin';

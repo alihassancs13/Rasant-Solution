@@ -18,7 +18,6 @@ export function useEmployeeRegistration() {
         { id: 4, name: 'Bank' }
     ];
     const formData = ref({
-        // Personal
         name: '',
         cnic: '',
         present_address: '',
@@ -31,15 +30,11 @@ export function useEmployeeRegistration() {
         salary: '',
         joined_date: '',
         status: 'Intern',
-
-        // Emergency
         emergency_name: '',
         emergency_relation: '',
         emergency_cnic: '',
         emergency_phone: '',
         emergency_address: '',
-
-        // Bank
         bank_name: '',
         branch_name: '',
         account_number: ''
@@ -111,15 +106,24 @@ export function useEmployeeRegistration() {
 
     // --- submission using store ---
     const submitForm = async (onSuccess) => {
+        if (isSubmitted.value) return; // Prevent double submission
+
+        // Validate all steps before submitting
+        const formElement = document.getElementById('employeeForm');
+        if (!formElement.checkValidity()) {
+            formElement.reportValidity();
+            // Find which step has errors and navigate to it
+            const invalidFields = formElement.querySelectorAll(':invalid');
+            if (invalidFields.length > 0) {
+                // Try to find which step contains the invalid field
+                // You can implement step mapping here
+            }
+            return;
+        }
         isSubmitted.value = true;
         const payload = new FormData();
-
-        // Helper: remove all non‑digits from CNIC
         const cleanCnic = (value) => (value || '').replace(/\D/g, '');
-
-        // Prepare cleaned data with all fields and defaults
         const cleanedData = {
-            // Personal
             name: (formData.value.name || '').trim(),
             cnic: cleanCnic(formData.value.cnic),
             present_address: (formData.value.present_address || '').trim(),
@@ -127,59 +131,113 @@ export function useEmployeeRegistration() {
             phone_number: (formData.value.phone_number || '').trim(),
             gender: formData.value.gender || 'Male',
             email: (formData.value.email || '').trim(),
-
-
             department: (formData.value.department || '').trim(),
-
             designation: (formData.value.designation || '').trim() || 'Employee',
             salary: parseFloat(formData.value.salary) || 0,
             joined_date: formData.value.joined_date || new Date().toISOString().split('T')[0],
-
             status: formData.value.status || 'Intern',
-
             is_active: true,
-
-            // Emergency
             emergency_name: (formData.value.emergency_name || '').trim(),
             emergency_relation: (formData.value.emergency_relation || '').trim(),
             emergency_cnic: cleanCnic(formData.value.emergency_cnic),
             emergency_phone: (formData.value.emergency_phone || '').trim(),
             emergency_address: (formData.value.emergency_address || '').trim(),
-
-            // Bank
             bank_name: (formData.value.bank_name || '').trim(),
             branch_name: (formData.value.branch_name || '').trim(),
             account_number: (formData.value.account_number || '').trim(),
         };
         Object.keys(cleanedData).forEach(key => {
-            payload.append(key, cleanedData[key]);
-        });
-        Object.keys(uploadedFiles.value).forEach(key => {
-            payload.append(key, uploadedFiles.value[key]);
-        });
-
-        const result = await store.addEmployee(payload);
-
-        if (result.success) {
-            // 4. Trigger your custom success toast!
-            showToast('Employee added successfully!', 'success');
-            console.log(result.data);
-            isSubmitted.value = false;
-            if (onSuccess) onSuccess(result.data);
-        } else {
-            let errorMsg = 'Submission failed:\n';
-            if (result.errors && typeof result.errors === 'object') {
-                for (const [field, msgs] of Object.entries(result.errors)) {
-                    errorMsg += `\n${field}: ${msgs.join(', ')}`;
-                }
-            } else {
-                errorMsg += result.error || 'Unknown error';
+            if (cleanedData[key] !== undefined && cleanedData[key] !== null) {
+                payload.append(key, cleanedData[key]);
             }
-            // 5. Trigger your custom error toast
-            showToast(errorMsg, 'error', 5000);
-            console.error(result.error);
+        });
+
+        Object.keys(uploadedFiles.value).forEach(key => {
+            if (uploadedFiles.value[key]) {
+                payload.append(key, uploadedFiles.value[key]);
+            }
+        });
+
+        try {
+            const result = await store.addEmployee(payload);
+
+            if (result.success) {
+                showToast(
+                    `Employee ${result.data?.name || ''} added successfully! `,
+                    'success',
+                    5000
+                );
+                console.log('Employee added:', result.data);
+                isSubmitted.value = false;
+                resetForm();
+                if (onSuccess) onSuccess(result.data);
+                return result;
+            } else {
+                let errorMsg = 'Submission failed:\n';
+                if (result.error) {
+                    errorMsg += result.error;
+                } else if (result.errors) {
+                    if (typeof result.errors === 'object') {
+                        for (const [field, msgs] of Object.entries(result.errors)) {
+                            if (Array.isArray(msgs)) {
+                                errorMsg += `\n${field}: ${msgs.join(', ')}`;
+                            } else {
+                                errorMsg += `\n${field}: ${msgs}`;
+                            }
+                        }
+                    } else {
+                        errorMsg += result.errors;
+                    }
+                } else {
+                    errorMsg += 'Unknown error occurred';
+                }
+
+                showToast(errorMsg, 'error', 7000);
+                console.error('Submission error:', result.error);
+                return result;
+            }
+        } catch (error) {
+            console.error('Unexpected error:', error);
+            showToast('An unexpected error occurred. Please try again.', 'error', 5000);
+            return { success: false, error: error.message };
+        } finally {
             isSubmitted.value = false;
         }
+    };
+    const resetForm = () => {
+        formData.value = {
+            name: '',
+            cnic: '',
+            present_address: '',
+            permanent_address: '',
+            phone_number: '',
+            gender: '',
+            email: '',
+            department: '',
+            designation: '',
+            salary: '',
+            joined_date: '',
+            status: 'Intern',
+            emergency_name: '',
+            emergency_relation: '',
+            emergency_cnic: '',
+            emergency_phone: '',
+            emergency_address: '',
+            bank_name: '',
+            branch_name: '',
+            account_number: ''
+        };
+
+        uploadedFiles.value = {};
+        fileNames.value = {
+            cnic_scan: '',
+            emergency_cnic_scan: '',
+            matric_certificate: '',
+            fsc_certificate: '',
+            university_degree: '',
+            other_course: ''
+        };
+        currentStep.value = 1;
     };
 
     return {
