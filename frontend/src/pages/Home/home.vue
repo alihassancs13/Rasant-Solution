@@ -352,7 +352,7 @@
             type="button"
             aria-label="Previous product"
             @click="productsCarousel.prev"
-            class="group hidden lg:flex w-11 h-11 rounded-full cursor-pointer border border-borderDefault bg-card text-headingCard items-center justify-center shrink-0 transition-all duration-200 hover:bg-buttonPrimaryHover hover:border-buttonPrimaryBorder hover:text-white hover:scale-105 hover:shadow-[0_8px_22px_-6px_rgba(249,115,22,0.45)] font-primary"
+            class="group hidden lg:flex w-11 h-11 rounded-full cursor-pointer border border-borderDefault bg-card text-headingCard items-center justify-center shrink-0 transition-all duration-200 hover:bg-buttonHover hover:border-buttonPrimaryBorder hover:text-white hover:scale-105 hover:shadow-[0_8px_22px_-6px_rgba(249,115,22,0.45)] font-primary"
         >
           <font-awesome-icon :icon="['fas', 'chevron-left']" class="text-sm transition-transform duration-200 group-hover:-translate-x-0.5" />
         </button>
@@ -670,7 +670,7 @@
               type="button"
               aria-label="Previous review"
               @click="testimonialPrev"
-              class="group hidden sm:flex w-11 h-11 rounded-full cursor-pointer border border-borderDefault bg-card text-headingCard items-center justify-center shrink-0 transition-all duration-200 hover:bg-buttonPrimaryHover hover:border-buttonPrimaryBorder hover:text-white hover:scale-105 hover:shadow-[0_8px_22px_-6px_rgba(249,115,22,0.45)]"
+              class="group hidden sm:flex w-11 h-11 rounded-full cursor-pointer border border-borderDefault bg-card text-headingCard items-center justify-center shrink-0 transition-all duration-200 hover:bg-buttonHover hover:border-buttonPrimaryBorder hover:text-white hover:scale-105 hover:shadow-[0_8px_22px_-6px_rgba(249,115,22,0.45)]"
           >
             <font-awesome-icon :icon="['fas', 'chevron-left']" class="text-sm transition-transform duration-200 group-hover:-translate-x-0.5" />
           </button>
@@ -724,7 +724,7 @@
               type="button"
               aria-label="Next review"
               @click="testimonialNext"
-              class="group hidden sm:flex w-11 h-11 rounded-full border border-borderDefault bg-card text-headingCard items-center justify-center shrink-0 transition-all duration-200 hover:bg-buttonPrimaryHover hover:border-buttonPrimaryBorder hover:text-white hover:scale-105 hover:shadow-[0_8px_22px_-6px_rgba(249,115,22,0.45)]"
+              class=" cursor-pointer group hidden sm:flex w-11 h-11 rounded-full border border-borderDefault bg-card text-headingCard items-center justify-center shrink-0 transition-all duration-200 hover:bg-buttonHover hover:border-buttonPrimaryBorder hover:text-white hover:scale-105 hover:shadow-[0_8px_22px_-6px_rgba(249,115,22,0.45)] "
           >
             <font-awesome-icon :icon="['fas', 'chevron-right']" class="text-sm transition-transform duration-200 group-hover:translate-x-0.5" />
           </button>

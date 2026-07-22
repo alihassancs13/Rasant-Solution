@@ -176,10 +176,12 @@
                   </td>
                   <td class="p-4 whitespace-nowrap text-text-secondary">{{ emp.joined_date }}</td>
                   <td class="p-4 whitespace-nowrap">
-                    <button class="flex items-center cursor-pointer gap-1.5 px-3 py-1.5 bg-teal-500 text-white rounded-lg text-xs font-bold shadow-sm hover:bg-teal-600 transition-colors">
+                    <router-link
+                        to="/admin/inbox"
+                        class="flex items-center cursor-pointer gap-1.5 px-3 py-1.5 bg-teal-500 text-white rounded-lg text-xs font-bold shadow-sm hover:bg-teal-600 transition-colors w-fit"                    >
                       <font-awesome-icon :icon="['far', 'comment']" />
                       DM
-                    </button>
+                    </router-link>
                   </td>
                   <td class="p-4 whitespace-nowrap text-center">
                     <div class="flex items-center justify-center gap-2">

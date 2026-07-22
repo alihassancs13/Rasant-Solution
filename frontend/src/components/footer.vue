@@ -65,25 +65,19 @@
         </div>
       </div>
 
-      <div class="flex flex-col sm:flex-row justify-between items-center gap-2.5 sm:gap-4 py-3 sm:py-5 border-t border-primary-600/10">
-        <p class="text-[11px] sm:text-sm text-neutral-600 font-primary text-center sm:text-left">
-          &copy; 2026 Rasant Solutions. All rights reserved.
-        </p>
-
-        <div class="flex gap-2 flex-wrap justify-center sm:justify-end" aria-label="Social media">
-          <a href="https://www.linkedin.com/company/rasant-solutions/" aria-label="LinkedIn" class="footer-social-btn hover:bg-[#0A66C2] hover:border-[#0A66C2] group">
-            <img src="../assets/icons/social-linkedin.svg" alt="" width="16" height="16" decoding="async" class="w-4 h-4 sm:w-[18px] sm:h-[18px] transition duration-250 group-hover:brightness-0 group-hover:invert" />
-          </a>
-          <a href="#" aria-label="X" class="footer-social-btn hover:bg-primary-900 hover:border-primary-900 group">
-            <img src="../assets/icons/social-x.svg" alt="" width="16" height="16" decoding="async" class="w-4 h-4 sm:w-[18px] sm:h-[18px] transition duration-250 group-hover:brightness-0 group-hover:invert" />
-          </a>
-          <a href="#" aria-label="GitHub" class="footer-social-btn hover:bg-primary-900 hover:border-primary-900 group">
-            <img src="../assets/icons/social-github.svg" alt="" width="16" height="16" decoding="async" class="w-4 h-4 sm:w-[18px] sm:h-[18px] transition duration-250 group-hover:brightness-0 group-hover:invert" />
-          </a>
-          <a href="#" aria-label="Instagram" class="footer-social-btn hover:bg-[#E1306C] hover:border-[#E1306C] group">
-            <img src="../assets/icons/social-instagram.svg" alt="" width="16" height="16" decoding="async" class="w-4 h-4 sm:w-[18px] sm:h-[18px] transition duration-250 group-hover:brightness-0 group-hover:invert" />
-          </a>
-        </div>
+      <div class="flex gap-2 flex-wrap justify-center sm:justify-end pb-4" aria-label="Social media">
+        <a href="https://www.linkedin.com/company/rasant-solutions/" aria-label="LinkedIn" class="footer-social-btn hover:bg-[#0A66C2] hover:border-[#0A66C2] group">
+          <img src="../assets/icons/social-linkedin.svg" alt="" width="16" height="16" decoding="async" class="w-4 h-4 sm:w-[18px] sm:h-[18px] transition duration-250" />
+        </a>
+        <a href="#" aria-label="X" class="footer-social-btn hover:bg-black hover:border-black group">
+          <img src="../assets/icons/social-x.svg" alt="" width="16" height="16" decoding="async" class="w-4 h-4 sm:w-[18px] sm:h-[18px] transition duration-250" />
+        </a>
+        <a href="#" aria-label="GitHub" class="footer-social-btn hover:bg-[#24292e] hover:border-[#24292e] group">
+          <img src="../assets/icons/social-github.svg" alt="" width="16" height="16" decoding="async" class="w-4 h-4 sm:w-[18px] sm:h-[18px] transition duration-250" />
+        </a>
+        <a href="#" aria-label="Instagram" class="footer-social-btn hover:bg-[#E1306C] hover:border-[#E1306C] group">
+          <img src="../assets/icons/social-instagram.svg" alt="" width="16" height="16" decoding="async" class="w-4 h-4 sm:w-[18px] sm:h-[18px] transition duration-250" />
+        </a>
       </div>
     </div>
   </footer>
