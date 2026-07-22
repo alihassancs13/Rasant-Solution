@@ -12,13 +12,6 @@ import {
 import BaseModal from '@/components/baseModal.vue'
 import BaseDetailModal from '@/components/baseDetailModal.vue'
 
-const { showToast } = useToast()
-const employees = ref([
-  { name: 'Sarah Ali',   empNo: '10', dept: 'Engineering', status: 'on_leave', pct: 82, synced: '2 days ago', gradient: 'var(--color-avatarPurpleBlue)' },
-  { name: 'Ali Raza',    empNo: '11', dept: 'DevOps',       status: 'late',     pct: 91, synced: '2 days ago', gradient: 'var(--color-avatarBlue)' },
-  { name: 'Hina Khan',   empNo: '12', dept: 'Product',      status: 'on_leave', pct: 88, synced: '2 days ago', gradient: 'var(--color-avatarPinkTeal)' },
-  { name: 'Usman Tariq', empNo: '13', dept: 'Sales',        status: 'present',  pct: 95, synced: '2 days ago', gradient: 'var(--color-avatarTestimonial3)' },
-])
 
 const {
   isLoadingList, searchQuery, filteredEmployees, loadEmployees,
