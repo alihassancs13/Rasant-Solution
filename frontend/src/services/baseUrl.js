@@ -25,6 +25,8 @@ export const API_ENDPOINTS = {
     POLICY_ASSIGN: (policyId) => `/api/employeeDashboard/salaries/policies/${policyId}/assign/`,
     FORCE_INCREMENT: '/api/employeeDashboard/salaries/force-increment/',
     INCREMENTS_DUE_TODAY: '/api/employeeDashboard/salaries/increment-due-today/',
+    GET_EMPLOYEE_DETAIL: '/api/employeeDashboard/salaries/get_employee_detail/',
+    CHECK_INSURANCE_RENEWALS:'api/employeeDashboard/salaries/recalculate-insurance/',
     GET_EMPLOYEE_DETAIL: (pk) => `/api/employeeDashboard/salaries/get_employee_detail/${pk}/`,
 
     ATTENDANCE: {
