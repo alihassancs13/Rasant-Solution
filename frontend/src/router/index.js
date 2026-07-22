@@ -180,6 +180,12 @@ const routes = [
     component: () => import('@/pages/admin/jira/jira.vue'),
     meta: { requiresAuth: true, role: 'employee' }
   },
+  {
+    path: '/admin/worklogs',
+    name: 'Worklogs',
+    component: () => import('@/pages/admin/worklogs/worklog.vue'),
+    meta: { requiresAuth: true, role: 'employee' }
+  },
 ];
 
 const router = createRouter({

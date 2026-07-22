@@ -21,4 +21,9 @@ urlpatterns = [
     path('jira/issue/<str:issue_key>/', views.get_issue_detail, name='get_issue_detail'),
     path('jira/check-jira-connection/', views.check_jira_connection, name='check-jira-connection'),
     path('jira/attachment/<str:attachment_id>/', views.proxy_attachment , name='get_single_attachment'),
+    path('worklogs/calendar/<int:year>/<int:month>/', views.get_calendar_worklogs, name='get_calendar_worklogs_path'),
+    path('worklogs/create-worklogs/', views.create_worklog_view, name='create_worklogs'),
+    path('worklogs/<str:worklog_id>/update/', views.update_worklog_view, name='update_worklogs'),
+    path("worklogs/<str:worklog_id>/delete/", views.delete_worklog_view, name="delete-worklog"),
+    path("worklogs/<str:worklog_id>/", views.get_worklog_view, name="get-worklog"),
 ]

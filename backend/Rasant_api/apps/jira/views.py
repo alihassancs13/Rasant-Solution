@@ -1,4 +1,5 @@
 import requests
+from datetime import datetime,timezone,timedelta
 import base64
 from django.http import JsonResponse, HttpResponse,StreamingHttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -10,12 +11,19 @@ import json as json_module
 from .services import (
     get_jira_headers,
     get_jira_creds,
+    get_jira_worklog,
+    fetch_worklogs,
+    create_jira_worklog,
+    update_jira_worklog,
     fetch_recent_jira_projects,
+    delete_jira_worklog,
+    _get_current_account_id,
+    _fetch_all_worklogs_for_issue,
     fetch_issue_types,
     fetch_statuses,
     get_issue_detail_service,
 )
-from .models import JiraCredential, JiraTask, Source
+from .models import JiraCredential, JiraTask, Source,Worklog
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -393,6 +401,7 @@ def create_jira_issue_service(data, user,attachments, source, created_by_id=None
 def create_jira_issue(request):
     app_name = apps.get_containing_app_config(__name__).name
     source = Source.objects.filter(code=app_name, is_active=True).first()
+    print("FILES:", request.FILES.getlist('attachments'))
 
     result, status_code = create_jira_issue_service(
         data=request.data,
@@ -899,3 +908,222 @@ def add_attachment(request):
         'attachments': attachments,
     }, status=200)
 
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_calendar_worklogs(request, year, month):
+    """
+    Get worklogs for a specific month and year using path parameters
+    """
+    try:
+        logs_by_date = fetch_worklogs(
+            request.user,
+            month=month,
+            year=year
+        )
+    except Exception as e:
+        return JsonResponse(
+            {
+                "success": False,
+                "message": str(e)
+            },
+            status=400,
+        )
+
+    return JsonResponse(
+        {
+            "success": True,
+            "logs": logs_by_date,
+        },
+        status=200,
+    )
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def create_worklog_view(request):
+    user = request.user
+
+    domain, headers = get_jira_creds(user)
+    if not domain:
+        return Response({"success": False, "message": "Jira is not connected. Please connect first."}, status=400)
+
+    issue_key = request.data.get("issue_key")
+    start_date = request.data.get("start_date")   # "07/22/2026"
+    start_time = request.data.get("start_time")    # "8:00 am"
+    end_date = request.data.get("end_date")        # "07/22/2026"
+    end_time = request.data.get("end_time")         # "4:00 pm"
+    comment = request.data.get("worklog_description", "")
+
+    if not all([issue_key, start_date, start_time, end_date, end_time]):
+        return Response({"success": False, "message": "Issue, start and end time are required."}, status=400)
+
+    try:
+        started_dt = datetime.strptime(f"{start_date} {start_time}", "%m/%d/%Y %I:%M %p")
+        ended_dt = datetime.strptime(f"{end_date} {end_time}", "%m/%d/%Y %I:%M %p")
+    except ValueError:
+        return Response({"success": False, "message": "Invalid date/time format."}, status=400)
+
+    if ended_dt <= started_dt:
+        return Response({"success": False, "message": "End time can not be before the start time."}, status=400)
+
+    time_spent_seconds = int((ended_dt - started_dt).total_seconds())
+    pk_tz = timezone(timedelta(hours=5))
+    started_dt = started_dt.replace(tzinfo=pk_tz)
+
+    started = started_dt.strftime("%Y-%m-%dT%H:%M:%S.000%z")
+
+    result = create_jira_worklog(
+        user=user,
+        issue_key=issue_key,
+        started=started,
+        time_spent_seconds=time_spent_seconds,
+        comment=comment,
+    )
+
+    if result.get("success"):
+        result["data"]["ended"] = ended_dt.isoformat()
+        data = result.get("data", {})
+
+        jira_credential = JiraCredential.objects.filter(
+            auth_user_id=user
+        ).first()
+
+        if jira_credential:
+            Worklog.objects.create(
+                jira_credential=jira_credential,
+                worklog_id=data.get("id"),
+                issue_key=issue_key,
+                issue_id=data.get("issueId"),
+                summary=request.data.get("summary", ""),
+                started=started_dt,
+                ended=ended_dt,
+                time_spent_seconds=data.get("timeSpentSeconds"),
+                comment=comment,
+                created_by=user,
+            )
+    return Response(result, status=result.get("status", 200))
+
+@api_view(["PUT"])
+@permission_classes([IsAuthenticated])
+def update_worklog_view(request, worklog_id):
+    user = request.user
+
+    domain, headers = get_jira_creds(user)
+    if not domain:
+        return Response({"success": False, "message": "Jira is not connected. Please connect first."}, status=400)
+
+    issue_key = request.data.get("issue_key")
+    start_date = request.data.get("start_date")
+    start_time = request.data.get("start_time")
+    end_date = request.data.get("end_date")
+    end_time = request.data.get("end_time")
+    comment = request.data.get("worklog_description", "")
+
+    if not all([issue_key, start_date, start_time, end_date, end_time]):
+        return Response({"success": False, "message": "Issue, start and end date are required"}, status=400)
+
+    try:
+        started_dt = datetime.strptime(f"{start_date} {start_time}", "%m/%d/%Y %I:%M %p")
+        ended_dt = datetime.strptime(f"{end_date} {end_time}", "%m/%d/%Y %I:%M %p")
+    except ValueError:
+        return Response({"success": False, "message": "Invalid date/time format."}, status=400)
+
+    if ended_dt <= started_dt:
+        return Response({"success": False, "message": "End time can not be before start time."}, status=400)
+
+    time_spent_seconds = int((ended_dt - started_dt).total_seconds())
+    started = started_dt.strftime("%Y-%m-%dT%H:%M:%S.000+0000")
+
+    result = update_jira_worklog(
+        user=user,
+        issue_key=issue_key,
+        worklog_id=worklog_id,
+        started=started,
+        time_spent_seconds=time_spent_seconds,
+        comment=comment,
+    )
+
+    if result.get("success"):
+        result["data"]["ended"] = ended_dt.isoformat()
+
+        data = result.get("data", {})
+
+        jira_credential = JiraCredential.objects.filter(
+            auth_user_id=user
+        ).first()
+
+        if jira_credential:
+            existing = Worklog.objects.filter(
+                jira_credential=jira_credential,
+                worklog_id=worklog_id
+            )
+
+            updated_count = existing.update(
+                issue_key=issue_key,
+                issue_id=data.get("issueId"),
+                worklog_id=data.get("id"),
+                summary=request.data.get("summary", ""),
+                started=started_dt,
+                ended=ended_dt,
+                time_spent_seconds=data.get("timeSpentSeconds"),
+                comment=comment,
+            )
+            print(f"DEBUG: updated_count={updated_count}")
+    return Response(result, status=result.get("status", 200))
+
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+def delete_worklog_view(request, worklog_id):
+    user = request.user
+
+    domain, headers = get_jira_creds(user)
+    if not domain:
+        return Response({"success": False, "message": "Jira is not connected. Please connect first."}, status=400)
+
+    issue_key = request.query_params.get("issue_key")
+    if not issue_key:
+        return Response({"success": False, "message": "issue_key query param is required."}, status=400)
+
+    result = delete_jira_worklog(user=user, issue_key=issue_key, worklog_id=worklog_id)
+
+    if result.get("success"):
+        jira_credential = JiraCredential.objects.filter(auth_user_id=user).first()
+        if jira_credential:
+            Worklog.objects.filter(
+                jira_credential=jira_credential,
+                worklog_id=worklog_id,
+            ).delete()
+
+    return Response(result, status=result.get("status", 200))
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_worklog_view(request, worklog_id):
+    user = request.user
+
+    domain, headers = get_jira_creds(user)
+    if not domain:
+        return Response(
+            {
+                "success": False,
+                "message": "Jira is not connected. Please connect first."
+            },
+            status=400
+        )
+
+    issue_key = request.query_params.get("issue_key")
+    if not issue_key:
+        return Response(
+            {
+                "success": False,
+                "message": "issue_key query parameter is required."
+            },
+            status=400
+        )
+
+    result = get_jira_worklog(
+        user=user,
+        issue_key=issue_key,
+        worklog_id=worklog_id,
+    )
+
+    return Response(result, status=result.get("status", 200))
