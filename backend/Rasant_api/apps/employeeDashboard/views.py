@@ -834,6 +834,7 @@ def get_employee_detail(request, pk):
 def calculate_and_save_deduction(employee, tax_percent=None, insurance_amount=None,
                                   deduction_month=None, include_attendance=True, force=False):
     deduction_month = (deduction_month or date.today().replace(day=1)).replace(day=1)
+    current_month = date.today().replace(day=1)
 
     if employee.joined_date and not employee.next_insurance_cycle_date:
         employee.next_insurance_cycle_date = (
@@ -856,8 +857,6 @@ def calculate_and_save_deduction(employee, tax_percent=None, insurance_amount=No
     if record.is_finalized:
         return record
 
-    # force=True bypasses the "don't overwrite already-synced" protection —
-    # used when the underlying Attendance data itself just changed.
     run_attendance = include_attendance and (force or not record.attendance_synced)
 
     if run_attendance:
@@ -934,6 +933,12 @@ def calculate_and_save_deduction(employee, tax_percent=None, insurance_amount=No
 
     if run_attendance:
         record.attendance_synced = True
+
+    # ---------- Auto-lock: once we're calculating for a month that has
+    # already ended, this is the final word — no caller should ever be
+    # able to touch it again, cron or manual alike.
+    if deduction_month < current_month:
+        record.is_finalized = True
 
     record.save()
     return record
@@ -1107,7 +1112,6 @@ def attendance_record_update(request, id):
             incoming['late_minutes'] = None
             incoming['overtime_hours'] = 0
         elif 'status' not in incoming:
-            # only clock_in/out/timetable changed — recompute status/late/overtime
             grace_minutes = PayrollSettings.get_settings().grace_minutes
             incoming['status'] = calculate_status(clock_in, clock_out, timetable_text, grace_minutes)
             late_minutes, overtime_hours = calculate_late_and_overtime(
@@ -1115,20 +1119,24 @@ def attendance_record_update(request, id):
             )
             incoming['late_minutes'] = late_minutes
             incoming['overtime_hours'] = overtime_hours
-        # else: status was set directly (manual dropdown change) — trust it as-is
 
     serializer = AttendanceHistorySerializer(attendance, data=incoming, partial=True)
     if serializer.is_valid():
         serializer.save()
 
-        # ---------- Resync payroll for this employee/month ----------
+        # ---------- Resync payroll — ONLY for the current, still-open month ----------
         deduction_month = attendance.date.replace(day=1)
-        calculate_and_save_deduction(
-            employee=attendance.employee,
-            deduction_month=deduction_month,
-            include_attendance=True,
-            force=True,
-        )
+        current_month = date.today().replace(day=1)
+
+        if deduction_month == current_month:
+            calculate_and_save_deduction(
+                employee=attendance.employee,
+                deduction_month=deduction_month,
+                include_attendance=True,
+                force=True,
+            )
+        # else: this attendance record belongs to a past, already-closed month —
+        # its SalaryDeductionHistory must not be touched retroactively.
 
         return Response({
             'message': 'Attendance record updated successfully.',
