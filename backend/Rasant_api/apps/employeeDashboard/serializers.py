@@ -12,10 +12,12 @@ from .models import (
     SalaryIncrementHistory,
     EmployeePolicyAssignment,
     Attendance,
+    PayrollSettings,
+    SalaryDeductionHistory,
 )
 import calendar
 from datetime import date
-from .utils import calculate_status
+from .utils import calculate_status, calculate_late_and_overtime
 
 def calculate_next_effective_date(cycle_code, from_date=None):
     base = from_date or date.today()
@@ -371,17 +373,12 @@ class AttendanceBulkRowSerializer(serializers.Serializer):
         error_messages={'does_not_exist': 'No employee found with attendance ID {value}.'},
     )
     date = serializers.DateField(input_formats=[
-        '%m/%d/%Y',
-        '%d-%m-%Y',
-        '%m/%d/%y',
-        '%d-%m-%y',
-        '%d/%m/%Y',
-        '%Y-%m-%d',
-        'iso-8601',
-    ],)
+        '%m/%d/%Y', '%d-%m-%Y', '%m/%d/%y', '%d-%m-%y',
+        '%d/%m/%Y', '%Y-%m-%d', 'iso-8601',
+    ])
     timetable = serializers.CharField(required=False, allow_blank=True)
-    clock_in = serializers.TimeField(required=False, allow_null=True,input_formats=['%I:%M %p', '%H:%M:%S', '%H:%M', 'iso-8601'],)
-    clock_out = serializers.TimeField(required=False, allow_null=True, input_formats=['%I:%M %p', '%H:%M:%S', '%H:%M', 'iso-8601'],)
+    clock_in = serializers.TimeField(required=False, allow_null=True, input_formats=['%I:%M %p', '%H:%M:%S', '%H:%M', 'iso-8601'])
+    clock_out = serializers.TimeField(required=False, allow_null=True, input_formats=['%I:%M %p', '%H:%M:%S', '%H:%M', 'iso-8601'])
 
     def to_internal_value(self, data):
         data = data.copy()
@@ -397,14 +394,31 @@ class AttendanceBulkRowSerializer(serializers.Serializer):
         clock_in = validated_data.get('clock_in')
         clock_out = validated_data.get('clock_out')
 
+        # Skip weekends entirely — no status/late/overtime calc, just save as-is
+        record_date = validated_data['date']
+        is_weekend = record_date.weekday() >= 5   # 5=Saturday, 6=Sunday
+
+        grace_minutes = PayrollSettings.get_settings().grace_minutes
+
+        if is_weekend:
+            status_value = 'present' if (clock_in and clock_out) else 'absent'
+            late_minutes, overtime_hours = None, 0
+        else:
+            status_value = calculate_status(clock_in, clock_out, timetable_text, grace_minutes)
+            late_minutes, overtime_hours = calculate_late_and_overtime(
+                clock_in, clock_out, timetable_text, grace_minutes
+            )
+
         attendance, _ = Attendance.objects.update_or_create(
             employee=employee,
-            date=validated_data['date'],
+            date=record_date,
             defaults={
                 'timetable': timetable_text,
                 'clock_in': clock_in,
                 'clock_out': clock_out,
-                'status': calculate_status(clock_in, clock_out, timetable_text),
+                'status': status_value,
+                'late_minutes': late_minutes,
+                'overtime_hours': overtime_hours,
             },
         )
         return attendance
@@ -417,8 +431,57 @@ class AttendanceBulkUploadSerializer(serializers.Serializer):
         if not value:
             raise serializers.ValidationError("No rows to upload.")
         return value
+
 class AttendanceHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Attendance
-        fields = ['id', 'date', 'timetable', 'clock_in', 'clock_out', 'status']
+        fields = [
+            'id', 'date', 'timetable', 'clock_in', 'clock_out', 'status',
+            'late_minutes', 'overtime_hours', 'is_paid',
+        ]
         read_only_fields = ['id', 'date']
+
+class PayrollSettingsSerializer(serializers.ModelSerializer):
+    updated_by_name = serializers.CharField(source='updated_by.username', read_only=True, default=None)
+
+    class Meta:
+        model = PayrollSettings
+        fields = [
+            'id',
+            'grace_minutes',
+            'allowed_leaves_per_month',
+            'allowed_absents_per_month',
+            'overtime_rate_per_hour',
+            'late_count_threshold',
+            'updated_by', 'updated_by_name', 'updated_at',
+        ]
+        read_only_fields = ['id', 'updated_by', 'updated_by_name', 'updated_at']
+
+    def update(self, instance, validated_data):
+        request = self.context.get('request')
+        user = getattr(request, 'user', None)
+        if user and user.is_authenticated:
+            validated_data['updated_by'] = user
+
+        for attr, value in validated_data.items():
+            setattr(instance, attr, value)
+        instance.save()
+        return instance
+class SalaryDeductionHistorySerializer(serializers.ModelSerializer):
+    employee_name = serializers.CharField(source='employee.full_name', read_only=True)
+
+    class Meta:
+        model = SalaryDeductionHistory
+        fields = [
+            'id', 'employee', 'employee_name', 'deduction_month',
+            'total_days', 'present_days', 'paid_leave_days',
+            'unpaid_leave_days', 'unpaid_absent_days',
+            'late_count', 'late_penalty_days', 'late_penalty_amount',
+            'overtime_hours', 'overtime_rate_applied', 'overtime_amount',
+            'per_day_salary', 'half_day_salary', 'base_salary',
+            'attendance_deduction_total',
+            'gross_salary', 'tax_amount', 'salary_after_tax',
+            'insurance_amount', 'net_salary',
+            'is_finalized', 'created_at',
+        ]
+        read_only_fields = fields

@@ -30,4 +30,6 @@ urlpatterns = [
     path('attendance/employees/', views.employee_attendance_list, name='employee-attendance-list'),
     path('attendance/employees/<int:id>/history/', views.employee_attendance_history, name='employee-attendance-history'),
     path('attendance/<int:id>/', views.attendance_record_update, name='attendance-record-update'),
+
+    path('salaries/payroll-settings/', views.payroll_settings_view, name='payroll-settings'),
 ]

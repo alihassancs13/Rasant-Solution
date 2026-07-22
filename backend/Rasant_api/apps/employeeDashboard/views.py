@@ -1,5 +1,6 @@
 
 import datetime
+import calendar
 from rest_framework.decorators import permission_classes
 from accounts.models import Role
 from django.http import HttpResponse
@@ -14,7 +15,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.core.mail import send_mail
 from django.db.models import Q
-from datetime import date
+from datetime import date, timedelta
 from django.conf import settings
 from collections import defaultdict
 from decimal import Decimal
@@ -23,20 +24,21 @@ from .serializers import calculate_next_effective_date
 import random
 import string
 from django.contrib.auth.hashers import make_password
+from .utils import calculate_status, calculate_late_and_overtime
 
 User = get_user_model()
 
 from .models import (
-    Employee, CVSubmission, JobOpening, JobType, JobStatus,
+    Employee, CVSubmission, JobOpening, JobStatus,
     IncrementType, IncrementPolicy, CycleTiming, ApplicationMode, EmployeePolicyAssignment,
-    SalaryIncrementHistory,SalaryDeductionHistory, Attendance,
+    SalaryIncrementHistory,SalaryDeductionHistory, Attendance, PayrollSettings,
 )
 from .serializers import (
     EmployeeSerializer, EmployeeListSerializer, UpdateEmployeeSerializer,
     CVSubmissionSerializer, JobOpeningSerializer, JobTypeSerializer, JobStatusSerializer,
     IncrementTypeSerializer, CycleTimingSerializer, ApplicationModeSerializer,
     IncrementPolicySerializer, EmployeePolicyAssignmentSerializer, EmployeeAttendanceSerializer, AttendanceBulkRowSerializer,
-    AttendanceHistorySerializer
+    AttendanceHistorySerializer, PayrollSettingsSerializer
 )
 # ---------- GENRERATE EMPLOYEE NUMBER ----------
 def generate_employee_number():
@@ -125,18 +127,15 @@ def add_employee(request):
         employee.employee_number = new_number
         try:
             employee.save()
-            try:
-                if employee.joined_date:
-                    calculate_and_save_deduction(
-                        employee=employee,
-                        tax_percent=employee.tax,
-                        insurance_amount=employee.insurance_amount,
-                        deduction_month=date.today().replace(day=1),
-                    )
-            except Exception as e:
-                # Log the error but don't fail the request
-                print(f" Deduction calculation failed: {e}")
-                # You can also log to a file here
+
+            if employee.joined_date:
+                calculate_and_save_deduction(
+                    employee=employee,
+                    tax_percent=employee.tax,
+                    insurance_amount=employee.insurance_amount,
+                    deduction_month=date.today().replace(day=1),
+                    include_attendance=False,
+                )
 
             return Response(
                 {
@@ -808,6 +807,22 @@ def get_employee_detail(request, pk):
         "net_salary": latest_deduction.net_salary if latest_deduction else None,
         "deduction_month": latest_deduction.deduction_month if latest_deduction else None,
 
+        # ---------- Attendance breakdown (new) ----------
+        "total_days": latest_deduction.total_days if latest_deduction else None,
+        "present_days": latest_deduction.present_days if latest_deduction else None,
+        "paid_leave_days": latest_deduction.paid_leave_days if latest_deduction else None,
+        "unpaid_leave_days": latest_deduction.unpaid_leave_days if latest_deduction else None,
+        "unpaid_absent_days": latest_deduction.unpaid_absent_days if latest_deduction else None,
+
+        "late_count": latest_deduction.late_count if latest_deduction else None,
+        "late_penalty_days": latest_deduction.late_penalty_days if latest_deduction else None,
+        "late_penalty_amount": latest_deduction.late_penalty_amount if latest_deduction else None,
+
+        "overtime_hours": latest_deduction.overtime_hours if latest_deduction else None,
+        "overtime_amount": latest_deduction.overtime_amount if latest_deduction else None,
+
+        "attendance_deduction_total": latest_deduction.attendance_deduction_total if latest_deduction else None,
+
         # ---------- Bank Details ----------
         "bank_name": employee.bank_name,
         "branch_name": employee.branch_name,
@@ -816,20 +831,74 @@ def get_employee_detail(request, pk):
 
     return Response(data, status=status.HTTP_200_OK)
 
-def calculate_and_save_deduction(employee, tax_percent=None, insurance_amount=None, deduction_month=None):
-    deduction_month = deduction_month or date.today().replace(day=1)
+def calculate_and_save_deduction(employee, tax_percent=None, insurance_amount=None,
+                                  deduction_month=None, include_attendance=True, force=False):
+    deduction_month = (deduction_month or date.today().replace(day=1)).replace(day=1)
+
     if employee.joined_date and not employee.next_insurance_cycle_date:
         employee.next_insurance_cycle_date = (
             employee.joined_date + relativedelta(months=12)
         ).replace(day=1)
         employee.save(update_fields=["next_insurance_cycle_date"])
 
-    gross_salary = employee.current_salary or employee.salary
-
     if tax_percent is None:
         tax_percent = employee.tax
     if insurance_amount is None:
         insurance_amount = employee.insurance_amount
+
+    base_salary = employee.current_salary or employee.salary
+    settings_obj = PayrollSettings.get_settings()
+
+    record, created = SalaryDeductionHistory.objects.get_or_create(
+        employee=employee, deduction_month=deduction_month,
+        defaults={'is_finalized': False},
+    )
+    if record.is_finalized:
+        return record
+
+    # force=True bypasses the "don't overwrite already-synced" protection —
+    # used when the underlying Attendance data itself just changed.
+    run_attendance = include_attendance and (force or not record.attendance_synced)
+
+    if run_attendance:
+        att = calculate_is_paid_for_month(employee, deduction_month)
+    elif record.attendance_synced:
+        att = {
+            'total_days': record.total_days,
+            'present_days': record.present_days,
+            'paid_leave_days': record.paid_leave_days,
+            'unpaid_leave_days': record.unpaid_leave_days,
+            'unpaid_absent_days': record.unpaid_absent_days,
+            'late_count': record.late_count,
+            'overtime_hours': record.overtime_hours,
+            'calendar_days_in_month': calendar.monthrange(deduction_month.year, deduction_month.month)[1],
+        }
+    else:
+        days_in_month = calendar.monthrange(deduction_month.year, deduction_month.month)[1]
+        month_start = deduction_month.replace(day=1)
+        month_end = month_start.replace(day=days_in_month)
+        wd = count_working_days(month_start, month_end)
+        att = {
+            'total_days': wd, 'present_days': 0, 'paid_leave_days': 0,
+            'unpaid_leave_days': 0, 'unpaid_absent_days': 0, 'late_count': 0,
+            'overtime_hours': Decimal("0"), 'calendar_days_in_month': days_in_month,
+        }
+
+    per_day_salary = base_salary / Decimal(att['calendar_days_in_month'])
+    half_day_salary = per_day_salary / Decimal("2")
+
+    extra_lates = max(0, att['late_count'] - settings_obj.late_count_threshold)
+    late_penalty_days = Decimal(extra_lates) * Decimal("0.5")
+    late_penalty_amount = late_penalty_days * per_day_salary
+
+    unpaid_days = att['unpaid_leave_days'] + att['unpaid_absent_days']
+    unpaid_deduction = Decimal(unpaid_days) * per_day_salary
+    attendance_deduction_total = unpaid_deduction + late_penalty_amount
+
+    overtime_rate_applied = settings_obj.overtime_rate_per_hour
+    overtime_amount = Decimal(str(att['overtime_hours'])) * overtime_rate_applied
+
+    gross_salary = base_salary - attendance_deduction_total + overtime_amount
 
     tax_amount = Decimal("0")
     if tax_percent:
@@ -842,15 +911,31 @@ def calculate_and_save_deduction(employee, tax_percent=None, insurance_amount=No
 
     net_salary = salary_after_tax - monthly_insurance
 
-    record = SalaryDeductionHistory.objects.create(
-        employee=employee,
-        deduction_month=deduction_month,
-        gross_salary=gross_salary,
-        tax_amount=tax_amount,
-        salary_after_tax=salary_after_tax,
-        insurance_amount=monthly_insurance,
-        net_salary=net_salary,
-    )
+    record.total_days = att['total_days']
+    record.present_days = att['present_days']
+    record.paid_leave_days = att['paid_leave_days']
+    record.unpaid_leave_days = att['unpaid_leave_days']
+    record.unpaid_absent_days = att['unpaid_absent_days']
+    record.late_count = att['late_count']
+    record.late_penalty_days = late_penalty_days
+    record.late_penalty_amount = late_penalty_amount
+    record.overtime_hours = att['overtime_hours']
+    record.overtime_rate_applied = overtime_rate_applied
+    record.overtime_amount = overtime_amount
+    record.per_day_salary = per_day_salary
+    record.half_day_salary = half_day_salary
+    record.base_salary = base_salary
+    record.attendance_deduction_total = attendance_deduction_total
+    record.gross_salary = gross_salary
+    record.tax_amount = tax_amount
+    record.salary_after_tax = salary_after_tax
+    record.insurance_amount = monthly_insurance
+    record.net_salary = net_salary
+
+    if run_attendance:
+        record.attendance_synced = True
+
+    record.save()
     return record
 
 def renew_insurance_cycle(employee):
@@ -1009,9 +1094,42 @@ def employee_attendance_history(request, id):
 def attendance_record_update(request, id):
     attendance = get_object_or_404(Attendance, id=id)
 
-    serializer = AttendanceHistorySerializer(attendance, data=request.data, partial=True)
+    incoming = request.data.copy()
+    clock_in = incoming.get('clock_in', attendance.clock_in)
+    clock_out = incoming.get('clock_out', attendance.clock_out)
+    timetable_text = incoming.get('timetable', attendance.timetable)
+
+    is_weekend = attendance.date.weekday() >= 5
+
+    if 'clock_in' in incoming or 'clock_out' in incoming or 'timetable' in incoming or 'status' in incoming:
+        if is_weekend:
+            incoming.setdefault('status', 'present' if (clock_in and clock_out) else 'absent')
+            incoming['late_minutes'] = None
+            incoming['overtime_hours'] = 0
+        elif 'status' not in incoming:
+            # only clock_in/out/timetable changed — recompute status/late/overtime
+            grace_minutes = PayrollSettings.get_settings().grace_minutes
+            incoming['status'] = calculate_status(clock_in, clock_out, timetable_text, grace_minutes)
+            late_minutes, overtime_hours = calculate_late_and_overtime(
+                clock_in, clock_out, timetable_text, grace_minutes
+            )
+            incoming['late_minutes'] = late_minutes
+            incoming['overtime_hours'] = overtime_hours
+        # else: status was set directly (manual dropdown change) — trust it as-is
+
+    serializer = AttendanceHistorySerializer(attendance, data=incoming, partial=True)
     if serializer.is_valid():
         serializer.save()
+
+        # ---------- Resync payroll for this employee/month ----------
+        deduction_month = attendance.date.replace(day=1)
+        calculate_and_save_deduction(
+            employee=attendance.employee,
+            deduction_month=deduction_month,
+            include_attendance=True,
+            force=True,
+        )
+
         return Response({
             'message': 'Attendance record updated successfully.',
             'record': {
@@ -1023,3 +1141,107 @@ def attendance_record_update(request, id):
         }, status=status.HTTP_200_OK)
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+def count_working_days(start_date, end_date):
+    total = 0
+    current = start_date
+    while current <= end_date:
+        if current.weekday() < 5:
+            total += 1
+        current += timedelta(days=1)
+    return total
+
+
+def calculate_is_paid_for_month(employee, deduction_month):
+    settings_obj = PayrollSettings.get_settings()
+    month_start = deduction_month.replace(day=1)
+    days_in_month = calendar.monthrange(month_start.year, month_start.month)[1]   # e.g. 31 for July
+    month_end = month_start.replace(day=days_in_month)
+
+    effective_start = max(month_start, employee.joined_date) if employee.joined_date else month_start
+
+    total_applicable_days = count_working_days(effective_start, month_end)   # numerator — working days only
+
+    records = Attendance.objects.filter(
+        employee=employee, date__gte=effective_start, date__lte=month_end,
+    ).exclude(
+        date__week_day__in=[1, 7]
+    ).order_by('date')
+
+    leave_counter = 0
+    absent_counter = 0
+    present_days = 0
+    paid_leave_days = 0
+    unpaid_leave_days = 0
+    unpaid_absent_days = 0
+    late_count = 0
+    overtime_hours_total = Decimal("0")
+
+    for record in records:
+        if record.date.weekday() >= 5:
+            continue
+
+        if record.status in ('present', 'late'):
+            record.is_paid = True
+            present_days += 1
+            if record.status == 'late':
+                late_count += 1
+
+        elif record.status == 'on_leave':
+            leave_counter += 1
+            if leave_counter <= settings_obj.allowed_leaves_per_month:
+                record.is_paid = True
+                paid_leave_days += 1
+            else:
+                record.is_paid = False
+                unpaid_leave_days += 1
+
+        elif record.status == 'absent':
+            absent_counter += 1
+            if absent_counter <= settings_obj.allowed_absents_per_month:
+                record.is_paid = True
+            else:
+                record.is_paid = False
+                unpaid_absent_days += 1
+
+        overtime_hours_total += Decimal(str(record.overtime_hours or 0))
+        record.save(update_fields=['is_paid'])
+
+    return {
+        'total_days': total_applicable_days,          # numerator — working days only (unchanged)
+        'present_days': present_days,
+        'paid_leave_days': paid_leave_days,
+        'unpaid_leave_days': unpaid_leave_days,
+        'unpaid_absent_days': unpaid_absent_days,
+        'late_count': late_count,
+        'overtime_hours': overtime_hours_total,
+        'calendar_days_in_month': days_in_month,        # ← NEW: divisor source (30/31)
+    }
+
+# ---------- Payroll Settings ----------
+@api_view(['GET', 'PUT'])
+@permission_classes([IsAuthenticated])
+def payroll_settings_view(request):
+    settings_obj = PayrollSettings.get_settings()
+
+    if request.method == 'GET':
+        serializer = PayrollSettingsSerializer(settings_obj)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    elif request.method == 'PUT':
+        serializer = PayrollSettingsSerializer(
+            settings_obj,
+            data=request.data,
+            partial=True,
+            context={'request': request}
+        )
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    else:
+        return Response(
+            {"error": "Method not allowed."},
+            status=status.HTTP_405_METHOD_NOT_ALLOWED
+        )

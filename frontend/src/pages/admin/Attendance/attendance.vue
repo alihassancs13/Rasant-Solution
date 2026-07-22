@@ -2,6 +2,7 @@
 import { onMounted, onUnmounted } from 'vue'
 import AdminSidebar from '../../../components/adminSidebar.vue'
 import DashboardHeader from '../../../components/header.vue'
+import StatCard from "@/components/StatCard.vue";
 import {
   useAttendance,
   STATUS_META,

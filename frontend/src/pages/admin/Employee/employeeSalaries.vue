@@ -11,9 +11,11 @@ import {useIncrementPolicy} from '@/composables/useIncrementPolicy.js'
 import {useAssignPolicy} from '@/composables/useAssignPolicy.js'
 import {useEmployeeStore} from '@/stores/employeeStore.js'
 import { usePolicyStore } from '@/stores/policyStore'
+import { usePayrollSettingsStore } from '../../../stores/payrollStore.js'
 
 const policyStore = usePolicyStore()
 const employeeStore = useEmployeeStore()
+const payrollSettingsStore = usePayrollSettingsStore()
 
 // ⚠️ IMPORTANT: Define employees FIRST before using it in composables
 const employees = computed(() => employeeStore.employees)
@@ -86,38 +88,14 @@ const tabs = [
   { key: 'payroll-settings', label: 'Payroll Settings', icon: ['fas', 'sliders'] },
 ]
 const activeTab = ref('employee-roster')
-const payrollSettings = ref({
-  grace_minutes: 10,
-  allowed_leaves_per_month: 2,
-  allowed_absents_per_month: 0,
-  overtime_rate_per_hour: 0,
-  late_penalty_mode: 'half_day',
-  late_count_threshold: 3,
-  late_fixed_penalty_amount: null,
-  standard_days_per_month: 30,
-})
-const isSavingPayrollSettings = ref(false)
-const payrollSettingsLoading = ref(false)
+const payrollSettings = computed(() => payrollSettingsStore.settings)
+const isSavingPayrollSettings = computed(() => payrollSettingsStore.isSaving)
+const payrollSettingsLoading = computed(() => payrollSettingsStore.isLoading)
+const payrollSettingsError = computed(() => payrollSettingsStore.error)
 
-const fetchPayrollSettings = async () => {
-  payrollSettingsLoading.value = true
-  try {
-    const { data } = await axios.get('/api/payroll-settings/')
-    payrollSettings.value = data
-  } finally {
-    payrollSettingsLoading.value = false
-  }
-}
+const fetchPayrollSettings = () => payrollSettingsStore.fetchSettings()
 
-const savePayrollSettings = async () => {
-  isSavingPayrollSettings.value = true
-  try {
-    const { data } = await axios.put('/api/payroll-settings/', payrollSettings.value)
-    payrollSettings.value = data
-  } finally {
-    isSavingPayrollSettings.value = false
-  }
-}
+const savePayrollSettings = () => payrollSettingsStore.saveSettings(payrollSettingsStore.settings)
 const formatDate = (dateStr) => {
   if (!dateStr) return '—'
   return new Date(dateStr).toLocaleDateString('en-US', {
@@ -354,75 +332,75 @@ watch(() => route.query.highlightEmployee, (newVal) => {
             </div>
           </div>
 
-           <!-- Desktop/Tablet: Table view -->
-      <div class="hidden md:block overflow-x-auto">
-       <table class="w-full text-sm">
-        <thead>
-          <tr class="border-t border-border-subtle">
-          <th class="text-left px-4 sm:px-5 py-3 text-[11px] font-semibold text-text-muted tracking-wide uppercase">Employee</th>
-          <th class="text-left px-4 sm:px-5 py-3 text-[11px] font-semibold text-text-muted tracking-wide uppercase">Salary</th>
-          <th class="text-left px-4 sm:px-5 py-3 text-[11px] font-semibold text-text-muted tracking-wide uppercase">Net Salary</th>
-          <th class="text-left px-4 sm:px-5 py-3 text-[11px] font-semibold text-text-muted tracking-wide uppercase">Assigned Policies</th>
-          <th class="text-left px-4 sm:px-5 py-3 text-[11px] font-semibold text-text-muted tracking-wide uppercase">Increment Status</th>
-          <th class="text-left px-4 sm:px-5 py-3 text-[11px] font-semibold text-text-muted tracking-wide uppercase">Projected</th>
-          <th class="text-left px-4 sm:px-5 py-3 text-[11px] font-semibold text-text-muted tracking-wide uppercase">Actions</th>
-        </tr>
-        </thead>
-        <tbody v-if="employeesLoading">
-        <tr v-for="i in 3" :key="i">
-         <td colspan="7" class="px-4 sm:px-5 py-4">
-          <div class="h-4 bg-border rounded w-full max-w-xs animate-pulse"></div>
-         </td>
-        </tr>
-        </tbody>
-        <tbody v-else-if="employees.length === 0">
-         <tr>
-          <td colspan="7" class="text-center py-16 text-text-muted">No employees found.</td>
-         </tr>
-        </tbody>
-        <tbody v-else>
-         <tr
-           v-for="(emp, i) in paginatedEmployees"
-           :key="emp.id"
-           :id="`employee-row-${emp.id}`"
-           class="border-t border-border-subtle hover:bg-surface/50 transition-colors"
-           :class="{ 'bg-warning-subtle ring-2 ring-inset ring-warning': emp.id === highlightedEmployeeId }"
-           @click="openEmployeeDetailModal(emp.id)"
-         >
-         <td class="px-4 sm:px-5 py-4">
-         <div class="flex items-center gap-2.5">
-          <div class="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0" :class="[avatarStyle(i).bg, avatarStyle(i).text]">
-            {{ initials(emp.full_name) }}
-          </div>
-          <div class="min-w-0">
-            <p class="font-semibold text-text-primary truncate">{{ emp.full_name }}</p>
-            <p class="text-xs text-text-muted truncate">{{ emp.employee_number }} · {{ emp.department }}</p>
-          </div>
-        </div>
-      </td>
-      <td class="px-4 sm:px-5 py-4 whitespace-nowrap">
-        <p class="font-semibold text-text-primary inline">{{ formatCurrency(emp.salary) }}</p>
-        <span
-            v-if="emp.raise_count"
-            class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold policy-mode-auto"
-        >
+          <!-- Desktop/Tablet: Table view -->
+          <div class="hidden md:block overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead>
+              <tr class="border-t border-border-subtle">
+                <th class="text-left px-4 sm:px-5 py-3 text-[11px] font-semibold text-text-muted tracking-wide uppercase">Employee</th>
+                <th class="text-left px-4 sm:px-5 py-3 text-[11px] font-semibold text-text-muted tracking-wide uppercase">Salary</th>
+                <th class="text-left px-4 sm:px-5 py-3 text-[11px] font-semibold text-text-muted tracking-wide uppercase">Net Salary</th>
+                <th class="text-left px-4 sm:px-5 py-3 text-[11px] font-semibold text-text-muted tracking-wide uppercase">Assigned Policies</th>
+                <th class="text-left px-4 sm:px-5 py-3 text-[11px] font-semibold text-text-muted tracking-wide uppercase">Increment Status</th>
+                <th class="text-left px-4 sm:px-5 py-3 text-[11px] font-semibold text-text-muted tracking-wide uppercase">Projected</th>
+                <th class="text-left px-4 sm:px-5 py-3 text-[11px] font-semibold text-text-muted tracking-wide uppercase">Actions</th>
+              </tr>
+              </thead>
+              <tbody v-if="employeesLoading">
+              <tr v-for="i in 3" :key="i">
+                <td colspan="7" class="px-4 sm:px-5 py-4">
+                  <div class="h-4 bg-border rounded w-full max-w-xs animate-pulse"></div>
+                </td>
+              </tr>
+              </tbody>
+              <tbody v-else-if="employees.length === 0">
+              <tr>
+                <td colspan="7" class="text-center py-16 text-text-muted">No employees found.</td>
+              </tr>
+              </tbody>
+              <tbody v-else>
+              <tr
+                  v-for="(emp, i) in paginatedEmployees"
+                  :key="emp.id"
+                  :id="`employee-row-${emp.id}`"
+                  class="border-t border-border-subtle hover:bg-surface/50 transition-colors"
+                  :class="{ 'bg-warning-subtle ring-2 ring-inset ring-warning': emp.id === highlightedEmployeeId }"
+                  @click="openEmployeeDetailModal(emp.id)"
+              >
+                <td class="px-4 sm:px-5 py-4">
+                  <div class="flex items-center gap-2.5">
+                    <div class="w-9 h-9 rounded-full flex items-center justify-center text-xs font-bold shrink-0" :class="[avatarStyle(i).bg, avatarStyle(i).text]">
+                      {{ initials(emp.full_name) }}
+                    </div>
+                    <div class="min-w-0">
+                      <p class="font-semibold text-text-primary truncate">{{ emp.full_name }}</p>
+                      <p class="text-xs text-text-muted truncate">{{ emp.employee_number }} · {{ emp.department }}</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-4 sm:px-5 py-4 whitespace-nowrap">
+                  <p class="font-semibold text-text-primary inline">{{ formatCurrency(emp.salary) }}</p>
+                  <span
+                      v-if="emp.raise_count"
+                      class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold policy-mode-auto"
+                  >
             +{{ emp.raise_count }} raises
           </span>
-      </td>
-      <td class="px-4 sm:px-5 py-4 whitespace-nowrap">
-        <p v-if="emp.net_salary" class="font-semibold text-success">{{ formatCurrency(emp.net_salary) }}</p>
-        <span v-else class="text-text-muted">—</span>
-      </td>
-      <td class="px-4 sm:px-5 py-4 text-text-secondary max-w-[220px]">
-        <div v-if="assignedPolicyDetails(emp.id).length" class="space-y-1">
-          <div v-for="d in assignedPolicyDetails(emp.id)" :key="d.id" class="break-words">
-            <span class="font-medium text-text-primary">{{ d.name }}</span>
-            <span class="text-xs text-text-muted"> · Next: {{ formatDate(d.nextDate) }}</span>
-          </div>
-        </div>
-        <span v-else>—</span>
-      </td>
-      <td class="px-4 sm:px-5 py-4">
+                </td>
+                <td class="px-4 sm:px-5 py-4 whitespace-nowrap">
+                  <p v-if="emp.net_salary" class="font-semibold text-success">{{ formatCurrency(emp.net_salary) }}</p>
+                  <span v-else class="text-text-muted">—</span>
+                </td>
+                <td class="px-4 sm:px-5 py-4 text-text-secondary max-w-[220px]">
+                  <div v-if="assignedPolicyDetails(emp.id).length" class="space-y-1">
+                    <div v-for="d in assignedPolicyDetails(emp.id)" :key="d.id" class="break-words">
+                      <span class="font-medium text-text-primary">{{ d.name }}</span>
+                      <span class="text-xs text-text-muted"> · Next: {{ formatDate(d.nextDate) }}</span>
+                    </div>
+                  </div>
+                  <span v-else>—</span>
+                </td>
+                <td class="px-4 sm:px-5 py-4">
           <span
               v-if="incrementStatusFor(emp)"
               class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold"
@@ -431,27 +409,27 @@ watch(() => route.query.highlightEmployee, (newVal) => {
             <font-awesome-icon v-if="incrementStatusFor(emp).icon" :icon="incrementStatusFor(emp).icon" class="w-3 h-3" />
             {{ incrementStatusFor(emp).label }}
           </span>
-        <span v-else class="text-text-muted">—</span>
-      </td>
-      <td class="px-4 sm:px-5 py-4 whitespace-nowrap">
-        <template v-if="hasAssignedPolicy(emp.id)">
-          <p class="font-semibold text-text-primary">{{ formatCurrency(calculateProjection(emp).projected) }}</p>
-          <p class="text-xs font-medium text-success">+{{ formatCurrency(calculateProjection(emp).increment) }}</p>
-        </template>
-        <span v-else class="text-text-muted">—</span>
-      </td>
-      <td class="px-4 sm:px-5 py-4 whitespace-nowrap">
-        <button
-        @click="openEmployeeDetailModal(emp.id)"
-        class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface transition-colors text-text-muted hover:text-text-primary"
-        title="View Details"
-        >
-       <font-awesome-icon :icon="['fas', 'eye']" class="w-3.5 h-3.5" />
-        </button>
-       </td>
-      </tr>
-      </tbody>
-     </table>
+                  <span v-else class="text-text-muted">—</span>
+                </td>
+                <td class="px-4 sm:px-5 py-4 whitespace-nowrap">
+                  <template v-if="hasAssignedPolicy(emp.id)">
+                    <p class="font-semibold text-text-primary">{{ formatCurrency(calculateProjection(emp).projected) }}</p>
+                    <p class="text-xs font-medium text-success">+{{ formatCurrency(calculateProjection(emp).increment) }}</p>
+                  </template>
+                  <span v-else class="text-text-muted">—</span>
+                </td>
+                <td class="px-4 sm:px-5 py-4 whitespace-nowrap">
+                  <button
+                      @click="openEmployeeDetailModal(emp.id)"
+                      class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-surface transition-colors text-text-muted hover:text-text-primary"
+                      title="View Details"
+                  >
+                    <font-awesome-icon :icon="['fas', 'eye']" class="w-3.5 h-3.5" />
+                  </button>
+                </td>
+              </tr>
+              </tbody>
+            </table>
 
             <!-- Pagination -->
             <div v-if="!employeesLoading && employees.length > 0 && totalEmployeePages > 1" class="pt-4 mt-2 px-4 sm:px-5 pb-4 border-t border-border-subtle flex items-center justify-between">
@@ -689,17 +667,18 @@ watch(() => route.query.highlightEmployee, (newVal) => {
             </div>
 
             <div class="dash-field">
-              <label>Standard Days Per Month</label>
-              <input v-model.number="payrollSettings.standard_days_per_month" type="number" min="1"
+              <label>Allowed Paid Leaves / Month</label>
+              <input v-model.number="payrollSettings.allowed_leaves_per_month" type="number" min="0"
                      class="w-full mt-1 px-3.5 py-2.5 rounded-md border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              <p class="text-xs text-text-muted mt-1">Leaves beyond this limit become unpaid.</p>
             </div>
 
             <div class="dash-field">
-              <label>Allowed Absents / Month</label>
-              <input v-model.number="payrollSettings.allowed_leaves_per_month" type="number" min="0"
+              <label>Allowed Unpaid-Free Absents / Month</label>
+              <input v-model.number="payrollSettings.allowed_absents_per_month" type="number" min="0"
                      class="w-full mt-1 px-3.5 py-2.5 rounded-md border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              <p class="text-xs text-text-muted mt-1">Absents beyond this limit become unpaid.</p>
             </div>
-
 
             <div class="dash-field">
               <label>Overtime Rate / Hour</label>
@@ -708,26 +687,10 @@ watch(() => route.query.highlightEmployee, (newVal) => {
             </div>
 
             <div class="dash-field">
-              <label>Late Penalty Mode</label>
-              <select v-model="payrollSettings.late_penalty_mode"
-                      class="w-full mt-1 px-3.5 py-2.5 rounded-md border border-border text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/30">
-                <option value="half_day">Convert to Half-Day Deduction</option>
-                <option value="fixed">Fixed Amount Penalty</option>
-                <option value="none">No Penalty</option>
-              </select>
-            </div>
-
-            <div class="dash-field" v-if="payrollSettings.late_penalty_mode === 'half_day'">
-              <label>Late Count Threshold</label>
-              <input v-model.number="payrollSettings.late_count_threshold" type="number" min="1"
+              <label>Free Lates Before Penalty</label>
+              <input v-model.number="payrollSettings.late_count_threshold" type="number" min="0"
                      class="w-full mt-1 px-3.5 py-2.5 rounded-md border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
-              <p class="text-xs text-text-muted mt-1">e.g. every N lates = 1 half-day deduction.</p>
-            </div>
-
-            <div class="dash-field" v-if="payrollSettings.late_penalty_mode === 'fixed'">
-              <label>Fixed Penalty Amount</label>
-              <input v-model.number="payrollSettings.late_fixed_penalty_amount" type="number" step="0.01" min="0"
-                     class="w-full mt-1 px-3.5 py-2.5 rounded-md border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              <p class="text-xs text-text-muted mt-1">First N lates in a month are free. Every late after that cuts half a day's salary.</p>
             </div>
 
             <div class="sm:col-span-2 flex justify-end pt-2">
@@ -1026,140 +989,186 @@ watch(() => route.query.highlightEmployee, (newVal) => {
       </div>
     </BaseModal>
 
-<BaseDetailModal
-    :is-open="showEmployeeDetailModal"
-    title="Employee Details"
-    size="lg"
-    :item-id="employeeDetail?.employee_number"
-    @close="closeEmployeeDetailModal">
+    <BaseDetailModal
+        :is-open="showEmployeeDetailModal"
+        title="Employee Details"
+        size="lg"
+        :item-id="employeeDetail?.employee_number"
+        @close="closeEmployeeDetailModal">
 
-  <!-- Loading -->
-  <div v-if="isEmployeeDetailLoading" class="flex flex-col items-center justify-center py-16 gap-3">
-    <font-awesome-icon :icon="['fas', 'spinner']" class="w-8 h-8 text-blue-500 animate-spin" />
-    <p class="text-sm text-gray-400">Loading employee details...</p>
-  </div>
-
-  <div v-else-if="employeeDetail" class="p-0">
-
-    <!-- Header -->
-    <div class="flex items-start justify-between gap-3 mb-4 pb-4 border-b border-gray-100">
-      <div class="flex items-start gap-3">
-        <div class="w-11 h-11 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0 border border-blue-200">
-          <font-awesome-icon :icon="['fas', 'user']" class="w-4 h-4 text-blue-600" />
-        </div>
-        <div>
-          <p class="text-[15px] font-semibold text-gray-900 leading-snug">
-            {{ employeeDetail.name }}
-          </p>
-          <p class="text-xs text-gray-400 mt-0.5 font-mono">
-            {{ employeeDetail.employee_number }}
-          </p>
-        </div>
+      <!-- Loading -->
+      <div v-if="isEmployeeDetailLoading" class="flex flex-col items-center justify-center py-16 gap-3">
+        <font-awesome-icon :icon="['fas', 'spinner']" class="w-8 h-8 text-blue-500 animate-spin" />
+        <p class="text-sm text-gray-400">Loading employee details...</p>
       </div>
 
-      <span class="flex-shrink-0 text-[11px] font-medium px-3 py-1.5 rounded-full
+      <div v-else-if="employeeDetail" class="p-0">
+
+        <!-- Header -->
+        <div class="flex items-start justify-between gap-3 mb-4 pb-4 border-b border-gray-100">
+          <div class="flex items-start gap-3">
+            <div class="w-11 h-11 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0 border border-blue-200">
+              <font-awesome-icon :icon="['fas', 'user']" class="w-4 h-4 text-blue-600" />
+            </div>
+            <div>
+              <p class="text-[15px] font-semibold text-gray-900 leading-snug">
+                {{ employeeDetail.name }}
+              </p>
+              <p class="text-xs text-gray-400 mt-0.5 font-mono">
+                {{ employeeDetail.employee_number }}
+              </p>
+            </div>
+          </div>
+
+          <span class="flex-shrink-0 text-[11px] font-medium px-3 py-1.5 rounded-full
                  bg-blue-50 text-blue-600 border border-blue-200 uppercase tracking-wide whitespace-nowrap">
         {{ employeeDetail.status }}
       </span>
-    </div>
-
-    <!-- Contact + Employment Info : single compact row -->
-    <div class="flex items-stretch justify-between bg-gray-50 rounded-xl border border-gray-100 mb-4 divide-x divide-gray-200 overflow-hidden">
-
-      <div class="flex-1 min-w-0 px-3 py-2.5">
-        <p class="text-[9.5px] font-medium text-gray-400 uppercase tracking-widest mb-1 flex items-center gap-1">
-          <font-awesome-icon :icon="['fas', 'envelope']" class="w-2.5 h-2.5" />
-          Email
-        </p>
-        <p class="text-xs text-gray-800 font-medium truncate" :title="employeeDetail.email">
-          {{ employeeDetail.email }}
-        </p>
-      </div>
-
-      <div class="flex-1 min-w-0 px-3 py-2.5">
-        <p class="text-[9.5px] font-medium text-gray-400 uppercase tracking-widest mb-1 flex items-center gap-1">
-          <font-awesome-icon :icon="['fas', 'phone']" class="w-2.5 h-2.5" />
-          Phone
-        </p>
-        <p class="text-xs text-gray-800 font-medium truncate">
-          {{ employeeDetail.phone_number }}
-        </p>
-      </div>
-
-      <div class="flex-1 min-w-0 px-3 py-2.5">
-        <p class="text-[9.5px] font-medium text-gray-400 uppercase tracking-widest mb-1 flex items-center gap-1">
-          <font-awesome-icon :icon="['fas', 'building']" class="w-2.5 h-2.5" />
-          Department
-        </p>
-        <p class="text-xs text-gray-800 font-medium truncate">
-          {{ employeeDetail.department }}
-        </p>
-      </div>
-
-      <div class="flex-1 min-w-0 px-3 py-2.5">
-        <p class="text-[9.5px] font-medium text-gray-400 uppercase tracking-widest mb-1 flex items-center gap-1">
-          <font-awesome-icon :icon="['far', 'calendar']" class="w-2.5 h-2.5" />
-          Joined
-        </p>
-        <p class="text-xs text-gray-800 font-medium truncate">
-          {{ employeeDetail.joined_date || 'N/A' }}
-        </p>
-      </div>
-
-    </div>
-
-    <!-- Salary Breakdown Card -->
-    <div class="rounded-xl p-[1px] bg-gradient-to-r from-blue-200 via-orange-100 to-blue-200">
-      <div class="rounded-[11px] bg-white p-3.5">
-
-        <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-2.5">
-          Salary Breakdown
-        </label>
-
-        <!-- Base vs Current -->
-        <div class="grid grid-cols-2 gap-2.5 mb-2.5">
-          <div class="p-2.5 bg-gray-50 rounded-lg border border-gray-100">
-            <p class="text-[10px] text-gray-400 uppercase tracking-wide mb-0.5">Base Salary</p>
-            <p class="text-sm font-semibold text-gray-700">
-              {{ formatCurrency(employeeDetail.base_salary) }}
-            </p>
-          </div>
-          <div class="p-2.5 bg-blue-50 rounded-lg border border-blue-300">
-           <p class="text-[10px] text-blue-700 uppercase tracking-wide mb-0.5">Current Salary</p>
-            <p class="text-sm font-bold text-blue-600 uppercase">
-              {{ formatCurrency(employeeDetail.current_salary) }}
-            </p>
-          </div>
         </div>
 
-        <!-- Deductions -->
-        <div class="space-y-1.5 mb-2.5">
-          <div class="flex items-center justify-between text-xs">
+        <!-- Contact + Employment Info : single compact row -->
+        <div class="flex items-stretch justify-between bg-gray-50 rounded-xl border border-gray-100 mb-4 divide-x divide-gray-200 overflow-hidden">
+
+          <div class="flex-1 min-w-0 px-3 py-2.5">
+            <p class="text-[9.5px] font-medium text-gray-400 uppercase tracking-widest mb-1 flex items-center gap-1">
+              <font-awesome-icon :icon="['fas', 'envelope']" class="w-2.5 h-2.5" />
+              Email
+            </p>
+            <p class="text-xs text-gray-800 font-medium truncate" :title="employeeDetail.email">
+              {{ employeeDetail.email }}
+            </p>
+          </div>
+
+          <div class="flex-1 min-w-0 px-3 py-2.5">
+            <p class="text-[9.5px] font-medium text-gray-400 uppercase tracking-widest mb-1 flex items-center gap-1">
+              <font-awesome-icon :icon="['fas', 'phone']" class="w-2.5 h-2.5" />
+              Phone
+            </p>
+            <p class="text-xs text-gray-800 font-medium truncate">
+              {{ employeeDetail.phone_number }}
+            </p>
+          </div>
+
+          <div class="flex-1 min-w-0 px-3 py-2.5">
+            <p class="text-[9.5px] font-medium text-gray-400 uppercase tracking-widest mb-1 flex items-center gap-1">
+              <font-awesome-icon :icon="['fas', 'building']" class="w-2.5 h-2.5" />
+              Department
+            </p>
+            <p class="text-xs text-gray-800 font-medium truncate">
+              {{ employeeDetail.department }}
+            </p>
+          </div>
+
+          <div class="flex-1 min-w-0 px-3 py-2.5">
+            <p class="text-[9.5px] font-medium text-gray-400 uppercase tracking-widest mb-1 flex items-center gap-1">
+              <font-awesome-icon :icon="['far', 'calendar']" class="w-2.5 h-2.5" />
+              Joined
+            </p>
+            <p class="text-xs text-gray-800 font-medium truncate">
+              {{ employeeDetail.joined_date || 'N/A' }}
+            </p>
+          </div>
+
+        </div>
+
+        <!-- Salary Breakdown Card -->
+        <div class="rounded-xl p-[1px] bg-gradient-to-r from-blue-200 via-orange-100 to-blue-200">
+          <div class="rounded-[11px] bg-white p-3.5">
+
+            <label class="block text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-2.5">
+              Salary Breakdown
+            </label>
+
+            <!-- Base vs Current -->
+            <div class="grid grid-cols-2 gap-2.5 mb-2.5">
+              <div class="p-2.5 bg-gray-50 rounded-lg border border-gray-100">
+                <p class="text-[10px] text-gray-400 uppercase tracking-wide mb-0.5">Base Salary</p>
+                <p class="text-sm font-semibold text-gray-700">
+                  {{ formatCurrency(employeeDetail.base_salary) }}
+                </p>
+              </div>
+              <div class="p-2.5 bg-blue-50 rounded-lg border border-blue-300">
+                <p class="text-[10px] text-blue-700 uppercase tracking-wide mb-0.5">Current Salary</p>
+                <p class="text-sm font-bold text-blue-600 uppercase">
+                  {{ formatCurrency(employeeDetail.current_salary) }}
+                </p>
+              </div>
+            </div>
+
+            <!-- Attendance Summary (new) -->
+            <div v-if="employeeDetail.total_days" class="grid grid-cols-4 gap-1.5 mb-2.5 text-center">
+              <div class="p-1.5 bg-gray-50 rounded-lg border border-gray-100">
+                <p class="text-[9px] text-gray-400 uppercase tracking-wide">Present</p>
+                <p class="text-xs font-semibold text-gray-700">{{ employeeDetail.present_days ?? '—' }}</p>
+              </div>
+              <div class="p-1.5 bg-gray-50 rounded-lg border border-gray-100">
+                <p class="text-[9px] text-gray-400 uppercase tracking-wide">Unpaid Leave</p>
+                <p class="text-xs font-semibold text-gray-700">{{ employeeDetail.unpaid_leave_days ?? '—' }}</p>
+              </div>
+              <div class="p-1.5 bg-gray-50 rounded-lg border border-gray-100">
+                <p class="text-[9px] text-gray-400 uppercase tracking-wide">Unpaid Absent</p>
+                <p class="text-xs font-semibold text-gray-700">{{ employeeDetail.unpaid_absent_days ?? '—' }}</p>
+              </div>
+              <div class="p-1.5 bg-gray-50 rounded-lg border border-gray-100">
+                <p class="text-[9px] text-gray-400 uppercase tracking-wide">Lates</p>
+                <p class="text-xs font-semibold text-gray-700">{{ employeeDetail.late_count ?? '—' }}</p>
+              </div>
+            </div>
+
+            <!-- Deductions -->
+            <div class="space-y-1.5 mb-2.5">
+              <div v-if="employeeDetail.unpaid_leave_days || employeeDetail.unpaid_absent_days" class="flex items-center justify-between text-xs">
+            <span class="flex items-center gap-1.5 text-gray-500">
+              <font-awesome-icon :icon="['fas', 'calendar-xmark']" class="w-3 h-3 text-gray-300" />
+              Off Days ({{ (employeeDetail.unpaid_leave_days || 0) + (employeeDetail.unpaid_absent_days || 0) }} unpaid)
+            </span>
+                <span class="text-red-500 font-medium">
+              - {{ formatCurrency((employeeDetail.attendance_deduction_total || 0) - (employeeDetail.late_penalty_amount || 0)) }}
+            </span>
+              </div>
+
+              <div v-if="employeeDetail.late_penalty_amount" class="flex items-center justify-between text-xs">
+            <span class="flex items-center gap-1.5 text-gray-500">
+              <font-awesome-icon :icon="['fas', 'clock']" class="w-3 h-3 text-gray-300" />
+              Late Penalty ({{ employeeDetail.late_count }} lates)
+            </span>
+                <span class="text-red-500 font-medium">- {{ formatCurrency(employeeDetail.late_penalty_amount) }}</span>
+              </div>
+
+              <div v-if="employeeDetail.overtime_amount" class="flex items-center justify-between text-xs">
+            <span class="flex items-center gap-1.5 text-gray-500">
+              <font-awesome-icon :icon="['fas', 'business-time']" class="w-3 h-3 text-gray-300" />
+              Overtime ({{ employeeDetail.overtime_hours }} hrs)
+            </span>
+                <span class="text-success font-medium">+ {{ formatCurrency(employeeDetail.overtime_amount) }}</span>
+              </div>
+
+              <div class="flex items-center justify-between text-xs">
             <span class="flex items-center gap-1.5 text-gray-500">
               <font-awesome-icon :icon="['fas', 'file-invoice-dollar']" class="w-3 h-3 text-gray-300" />
               Tax ({{ employeeDetail.tax_percent }}%)
             </span>
-            <span class="text-red-500 font-medium">- {{ formatCurrency(employeeDetail.tax_amount) }}</span>
-          </div>
+                <span class="text-red-500 font-medium">- {{ formatCurrency(employeeDetail.tax_amount) }}</span>
+              </div>
 
-          <div class="flex items-center justify-between text-xs">
+              <div class="flex items-center justify-between text-xs">
             <span class="flex items-center gap-1.5 text-gray-500">
               Insurance
               <font-awesome-icon :icon="['fas', 'shield-halved']" class="w-3 h-3 text-gray-300" />
             </span>
-            <span class="text-red-500 font-medium">- {{ formatCurrency(employeeDetail.insurance_amount) }}</span>
+                <span class="text-red-500 font-medium">- {{ formatCurrency(employeeDetail.insurance_amount) }}</span>
+              </div>
+            </div>
+
+            <!-- Net Salary Highlight -->
+            <div class="flex items-center justify-between rounded-lg  bg-blue-50 border border-blue-300 px-3 py-2.5">
+              <span class="text-[10px] text-blue-700 uppercase tracking-wide">Total Salary</span>
+              <span class="text-base font-bold text-blue-600">{{ formatCurrency(employeeDetail.net_salary ?? employeeDetail.current_salary) }}</span>
+            </div>
           </div>
         </div>
-
-        <!-- Net Salary Highlight -->
-        <div class="flex items-center justify-between rounded-lg  bg-blue-50 border border-blue-300 px-3 py-2.5">
-          <span class="text-[10px] text-blue-700 uppercase tracking-wide">Total Salary</span>
-          <span class="text-base font-bold text-blue-600">{{ formatCurrency(employeeDetail.net_salary ?? employeeDetail.current_salary) }}</span>
-        </div>
       </div>
-    </div>
-  </div>
-</BaseDetailModal>
+    </BaseDetailModal>
   </div>
 </template>
 <style scoped>

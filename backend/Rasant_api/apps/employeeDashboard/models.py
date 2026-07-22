@@ -351,6 +351,33 @@ class SalaryDeductionHistory(models.Model):
     insurance_amount = models.DecimalField(max_digits=10, decimal_places=2)
     net_salary = models.DecimalField(max_digits=10, decimal_places=2)
 
+    # --- Attendance summary ---
+    total_days = models.PositiveIntegerField(default=30)
+    present_days = models.PositiveIntegerField(default=0)
+    paid_leave_days = models.PositiveIntegerField(default=0)
+    unpaid_leave_days = models.PositiveIntegerField(default=0)
+    unpaid_absent_days = models.PositiveIntegerField(default=0)
+
+    # --- Late penalty ---
+    late_count = models.PositiveIntegerField(default=0)
+    late_penalty_days = models.DecimalField(max_digits=4, decimal_places=1, default=0)
+    late_penalty_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    attendance_synced = models.BooleanField(default=False)
+
+    # --- Overtime ---
+    overtime_hours = models.DecimalField(max_digits=6, decimal_places=2, default=0)
+    overtime_rate_applied = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+    overtime_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    # --- Calculation base values ---
+    per_day_salary = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    half_day_salary = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    base_salary = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    attendance_deduction_total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
+    # --- Lock ---
+    is_finalized = models.BooleanField(default=False)
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -359,6 +386,38 @@ class SalaryDeductionHistory(models.Model):
 
     def __str__(self):
         return f"{self.employee.name} — {self.deduction_month.strftime('%b %Y')}"
+
+class PayrollSettings(models.Model):
+    grace_minutes = models.PositiveIntegerField(default=10)
+    allowed_leaves_per_month = models.PositiveIntegerField(default=2)
+    allowed_absents_per_month = models.PositiveIntegerField(default=0)
+
+    overtime_rate_per_hour = models.DecimalField(max_digits=8, decimal_places=2, default=0)
+
+    late_count_threshold = models.PositiveIntegerField(
+        default=3,
+        help_text="Free lates per month before half-day penalty starts"
+    )
+
+    updated_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True
+    )
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = "payroll_settings"
+
+    def save(self, *args, **kwargs):
+        self.pk = 1  # enforce singleton
+        super().save(*args, **kwargs)
+
+    @classmethod
+    def get_settings(cls):
+        obj, _ = cls.objects.get_or_create(pk=1)
+        return obj
+
+    def __str__(self):
+        return "Payroll Settings"
 
 class Attendance(models.Model):
 
@@ -375,6 +434,10 @@ class Attendance(models.Model):
     clock_in = models.TimeField(null=True, blank=True)
     clock_out = models.TimeField(null=True, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='present')
+
+    late_minutes = models.PositiveIntegerField(null=True, blank=True)
+    overtime_hours = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    is_paid = models.BooleanField(null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
