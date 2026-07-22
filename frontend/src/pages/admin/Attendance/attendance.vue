@@ -55,7 +55,7 @@ onUnmounted(() => document.removeEventListener('click', closeHistoryStatusDropdo
             :titleOverride="currentEmployee ? currentEmployee.name : 'Attendance'"
             :subtitleOverride="currentEmployee ? `${currentEmployee.empNo} · ${currentEmployee.dept}` : 'Manage employee attendance & records'"
             @back="closeHistory"
-            :iconOverride="['fas', 'briefcase']"
+            :iconOverride="['fas', 'user-check']"
         />
       </div>
 
