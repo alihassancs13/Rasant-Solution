@@ -1,5 +1,5 @@
 // composables/useWorklog.js
-import { ref, reactive, computed, onMounted, watch } from 'vue'
+import { ref, reactive, computed, onMounted,onUnmounted, watch } from 'vue'
 import { useJiraStore } from '@/stores/jiraStore.js'
 import { useWorklogStore } from '@/stores/worklogStore.js'
 import { useToast } from '@/composables/useToast.js';
@@ -8,6 +8,8 @@ export function useWorklog() {
   const worklogStore = useWorklogStore();
   const { showToast } = useToast();
   const jiraStore = useJiraStore()
+  const isMonthPickerOpen = ref(false)
+  const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
   const selectedMonthFilter = ref(new Date().toISOString().slice(0, 7))
   const isAddModalOpen = ref(false)
   const isCreating = ref(false)
@@ -27,6 +29,40 @@ export function useWorklog() {
     end_time: '',
     worklog_description: '',
   })
+
+  const pickerYear = ref(
+  selectedMonthFilter.value
+    ? Number(selectedMonthFilter.value.split('-')[0])
+    : new Date().getFullYear()
+  )
+
+  const displayedMonthLabel = computed(() => {
+  if (!selectedMonthFilter.value) return 'Select month'
+  const [year, month] = selectedMonthFilter.value.split('-')
+  const idx = Number(month) - 1
+  return `${monthNames[idx]} ${year}`
+})
+
+const isSelectedMonth = (idx) => {
+  if (!selectedMonthFilter.value) return false
+  const [year, month] = selectedMonthFilter.value.split('-')
+  return Number(year) === pickerYear.value && Number(month) - 1 === idx
+}
+
+const selectMonth = (idx) => {
+  const monthStr = String(idx + 1).padStart(2, '0')
+  selectedMonthFilter.value = `${pickerYear.value}-${monthStr}`
+  isMonthPickerOpen.value = false
+}
+
+// close dropdown when clicking outside
+const closeMonthPickerOnOutsideClick = (e) => {
+  if (!e.target.closest('.month-picker-wrapper')) {
+    isMonthPickerOpen.value = false
+  }
+}
+onMounted(() => document.addEventListener('click', closeMonthPickerOnOutsideClick))
+onUnmounted(() => document.removeEventListener('click', closeMonthPickerOnOutsideClick))
 
 
     const loadCalendarWorklogs = async () => {
@@ -697,7 +733,15 @@ const openViewModal = async (entry) => {
     closeViewModal,
     formatDateOnly,
     monthlyStats,
-    selectedMonthFilter
+    selectedMonthFilter,
+
+    // --- month picker ---
+    isMonthPickerOpen,
+    monthNames,
+    pickerYear,
+    displayedMonthLabel,
+    isSelectedMonth,
+    selectMonth,
 
   };
 }

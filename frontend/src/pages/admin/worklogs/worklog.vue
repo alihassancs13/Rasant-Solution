@@ -67,20 +67,65 @@
           <!-- Tabs + Add button in the same row -->
         <div class="flex items-center justify-between flex-wrap gap-3">
           <!-- Month Filter -->
-        <div class="flex items-center gap-3 bg-white px-4 py-2.5 rounded-xl border border-border shadow-sm">
-           <label class="text-sm font-medium text-text-secondary flex items-center gap-2">
-           <font-awesome-icon :icon="['fas', 'calendar-days']" class="text-blue-700" />
-             Filter by Month
-           </label>
+        <div class="flex items-center gap-3 bg-white px-4 py-2.5 rounded-xl border border-border shadow-sm relative month-picker-wrapper">
+         <label class="text-sm font-medium text-text-secondary flex items-center gap-2">
+          <font-awesome-icon :icon="['fas', 'calendar-days']" class="text-blue-700" />
+            Filter by Month
+          </label>
 
-        <input
-            type="month"
-            v-model="selectedMonthFilter"
-            class="px-3 py-1.5 rounded-lg border border-border bg-surface text-sm
-             focus:outline-none focus:ring-2 focus:ring-[#2F6FC4]
-             transition-all duration-200 cursor-pointer"
-          />
-         </div>
+         <div class="relative">
+           <button
+            type="button"
+            @click="isMonthPickerOpen = !isMonthPickerOpen"
+            class="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-border bg-surface text-sm
+            focus:outline-none focus:ring-2 focus:ring-[#2F6FC4]
+            transition-all duration-200 cursor-pointer"
+            >
+           {{ displayedMonthLabel }}
+           <font-awesome-icon :icon="['fas', 'calendar']" class="text-text-muted text-xs" />
+          </button>
+
+        <div
+           v-if="isMonthPickerOpen"
+           class="absolute top-full left-0 mt-1.5 bg-white border border-border rounded-xl shadow-lg z-50 p-3 w-56"
+         >
+      <!-- Year navigation -->
+      <div class="flex items-center justify-between mb-2.5">
+        <button
+            type="button"
+            @click="pickerYear--"
+            class="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-surface transition-colors"
+        >
+          <font-awesome-icon :icon="['fas', 'chevron-left']" class="text-xs" />
+        </button>
+        <span class="text-sm font-semibold text-text-primary">{{ pickerYear }}</span>
+        <button
+            type="button"
+            @click="pickerYear++"
+            class="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-surface transition-colors"
+        >
+          <font-awesome-icon :icon="['fas', 'chevron-right']" class="text-xs" />
+        </button>
+      </div>
+
+      <!-- Month grid -->
+      <div class="grid grid-cols-3 gap-1.5">
+        <button
+            v-for="(m, idx) in monthNames"
+            :key="m"
+            type="button"
+            @click="selectMonth(idx)"
+            class="px-2 py-1.5 rounded-lg text-xs font-medium transition-colors"
+            :class="isSelectedMonth(idx)
+              ? 'bg-gradient-to-r from-[#2F6FC4] via-[#3F7FD2] to-[#4A88D8] text-white'
+              : 'text-text-secondary hover:bg-surface'"
+        >
+          {{ m }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 
         <button
          @click="openAddModal"
@@ -329,7 +374,7 @@
                     <font-awesome-icon icon="fa-solid fa-chevron-left" class="w-3 h-3 text-text-secondary" />
                   </button>
 
-                  <template v-for="page in activePaginationRange" :key="page === '...' ? `ellipsis-${Math.random()}` : page">
+                  <template v-for="(page, index) in activePaginationRange" :key="page === '...' ? `ellipsis-${index}` : page">
                     <span v-if="page === '...'" class="w-8 h-8 flex items-center justify-center text-xs text-text-muted">…</span>
                     <button
                         v-else
@@ -863,6 +908,14 @@ const {
   selectedViewWorklog,
   closeViewModal,
   formatDateOnly,
-  selectedMonthFilter
+  selectedMonthFilter,
+
+  // --- month picker ---
+    isMonthPickerOpen,
+    monthNames,
+    pickerYear,
+    displayedMonthLabel,
+    isSelectedMonth,
+    selectMonth,
 } = useWorklog()
 </script>
