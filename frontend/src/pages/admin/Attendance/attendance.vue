@@ -57,194 +57,193 @@ onUnmounted(() => document.removeEventListener('click', closeHistoryStatusDropdo
         />
       </div>
 
-      <div class="flex-1 overflow-y-auto px-8 pb-16 sm:px-6">
-        <div class="max-w-300 mx-auto">
+      <main class="flex-1 overflow-y-auto overflow-x-hidden px-3 sm:px-4 pb-4 space-y-4">
 
-          <!-- ============ LIST VIEW ============ -->
-          <template v-if="!currentEmployee">
-            <div class="flex items-start justify-between gap-4 flex-wrap mb-6">
-              <div>
-                <h1 class="text-xl font-extrabold tracking-tight text-text-primary mb-1">
-                  Attendance
-                </h1>
-                <p class="text-[13.5px] text-text-secondary">
-                  Track daily check-ins and manage weekly attendance uploads.
-                </p>
+        <!-- ============ LIST VIEW ============ -->
+        <template v-if="!currentEmployee">
+          <div class="flex items-start justify-between gap-4 flex-wrap mb-6">
+            <div>
+              <h1 class="text-xl font-extrabold tracking-tight text-text-primary mb-1">
+                Attendance
+              </h1>
+              <p class="text-[13.5px] text-text-secondary">
+                Track daily check-ins and manage weekly attendance uploads.
+              </p>
+            </div>
+            <button
+                type="button"
+                @click="openUploadModal"
+                class="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-[13.5px] font-semibold text-white bg-chat-bubble-me-gradient hover:opacity-90 shadow-[0_6px_16px_rgba(27,85,226,0.3)] transition-colors cursor-pointer"
+            >
+              <font-awesome-icon icon="fa-solid fa-plus" class="w-3.5 h-3.5" />
+              Upload attendance file
+            </button>
+          </div>
+
+          <div class="bg-white border border-border rounded-xl shadow-(--shadow-card) overflow-hidden">
+            <div class="flex items-center justify-between gap-4 flex-wrap px-4.5 py-3.5 border-b border-border-subtle">
+              <div class="relative flex-1 min-w-[220px] max-w-[340px]">
+                <font-awesome-icon
+                    icon="fa-solid fa-magnifying-glass"
+                    class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted"
+                />
+                <input
+                    v-model="searchQuery"
+                    type="text"
+                    placeholder="Search employee..."
+                    class="w-full rounded-full border border-border bg-white pl-9 pr-4 py-2.5 text-[13.5px] text-text-primary focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary-subtle"
+                />
               </div>
-              <button
-                  type="button"
-                  @click="openUploadModal"
-                  class="inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-[13.5px] font-semibold text-white bg-chat-bubble-me-gradient hover:opacity-90 shadow-[0_6px_16px_rgba(27,85,226,0.3)] transition-colors cursor-pointer"
-              >
-                <font-awesome-icon icon="fa-solid fa-plus" class="w-3.5 h-3.5" />
-                Upload attendance file
-              </button>
+              <div class="flex items-center gap-2 text-sm text-text-muted">
+                <span>Rows per page</span>
+                <div class="relative">
+                  <select
+                      v-model.number="employeesPageSize"
+                      class="appearance-none pl-3 pr-8 py-1.5 text-sm bg-white border border-border rounded-lg text-text-primary cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-subtle"
+                  >
+                    <option v-for="size in employeesPageSizeOptions" :key="size" :value="size">{{ size }}</option>
+                  </select>
+                  <font-awesome-icon icon="fa-solid fa-chevron-down" class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-text-muted w-2.5 h-2.5" />
+                </div>
+              </div>
             </div>
 
-            <div class="bg-white border border-border rounded-xl shadow-(--shadow-card) overflow-hidden">
-              <div class="flex items-center justify-between gap-4 flex-wrap px-4.5 py-3.5 border-b border-border-subtle">
-                <div class="relative flex-1 min-w-[220px] max-w-[340px]">
-                  <font-awesome-icon
-                      icon="fa-solid fa-magnifying-glass"
-                      class="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted"
-                  />
-                  <input
-                      v-model="searchQuery"
-                      type="text"
-                      placeholder="Search employee..."
-                      class="w-full rounded-full border border-border bg-white pl-9 pr-4 py-2.5 text-[13.5px] text-text-primary focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary-subtle"
-                  />
-                </div>
-                <div class="flex items-center gap-2 text-sm text-text-muted">
-                  <span>Rows per page</span>
-                  <div class="relative">
-                    <select
-                        v-model.number="employeesPageSize"
-                        class="appearance-none pl-3 pr-8 py-1.5 text-sm bg-white border border-border rounded-lg text-text-primary cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-subtle"
+            <table class="w-full border-collapse">
+              <thead>
+              <tr>
+                <th class="text-left text-[10.5px] font-bold tracking-wider uppercase text-text-muted px-4.5 py-3.5 border-b border-border-subtle whitespace-nowrap">Employee</th>
+                <th class="text-left text-[10.5px] font-bold tracking-wider uppercase text-text-muted px-4.5 py-3.5 border-b border-border-subtle whitespace-nowrap">Employee No.</th>
+                <th class="text-left text-[10.5px] font-bold tracking-wider uppercase text-text-muted px-4.5 py-3.5 border-b border-border-subtle whitespace-nowrap">Department</th>
+                <th class="text-left text-[10.5px] font-bold tracking-wider uppercase text-text-muted px-4.5 py-3.5 border-b border-border-subtle whitespace-nowrap">Attendance %</th>
+                <th class="text-left text-[10.5px] font-bold tracking-wider uppercase text-text-muted px-4.5 py-3.5 border-b border-border-subtle whitespace-nowrap">Last synced</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr
+                  v-for="emp in paginatedEmployees"
+                  :key="emp.empNo"
+                  @click="openHistory(emp)"
+                  class="hover:bg-surface/60 cursor-pointer"
+              >
+                <td class="px-4.5 py-3.5 border-b border-border-subtle">
+                  <div class="flex items-center gap-2.5">
+                    <div
+                        class="w-9.5 h-9.5 rounded-full flex items-center justify-center text-[13px] font-bold text-white shrink-0"
+                        :style="{ background: emp.gradient }"
                     >
-                      <option v-for="size in employeesPageSizeOptions" :key="size" :value="size">{{ size }}</option>
-                    </select>
-                    <font-awesome-icon icon="fa-solid fa-chevron-down" class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-text-muted w-2.5 h-2.5" />
-                  </div>
-                </div>
-              </div>
-
-              <table class="w-full border-collapse">
-                <thead>
-                <tr>
-                  <th class="text-left text-[10.5px] font-bold tracking-wider uppercase text-text-muted px-4.5 py-3.5 border-b border-border-subtle whitespace-nowrap">Employee</th>
-                  <th class="text-left text-[10.5px] font-bold tracking-wider uppercase text-text-muted px-4.5 py-3.5 border-b border-border-subtle whitespace-nowrap">Employee No.</th>
-                  <th class="text-left text-[10.5px] font-bold tracking-wider uppercase text-text-muted px-4.5 py-3.5 border-b border-border-subtle whitespace-nowrap">Department</th>
-                  <th class="text-left text-[10.5px] font-bold tracking-wider uppercase text-text-muted px-4.5 py-3.5 border-b border-border-subtle whitespace-nowrap">Attendance %</th>
-                  <th class="text-left text-[10.5px] font-bold tracking-wider uppercase text-text-muted px-4.5 py-3.5 border-b border-border-subtle whitespace-nowrap">Last synced</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr
-                    v-for="emp in paginatedEmployees"
-                    :key="emp.empNo"
-                    @click="openHistory(emp)"
-                    class="hover:bg-surface/60 cursor-pointer"
-                >
-                  <td class="px-4.5 py-3.5 border-b border-border-subtle">
-                    <div class="flex items-center gap-2.5">
-                      <div
-                          class="w-9.5 h-9.5 rounded-full flex items-center justify-center text-[13px] font-bold text-white shrink-0"
-                          :style="{ background: emp.gradient }"
-                      >
-                        {{ emp.initials }}
-                      </div>
-                      <span class="font-semibold text-text-primary">{{ emp.name }}</span>
+                      {{ emp.initials }}
                     </div>
-                  </td>
-                  <td class="px-4.5 py-3.5 border-b border-border-subtle">
+                    <span class="font-semibold text-text-primary">{{ emp.name }}</span>
+                  </div>
+                </td>
+                <td class="px-4.5 py-3.5 border-b border-border-subtle">
                       <span class="font-mono text-xs font-semibold bg-surface border border-border text-text-secondary px-2.5 py-1 rounded-md">
                         {{ emp.empNo }}
                       </span>
-                  </td>
-                  <td class="px-4.5 py-3.5 border-b border-border-subtle text-[13.5px] text-text-primary">
-                    {{ emp.dept }}
-                  </td>
-                  <td class="px-4.5 py-3.5 border-b border-border-subtle">
-                    <div class="flex items-center gap-2 min-w-[90px]">
-                      <div class="flex-1 h-1.5 rounded-full bg-border-subtle overflow-hidden">
-                        <div class="h-full rounded-full" :class="attendanceBarClass(emp.pct).bar" :style="{ width: emp.pct + '%' }" />
-                      </div>
-                      <span class="text-[12.5px] font-bold w-8.5" :class="attendanceBarClass(emp.pct).text">{{ emp.pct }}%</span>
+                </td>
+                <td class="px-4.5 py-3.5 border-b border-border-subtle text-[13.5px] text-text-primary">
+                  {{ emp.dept }}
+                </td>
+                <td class="px-4.5 py-3.5 border-b border-border-subtle">
+                  <div class="flex items-center gap-2 min-w-[90px]">
+                    <div class="flex-1 h-1.5 rounded-full bg-border-subtle overflow-hidden">
+                      <div class="h-full rounded-full" :class="attendanceBarClass(emp.pct).bar" :style="{ width: emp.pct + '%' }" />
                     </div>
-                  </td>
-                  <td class="px-4.5 py-3.5 border-b border-border-subtle text-xs text-text-muted">
-                    {{ emp.synced }}
-                  </td>
-                </tr>
-                <tr v-if="isLoadingList">
-                  <td colspan="6" class="text-center text-[13px] text-text-muted py-12">
-                    Loading attendance…
-                  </td>
-                </tr>
-                <tr v-else-if="!filteredEmployees.length">
-                  <td colspan="6" class="text-center text-[13px] text-text-muted py-12">
-                    No employees match these filters.
-                  </td>
-                </tr>
-                </tbody>
-              </table>
+                    <span class="text-[12.5px] font-bold w-8.5" :class="attendanceBarClass(emp.pct).text">{{ emp.pct }}%</span>
+                  </div>
+                </td>
+                <td class="px-4.5 py-3.5 border-b border-border-subtle text-xs text-text-muted">
+                  {{ emp.synced }}
+                </td>
+              </tr>
+              <tr v-if="isLoadingList">
+                <td colspan="6" class="text-center text-[13px] text-text-muted py-12">
+                  Loading attendance…
+                </td>
+              </tr>
+              <tr v-else-if="!filteredEmployees.length">
+                <td colspan="6" class="text-center text-[13px] text-text-muted py-12">
+                  No employees match these filters.
+                </td>
+              </tr>
+              </tbody>
+            </table>
 
-              <div v-if="filteredEmployees.length" class="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 sm:px-5 py-4 border-t border-border-subtle">
+            <div v-if="filteredEmployees.length" class="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 sm:px-5 py-4 border-t border-border-subtle">
                 <span class="text-sm text-text-muted whitespace-nowrap">
                   {{ employeesStartIndex + 1 }}–{{ employeesEndIndex }} of {{ filteredEmployees.length }}
                 </span>
-                <div class="flex items-center gap-1">
-                  <button
-                      @click="employeesPrevPage"
-                      :disabled="employeesCurrentPage === 1"
-                      class="w-8 h-8 flex items-center justify-center rounded-lg border border-border text-text-secondary hover:bg-surface disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
-                      title="Previous page"
-                  >
-                    <font-awesome-icon icon="fa-solid fa-chevron-left" class="w-3 h-3" />
-                  </button>
-                  <button
-                      v-for="(page, idx) in employeesPageNumbers"
-                      :key="`${page}-${idx}`"
-                      @click="employeesGoToPage(page)"
-                      :disabled="page === '...'"
-                      class="min-w-8 h-8 px-2 flex items-center justify-center rounded-lg text-sm font-semibold transition cursor-pointer"
-                      :class="page === employeesCurrentPage
+              <div class="flex items-center gap-1">
+                <button
+                    @click="employeesPrevPage"
+                    :disabled="employeesCurrentPage === 1"
+                    class="w-8 h-8 flex items-center justify-center rounded-lg border border-border text-text-secondary hover:bg-surface disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
+                    title="Previous page"
+                >
+                  <font-awesome-icon icon="fa-solid fa-chevron-left" class="w-3 h-3" />
+                </button>
+                <button
+                    v-for="(page, idx) in employeesPageNumbers"
+                    :key="`${page}-${idx}`"
+                    @click="employeesGoToPage(page)"
+                    :disabled="page === '...'"
+                    class="min-w-8 h-8 px-2 flex items-center justify-center rounded-lg text-sm font-semibold transition cursor-pointer"
+                    :class="page === employeesCurrentPage
                       ? 'bg-chat-bubble-me-gradient text-white shadow-md'
                       : page === '...' ? 'text-text-muted cursor-default' : 'text-text-secondary border border-border hover:bg-primary-subtle'"
-                  >
-                    {{ page }}
-                  </button>
-                  <button
-                      @click="employeesNextPage"
-                      :disabled="employeesCurrentPage === employeesTotalPages"
-                      class="w-8 h-8 flex items-center justify-center rounded-lg border border-border text-text-secondary hover:bg-surface disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
-                      title="Next page"
-                  >
-                    <font-awesome-icon icon="fa-solid fa-chevron-right" class="w-3 h-3" />
-                  </button>
-                </div>
+                >
+                  {{ page }}
+                </button>
+                <button
+                    @click="employeesNextPage"
+                    :disabled="employeesCurrentPage === employeesTotalPages"
+                    class="w-8 h-8 flex items-center justify-center rounded-lg border border-border text-text-secondary hover:bg-surface disabled:opacity-40 disabled:cursor-not-allowed transition cursor-pointer"
+                    title="Next page"
+                >
+                  <font-awesome-icon icon="fa-solid fa-chevron-right" class="w-3 h-3" />
+                </button>
               </div>
             </div>
-          </template>
+          </div>
+        </template>
 
-          <!-- ============ DETAIL VIEW ============ -->
-          <template v-else>
-            <div class="bg-white border border-border rounded-xl shadow-(--shadow-card) overflow-hidden">
-              <!-- Stats Cards -->
-              <div class="p-4.5 border-b border-border-subtle">
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                  <StatCard
-                      label="Present"
-                      :value="historyStats.present"
-                      :icon="['fas', 'check-circle']"
-                      color="green"
-                  />
-                  <StatCard
-                      label="Late"
-                      :value="historyStats.late"
-                      :icon="['fas', 'clock']"
-                      color="yellow"
-                  />
-                  <StatCard
-                      label="Absent"
-                      :value="historyStats.absent"
-                      :icon="['fas', 'times-circle']"
-                      color="red"
-                  />
-                  <StatCard
-                      label="On Leave"
-                      :value="historyStats.on_leave"
-                      :icon="['fas', 'calendar-day']"
-                      color="teal"
-                  />
-                </div>
+        <!-- ============ DETAIL VIEW ============ -->
+        <template v-else>
+          <div class="bg-white border border-border rounded-xl shadow-(--shadow-card) overflow-hidden">
+            <!-- Stats Cards -->
+            <div class="p-4.5 border-b border-border-subtle">
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                <StatCard
+                    label="Present"
+                    :value="historyStats.present"
+                    :icon="['fas', 'check-circle']"
+                    color="green"
+                />
+                <StatCard
+                    label="Late"
+                    :value="historyStats.late"
+                    :icon="['fas', 'clock']"
+                    color="yellow"
+                />
+                <StatCard
+                    label="Absent"
+                    :value="historyStats.absent"
+                    :icon="['fas', 'times-circle']"
+                    color="red"
+                />
+                <StatCard
+                    label="On Leave"
+                    :value="historyStats.on_leave"
+                    :icon="['fas', 'calendar-day']"
+                    color="teal"
+                />
               </div>
+            </div>
 
-              <!-- Filters Bar -->
-              <div class="flex items-center justify-between gap-3 flex-wrap px-4.5 py-2.5 border-b border-border-subtle bg-surface">
-                <!-- Left side: Status filter chips -->
-                <div class="flex gap-2 flex-wrap">
+            <!-- Filters Bar -->
+            <div class="flex items-center justify-between gap-3 flex-wrap px-4.5 py-2.5 border-b border-border-subtle bg-surface">
+              <!-- Left side: Status filter chips -->
+              <div class="flex gap-2 flex-wrap">
                   <span
                       v-for="chip in historyChips"
                       :key="chip.value"
@@ -256,135 +255,134 @@ onUnmounted(() => document.removeEventListener('click', closeHistoryStatusDropdo
                   >
                     {{ chip.label }}
                   </span>
-                </div>
-
-                <!-- Right side: Date filter + Rows per page -->
-                <div class="flex items-center gap-3 flex-wrap">
-                  <!-- Clear date filter button (shown when date filter is active) -->
-                  <button
-                      v-if="hasDateFilter"
-                      type="button"
-                      @click="clearDateFilter"
-                      class="inline-flex items-center gap-1.5 px-4 py-1.75 rounded-full text-[13px] font-semibold bg-danger-subtle text-danger hover:opacity-90 cursor-pointer"
-                  >
-                    <font-awesome-icon icon="fa-solid fa-xmark" class="w-3 h-3" />
-                    Clear
-                  </button>
-
-                  <!-- Date inputs -->
-                  <div class="flex items-center gap-2">
-                    <font-awesome-icon icon="fa-solid fa-calendar-days" class="w-4 h-4 text-text-muted shrink-0" />
-                    <input
-                        v-model="dateFrom"
-                        type="date"
-                        class="h-9 py-5 px-2.5 rounded-lg border border-border text-[13px] text-text-primary bg-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary-subtle"
-                    />
-                    <span class="text-[13px] text-text-muted">to</span>
-                    <input
-                        v-model="dateTo"
-                        type="date"
-                        class="h-9 py-5 px-2.5 rounded-lg border border-border text-[13px] text-text-primary bg-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary-subtle"
-                    />
-                  </div>
-
-                  <!-- Apply button -->
-                  <button
-                      type="button"
-                      @click="applyDateFilter"
-                      :disabled="isLoadingHistory"
-                      class="rounded-full px-4.5 py-2.25 text-[13px] font-semibold text-white bg-chat-bubble-me-gradient hover:opacity-90 shadow-[0_6px_16px_rgba(27,85,226,0.3)] transition-colors cursor-pointer disabled:opacity-50"
-                  >
-                    Apply
-                  </button>
-
-                  <!-- Rows per page dropdown -->
-                  <div class="flex items-center gap-2 text-[13px] text-text-muted">
-                    <span>Rows</span>
-                    <div class="relative">
-                      <select
-                          v-model.number="historyPageSize"
-                          class="appearance-none pl-3 pr-7 py-1.5 text-[13px] bg-white border border-border rounded-lg text-text-primary cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-subtle"
-                      >
-                        <option v-for="size in historyPageSizeOptions" :key="size" :value="size">{{ size }}</option>
-                      </select>
-                      <font-awesome-icon icon="fa-solid fa-chevron-down" class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-text-muted w-2.5 h-2.5" />
-                    </div>
-                  </div>
-                </div>
               </div>
 
-              <!-- History Table -->
-              <p v-if="isLoadingHistory" class="text-center text-[13px] text-text-muted py-12">Loading history…</p>
-              <table v-else-if="historyRecords.length" class="w-full border-collapse">
-                <thead>
-                <tr>
-                  <th class="text-left text-[10.5px] font-bold uppercase tracking-wide text-text-muted px-6 py-4 border-b border-border-subtle bg-surface">Date</th>
-                  <th class="text-left text-[10.5px] font-bold uppercase tracking-wide text-text-muted px-6 py-4 border-b border-border-subtle bg-surface">Status</th>
-                  <th class="text-left text-[10.5px] font-bold uppercase tracking-wide text-text-muted px-6 py-4 border-b border-border-subtle bg-surface">Check-in</th>
-                  <th class="text-left text-[10.5px] font-bold uppercase tracking-wide text-text-muted px-6 py-4 border-b border-border-subtle bg-surface">Check-out</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="rec in paginatedHistory" :key="rec.date" class="hover:bg-surface/60">
-                  <td class="px-6 py-4 text-[13.5px] text-text-primary border-b border-border-subtle">{{ formatDateLabel(rec.date) }}</td>
-                  <td class="px-6 py-4 border-b border-border-subtle relative">
-                    <button type="button" @click.stop="toggleHistoryStatusDropdown(rec, $event)"
-                            class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold cursor-pointer transition-all border border-transparent hover:shadow-sm"
-                            :class="STATUS_META[rec.status].className">
-                      {{ STATUS_META[rec.status].label }}
-                      <font-awesome-icon icon="fa-solid fa-chevron-down" class="w-2 h-2 transition-transform opacity-70"
-                                         :class="{ 'rotate-180': openHistoryStatusId === rec.id }" />
-                    </button>
-                  </td>
-                  <td class="px-6 py-4 text-[13.5px] text-text-primary border-b border-border-subtle">{{ rec.in }}</td>
-                  <td class="px-6 py-4 text-[13.5px] text-text-primary border-b border-border-subtle">{{ rec.out }}</td>
-                </tr>
-                </tbody>
-              </table>
-              <p v-else class="text-center text-[13px] text-text-muted py-12">No records match these filters.</p>
+              <!-- Right side: Date filter + Rows per page -->
+              <div class="flex items-center gap-3 flex-wrap">
+                <!-- Clear date filter button (shown when date filter is active) -->
+                <button
+                    v-if="hasDateFilter"
+                    type="button"
+                    @click="clearDateFilter"
+                    class="inline-flex items-center gap-1.5 px-4 py-1.75 rounded-full text-[13px] font-semibold bg-danger-subtle text-danger hover:opacity-90 cursor-pointer"
+                >
+                  <font-awesome-icon icon="fa-solid fa-xmark" class="w-3 h-3" />
+                  Clear
+                </button>
 
-              <!-- Pagination -->
-              <div v-if="!isLoadingHistory && historyRecords.length" class="flex items-center justify-between gap-3 flex-wrap px-6 py-4 border-t border-border-subtle">
-                <span class="text-xs text-text-muted">
-                  {{ historyStartIndex + 1 }}–{{ historyEndIndex }} of {{ historyRecords.length }} records
-                </span>
-                <div class="flex items-center gap-1">
-                  <button
-                      type="button"
-                      :disabled="currentPage === 1"
-                      @click="historyPrevPage"
-                      class="min-w-[30px] h-7.5 px-1.5 rounded-lg border border-border bg-white text-text-secondary text-[12.5px] flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed hover:enabled:border-text-muted hover:enabled:text-text-primary cursor-pointer"
-                  >
-                    <font-awesome-icon icon="fa-solid fa-chevron-left" class="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                      v-for="(p, idx) in pageNumbers"
-                      :key="`${p}-${idx}`"
-                      type="button"
-                      @click="goToPage(p)"
-                      :disabled="p === '...'"
-                      class="min-w-[30px] h-7.5 px-1.5 rounded-lg border text-[12.5px] flex items-center justify-center transition-colors cursor-pointer"
-                      :class="p === currentPage
-                      ? 'bg-primary text-white border-primary'
-                      : p === '...' ? 'text-text-muted cursor-default border-transparent' : 'bg-white text-text-secondary border-border hover:border-text-muted hover:text-text-primary'"
-                  >
-                    {{ p }}
-                  </button>
-                  <button
-                      type="button"
-                      :disabled="currentPage === totalPages"
-                      @click="historyNextPage"
-                      class="min-w-[30px] h-7.5 px-1.5 rounded-lg border border-border bg-white text-text-secondary text-[12.5px] flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed hover:enabled:border-text-muted hover:enabled:text-text-primary cursor-pointer"
-                  >
-                    <font-awesome-icon icon="fa-solid fa-chevron-right" class="w-3.5 h-3.5" />
-                  </button>
+                <!-- Date inputs -->
+                <div class="flex items-center gap-2">
+                  <font-awesome-icon icon="fa-solid fa-calendar-days" class="w-4 h-4 text-text-muted shrink-0" />
+                  <input
+                      v-model="dateFrom"
+                      type="date"
+                      class="h-9 py-5 px-2.5 rounded-lg border border-border text-[13px] text-text-primary bg-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary-subtle"
+                  />
+                  <span class="text-[13px] text-text-muted">to</span>
+                  <input
+                      v-model="dateTo"
+                      type="date"
+                      class="h-9 py-5 px-2.5 rounded-lg border border-border text-[13px] text-text-primary bg-white focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary-subtle"
+                  />
+                </div>
+
+                <!-- Apply button -->
+                <button
+                    type="button"
+                    @click="applyDateFilter"
+                    :disabled="isLoadingHistory"
+                    class="rounded-full px-4.5 py-2.25 text-[13px] font-semibold text-white bg-chat-bubble-me-gradient hover:opacity-90 shadow-[0_6px_16px_rgba(27,85,226,0.3)] transition-colors cursor-pointer disabled:opacity-50"
+                >
+                  Apply
+                </button>
+
+                <!-- Rows per page dropdown -->
+                <div class="flex items-center gap-2 text-[13px] text-text-muted">
+                  <span>Rows</span>
+                  <div class="relative">
+                    <select
+                        v-model.number="historyPageSize"
+                        class="appearance-none pl-3 pr-7 py-1.5 text-[13px] bg-white border border-border rounded-lg text-text-primary cursor-pointer focus:outline-none focus:ring-2 focus:ring-primary-subtle"
+                    >
+                      <option v-for="size in historyPageSizeOptions" :key="size" :value="size">{{ size }}</option>
+                    </select>
+                    <font-awesome-icon icon="fa-solid fa-chevron-down" class="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-text-muted w-2.5 h-2.5" />
+                  </div>
                 </div>
               </div>
             </div>
-          </template>
 
-        </div>
-      </div>
+            <!-- History Table -->
+            <p v-if="isLoadingHistory" class="text-center text-[13px] text-text-muted py-12">Loading history…</p>
+            <table v-else-if="historyRecords.length" class="w-full border-collapse">
+              <thead>
+              <tr>
+                <th class="text-left text-[10.5px] font-bold uppercase tracking-wide text-text-muted px-6 py-4 border-b border-border-subtle bg-surface">Date</th>
+                <th class="text-left text-[10.5px] font-bold uppercase tracking-wide text-text-muted px-6 py-4 border-b border-border-subtle bg-surface">Status</th>
+                <th class="text-left text-[10.5px] font-bold uppercase tracking-wide text-text-muted px-6 py-4 border-b border-border-subtle bg-surface">Check-in</th>
+                <th class="text-left text-[10.5px] font-bold uppercase tracking-wide text-text-muted px-6 py-4 border-b border-border-subtle bg-surface">Check-out</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr v-for="rec in paginatedHistory" :key="rec.date" class="hover:bg-surface/60">
+                <td class="px-6 py-4 text-[13.5px] text-text-primary border-b border-border-subtle">{{ formatDateLabel(rec.date) }}</td>
+                <td class="px-6 py-4 border-b border-border-subtle relative">
+                  <button type="button" @click.stop="toggleHistoryStatusDropdown(rec, $event)"
+                          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold cursor-pointer transition-all border border-transparent hover:shadow-sm"
+                          :class="STATUS_META[rec.status].className">
+                    {{ STATUS_META[rec.status].label }}
+                    <font-awesome-icon icon="fa-solid fa-chevron-down" class="w-2 h-2 transition-transform opacity-70"
+                                       :class="{ 'rotate-180': openHistoryStatusId === rec.id }" />
+                  </button>
+                </td>
+                <td class="px-6 py-4 text-[13.5px] text-text-primary border-b border-border-subtle">{{ rec.in }}</td>
+                <td class="px-6 py-4 text-[13.5px] text-text-primary border-b border-border-subtle">{{ rec.out }}</td>
+              </tr>
+              </tbody>
+            </table>
+            <p v-else class="text-center text-[13px] text-text-muted py-12">No records match these filters.</p>
+
+            <!-- Pagination -->
+            <div v-if="!isLoadingHistory && historyRecords.length" class="flex items-center justify-between gap-3 flex-wrap px-6 py-4 border-t border-border-subtle">
+                <span class="text-xs text-text-muted">
+                  {{ historyStartIndex + 1 }}–{{ historyEndIndex }} of {{ historyRecords.length }} records
+                </span>
+              <div class="flex items-center gap-1">
+                <button
+                    type="button"
+                    :disabled="currentPage === 1"
+                    @click="historyPrevPage"
+                    class="min-w-[30px] h-7.5 px-1.5 rounded-lg border border-border bg-white text-text-secondary text-[12.5px] flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed hover:enabled:border-text-muted hover:enabled:text-text-primary cursor-pointer"
+                >
+                  <font-awesome-icon icon="fa-solid fa-chevron-left" class="w-3.5 h-3.5" />
+                </button>
+                <button
+                    v-for="(p, idx) in pageNumbers"
+                    :key="`${p}-${idx}`"
+                    type="button"
+                    @click="goToPage(p)"
+                    :disabled="p === '...'"
+                    class="min-w-[30px] h-7.5 px-1.5 rounded-lg border text-[12.5px] flex items-center justify-center transition-colors cursor-pointer"
+                    :class="p === currentPage
+                      ? 'bg-primary text-white border-primary'
+                      : p === '...' ? 'text-text-muted cursor-default border-transparent' : 'bg-white text-text-secondary border-border hover:border-text-muted hover:text-text-primary'"
+                >
+                  {{ p }}
+                </button>
+                <button
+                    type="button"
+                    :disabled="currentPage === totalPages"
+                    @click="historyNextPage"
+                    class="min-w-[30px] h-7.5 px-1.5 rounded-lg border border-border bg-white text-text-secondary text-[12.5px] flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed hover:enabled:border-text-muted hover:enabled:text-text-primary cursor-pointer"
+                >
+                  <font-awesome-icon icon="fa-solid fa-chevron-right" class="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </template>
+
+      </main>
     </div>
 
     <!-- Upload modal -->
