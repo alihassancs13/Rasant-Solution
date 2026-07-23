@@ -364,7 +364,7 @@ export const useDocumentStore = defineStore('documents', {
             }
         },
 
-        async uploadFile(folderId, file) {
+        async uploadFile(folderId, file, onProgress = null) {
             if (this.isEmployeeView) {
                 throw new Error('Employees cannot upload files');
             }
@@ -380,13 +380,10 @@ export const useDocumentStore = defineStore('documents', {
                 formData.append('folder_id', folderId);
                 formData.append('file', file);
 
-                const response = await this._apiRequest(
+                const response = await this._uploadWithProgress(
                     API_ENDPOINTS.DOCUMENTS.FILES.UPLOAD,
-                    {
-                        method: 'POST',
-                        body: formData,
-                        isFormData: true,
-                    }
+                    formData,
+                    onProgress,
                 );
                 const newFile = {
                     ...response.data,
@@ -414,6 +411,63 @@ export const useDocumentStore = defineStore('documents', {
             } finally {
                 this.isLoading = false;
             }
+        },
+
+        _uploadWithProgress(endpoint, formData, onProgress) {
+            const cleanedBaseUrl = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL;
+            let endpointPath = endpoint;
+            if (!endpointPath.startsWith('/')) endpointPath = `/${endpointPath}`;
+            const fullUrl = `${cleanedBaseUrl}${endpointPath}`;
+            const token = getAuthToken();
+
+            return new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', fullUrl);
+
+                if (token) {
+                    xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+                }
+
+                xhr.upload.onprogress = (event) => {
+                    if (!onProgress) return;
+                    if (event.lengthComputable) {
+                        const percent = Math.min(100, Math.round((event.loaded / event.total) * 100));
+                        onProgress({
+                            percent,
+                            loaded: event.loaded,
+                            total: event.total,
+                        });
+                    } else {
+                        onProgress({ percent: null, loaded: event.loaded, total: null });
+                    }
+                };
+
+                xhr.onload = () => {
+                    let payload = null;
+                    try {
+                        payload = xhr.responseText ? JSON.parse(xhr.responseText) : {};
+                    } catch (e) {
+                        payload = {};
+                    }
+
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        if (onProgress) onProgress({ percent: 100, loaded: null, total: null });
+                        resolve(payload);
+                        return;
+                    }
+
+                    const errorMessage =
+                        payload?.error ||
+                        payload?.message ||
+                        payload?.detail ||
+                        `HTTP ${xhr.status}: ${xhr.statusText || 'Upload failed'}`;
+                    reject(new Error(errorMessage));
+                };
+
+                xhr.onerror = () => reject(new Error('Network error while uploading. Please try again.'));
+                xhr.onabort = () => reject(new Error('Upload cancelled.'));
+                xhr.send(formData);
+            });
         },
 
         async updateFolder(folderId, name) {
@@ -527,6 +581,40 @@ export const useDocumentStore = defineStore('documents', {
             } catch (error) {
                 this.error = error.message;
                 console.error('Share document error:', error);
+                throw error;
+            } finally {
+                this.isLoading = false;
+            }
+        },
+
+        async removeDocumentShare(folderId, fileId, employeeId) {
+            if (this.isEmployeeView) {
+                throw new Error('Employees cannot unshare documents');
+            }
+
+            this.isLoading = true;
+            this.error = null;
+            try {
+                const payload = { employee_id: employeeId };
+                if (folderId) {
+                    payload.folder_id = folderId;
+                } else if (fileId) {
+                    payload.file_id = fileId;
+                } else {
+                    throw new Error('Either folder_id or file_id is required');
+                }
+
+                const response = await this._apiRequest(
+                    API_ENDPOINTS.DOCUMENTS.REMOVE_SHARE,
+                    {
+                        method: 'DELETE',
+                        body: JSON.stringify(payload),
+                    }
+                );
+                return response;
+            } catch (error) {
+                this.error = error.message;
+                console.error('Remove document share error:', error);
                 throw error;
             } finally {
                 this.isLoading = false;

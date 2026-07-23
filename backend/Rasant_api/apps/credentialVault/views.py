@@ -214,9 +214,10 @@ def remove_shared_credential(request):
         # Delete the shared credential
         shared_credential.delete()
 
+        employee_label = getattr(employee, 'name', None) or getattr(employee, 'email', None) or employee_id
         return Response({
             'status': 'success',
-            'message': f'Credential access revoked from employee {employee.username or employee.email}',
+            'message': f'Credential access revoked from employee {employee_label}',
             'credential_id': credential_id,
             'employee_id': employee_id
         }, status=status.HTTP_200_OK)
@@ -226,3 +227,37 @@ def remove_shared_credential(request):
             {'error': str(e)},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
+
+
+@api_view(['PUT', 'PATCH'])
+@permission_classes([IsAuthenticated])
+def update_credential(request, pk):
+    """Update an existing credential."""
+    credential = get_object_or_404(CredentialStore, pk=pk)
+    serializer = CredentialSerializer(credential, data=request.data, partial=True)
+    if serializer.is_valid():
+        serializer.save()
+        return Response({
+            'status': 'success',
+            'message': 'Credential updated successfully',
+            'data': serializer.data,
+        }, status=status.HTTP_200_OK)
+    return Response({
+        'status': 'error',
+        'message': 'Validation failed',
+        'errors': serializer.errors,
+    }, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_credential(request, pk):
+    """Delete a credential and its shares."""
+    credential = get_object_or_404(CredentialStore, pk=pk)
+    name = credential.name
+    credential.delete()
+    return Response({
+        'status': 'success',
+        'message': f'Credential "{name}" deleted successfully',
+        'id': pk,
+    }, status=status.HTTP_200_OK)

@@ -442,14 +442,37 @@ export function useIncrementPolicy(employees) {
         }
     }
 
+    const bonusDraft = ref(0)
+    const isSavingBonus = ref(false)
+
     const openEmployeeDetailModal = async (employeeId) => {
         showEmployeeDetailModal.value = true
         await fetchEmployeeDetail(employeeId)
+        bonusDraft.value = Number(policyStore.employeeDetail?.bonus_amount || 0)
     }
 
     const closeEmployeeDetailModal = () => {
         showEmployeeDetailModal.value = false
         policyStore.employeeDetail = null
+        bonusDraft.value = 0
+    }
+
+    const saveMonthlyBonus = async () => {
+        const emp = policyStore.employeeDetail
+        if (!emp?.id) return { success: false }
+        isSavingBonus.value = true
+        try {
+            const result = await policyStore.saveEmployeeMonthlyBonus(emp.id, bonusDraft.value, emp.deduction_month)
+            if (result.success) {
+                showToast('Monthly bonus saved.', 'success')
+                bonusDraft.value = Number(policyStore.employeeDetail?.bonus_amount || 0)
+            } else {
+                showToast(result.error || 'Failed to save bonus', 'error')
+            }
+            return result
+        } finally {
+            isSavingBonus.value = false
+        }
     }
 
 
@@ -475,5 +498,6 @@ export function useIncrementPolicy(employees) {
         isEmployeeDueToday, employeeDetail, isEmployeeDetailLoading,
         showEmployeeDetailModal, fetchEmployeeDetail,
         openEmployeeDetailModal, closeEmployeeDetailModal,
+        bonusDraft, isSavingBonus, saveMonthlyBonus,
     }
 }

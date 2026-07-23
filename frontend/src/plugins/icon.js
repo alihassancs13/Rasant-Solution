@@ -94,6 +94,10 @@ import {
   faCopy,
   faTimesCircle,
   faCalendarDay,
+  faChartLine,
+  faChartBar,
+  faUserPlus,
+  faBuilding,
 } from '@fortawesome/free-solid-svg-icons'
 
 import {
@@ -240,4 +244,8 @@ library.add(
     faCopy,
     faTimesCircle,
     faCalendarDay,
+    faChartLine,
+    faChartBar,
+    faUserPlus,
+    faBuilding,
 )

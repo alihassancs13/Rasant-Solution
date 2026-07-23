@@ -75,23 +75,6 @@
           </div>
         </div>
 
-        <!-- Role Badge (expanded) -->
-        <div class="mb-4" v-show="!showCollapsed && !isDrillDown">
-          <div class="bg-primary-subtle text-primary font-bold text-xs tracking-wider text-center py-2 px-4 rounded-xl uppercase">
-            {{ userRole }}
-          </div>
-        </div>
-
-        <!-- Role Badge (collapsed - initials) -->
-        <div class="mb-4 flex justify-center" v-show="showCollapsed && !isDrillDown">
-          <div
-              class="w-8 h-8 rounded-full bg-primary-subtle text-primary font-bold text-[10px] flex items-center justify-center uppercase"
-              :title="userRole"
-          >
-            {{ userRole.slice(0, 2) }}
-          </div>
-        </div>
-
         <!-- Loading State -->
         <div v-if="loading" class="text-center py-10">
           <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent"></div>
@@ -116,11 +99,13 @@
                 <router-link
                     v-for="module in employeeChildrenModules"
                     :key="module.id"
-                    :to="getModuleRoute(module.name)"
+                    :to="module.link || getModuleRoute(module.name)"
+                    active-class=""
+                    exact-active-class=""
                     @click="handleChildNavigation"
                     class="flex items-center px-4 py-2 rounded-xl text-text-muted hover:bg-primary-subtle hover:text-primary font-medium transition-all"
                     :class="[
-                      isActive(module.name, $route.path) ? 'bg-primary-subtle text-primary font-semibold shadow-sm border-primary' : '',
+                      isActive(module.name) ? 'bg-primary-subtle text-primary font-semibold shadow-sm border-primary' : '',
                       showCollapsed ? 'justify-center' : 'space-x-3'
                     ]"
                     :title="showCollapsed ? module.name : null"
@@ -139,19 +124,42 @@
               <p class="text-[11px] font-bold text-text-muted tracking-widest px-3 mb-1 uppercase" v-show="!showCollapsed">Company</p>
               <div class="space-y-1.5">
                 <template v-for="module in companyModules" :key="module.id">
-                  <!-- 🔥 Skip rendering "Employees" module for non-admin users -->
-                  <template v-if="module.name === 'Employees' && currentUserRole !== 'admin'">
-                    <!-- Don't render Employees for non-admins -->
-                  </template>
+                  <!-- Nested parent modules (e.g. Employees) — admin only -->
+                  <div v-if="module.children?.length && currentUserRole === 'admin'" class="relative sidebar-dropdown">
+                    <button
+                        @click.stop="drillIntoEmployees"
+                        class="w-full flex items-center px-4 py-2 cursor-pointer rounded-xl text-text-muted hover:bg-primary-subtle hover:text-primary font-medium transition-all focus:outline-none"
+                        :class="[
+              isActive(module.name) ? 'bg-primary-subtle text-primary font-semibold shadow-sm border-primary' : '',
+              showCollapsed ? 'justify-center' : 'justify-between'
+            ]"
+                        :title="showCollapsed ? module.name : null"
+                    >
+                      <div class="flex items-center" :class="showCollapsed ? '' : 'space-x-3'">
+                        <font-awesome-icon :icon="module.icon" class="text-lg w-5 shrink-0" />
+                        <span v-show="!showCollapsed">{{ module.name }}</span>
+                      </div>
+                      <font-awesome-icon
+                          v-show="!showCollapsed"
+                          icon="fa-solid fa-chevron-right"
+                          class="text-xs"
+                      />
+                    </button>
+                  </div>
 
-                  <!-- Regular module -->
+                  <!-- Skip nested parents for non-admin (children not shown as top-level) -->
+                  <template v-else-if="module.children?.length && currentUserRole !== 'admin'"></template>
+
+                  <!-- Regular module from backend -->
                   <router-link
-                      v-else-if="!module.children"
-                      :to="getModuleRoute(module.name)"
+                      v-else
+                      :to="module.link || getModuleRoute(module.name)"
+                      active-class=""
+                      exact-active-class=""
                       @click="handleNavigation"
                       class="relative flex items-center px-4 py-2 rounded-xl text-text-muted hover:bg-primary-subtle hover:text-primary font-medium transition-all"
                       :class="[
-            isActive(module.name, $route.path) ? 'bg-primary-subtle text-primary font-semibold shadow-sm border-primary' : '',
+            isActive(module.name) ? 'bg-primary-subtle text-primary font-semibold shadow-sm border-primary' : '',
             showCollapsed ? 'justify-center' : 'space-x-3'
           ]"
                       :title="showCollapsed ? module.name : null"
@@ -173,34 +181,35 @@
             {{ unreadConversationsCount }}
           </span>
                   </router-link>
-
-                  <!-- Module with dropdown (Employees) - Only for admin -->
-                  <div v-else-if="module.children && currentUserRole === 'admin'" class="relative sidebar-dropdown">
-                    <button
-                        @click.stop="drillIntoEmployees"
-                        class="w-full flex items-center px-4 py-2 cursor-pointer rounded-xl text-text-muted hover:bg-primary-subtle hover:text-primary font-medium transition-all focus:outline-none"
-                        :class="[
-              isActive(module.name, $route.path) ? 'bg-primary-subtle text-primary font-semibold shadow-sm border-primary' : '',
-              showCollapsed ? 'justify-center' : 'justify-between'
-            ]"
-                        :title="showCollapsed ? module.name : null"
-                    >
-                      <div class="flex items-center" :class="showCollapsed ? '' : 'space-x-3'">
-                        <font-awesome-icon :icon="module.icon" class="text-lg w-5 shrink-0" />
-                        <span v-show="!showCollapsed">{{ module.name }}</span>
-                      </div>
-                      <font-awesome-icon
-                          v-show="!showCollapsed"
-                          icon="fa-solid fa-chevron-right"
-                          class="text-xs"
-                      />
-                    </button>
-                  </div>
                 </template>
               </div>
             </div>
 
 
+
+            <!-- Account Section -->
+            <div v-if="accountModules.length && !isDrillDown" class="pt-2">
+              <p class="text-[11px] font-bold text-text-muted tracking-widest px-3 mb-1 uppercase" v-show="!showCollapsed">Account</p>
+              <div class="space-y-1.5">
+                <router-link
+                    v-for="module in accountModules"
+                    :key="module.id"
+                    :to="module.link || getModuleRoute(module.name)"
+                    active-class=""
+                    exact-active-class=""
+                    @click="handleNavigation"
+                    class="flex items-center px-4 py-2 rounded-xl text-text-muted hover:bg-primary-subtle hover:text-primary font-medium transition-all"
+                    :class="[
+                      isActive(module.name) ? 'bg-primary-subtle text-primary font-semibold shadow-sm border-primary' : '',
+                      showCollapsed ? 'justify-center' : 'space-x-3'
+                    ]"
+                    :title="showCollapsed ? module.name : null"
+                >
+                  <font-awesome-icon :icon="module.icon || 'fa-solid fa-users-gear'" class="text-lg w-5 shrink-0" />
+                  <span v-show="!showCollapsed" class="transition-opacity duration-150">{{ module.name === 'Manage Profile' ? 'Manage Account' : module.name }}</span>
+                </router-link>
+              </div>
+            </div>
 
           </template>
         </nav>
@@ -283,20 +292,18 @@ const {
   dropdownStates,
   loadModules,
   companyModules,
+  accountModules,
   employeeChildrenModules,
   isDrillDown,
   drillIntoEmployees,
   goBackFromDrillDown,
   getModuleRoute,
   isActive,
-  getUserRole,
   isSidebarOpen,
   collapsed,
   currentUserRole,
   unreadConversationsCount,
 } = useAdminSidebar();
-
-const userRole = getUserRole();
 
 const handleClickOutside = (e) => {
   if (!e.target.closest('.sidebar-dropdown')) {

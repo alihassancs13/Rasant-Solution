@@ -115,7 +115,12 @@ export function useLogin() {
 
                 // Redirect after delay
                 setTimeout(() => {
-                    const redirectPath = loginStore.redirectBasedOnRole();
+                    const queryRedirect = router.currentRoute.value.query?.redirect;
+                    const rolePath = loginStore.redirectBasedOnRole();
+                    const redirectPath =
+                        typeof queryRedirect === 'string' && queryRedirect.startsWith('/')
+                            ? queryRedirect
+                            : rolePath;
                     router.replace(redirectPath);
                 }, 1000);
             } else {

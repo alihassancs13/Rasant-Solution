@@ -119,14 +119,6 @@ const {
                 <div class="flex items-center justify-between gap-3 border-b border-border-subtle px-4 py-[18px]">
                   <span class="font-display text-xl font-extrabold text-primary-900">Messages</span>
                   <div class="flex items-center gap-2">
-                    <button type="button" @click="triggerMyAvatarUpload" aria-label="Change my photo" class="relative h-9 w-9 shrink-0 rounded-full overflow-hidden cursor-pointer">
-                      <img v-if="myAvatar" :src="myAvatar" class="h-full w-full object-cover" />
-                      <div v-else class="flex h-full w-full items-center justify-center bg-neutral-200 text-xs font-semibold text-neutral-600">Me</div>
-                      <div v-if="uploadingMyAvatar" class="absolute inset-0 flex items-center justify-center bg-black/40">
-                        <i class="fa-solid fa-spinner fa-spin text-white text-xs"></i>
-                      </div>
-                    </button>
-                    <input ref="myAvatarInput" type="file" accept="image/*" class="hidden" @change="handleMyAvatarChange" />
                     <button type="button" @click="openContactsPanel" aria-label="New chat" class="flex h-9 w-9 items-center justify-center rounded-full text-text-secondary hover:bg-surface-alt cursor-pointer">
                       <i class="fa-solid fa-plus text-[16px]"></i>
                     </button>

@@ -1,0 +1,11 @@
+{% extends "emails/base.html" %}
+{% block title %}SMTP test — Rasant Solutions{% endblock %}
+{% block content %}
+  <h1 style="margin:0 0 12px;font-size:22px;color:#1E3A5F;">SMTP connection successful</h1>
+  <p style="margin:0 0 12px;font-size:15px;line-height:1.6;color:#475569;">
+    This test email was sent to <strong>{{ to_email }}</strong> using your saved email settings.
+  </p>
+  <p style="margin:0;font-size:14px;color:#64748B;">
+    If you received this message, outbound SMTP is configured correctly.
+  </p>
+{% endblock %}

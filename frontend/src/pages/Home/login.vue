@@ -135,12 +135,12 @@
                 <label for="password" class="text-[0.7rem] font-bold tracking-wider text-headingMain uppercase">
                   Password
                 </label>
-                <a
-                    href="mailto:sales@rasantsolutions.com?subject=Forgot%20Password"
+                <router-link
+                    to="/forgot-password"
                     class="text-xs font-semibold text-secondary-500 transition-all duration-200 hover:text-accent-4 hover:underline hover:underline-offset-2"
                 >
                   Forgot password?
-                </a>
+                </router-link>
               </div>
               <div class="relative group">
                 <span class="pointer-events-none absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-sm text-primary-500 transition-transform duration-200 group-focus-within:scale-110">

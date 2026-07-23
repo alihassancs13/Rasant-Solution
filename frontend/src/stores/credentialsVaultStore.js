@@ -182,7 +182,9 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}))
-                throw new Error(errorData.message || `Failed to remove share: ${response.status}`)
+                throw new Error(
+                    errorData.error || errorData.message || `Failed to remove share: ${response.status}`
+                )
             }
 
             const data = await response.json()
@@ -343,6 +345,123 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
         }
     }
 
+    const updateCredential = async (credentialId, credentialData) => {
+        loading.value = true
+        error.value = null
+        try {
+            const token = getAuthToken()
+            if (!token) {
+                throw new Error('No authentication token found. Please login again.')
+            }
+
+            const cleanedBaseUrl = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL
+            const url = `${cleanedBaseUrl}${API_ENDPOINTS.CREDENTIALS.UPDATE(credentialId)}`
+
+            const response = await fetch(url, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify(credentialData),
+            })
+
+            if (response.status === 401) {
+                localStorage.removeItem('access_token')
+                localStorage.removeItem('accessToken')
+                localStorage.removeItem('token')
+                window.location.href = '/login'
+                throw new Error('Session expired. Please login again.')
+            }
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}))
+                let errorMessage = errorData.error || errorData.message || `Failed to update credential: ${response.status}`
+                if (errorData.errors) {
+                    const fieldErrors = []
+                    Object.values(errorData.errors).forEach((msgs) => {
+                        if (Array.isArray(msgs)) fieldErrors.push(msgs.join(' '))
+                        else if (msgs) fieldErrors.push(String(msgs))
+                    })
+                    if (fieldErrors.length) errorMessage = fieldErrors.join(' ')
+                }
+                throw new Error(errorMessage)
+            }
+
+            const data = await response.json()
+            const updated = data.data || data
+            const idx = credentials.value.findIndex((c) => c.id === credentialId)
+            if (idx > -1) {
+                credentials.value[idx] = {
+                    ...credentials.value[idx],
+                    id: updated.id || credentialId,
+                    name: updated.name || credentialData.name,
+                    link: updated.link || credentialData.link || '',
+                    username: updated.username || credentialData.username || '',
+                    email: updated.email || credentialData.email || '',
+                    password_display: updated.password_display || credentialData.password || credentials.value[idx].password_display,
+                    description: updated.description ?? credentialData.description ?? '',
+                    shared_with: Array.isArray(updated.shared_with)
+                        ? updated.shared_with.map((s) => (typeof s === 'object' ? s.employee_id : s))
+                        : credentials.value[idx].shared_with,
+                }
+            }
+
+            return { success: true, data: credentials.value[idx] || updated }
+        } catch (err) {
+            error.value = err.message
+            console.error('Error updating credential:', err)
+            return { success: false, error: err.message }
+        } finally {
+            loading.value = false
+        }
+    }
+
+    const deleteCredential = async (credentialId) => {
+        loading.value = true
+        error.value = null
+        try {
+            const token = getAuthToken()
+            if (!token) {
+                throw new Error('No authentication token found. Please login again.')
+            }
+
+            const cleanedBaseUrl = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL
+            const url = `${cleanedBaseUrl}${API_ENDPOINTS.CREDENTIALS.DELETE(credentialId)}`
+
+            const response = await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+            })
+
+            if (response.status === 401) {
+                localStorage.removeItem('access_token')
+                localStorage.removeItem('accessToken')
+                localStorage.removeItem('token')
+                window.location.href = '/login'
+                throw new Error('Session expired. Please login again.')
+            }
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}))
+                throw new Error(errorData.error || errorData.message || `Failed to delete credential: ${response.status}`)
+            }
+
+            credentials.value = credentials.value.filter((c) => c.id !== credentialId)
+            totalCount.value = Math.max(0, totalCount.value - 1)
+            return { success: true }
+        } catch (err) {
+            error.value = err.message
+            console.error('Error deleting credential:', err)
+            return { success: false, error: err.message }
+        } finally {
+            loading.value = false
+        }
+    }
+
     const shareCredential = async (credentialId, employeeIds) => {
         loading.value = true
         error.value = null
@@ -412,6 +531,8 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
         fetchCredentials,
         fetchEmployeeCredentials,
         createCredential,
+        updateCredential,
+        deleteCredential,
         shareCredential,
         togglePassword,
         clearError,

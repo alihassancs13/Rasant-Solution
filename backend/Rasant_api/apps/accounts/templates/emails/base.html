@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Rasant Solutions{% endblock %}</title>
+</head>
+<body style="margin:0;padding:0;background:#F1F5F9;font-family:'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#334155;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F1F5F9;padding:32px 16px;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #E2E8F0;">
+          <tr>
+            <td style="background:linear-gradient(135deg,#1E3A5F 0%,#2A5F9E 55%,#4A90E2 100%);padding:28px 32px;text-align:center;">
+              <img src="cid:rasant_logo" alt="Rasant Solutions" width="180" style="display:inline-block;max-width:180px;height:auto;" />
+              <p style="margin:12px 0 0;color:#E0F2FE;font-size:13px;letter-spacing:0.04em;">{{ company.tagline }}</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:32px;">
+              {% block content %}{% endblock %}
+            </td>
+          </tr>
+          <tr>
+            <td style="padding:20px 32px 28px;background:#F8FAFC;border-top:1px solid #E2E8F0;">
+              <p style="margin:0 0 6px;font-size:13px;color:#1E3A5F;font-weight:700;">{{ company.name }}</p>
+              <p style="margin:0;font-size:12px;color:#64748B;line-height:1.5;">
+                Need help? Contact
+                <a href="mailto:{{ support_email }}" style="color:#4A90E2;text-decoration:none;">{{ support_email }}</a>
+                <br />
+                <a href="{{ frontend_url }}" style="color:#4A90E2;text-decoration:none;">{{ frontend_url }}</a>
+              </p>
+            </td>
+          </tr>
+        </table>
+        <p style="margin:16px 0 0;font-size:11px;color:#94A3B8;">This is an automated message from Rasant Solutions HR.</p>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

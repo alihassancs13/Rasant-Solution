@@ -3,9 +3,7 @@ import { computed, onMounted, ref, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useSidebarStore } from '@/stores/sidebarStore.js';
 import { useInboxStore } from '@/stores/inboxStore.js';
-const COMPANY_MODULES = ['Overview', 'Inbox', 'Employees', 'Inquiries', 'Jira', 'Documents', 'Vault','Worklogs'];
-const PROJECT_MODULES = ['Sentra AI', 'AI Agent', 'Chatbot', 'Orchestri'];
-const EMPLOYEE_CHILDREN = ['Dashboard', 'Attendance', 'Careers', 'Salaries'];
+
 const dropdownStates = ref({});
 const isSidebarOpen = ref(false);
 const collapsed = ref(localStorage.getItem('sidebarCollapsed') === 'true');
@@ -17,7 +15,6 @@ export function useAdminSidebar() {
     const store = useSidebarStore();
     const inboxStore = useInboxStore();
 
-    // Get user data from localStorage
     const getUserData = () => {
         try {
             const userStr = localStorage.getItem('user');
@@ -28,162 +25,115 @@ export function useAdminSidebar() {
         }
     };
 
-    // Get user role and map to role_id
     const userRoleId = computed(() => {
         const user = getUserData();
         if (!user) return null;
 
-        // Check if user has role property
-        const userRole = user.role || user.role_name || user.role_id || null;
+        const explicitId = user.role_id ?? user.roleId ?? (typeof user.role === 'object' ? user.role?.id : null);
+        if (explicitId === 1 || explicitId === '1') return 1;
+        if (explicitId === 2 || explicitId === '2') return 2;
 
-        console.log('User data:', user);
-        console.log('User role value:', userRole);
+        const raw =
+            user.role_name ||
+            (typeof user.role === 'string' ? user.role : user.role?.name) ||
+            '';
+        const name = String(raw).toLowerCase().trim();
 
-        // Map role name to role_id
-        if (userRole === 'admin' || userRole === 'Administrator' || userRole === 1 || userRole === '1') {
-            return 1; // Admin role_id
-        } else if (userRole === 'employee' || userRole === 'Employee' || userRole === 2 || userRole === '2') {
-            return 2; // Employee role_id
-        }
-
-        // If it's a number already
-        if (typeof userRole === 'number') {
-            return userRole;
-        }
-
-        // If it's a string number
-        if (typeof userRole === 'string' && !isNaN(userRole)) {
-            return parseInt(userRole);
-        }
-
-        // Default to null if unknown
+        if (name.includes('admin') || name === 'administrator') return 1;
+        if (name.includes('employee')) return 2;
         return null;
     });
 
-    // Get current user role as string for display
     const currentUserRole = computed(() => {
         const roleId = userRoleId.value;
         if (roleId === 1) return 'admin';
         if (roleId === 2) return 'employee';
-        return 'admin'; // Default
+        return 'employee';
     });
 
+    /** Flat list of all modules returned by the API (including nested children). */
     const modules = computed(() => {
-        return Array.isArray(store.modules) ? store.modules : [];
-    });
-
-    // FIXED: Filter modules based on user's role_id
-    const filteredModules = computed(() => {
-        const allModules = modules.value;
-        if (!allModules.length) {
-            console.log('No modules found in store');
-            return [];
-        }
-
-        const roleId = userRoleId.value;
-        const user = getUserData();
-
-        console.log('User data from localStorage:', user);
-        console.log('User Role ID extracted:', roleId);
-        console.log('All modules from database:', allModules);
-
-        // If no role_id found, log warning and show nothing
-        if (!roleId) {
-            console.warn('No role_id found for user. User data:', user);
-            return [];
-        }
-
-        // Filter modules by role_id
-        const filtered = allModules.filter(module => {
-            // Get the role_id from the module
-            const moduleRoleId = module.role_id || module.roleId || module.role?.id;
-
-            // Log for debugging
-            console.log(`Module: ${module.name}, Module Role ID: ${moduleRoleId}, User Role ID: ${roleId}, Match: ${moduleRoleId === roleId}`);
-
-            return moduleRoleId === roleId;
+        const top = Array.isArray(store.modules) ? store.modules : [];
+        const flat = [...top];
+        top.forEach((m) => {
+            if (Array.isArray(m?.children)) flat.push(...m.children);
         });
-
-        console.log(`Filtered modules for role_id ${roleId}:`, filtered);
-        return filtered;
+        return flat;
     });
 
     const unreadConversationsCount = computed(() => inboxStore.unreadConversationsCount);
     const loading = computed(() => store.isLoading);
     const error = computed(() => store.error);
 
+    /** Main nav items — exactly what backend sent (already role-scoped + nested). */
+    const companyModules = computed(() => {
+        return Array.isArray(store.modules) ? store.modules : [];
+    });
+
+    const projectModules = computed(() => {
+        return Array.isArray(store.projectModules) ? store.projectModules : [];
+    });
+
+    const accountModules = computed(() => {
+        const fromApi = Array.isArray(store.accountModules) ? store.accountModules : [];
+        if (fromApi.length) return fromApi;
+        // Always keep account reachable even if DB has no account module row
+        return [{
+            id: 'account-fallback',
+            name: 'Manage Account',
+            icon: 'fa-solid fa-users-gear',
+            link: '/admin/account',
+            role_id: userRoleId.value,
+            section: 'account',
+        }];
+    });
+
     const employeeChildrenModules = computed(() => {
-        const moduleList = filteredModules.value;
-        if (!moduleList.length) return [];
-        return moduleList.filter(m =>
-            m && EMPLOYEE_CHILDREN.includes(m.name?.trim())
-        );
+        const employees = companyModules.value.find((m) => Array.isArray(m?.children) && m.children.length);
+        return employees?.children || [];
     });
 
     const employeesParent = computed(() => {
         if (isDrillDown.value) return null;
-        return filteredModules.value.find(m => m?.name?.trim() === 'Employees');
-    });
-
-    const companyModules = computed(() => {
-        const moduleList = filteredModules.value;
-        if (!moduleList.length) return [];
-
-        // Only show modules that are in COMPANY_MODULES
-        const all = moduleList.filter(m =>
-            m && COMPANY_MODULES.includes(m.name?.trim())
-        );
-
-        // For admin, check if Employees module exists and add children
-        const employees = all.find(m => m?.name?.trim() === 'Employees');
-
-        if (employees && currentUserRole.value === 'admin') {
-            const children = moduleList.filter(m =>
-                m && EMPLOYEE_CHILDREN.includes(m.name?.trim())
-            );
-            if (children.length) {
-                return all
-                    .filter(m => m?.name?.trim() !== 'Employees')
-                    .concat([{ ...employees, children }]);
-            }
-        }
-        return all;
-    });
-
-    const projectModules = computed(() => {
-        const moduleList = filteredModules.value;
-        if (!moduleList.length) return [];
-        return moduleList.filter(m =>
-            m && PROJECT_MODULES.includes(m.name?.trim())
-        );
-    });
-
-    const accountModules = computed(() => {
-        const moduleList = filteredModules.value;
-        if (!moduleList.length) return [];
-        return moduleList.filter(m =>
-            m && m.name?.trim() === 'Manage Profile'
-        );
+        return companyModules.value.find((m) => Array.isArray(m?.children) && m.children.length) || null;
     });
 
     const getModuleRoute = (name) => {
         if (!name) return '/admin';
-        return store.getModuleRoute(name);
+        const fromStore = store.getModuleRoute(name);
+        if (fromStore) return fromStore;
+        const account = accountModules.value.find((m) => m?.name?.trim() === name?.trim());
+        if (account?.link) return account.link;
+        return `/admin/${String(name).toLowerCase().replace(/ /g, '-')}`;
     };
 
     const isActive = (moduleName) => {
         if (!moduleName) return false;
 
-        const path = route.path.toLowerCase();
-        const modulePath = getModuleRoute(moduleName).toLowerCase();
+        const normalize = (p) => (p || '').toLowerCase().replace(/\/+$/, '') || '/';
+        const path = normalize(route.path);
+        const modulePath = normalize(getModuleRoute(moduleName));
 
-        if (path === modulePath || path.startsWith(modulePath + '/')) return true;
+        const allModulePaths = modules.value
+            .map((m) => normalize(m?.link || getModuleRoute(m?.name)))
+            .filter((p) => p && p !== '/');
 
-        const module = store.getModuleByName(moduleName);
-        if (module?.children) {
-            return module.children.some(child => {
-                const childPath = getModuleRoute(child.name).toLowerCase();
-                return path === childPath || path.startsWith(childPath + '/');
+        const matches = allModulePaths.filter(
+            (p) => path === p || path.startsWith(`${p}/`)
+        );
+        if (matches.length) {
+            matches.sort((a, b) => b.length - a.length);
+            const best = matches[0];
+            return best === modulePath;
+        }
+
+        if (path === modulePath || path.startsWith(`${modulePath}/`)) return true;
+
+        const parent = companyModules.value.find((m) => m?.name?.trim() === moduleName?.trim());
+        if (parent?.children?.length) {
+            return parent.children.some((child) => {
+                const childPath = normalize(child.link || getModuleRoute(child.name));
+                return path === childPath || path.startsWith(`${childPath}/`);
             });
         }
         return false;
@@ -215,7 +165,7 @@ export function useAdminSidebar() {
     const drillIntoEmployees = () => {
         isDrillDown.value = true;
         localStorage.setItem('sidebarDrillDown', 'true');
-        Object.keys(dropdownStates.value).forEach(key => {
+        Object.keys(dropdownStates.value).forEach((key) => {
             dropdownStates.value[key] = false;
         });
     };
@@ -226,10 +176,18 @@ export function useAdminSidebar() {
     };
 
     const checkDrillDownOnRoute = () => {
-        const currentPath = route.path;
-        const childPaths = employeeChildrenModules.value.map(m => getModuleRoute(m.name));
+        if (currentUserRole.value === 'employee') {
+            isDrillDown.value = false;
+            localStorage.setItem('sidebarDrillDown', 'false');
+            return;
+        }
 
-        if (childPaths.some(path => currentPath.startsWith(path))) {
+        const currentPath = route.path;
+        const childPaths = employeeChildrenModules.value
+            .map((m) => m.link || getModuleRoute(m.name))
+            .filter(Boolean);
+
+        if (childPaths.some((path) => currentPath === path || currentPath.startsWith(`${path}/`))) {
             isDrillDown.value = true;
             localStorage.setItem('sidebarDrillDown', 'true');
         }
@@ -242,17 +200,22 @@ export function useAdminSidebar() {
     const getUserRole = () => {
         try {
             const user = JSON.parse(localStorage.getItem('user') || '{}');
-            return user.role?.name || user.role_name || user.role || 'Administrator';
+            const name =
+                user.role_name ||
+                (typeof user.role === 'object' ? user.role?.name : user.role) ||
+                '';
+            if (name) return String(name);
+            if (user.role_id === 2 || user.role_id === '2') return 'employee';
+            if (user.role_id === 1 || user.role_id === '1') return 'admin';
+            return 'user';
         } catch {
-            return 'Administrator';
+            return 'user';
         }
     };
 
     const loadModules = async () => {
         try {
-            if (!store.modules || store.modules.length === 0) {
-                await store.fetchModules();
-            }
+            await store.fetchModules();
             checkDrillDownOnRoute();
         } catch (err) {
             console.error('Failed to load sidebar modules:', err);

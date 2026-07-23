@@ -2,6 +2,7 @@
 import { defineStore } from 'pinia';
 import { authAPI } from '../services/loginApi.js';
 import { usePolicyStore } from '@/stores/policyStore';
+import { useSidebarStore } from '@/stores/sidebarStore.js';
 
 export const useLoginStore = defineStore('login', {
     state: () => ({
@@ -16,7 +17,16 @@ export const useLoginStore = defineStore('login', {
 
     getters: {
         getUser: (state) => state.user,
-        getUserRole: (state) => state.user?.role_name || state.user?.role || 'client',
+        getUserRole: (state) => {
+            const user = state.user;
+            if (!user) return 'client';
+            if (user.role_name) return String(user.role_name);
+            if (typeof user.role === 'string') return user.role;
+            if (user.role && typeof user.role === 'object' && user.role.name) return String(user.role.name);
+            if (user.role_id === 1 || user.role_id === '1') return 'admin';
+            if (user.role_id === 2 || user.role_id === '2') return 'employee';
+            return 'client';
+        },
         getUserName: (state) => state.user?.username || state.user?.email || '',
         getUserEmail: (state) => state.user?.email || '',
     },
@@ -43,6 +53,7 @@ export const useLoginStore = defineStore('login', {
             localStorage.removeItem('accessToken');  //  changed
             localStorage.removeItem('refreshToken');
             localStorage.removeItem('user');
+            useSidebarStore().clearModules();
         },
         async login(credentials) {
             this.isLoading = true;
@@ -50,6 +61,8 @@ export const useLoginStore = defineStore('login', {
             this.errorType = null;
 
             try {
+                useSidebarStore().clearModules();
+
                 const response = await authAPI.login(credentials);
                 const { status, data, message } = response.data;
 
@@ -148,16 +161,10 @@ export const useLoginStore = defineStore('login', {
         },
 
         redirectBasedOnRole() {
-            const role = this.getUserRole?.toLowerCase() || 'client';
-            const roleMap = {
-                'admin': '/admin/overview',
-                'superuser': '/employee/credentialsvault',
-                'employee': '/',
-                'staff': '/',
-                'client': '/',
-                'user': '/',
-            };
-            return roleMap[role] || '/';
+            const role = String(this.getUserRole || '').toLowerCase();
+            if (role.includes('admin')) return '/admin/overview';
+            if (role.includes('employee')) return '/employee/overview';
+            return '/login';
         },
         syncFromStorage(data) {
             if (data.accessToken !== undefined) {

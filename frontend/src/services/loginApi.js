@@ -63,7 +63,11 @@ export const authAPI = {
     login: (credentials) => loginApi.post(API_ENDPOINTS.LOGIN, credentials),
     refreshToken: (refreshToken) => loginApi.post(API_ENDPOINTS.REFRESH_TOKEN, { refresh: refreshToken }),
     logout: (refreshToken) => loginApi.post(API_ENDPOINTS.LOGOUT, { refresh: refreshToken }),
-
+    forgotPassword: (email) => loginApi.post(API_ENDPOINTS.PASSWORD_FORGOT, { email }),
+    verifyResetOtp: (email, code) => loginApi.post(API_ENDPOINTS.PASSWORD_VERIFY_OTP, { email, code }),
+    resetPassword: (payload) => loginApi.post(API_ENDPOINTS.PASSWORD_RESET, payload),
+    validateSetupToken: (token) => loginApi.get(API_ENDPOINTS.PASSWORD_SETUP(token)),
+    confirmSetupPassword: (token, payload) => loginApi.post(API_ENDPOINTS.PASSWORD_SETUP_CONFIRM(token), payload),
 };
 
 export default loginApi;

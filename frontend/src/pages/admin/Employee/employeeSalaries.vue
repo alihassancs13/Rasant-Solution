@@ -12,6 +12,9 @@ import {useAssignPolicy} from '@/composables/useAssignPolicy.js'
 import {useEmployeeStore} from '@/stores/employeeStore.js'
 import { usePolicyStore } from '@/stores/policyStore'
 import { usePayrollSettingsStore } from '../../../stores/payrollStore.js'
+import { getCurrentPosition, reverseGeocodeLabel } from '@/composables/useGeolocation.js'
+import { useToast } from '@/composables/useToast.js'
+import ToastContainer from '@/components/ToastContainer.vue'
 
 const policyStore = usePolicyStore()
 const employeeStore = useEmployeeStore()
@@ -72,6 +75,7 @@ const {
   selectedApplyIds, toggleApplySelection, toggleSelectAllApply, employeeDetail, isEmployeeDetailLoading,
   showEmployeeDetailModal, fetchEmployeeDetail,openEmployeeDetailModal, closeEmployeeDetailModal,
   openApplyModal, closeApplyModal, confirmApplyIncrement,isEmployeeDueToday,isEmployeeOverdue,
+  bonusDraft, isSavingBonus, saveMonthlyBonus,
 } = useIncrementPolicy(employees)
 
 // ── Assign policy modal (separate composable) ──
@@ -90,12 +94,64 @@ const tabs = [
 const activeTab = ref('employee-roster')
 const payrollSettings = computed(() => payrollSettingsStore.settings)
 const isSavingPayrollSettings = computed(() => payrollSettingsStore.isSaving)
+const isSettingOffice = computed(() => payrollSettingsStore.isSettingOffice)
 const payrollSettingsLoading = computed(() => payrollSettingsStore.isLoading)
 const payrollSettingsError = computed(() => payrollSettingsStore.error)
+const holidays = computed(() => payrollSettingsStore.holidays)
+const holidaysLoading = computed(() => payrollSettingsStore.holidaysLoading)
+const holidaySaving = computed(() => payrollSettingsStore.holidaySaving)
+
+const holidayForm = ref({ date: '', name: 'Holiday', note: '' })
+const holidayYear = ref(new Date().getFullYear())
 
 const fetchPayrollSettings = () => payrollSettingsStore.fetchSettings()
+const fetchHolidays = () => payrollSettingsStore.fetchHolidays(holidayYear.value)
 
 const savePayrollSettings = () => payrollSettingsStore.saveSettings(payrollSettingsStore.settings)
+
+const { showToast } = useToast()
+
+async function addHoliday() {
+  if (!holidayForm.value.date) {
+    showToast('Pick a holiday date.', 'error')
+    return
+  }
+  const result = await payrollSettingsStore.createHoliday({
+    date: holidayForm.value.date,
+    name: holidayForm.value.name || 'Holiday',
+    note: holidayForm.value.note || '',
+  })
+  if (result.success) {
+    showToast(result.message || 'Holiday saved. Attendance marked for all employees.', 'success')
+    holidayForm.value = { date: '', name: 'Holiday', note: '' }
+  } else {
+    showToast(result.error || 'Could not save holiday', 'error')
+  }
+}
+
+async function removeHoliday(id) {
+  const result = await payrollSettingsStore.deleteHoliday(id)
+  if (result.success) {
+    showToast(result.message || 'Holiday removed.', 'success')
+  } else {
+    showToast(result.error || 'Could not remove holiday', 'error')
+  }
+}
+
+async function captureOfficeLocation() {
+  try {
+    const coords = await getCurrentPosition()
+    const address = await reverseGeocodeLabel(coords.latitude, coords.longitude)
+    const result = await payrollSettingsStore.setOfficeFromDevice({ ...coords, address })
+    if (result.success) {
+      showToast('Office location saved from your current position.', 'success')
+    } else {
+      showToast(result.error || 'Could not save office location', 'error')
+    }
+  } catch (err) {
+    showToast(err.message || 'Location permission required', 'error')
+  }
+}
 const formatDate = (dateStr) => {
   if (!dateStr) return '—'
   return new Date(dateStr).toLocaleDateString('en-US', {
@@ -218,7 +274,12 @@ onMounted(async () => {
     handleHighlightEmployee(Number(route.query.highlightEmployee))
   }
   fetchPayrollSettings()
+  fetchHolidays()
 
+})
+
+watch(holidayYear, () => {
+  fetchHolidays()
 })
 
 watch(() => route.query.highlightEmployee, (newVal) => {
@@ -231,6 +292,7 @@ watch(() => route.query.highlightEmployee, (newVal) => {
 <template>
   <div class="flex h-screen bg-surface">
     <AdminSidebar />
+    <ToastContainer />
 
     <div class="flex-1 flex flex-col overflow-hidden">
       <div class="p-3 pl-1 sm:p-4 md:pl-4">
@@ -649,7 +711,8 @@ watch(() => route.query.highlightEmployee, (newVal) => {
           <div class="p-4 sm:p-5">
             <h2 class="text-lg font-bold text-text-primary">Payroll Settings</h2>
             <p class="text-sm text-text-muted mt-0.5">
-              Global rules used to calculate attendance-based deductions and overtime. Changes apply to future payroll runs only.
+              Global rules used to calculate attendance-based deductions and overtime for Contract &amp; Permanent staff.
+              Intern and Probation statuses are exempt from leave / absent / late payroll deductions.
             </p>
           </div>
 
@@ -693,11 +756,137 @@ watch(() => route.query.highlightEmployee, (newVal) => {
               <p class="text-xs text-text-muted mt-1">First N lates in a month are free. Every late after that cuts half a day's salary.</p>
             </div>
 
+            <div class="dash-field">
+              <label>Default Shift (self check-in)</label>
+              <input v-model="payrollSettings.default_timetable" type="text"
+                     placeholder="10 - 7"
+                     class="w-full mt-1 px-3.5 py-2.5 rounded-md border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              <p class="text-xs text-text-muted mt-1">Used when employees punch in from Overview (e.g. 10 - 7).</p>
+            </div>
+
+            <div class="dash-field">
+              <label>Office Radius (meters)</label>
+              <input v-model.number="payrollSettings.office_radius_meters" type="number" min="20"
+                     class="w-full mt-1 px-3.5 py-2.5 rounded-md border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+              <p class="text-xs text-text-muted mt-1">Check-ins inside this radius are marked In office.</p>
+            </div>
+
+            <div class="sm:col-span-2 rounded-md border border-border bg-surface/50 p-4">
+              <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h3 class="text-sm font-bold text-text-primary">Office location</h3>
+                  <p class="text-xs text-text-muted mt-1 max-w-xl">
+                    Stand at the office and click the button — we save your current GPS pin the same way employees check in.
+                  </p>
+                  <p v-if="payrollSettings.office_configured" class="text-xs text-emerald-700 mt-2 font-medium">
+                    Office pin set
+                    <span v-if="payrollSettings.office_latitude != null">
+                      · {{ payrollSettings.office_latitude }}, {{ payrollSettings.office_longitude }}
+                    </span>
+                  </p>
+                  <p v-else class="text-xs text-amber-700 mt-2 font-medium">Office pin not set yet.</p>
+                  <p v-if="payrollSettings.office_address" class="text-xs text-text-muted mt-1">{{ payrollSettings.office_address }}</p>
+                </div>
+                <ShineButton
+                  variant="blue"
+                  shape="xl"
+                  size="sm"
+                  :loading="isSettingOffice"
+                  @click="captureOfficeLocation"
+                >
+                  <font-awesome-icon :icon="['fas', 'location-crosshairs']" class="w-3 h-3" />
+                  Use my current location
+                </ShineButton>
+              </div>
+            </div>
+
             <div class="sm:col-span-2 flex justify-end pt-2">
               <ShineButton variant="teal" shape="xl" size="sm" :loading="isSavingPayrollSettings" @click="savePayrollSettings">
                 <font-awesome-icon :icon="['fas', 'floppy-disk']" class="w-3 h-3" />
                 Save Settings
               </ShineButton>
+            </div>
+
+            <div class="sm:col-span-2 mt-2 rounded-md border border-border bg-surface/50 p-4">
+              <div class="flex flex-wrap items-start justify-between gap-3 mb-4">
+                <div>
+                  <h3 class="text-sm font-bold text-text-primary">Company holidays</h3>
+                  <p class="text-xs text-text-muted mt-1 max-w-xl">
+                    Set a date as holiday — attendance is auto-marked <span class="font-semibold">Holiday</span> for all employees.
+                    Holidays and weekends are excluded from absent / late salary deductions.
+                  </p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <label class="text-xs text-text-muted">Year</label>
+                  <input
+                    v-model.number="holidayYear"
+                    type="number"
+                    min="2020"
+                    max="2100"
+                    class="w-24 px-2.5 py-1.5 rounded-md border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  />
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 mb-4">
+                <div class="dash-field sm:col-span-1">
+                  <label>Date</label>
+                  <input v-model="holidayForm.date" type="date"
+                         class="w-full mt-1 px-3.5 py-2.5 rounded-md border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                </div>
+                <div class="dash-field sm:col-span-1">
+                  <label>Name</label>
+                  <input v-model="holidayForm.name" type="text" placeholder="E.g. Independence Day"
+                         class="w-full mt-1 px-3.5 py-2.5 rounded-md border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                </div>
+                <div class="dash-field sm:col-span-1">
+                  <label>Note (optional)</label>
+                  <input v-model="holidayForm.note" type="text" placeholder="Optional note"
+                         class="w-full mt-1 px-3.5 py-2.5 rounded-md border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                </div>
+                <div class="flex items-end">
+                  <ShineButton variant="blue" shape="xl" size="sm" class="w-full sm:w-auto" :loading="holidaySaving" @click="addHoliday">
+                    <font-awesome-icon :icon="['fas', 'plus']" class="w-3 h-3" />
+                    Add holiday
+                  </ShineButton>
+                </div>
+              </div>
+
+              <div v-if="holidaysLoading" class="text-center py-8">
+                <font-awesome-icon icon="fa-solid fa-spinner" spin class="text-text-muted text-xl" />
+              </div>
+              <div v-else-if="!holidays.length" class="text-sm text-text-muted py-4 text-center border border-dashed border-border rounded-md">
+                No holidays set for {{ holidayYear }}.
+              </div>
+              <div v-else class="overflow-x-auto rounded-md border border-border">
+                <table class="min-w-full text-sm">
+                  <thead class="bg-surface text-left text-text-muted">
+                    <tr>
+                      <th class="px-3 py-2 font-semibold">Date</th>
+                      <th class="px-3 py-2 font-semibold">Name</th>
+                      <th class="px-3 py-2 font-semibold">Note</th>
+                      <th class="px-3 py-2 font-semibold w-24"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="h in holidays" :key="h.id" class="border-t border-border">
+                      <td class="px-3 py-2.5 text-text-primary whitespace-nowrap">{{ h.date }}</td>
+                      <td class="px-3 py-2.5 text-text-primary">{{ h.name }}</td>
+                      <td class="px-3 py-2.5 text-text-muted">{{ h.note || '—' }}</td>
+                      <td class="px-3 py-2.5 text-right">
+                        <button
+                          type="button"
+                          class="text-red-600 hover:text-red-700 text-xs font-semibold cursor-pointer disabled:opacity-50"
+                          :disabled="holidaySaving"
+                          @click="removeHoliday(h.id)"
+                        >
+                          Remove
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
             </div>
 
           </div>
@@ -1142,6 +1331,37 @@ watch(() => route.query.highlightEmployee, (newVal) => {
             </span>
                 <span class="text-success font-medium">+ {{ formatCurrency(employeeDetail.overtime_amount) }}</span>
               </div>
+
+              <div class="flex items-center justify-between gap-2 text-xs py-1">
+                <span class="flex items-center gap-1.5 text-gray-500">
+                  <font-awesome-icon :icon="['fas', 'gift']" class="w-3 h-3 text-gray-300" />
+                  Bonus (this month)
+                </span>
+                <div class="flex items-center gap-2">
+                  <input
+                    v-model.number="bonusDraft"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    class="w-28 px-2 py-1 rounded-md border border-border text-xs text-right focus:outline-none focus:ring-2 focus:ring-primary/30"
+                  />
+                  <button
+                    type="button"
+                    class="px-2.5 py-1 rounded-md bg-primary text-white text-[11px] font-semibold disabled:opacity-50 cursor-pointer"
+                    :disabled="isSavingBonus"
+                    @click="saveMonthlyBonus"
+                  >
+                    {{ isSavingBonus ? 'Saving…' : 'Save' }}
+                  </button>
+                </div>
+              </div>
+
+              <p
+                v-if="employeeDetail.payroll_deductions_applied === false"
+                class="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-2 py-1.5"
+              >
+                Leave / absent / late payroll settings do not apply for {{ employeeDetail.status }} employees.
+              </p>
 
               <div class="flex items-center justify-between text-xs">
             <span class="flex items-center gap-1.5 text-gray-500">

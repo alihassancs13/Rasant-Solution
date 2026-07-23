@@ -19,5 +19,6 @@ urlpatterns = [
     path('files/all/', views.get_all_files, name='all-files'),
     path('files/<int:pk>/view/', views.view_file_content, name='view-file-content'),
     path('share_document/', views.share_document, name='share_document'),
+    path('remove_share/', views.remove_shared_document, name='remove_shared_document'),
     path('get_employee_document/<int:employee_id>/', views.get_employee_documents, name='get_employee_documents'),
 ]

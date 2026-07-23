@@ -14,10 +14,35 @@
         />
       </div>
       <main class="flex-1 overflow-y-auto overflow-x-hidden px-3 sm:px-4 pb-4 space-y-4">
+        <!-- Soft Jira connect banner (manual worklogs still available) -->
+        <div
+          v-if="needsJiraLogin"
+          class="bg-white border border-[#BFDBFE] rounded-xl shadow-sm px-5 py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3"
+        >
+          <div class="flex items-start gap-3">
+            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-[rgba(74,144,226,0.12)] text-[#1E3A5F] shrink-0">
+              <font-awesome-icon :icon="['fab', 'jira']" />
+            </div>
+            <div>
+              <p class="text-sm font-bold text-headingMain">Jira not connected</p>
+              <p class="text-xs text-text-muted mt-0.5">
+                Connect Jira to sync tickets automatically. You can still add <strong>manual</strong> worklogs below.
+              </p>
+            </div>
+          </div>
+          <router-link
+            to="/admin/jira"
+            class="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold text-white shadow-md btn-primary-gradient whitespace-nowrap"
+          >
+            <font-awesome-icon :icon="['fab', 'jira']" />
+            Go to Jira login
+          </router-link>
+        </div>
+
         <!-- Stats Cards -->
         <div class="grid grid-cols-1 sm:grid-cols-4 gap-3 sm:gap-4">
           <StatCard
-              label="Total Days"
+              label="Total Hours"
               :value="monthlyStats.totalHours"
               :icon="['fas', 'clock']"
               color="blue"
@@ -409,14 +434,50 @@
           :is-open="isAddModalOpen"
           mode="form"
           title="Add Worklog"
-          subtitle="Log time spent on a Jira issue."
+          :subtitle="worklogForm.source === 'manual' ? 'Save a manual time entry to the local worklog table.' : 'Log time on a Jira issue (also stored locally).'"
           submit-text="Save worklog"
           :loading="isCreating"
           @close="closeAddModal"
           @save="handleCreateWorklog"
       >
         <form @submit.prevent="handleCreateWorklog" class="grid grid-cols-1 gap-4 text-left text-gray-700">
-          <div class="flex flex-col gap-1.5 relative">
+          <div>
+            <label class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5 block">Entry type</label>
+            <div class="inline-flex items-center gap-1 bg-white border border-border rounded-lg p-1">
+              <button
+                type="button"
+                class="px-3 py-1.5 rounded-md text-xs font-semibold cursor-pointer"
+                :class="worklogForm.source === 'jira' ? 'tab-active-gradient text-white' : 'text-gray-500 hover:bg-blue-50'"
+                :disabled="needsJiraLogin"
+                @click="worklogForm.source = 'jira'"
+              >
+                Jira
+              </button>
+              <button
+                type="button"
+                class="px-3 py-1.5 rounded-md text-xs font-semibold cursor-pointer"
+                :class="worklogForm.source === 'manual' ? 'tab-active-gradient text-white' : 'text-gray-500 hover:bg-blue-50'"
+                @click="worklogForm.source = 'manual'"
+              >
+                Manual
+              </button>
+            </div>
+          </div>
+
+          <div v-if="worklogForm.source === 'manual'" class="flex flex-col gap-1.5">
+            <label class="text-xs font-bold uppercase tracking-wider text-gray-400">
+              Task / title
+            </label>
+            <input
+              type="text"
+              v-model="worklogForm.summary"
+              placeholder="e.g. Client meeting, docs, support"
+              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4]"
+            />
+            <input type="hidden" v-model="worklogForm.issue_key" />
+          </div>
+
+          <div v-else class="flex flex-col gap-1.5 relative">
             <label class="text-xs font-bold uppercase tracking-wider text-gray-400">
               Issue Key <span class="text-red-500">*</span>
             </label>
@@ -843,6 +904,7 @@ import EditModal from '@/components/baseModal.vue'
 import { useWorklog } from '@/composables/useWorklog.js'
 
 const {
+  needsJiraLogin,
   isAddModalOpen,
   isCreating,
   worklogForm,

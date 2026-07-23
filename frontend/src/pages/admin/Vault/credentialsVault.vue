@@ -144,13 +144,32 @@
                             </a>
                           </div>
                         </div>
-                        <button
-                            @click="openShareModal(cred)"
-                            class="text-indigo-600 hover:text-indigo-800 transition-colors p-2 rounded-lg hover:bg-indigo-50 flex-shrink-0"
-                            title="Share credential"
-                        >
-                          <i class="fas fa-share-alt text-sm"></i>
-                        </button>
+                        <div class="flex items-center gap-1 flex-shrink-0">
+                          <button
+                              type="button"
+                              @click="openEditModal(cred)"
+                              class="text-slate-500 hover:text-indigo-700 transition-colors p-2 rounded-lg hover:bg-indigo-50"
+                              title="Edit credential"
+                          >
+                            <i class="fas fa-pen text-sm"></i>
+                          </button>
+                          <button
+                              type="button"
+                              @click="openDeleteModal(cred)"
+                              class="text-slate-500 hover:text-red-600 transition-colors p-2 rounded-lg hover:bg-red-50"
+                              title="Delete credential"
+                          >
+                            <i class="fas fa-trash text-sm"></i>
+                          </button>
+                          <button
+                              type="button"
+                              @click="openShareModal(cred)"
+                              class="text-indigo-600 hover:text-indigo-800 transition-colors p-2 rounded-lg hover:bg-indigo-50"
+                              title="Share credential"
+                          >
+                            <i class="fas fa-share-alt text-sm"></i>
+                          </button>
+                        </div>
                       </div>
                     </div>
 
@@ -226,16 +245,16 @@
       </div>
     </div>
 
-    <!-- Add Modal using BaseModal -->
+    <!-- Add / Edit Modal using BaseModal -->
     <BaseModal
         :isOpen="showModal"
         mode="form"
         size="md"
-        title="Add Credential"
-        subtitle="Store login details for a project or admin panel."
-        :submitText="'Save credential'"
+        :title="isEditing ? 'Edit Credential' : 'Add Credential'"
+        :subtitle="isEditing ? 'Update login details for this credential.' : 'Store login details for a project or admin panel.'"
+        :submitText="isEditing ? 'Save changes' : 'Save credential'"
         :cancelText="'Cancel'"
-        :loading="loading"
+        :loading="isSaving || loading"
         formId="credential-form"
         @close="closeModal"
         @cancel="closeModal"
@@ -293,13 +312,16 @@
           <!-- Password + Confirm Password in one row -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Password
+                <span v-if="isEditing" class="text-gray-400 text-xs font-normal">(leave blank to keep current)</span>
+              </label>
               <input
                   v-model="form.password"
                   type="text"
-                  placeholder="Enter password"
+                  :placeholder="isEditing ? 'Leave blank to keep current' : 'Enter password'"
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-                  required
+                  :required="!isEditing"
               />
               <p v-if="fieldErrors.password" class="text-xs mt-1 text-red-500">{{ fieldErrors.password }}</p>
               <p
@@ -315,13 +337,13 @@
               <input
                   v-model="form.confirmPassword"
                   type="text"
-                  placeholder="Re-enter password"
+                  :placeholder="isEditing ? 'Confirm new password' : 'Re-enter password'"
                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-                  required
+                  :required="!isEditing || !!form.password"
               />
               <p v-if="fieldErrors.confirmPassword" class="text-xs mt-1 text-red-500">{{ fieldErrors.confirmPassword }}</p>
               <p v-else-if="passwordMismatch" class="text-xs mt-1 text-red-500">
-                Password do not match
+                Passwords do not match
               </p>
             </div>
           </div>
@@ -340,6 +362,19 @@
         </div>
       </form>
     </BaseModal>
+
+    <!-- Delete confirmation -->
+    <BaseModal
+        :is-open="showDeleteModal"
+        mode="delete"
+        title="Delete credential"
+        :subtitle="deleteSubtitle"
+        submit-text="Delete"
+        cancel-text="Cancel"
+        :loading="isDeleting"
+        @close="closeDeleteModal"
+        @save="submitDelete"
+    />
 
     <!-- Share Modal using BaseModal -->
     <BaseModal
@@ -493,6 +528,19 @@
         </div>
       </div>
     </BaseModal>
+
+    <!-- Unshare confirmation -->
+    <BaseModal
+        :is-open="showUnshareModal"
+        mode="delete"
+        title="Remove access"
+        :subtitle="unshareSubtitle"
+        submit-text="Remove access"
+        cancel-text="Cancel"
+        :loading="isUnsharing"
+        @close="closeUnshareModal"
+        @save="submitUnshare"
+    />
   </div>
 </template>
 

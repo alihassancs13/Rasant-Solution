@@ -10,24 +10,29 @@ export function useWorklog() {
   const jiraStore = useJiraStore()
   const isMonthPickerOpen = ref(false)
   const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-  const selectedMonthFilter = ref(new Date().toISOString().slice(0, 7))
+  const now = new Date()
+  const selectedMonthFilter = ref(
+    `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`
+  )
   const isAddModalOpen = ref(false)
   const isCreating = ref(false)
-  const WORK_HOURS_PER_DAY = 8
   const calendarWorklogs = ref({})
   const isCalendarLoading = ref(false)
+  const needsJiraLogin = ref(false)
   const monthPages = ref({})
   const activeMonthTab = ref(null)
   const expandedMonths = ref({})
   const PAGE_SIZE = ref(10)
 
   const worklogForm = reactive({
+    source: 'jira',
     issue_key: '',
     start_date: '',
     start_time: '',
     end_date: '',
     end_time: '',
     worklog_description: '',
+    summary: '',
   })
 
   const pickerYear = ref(
@@ -55,6 +60,23 @@ const selectMonth = (idx) => {
   isMonthPickerOpen.value = false
 }
 
+const isJiraAuthError = (message = '') => {
+  const text = String(message || '').toLowerCase()
+  return text.includes('jira') && (
+    text.includes('not connected') ||
+    text.includes('connect first') ||
+    text.includes('expired') ||
+    text.includes('please connect')
+  )
+}
+
+const ensureJiraConnected = async () => {
+  await jiraStore.checkJiraConnection()
+  const connected = jiraStore.jiraConnected && !jiraStore.jiraExpired
+  needsJiraLogin.value = !connected
+  return connected
+}
+
 // close dropdown when clicking outside
 const closeMonthPickerOnOutsideClick = (e) => {
   if (!e.target.closest('.month-picker-wrapper')) {
@@ -73,8 +95,27 @@ onUnmounted(() => document.removeEventListener('click', closeMonthPickerOnOutsid
       const [year, month] = selectedMonthFilter.value.split('-').map(Number)
       const result = await worklogStore.getCalendarWorklogs(month, year)
       calendarWorklogs.value = result.logs || {}
+      // Soft banner only — DB/manual worklogs still load
+      if (result.jira_sync_error && isJiraAuthError(result.jira_sync_error)) {
+        needsJiraLogin.value = true
+      } else if (!result.jira_sync_error) {
+        // Connected sync ok (or no jira attempted with empty error after local-only)
+        const connected = jiraStore.jiraConnected && !jiraStore.jiraExpired
+        needsJiraLogin.value = !connected
+      }
     } catch (error) {
-      showToast('Failed to load worklog calendar', 'error')
+      const message =
+        error?.response?.data?.message ||
+        error?.response?.data?.error ||
+        error?.message ||
+        ''
+      if (isJiraAuthError(message)) {
+        needsJiraLogin.value = true
+        // Still try not to wipe local display — calendar may return empty
+        calendarWorklogs.value = {}
+      } else {
+        showToast('Failed to load worklog calendar', 'error')
+      }
     } finally {
       isCalendarLoading.value = false
     }
@@ -149,19 +190,21 @@ onUnmounted(() => document.removeEventListener('click', closeMonthPickerOnOutsid
     expandedMonths.value[monthKey] = !expandedMonths.value[monthKey]
   }
 
-  // Formats seconds into "1d 2h" style using 8h workday
+  /** Clock hours from seconds (matches Worklog Analytics: seconds / 3600). */
+  const secondsToHours = (seconds) =>
+    Math.round(((Number(seconds) || 0) / 3600) * 100) / 100
+
+  /** e.g. "12.5h" — used for totals so Worklogs and Analytics match. */
+  const formatHours = (seconds) => `${secondsToHours(seconds)}h`
+
+  /** Entry duration as clock time: "2h 30m" (no workday "d"). */
   const formatDuration = (seconds) => {
     if (!seconds) return '0m'
     const totalMinutes = Math.floor(seconds / 60)
-    const minutesPerDay = 8 * 60
-
-    const days = Math.floor(totalMinutes / minutesPerDay)
-    const remainingAfterDays = totalMinutes % minutesPerDay
-    const hours = Math.floor(remainingAfterDays / 60)
-    const minutes = remainingAfterDays % 60
+    const hours = Math.floor(totalMinutes / 60)
+    const minutes = totalMinutes % 60
 
     const parts = []
-    if (days > 0) parts.push(`${days}d`)
     if (hours > 0) parts.push(`${hours}h`)
     if (minutes > 0) parts.push(`${minutes}m`)
 
@@ -268,23 +311,35 @@ onUnmounted(() => document.removeEventListener('click', closeMonthPickerOnOutsid
   }
 
   const loadUserIssues = async () => {
+    if (needsJiraLogin.value) return
     const accountId = jiraStore.jiraUser?.account_id
     if (!accountId) return
     try {
       await jiraStore.getUserIssues(accountId)
     } catch (err) {
-      showToast('Failed to load Jira issues', 'error')
+      const message =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err?.message ||
+        ''
+      if (isJiraAuthError(message)) {
+        needsJiraLogin.value = true
+      } else {
+        showToast('Failed to load Jira issues', 'error')
+      }
     }
   }
 
   const resetForm = () => {
     Object.assign(worklogForm, {
+      source: needsJiraLogin.value ? 'manual' : 'jira',
       issue_key: '',
       start_date: '',
       start_time: '',
       end_date: '',
       end_time: '',
       worklog_description: '',
+      summary: '',
     })
     issueSearchQuery.value = ''
     isIssueSelected.value = false
@@ -327,15 +382,10 @@ onUnmounted(() => document.removeEventListener('click', closeMonthPickerOnOutsid
     if (!start || !end || end <= start) return ''
 
     const totalMinutes = Math.floor((end - start) / 60000)
-    const minutesPerDay = WORK_HOURS_PER_DAY * 60
-
-    const days = Math.floor(totalMinutes / minutesPerDay)
-    const remainingAfterDays = totalMinutes % minutesPerDay
-    const hours = Math.floor(remainingAfterDays / 60)
-    const minutes = remainingAfterDays % 60
+    const hours = Math.floor(totalMinutes / 60)
+    const minutes = totalMinutes % 60
 
     const parts = []
-    if (days > 0) parts.push(`${days}d`)
     if (hours > 0) parts.push(`${hours}h`)
     if (minutes > 0) parts.push(`${minutes}m`)
 
@@ -352,7 +402,13 @@ onUnmounted(() => document.removeEventListener('click', closeMonthPickerOnOutsid
   )
 
   const handleCreateWorklog = async () => {
-    if (!worklogForm.issue_key || !worklogForm.start_date || !worklogForm.start_time || !worklogForm.end_date || !worklogForm.end_time) {
+    const isManual = worklogForm.source === 'manual'
+    if (isManual) {
+      if (!worklogForm.start_date || !worklogForm.start_time || !worklogForm.end_date || !worklogForm.end_time) {
+        showToast('Please fill all required fields.', 'error')
+        return
+      }
+    } else if (!worklogForm.issue_key || !worklogForm.start_date || !worklogForm.start_time || !worklogForm.end_date || !worklogForm.end_time) {
       showToast('Please fill all required fields.', 'error')
       return
     }
@@ -360,7 +416,11 @@ onUnmounted(() => document.removeEventListener('click', closeMonthPickerOnOutsid
     isCreating.value = true
     try {
       const payload = {
-        issue_key: worklogForm.issue_key,
+        source: isManual ? 'manual' : 'jira',
+        issue_key: isManual
+          ? (worklogForm.issue_key || worklogForm.summary || 'MANUAL')
+          : worklogForm.issue_key,
+        summary: worklogForm.summary || '',
         start_date: formatDateForApi(worklogForm.start_date),
         start_time: formatTimeForApi(worklogForm.start_time),
         end_date: formatDateForApi(worklogForm.end_date),
@@ -369,14 +429,20 @@ onUnmounted(() => document.removeEventListener('click', closeMonthPickerOnOutsid
       }
 
       await worklogStore.createWorklog(payload)
-      showToast('Worklog added successfully!', 'success')
+      showToast(isManual ? 'Manual worklog saved!' : 'Worklog added successfully!', 'success')
       await loadCalendarWorklogs()
       closeAddModal()
 
     } catch (error) {
       console.error('FULL ERROR:', error)
-      const message = error?.response?.data?.message || 'Failed to add worklog'
-      showToast(message, 'error')
+      const message = error?.response?.data?.message || error?.response?.data?.error || 'Failed to add worklog'
+      if (isJiraAuthError(message)) {
+        needsJiraLogin.value = true
+        worklogForm.source = 'manual'
+        showToast('Jira not connected — switch to Manual, or log in to Jira.', 'error')
+      } else {
+        showToast(message, 'error')
+      }
     } finally {
       isCreating.value = false
     }
@@ -520,8 +586,13 @@ onUnmounted(() => document.removeEventListener('click', closeMonthPickerOnOutsid
       await loadCalendarWorklogs()
     } catch (error) {
       console.error('FULL ERROR:', error)
-      const message = error?.response?.data?.message || 'Failed to update worklog'
-      showToast(message, 'error')
+      const message = error?.response?.data?.message || error?.response?.data?.error || 'Failed to update worklog'
+      if (isJiraAuthError(message)) {
+        needsJiraLogin.value = true
+        closeEditModal()
+      } else {
+        showToast(message, 'error')
+      }
     } finally {
       isUpdating.value = false
     }
@@ -563,9 +634,14 @@ onUnmounted(() => document.removeEventListener('click', closeMonthPickerOnOutsid
     console.error("FULL ERROR:", error)
 
     const message =
-      error?.response?.data?.message || "Failed to delete worklog"
+      error?.response?.data?.message || error?.response?.data?.error || "Failed to delete worklog"
 
-    showToast(message, "error")
+    if (isJiraAuthError(message)) {
+      needsJiraLogin.value = true
+      closeDeleteModal()
+    } else {
+      showToast(message, "error")
+    }
   } finally {
     isDeleting.value = false
   }
@@ -630,11 +706,8 @@ const openViewModal = async (entry) => {
    }
 
     const monthlyStats = computed(() => {
-    const monthGroup = worklogsByMonth.value.find(
-      m => m.month === activeMonthTab.value
-    )
-
-    const entries = monthGroup?.entries || []
+    // Always use the currently selected month filter (not stale tab / all months)
+    const entries = worklogsByMonth.value[0]?.entries || []
 
     const totalSeconds = entries.reduce(
       (sum, e) => sum + (e.time_spent_seconds || 0),
@@ -645,29 +718,28 @@ const openViewModal = async (entry) => {
     const uniqueDays = new Set(entries.map(e => e.date)).size
 
     return {
-      totalHours: formatDuration(totalSeconds),
+      totalHours: formatHours(totalSeconds),
       issuesWorked: uniqueIssues,
       totalEntries: entries.length,
       daysLogged: uniqueDays,
     }
   })
 
-  watch(selectedMonthFilter, () => {
-    loadCalendarWorklogs()
-    // Reset pagination
+  watch(selectedMonthFilter, async () => {
     monthPages.value = {}
-    // Reset active tab
-    if (worklogsByMonth.value.length > 0) {
-      activeMonthTab.value = worklogsByMonth.value[0]?.month
-    }
+    await loadCalendarWorklogs()
+    activeMonthTab.value = worklogsByMonth.value[0]?.month || null
   })
 
-  onMounted(() => {
-    loadUserIssues()
-    loadCalendarWorklogs()
+  onMounted(async () => {
+    await ensureJiraConnected()
+    // Always load local DB calendar (manual + synced). Jira sync runs server-side when connected.
+    await loadUserIssues()
+    await loadCalendarWorklogs()
   })
 
   return {
+    needsJiraLogin,
     isAddModalOpen,
     isCreating,
     worklogForm,
@@ -691,6 +763,8 @@ const openViewModal = async (entry) => {
     expandedMonths,
     toggleMonth,
     formatDuration,
+    formatHours,
+    secondsToHours,
     paginatedWorklogsByMonth,
     nextPage,
     prevPage,

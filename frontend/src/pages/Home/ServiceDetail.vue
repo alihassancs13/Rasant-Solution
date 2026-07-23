@@ -102,7 +102,7 @@ watch(
       return
     }
     if (service.value?.title) {
-      document.title = `${service.value.title} - Rasant Solutions`
+      document.title = `${service.value.title} | Rasant Solutions`
     }
   },
   { immediate: true },

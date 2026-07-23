@@ -204,12 +204,20 @@
                   <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Status</label>
                     <select v-model="formData.status" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm bg-white">
-                      <option value="Intern">Intern</option>
-                      <option value="Probation">Probation</option>
-                      <option value="Contract">Contract</option>
-                      <option value="Permanent">Permanent</option>
+                    <option
+                      v-for="st in employmentStatuses"
+                      :key="st.id || st.code || st.name"
+                      :value="st.name"
+                    >{{ st.name }}</option>
                     </select>
                   </div>
+                </div>
+                <div class="mt-4">
+                  <label class="inline-flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+                    <input type="checkbox" v-model="formData.work_from_home" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
+                    Work from home
+                  </label>
+                  <p class="text-xs text-slate-500 mt-1">If enabled, attendance outside the office radius is marked as Work from home.</p>
                 </div>
                 <!-- Present Address -->
                 <div>
@@ -518,6 +526,7 @@ import { useEmployeeRegistration } from '@/composables/useEmployeeRegistration.j
 import { onMounted, ref, computed, nextTick } from 'vue';
 import { useRouter } from 'vue-router';
 import Navbar from '@/components/Navbar.vue';
+import { useEmployeeStore } from '@/stores/employeeStore.js';
 
 export default {
   components: { Navbar },
@@ -527,6 +536,8 @@ export default {
     const isSubmitted = ref(false);
     const isDirectAccess = ref(false);
     const validationError = ref('');
+    const employeeStore = useEmployeeStore();
+    const employmentStatuses = computed(() => employeeStore.employmentStatuses || []);
 
     // Get token from URL
     const getTokenFromURL = () => {
@@ -633,6 +644,7 @@ export default {
 
     onMounted(() => {
       checkDirectAccess();
+      employeeStore.fetchEmploymentStatuses();
 
       if (token) {
         console.log('Token from URL:', token);
@@ -661,13 +673,14 @@ export default {
       validationError.value = '';
 
       if (currentStep.value === totalSteps) {
-        submitForm(() => {
+        submitForm((data) => {
           isSubmitted.value = true;
-
+          // Refresh dashboard list when submitted from the modal
           if (!isDirectAccess.value) {
+            window.dispatchEvent(new CustomEvent('employee-created', { detail: data }));
             setTimeout(() => {
               emit('close');
-            }, 4000);
+            }, 2500);
           }
         });
       } else {
@@ -711,6 +724,7 @@ export default {
       cnicError,
       formatCnic,
       validationError,
+      employmentStatuses,
     };
   }
 };

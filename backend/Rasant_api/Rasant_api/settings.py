@@ -72,7 +72,9 @@ ROOT_URLCONF = 'Rasant_api.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            BASE_DIR / 'apps' / 'accounts' / 'templates',
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -122,12 +124,14 @@ DATABASES = {
 }
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'alihassanisb720@gmail.com'
-EMAIL_HOST_PASSWORD = 'sgms zmwz msjx gcah'
-DEFAULT_FROM_EMAIL = 'Rasant Solutions <alihassanisb720@gmail.com>'
+EMAIL_HOST = 'mail.rasantsol.com'
+EMAIL_PORT = 465
+EMAIL_USE_TLS = False
+EMAIL_USE_SSL = True
+EMAIL_HOST_USER = 'danialali@rasantsol.com'
+EMAIL_HOST_PASSWORD = ''
+DEFAULT_FROM_EMAIL = 'Rasant Solutions <danialali@rasantsol.com>'
+FRONTEND_URL = 'http://localhost:5173'
 
 
 # Password validation

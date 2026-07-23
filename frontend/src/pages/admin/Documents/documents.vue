@@ -501,14 +501,14 @@
             <div
                 v-for="emp in shareFilteredEmployees"
                 :key="emp.id"
-                @click="toggleEmployee(emp)"
                 class="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors border"
                 :class="[
         isAlreadyShared(emp.id)
-            ? 'bg-gray-50 border-gray-100 opacity-60 cursor-not-allowed'
+            ? 'bg-green-50 border-green-200 hover:bg-green-100'
             : 'hover:bg-gray-50 border-gray-100 cursor-pointer',
         isEmployeeSelected(emp.id) ? 'bg-indigo-50 border-indigo-200' : ''
     ]"
+                @click="!isAlreadyShared(emp.id) && toggleEmployee(emp)"
             >
               <div class="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold text-xs">
                 {{ getInitials(emp.full_name || emp.email || 'U') }}
@@ -523,9 +523,15 @@
                 </p>
               </div>
               <div class="flex-shrink-0">
-                <div v-if="isAlreadyShared(emp.id)" class="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center">
-                  <i class="fas fa-check text-green-600 text-[8px]"></i>
-                </div>
+                <button
+                    v-if="isAlreadyShared(emp.id)"
+                    type="button"
+                    class="w-6 h-6 rounded-full bg-red-100 hover:bg-red-200 flex items-center justify-center transition-colors"
+                    title="Remove access"
+                    @click.stop="openUnshareModal(emp.id)"
+                >
+                  <i class="fas fa-times text-red-600 text-[10px]"></i>
+                </button>
                 <div
                     v-else
                     class="w-4 h-4 rounded-full border-2 flex items-center justify-center"
@@ -560,6 +566,54 @@
         </div>
       </div>
     </BaseModal>
+
+    <!-- ===== UNSHARE CONFIRM MODAL ===== -->
+    <BaseModal
+        :is-open="showUnshareModal"
+        mode="delete"
+        title="Remove access"
+        :subtitle="unshareSubtitle"
+        submit-text="Remove access"
+        cancel-text="Cancel"
+        :loading="isUnsharing"
+        @close="closeUnshareModal"
+        @save="submitUnshare"
+    />
+
+    <!-- Upload progress overlay -->
+    <div
+      v-if="isUploading"
+      class="fixed inset-0 z-[80] flex items-center justify-center bg-black/40 backdrop-blur-[1px] px-4"
+    >
+      <div class="w-full max-w-md rounded-xl border border-border bg-white shadow-xl p-5 sm:p-6">
+        <div class="flex items-start gap-3 mb-4">
+          <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[rgba(74,144,226,0.12)] text-[#1E3A5F]">
+            <i class="fas fa-cloud-arrow-up text-lg"></i>
+          </div>
+          <div class="min-w-0 flex-1">
+            <h3 class="text-base font-bold text-headingMain">Uploading document</h3>
+            <p class="text-xs text-text-muted mt-0.5 truncate" :title="uploadFileName">
+              {{ uploadFileName || 'Preparing…' }}
+            </p>
+          </div>
+          <span class="text-sm font-bold text-[#1E3A5F] tabular-nums">{{ uploadPercent }}%</span>
+        </div>
+
+        <div class="h-2.5 w-full overflow-hidden rounded-full bg-slate-100 border border-slate-200">
+          <div
+            class="h-full rounded-full bg-gradient-to-r from-[#2A5F9E] via-[#3F7FD2] to-[#4A90E2] transition-[width] duration-200 ease-out"
+            :style="{ width: `${Math.max(uploadPercent, 2)}%` }"
+          ></div>
+        </div>
+
+        <div class="mt-3 flex items-center justify-between gap-3 text-xs text-text-muted">
+          <span class="truncate">{{ uploadStatusText || 'Please wait…' }}</span>
+          <span v-if="uploadTotal > 1" class="shrink-0 tabular-nums">
+            {{ uploadIndex }}/{{ uploadTotal }}
+          </span>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 

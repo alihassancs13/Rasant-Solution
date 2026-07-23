@@ -30,6 +30,7 @@ export function useEmployeeRegistration() {
         salary: '',
         joined_date: '',
         status: 'Intern',
+        work_from_home: false,
         emergency_name: '',
         emergency_relation: '',
         emergency_cnic: '',
@@ -123,29 +124,43 @@ export function useEmployeeRegistration() {
         isSubmitted.value = true;
         const payload = new FormData();
         const cleanCnic = (value) => (value || '').replace(/\D/g, '');
+
+        const cleanedCnic = cleanCnic(formData.value.cnic);
+        const cleanedEmergencyCnic = cleanCnic(formData.value.emergency_cnic);
+
+        // Prepare cleaned data with all fields and defaults
         const cleanedData = {
             name: (formData.value.name || '').trim(),
-            cnic: cleanCnic(formData.value.cnic),
             present_address: (formData.value.present_address || '').trim(),
             permanent_address: (formData.value.permanent_address || '').trim(),
             phone_number: (formData.value.phone_number || '').trim(),
             gender: formData.value.gender || 'Male',
             email: (formData.value.email || '').trim(),
+            department: (formData.value.department || '').trim() || 'Unassigned',
             department: (formData.value.department || '').trim(),
             designation: (formData.value.designation || '').trim() || 'Employee',
             salary: parseFloat(formData.value.salary) || 0,
             joined_date: formData.value.joined_date || new Date().toISOString().split('T')[0],
             status: formData.value.status || 'Intern',
             is_active: true,
+            work_from_home: !!formData.value.work_from_home,
             emergency_name: (formData.value.emergency_name || '').trim(),
             emergency_relation: (formData.value.emergency_relation || '').trim(),
-            emergency_cnic: cleanCnic(formData.value.emergency_cnic),
             emergency_phone: (formData.value.emergency_phone || '').trim(),
             emergency_address: (formData.value.emergency_address || '').trim(),
             bank_name: (formData.value.bank_name || '').trim(),
             branch_name: (formData.value.branch_name || '').trim(),
             account_number: (formData.value.account_number || '').trim(),
         };
+
+        if (cleanedCnic) cleanedData.cnic = cleanedCnic;
+        if (cleanedEmergencyCnic) cleanedData.emergency_cnic = cleanedEmergencyCnic;
+
+        if (!cleanedData.name || !cleanedData.email || !cleanedData.phone_number) {
+            showToast('Name, email, and phone number are required.', 'error');
+            return { success: false };
+        }
+
         Object.keys(cleanedData).forEach(key => {
             if (cleanedData[key] !== undefined && cleanedData[key] !== null) {
                 payload.append(key, cleanedData[key]);
@@ -203,6 +218,29 @@ export function useEmployeeRegistration() {
         } finally {
             isSubmitted.value = false;
         }
+        if (result.success) {
+            const emailNote = result.data?.email_sent === false
+                ? ' (create-password email could not be sent — check Email settings)'
+                : ' Create-password link emailed to the employee.';
+            showToast(`Employee added successfully.${emailNote}`, 'success', 5000);
+            isSubmitted.value = true;
+            if (onSuccess) onSuccess(result.data);
+            return { success: true, data: result.data };
+        }
+
+        let errorMsg = 'Submission failed';
+        if (result.errors && typeof result.errors === 'object') {
+            const parts = Object.entries(result.errors).map(([field, msgs]) => {
+                const text = Array.isArray(msgs) ? msgs.join(', ') : String(msgs);
+                return `${field}: ${text}`;
+            });
+            if (parts.length) errorMsg = parts.join(' | ');
+        } else if (result.error) {
+            errorMsg = result.error;
+        }
+        showToast(errorMsg, 'error', 6000);
+        isSubmitted.value = false;
+        return { success: false, error: errorMsg };
     };
     const resetForm = () => {
         formData.value = {
@@ -218,6 +256,7 @@ export function useEmployeeRegistration() {
             salary: '',
             joined_date: '',
             status: 'Intern',
+            work_from_home: false,
             emergency_name: '',
             emergency_relation: '',
             emergency_cnic: '',

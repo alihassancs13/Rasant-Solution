@@ -3,15 +3,21 @@ from .models import CredentialStore,SharedCredential
 from employeeDashboard.models import Employee
 import base64
 class CredentialSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=True)
+    password = serializers.CharField(write_only=True, required=False, allow_blank=True)
     password_display = serializers.SerializerMethodField(read_only=True)
     shared_with = serializers.SerializerMethodField(read_only=True)
-    description = serializers.CharField(required=False, allow_blank=True, allow_null=True)  # ADD THIS LINE
+    description = serializers.CharField(required=False, allow_blank=True, allow_null=True)
 
     class Meta:
         model = CredentialStore
         fields = ['id', 'name', 'link', 'username', 'email', 'password', 'password_display', 'description', 'shared_with', 'created_at']
         read_only_fields = ['id', 'created_at']
+
+    def validate(self, attrs):
+        # Password required on create only
+        if not self.instance and not attrs.get('password'):
+            raise serializers.ValidationError({'password': 'Password is required.'})
+        return attrs
 
     def validate_username(self, value):
         """Check if username is unique"""
@@ -46,10 +52,9 @@ class CredentialSerializer(serializers.ModelSerializer):
         return credential
 
     def update(self, instance, validated_data):
-        if 'password' in validated_data:
-            password = validated_data.pop('password')
-            encoded_password = base64.b64encode(password.encode()).decode()
-            instance.password = encoded_password
+        password = validated_data.pop('password', None)
+        if password:
+            instance.password = base64.b64encode(password.encode()).decode()
 
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
@@ -60,7 +65,7 @@ class CredentialSerializer(serializers.ModelSerializer):
     def get_password_display(self, obj):
         try:
             return base64.b64decode(obj.password).decode()
-        except:
+        except Exception:
             return obj.password
 
     def get_shared_with(self, obj):
@@ -78,7 +83,7 @@ class CredentialSerializer(serializers.ModelSerializer):
             emp = employee_map.get(share.employee_id)
             result.append({
                 'employee_id': share.employee_id,
-                'employee_username': getattr(emp, 'username', None) if emp else None,
+                'employee_name': getattr(emp, 'name', None) if emp else None,
                 'employee_email': getattr(emp, 'email', None) if emp else None,
             })
         return result

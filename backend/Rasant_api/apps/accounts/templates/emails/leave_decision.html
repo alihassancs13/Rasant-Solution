@@ -1,0 +1,40 @@
+{% extends "emails/base.html" %}
+{% block title %}Leave {{ decision_label }} — Rasant Solutions{% endblock %}
+{% block content %}
+  <h1 style="margin:0 0 12px;font-size:22px;line-height:1.3;color:#1E3A5F;">
+    Leave request {{ decision_label }}
+  </h1>
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.6;color:#475569;">
+    Hi {{ employee_name }}, your leave request has been <strong>{{ decision_label }}</strong>.
+  </p>
+
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:{% if approved %}#ECFDF5;border:1px solid #A7F3D0{% else %}#FEF2F2;border:1px solid #FECACA{% endif %};border-radius:12px;margin:0 0 22px;">
+    <tr>
+      <td style="padding:18px 20px;">
+        <p style="margin:0 0 6px;font-size:14px;color:#334155;"><strong>Subject:</strong> {{ subject }}</p>
+        <p style="margin:0 0 6px;font-size:14px;color:#334155;"><strong>Dates:</strong> {% if is_half_day %}{{ start_date }}{% else %}{{ start_date }} → {{ end_date }}{% endif %}</p>
+        <p style="margin:0 0 6px;font-size:14px;color:#334155;"><strong>Duration:</strong> {{ duration_label }}</p>
+        <p style="margin:0;font-size:14px;color:#334155;"><strong>Status:</strong> {{ decision_label|title }}</p>
+      </td>
+    </tr>
+  </table>
+
+  {% if admin_note %}
+  <p style="margin:0 0 8px;font-size:12px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase;color:#1E3A5F;">Admin note</p>
+  <div style="margin:0 0 22px;padding:16px 18px;background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;font-size:14px;line-height:1.7;color:#334155;white-space:pre-wrap;">{{ admin_note }}</div>
+  {% endif %}
+
+  {% if approved %}
+  <p style="margin:0 0 22px;font-size:14px;line-height:1.6;color:#64748B;">
+    {% if is_half_day %}
+    Your attendance for this date has been marked as a <strong>half-day leave</strong>. You can still check in for the working half.
+    {% else %}
+    Your attendance for these dates has been marked as <strong>On leave</strong> automatically.
+    {% endif %}
+  </p>
+  {% endif %}
+
+  <a href="{{ portal_url }}" style="display:inline-block;background:#D45A1A;color:#ffffff;text-decoration:none;font-weight:700;font-size:14px;padding:12px 22px;border-radius:10px;">
+    Open leave portal
+  </a>
+{% endblock %}

@@ -104,24 +104,30 @@
                     <font-awesome-icon :icon="['fas', 'bell']" class="w-4 h-4 text-danger" />
                   </div>
                   <div>
-                    <p class="text-sm font-bold text-text-primary leading-tight">Increments due today</p>
+                    <p class="text-sm font-bold text-text-primary leading-tight">Notifications</p>
                     <p class="text-[11px] text-text-muted">{{ currentDate }}</p>
                   </div>
                 </div>
                 <span
-                    v-if="policyStore.dueTodayIncrements.length"
+                    v-if="unseenCount > 0"
                     class="text-xs font-bold text-danger bg-danger-subtle px-2.5 py-1 rounded-full"
                 >
-                  {{ policyStore.dueTodayIncrements.length }} pending
+                  {{ unseenCount }} new
                 </span>
               </div>
             </div>
 
             <!-- List -->
             <div class="max-h-96 overflow-y-auto">
-              <!-- Empty state -->
               <div
-                  v-if="!policyStore.dueTodayIncrements.length"
+                  v-if="notificationStore.isLoading && !notificationStore.items.length"
+                  class="px-6 py-10 text-center text-sm text-text-muted"
+              >
+                Loading…
+              </div>
+
+              <div
+                  v-else-if="!notificationStore.items.length"
                   class="flex flex-col items-center justify-center gap-3 px-6 py-10 text-center"
               >
                 <div class="w-14 h-14 rounded-full bg-success-subtle flex items-center justify-center">
@@ -129,45 +135,49 @@
                 </div>
                 <div>
                   <p class="text-sm font-semibold text-text-primary">You're all caught up</p>
-                  <p class="text-xs text-text-muted mt-0.5">No increments due today.</p>
+                  <p class="text-xs text-text-muted mt-0.5">No notifications yet.</p>
                 </div>
               </div>
 
-              <!-- Items -->
               <button
-                  v-for="(item, idx) in policyStore.dueTodayIncrements"
-                  :key="`${item.employee_id}-${item.policy_id}`"
+                  v-for="item in notificationStore.items"
+                  :key="item.id"
+                  type="button"
                   @click="handleNotifItemClick(item)"
-                  class="group w-full flex items-center gap-3 px-5 py-3 border-b border-border last:border-0 hover:bg-primary-subtle/40 transition-colors text-left cursor-pointer"
+                  class="group w-full flex items-start gap-3 px-5 py-3 border-b border-border last:border-0 hover:bg-primary-subtle/40 transition-colors text-left cursor-pointer"
+                  :class="!item.is_read ? 'bg-primary-subtle/20' : ''"
               >
-                <div class="relative shrink-0">
-                  <div class="w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold"
-                       :class="[avatarStyle(idx).bg, avatarStyle(idx).text]">
-                    {{ getInitials(item.employee_name) }}
-                  </div>
+                <div
+                    class="w-10 h-10 rounded-full flex items-center justify-center shrink-0"
+                    :class="typeStyle(item.type).bg"
+                >
+                  <font-awesome-icon :icon="typeStyle(item.type).icon" class="w-3.5 h-3.5" :class="typeStyle(item.type).text" />
                 </div>
 
                 <div class="min-w-0 flex-1">
-                  <p class="text-sm font-semibold text-text-primary truncate">{{ item.employee_name }}</p>
-                  <p class="text-xs text-text-muted truncate flex items-center gap-1 mt-0.5">
-                    <font-awesome-icon :icon="['fas', 'file-lines']" class="w-2.5 h-2.5" />
-                    {{ item.policy_name }}
-                  </p>
+                  <div class="flex items-start justify-between gap-2">
+                    <p class="text-sm font-semibold text-text-primary truncate">{{ item.title }}</p>
+                    <span v-if="!item.is_read" class="mt-1 w-2 h-2 rounded-full bg-danger shrink-0"></span>
+                  </div>
+                  <p v-if="item.body" class="text-xs text-text-muted mt-0.5 line-clamp-2">{{ item.body }}</p>
+                  <p class="text-[10px] text-text-muted mt-1">{{ formatNotifTime(item.created_at) }}</p>
                 </div>
-
-                <font-awesome-icon
-                    :icon="['fas', 'chevron-right']"
-                    class="w-3 h-3 text-text-muted opacity-0 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all shrink-0"
-                />
               </button>
             </div>
 
-            <!-- Footer -->
             <div
-                v-if="policyStore.dueTodayIncrements.length"
-                class="px-5 py-3 bg-surface border-t border-border text-center"
+                v-if="notificationStore.items.length"
+                class="px-5 py-3 bg-surface border-t border-border flex items-center justify-between gap-2"
             >
-              <p class="text-xs text-text-muted">Click an employee to jump to their record</p>
+              <p class="text-xs text-text-muted">Inbox, inquiries, hiring &amp; more</p>
+              <button
+                  v-if="unseenCount > 0"
+                  type="button"
+                  class="text-xs font-semibold text-primary hover:underline cursor-pointer"
+                  @click.stop="markAllRead"
+              >
+                Mark all read
+              </button>
             </div>
           </div>
         </transition>
@@ -177,11 +187,18 @@
       <div ref="userMenuRef" class="relative">
         <button
             @click="toggleUserMenu"
-            class="dash-topbar-profile flex items-center justify-center"
+            class="dash-topbar-profile flex items-center justify-center overflow-hidden"
             aria-haspopup="true"
             :aria-expanded="showUserMenu"
+            :title="profileDisplayName"
         >
-          {{ userInitials }}
+          <img
+              v-if="profileAvatarUrl"
+              :src="profileAvatarUrl"
+              alt="Profile"
+              class="w-full h-full object-cover"
+          />
+          <span v-else>{{ profileInitials }}</span>
         </button>
 
         <transition
@@ -251,13 +268,16 @@
 </template>
 
 <script setup>
-import { computed, ref, onMounted, onUnmounted } from 'vue'
+import { computed, ref, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useOverview } from '@/composables/useOverview.js'
 import { useAdminSidebar } from '@/composables/useAdminsidebar.js'
-import { usePolicyStore } from '@/stores/policyStore'
+import { useLoginStore } from '@/stores/loginStore.js'
+import { useNotificationStore } from '@/stores/notificationStore.js'
+import { BASE_URL, API_ENDPOINTS } from '@/services/baseUrl.js'
 
-const policyStore = usePolicyStore()
+const notificationStore = useNotificationStore()
+const loginStore = useLoginStore()
 const showNotifMenu = ref(false)
 const notifRef = ref(null)
 
@@ -268,33 +288,41 @@ const { isSidebarOpen, toggleSidebar } = useAdminSidebar()
 function toggleNotifMenu() {
   showNotifMenu.value = !showNotifMenu.value
   if (showNotifMenu.value) {
-    markAllAsSeen()
+    notificationStore.fetchNotifications()
   }
 }
 
-const avatarPalette = [
-  { bg: 'bg-teal-200', text: 'text-teal-700' },
-  { bg: 'bg-blue-200', text: 'text-blue-700' },
-  { bg: 'bg-purple-200', text: 'text-purple-700' },
-  { bg: 'bg-pink-200', text: 'text-pink-700' },
-  { bg: 'bg-amber-200', text: 'text-amber-700' },
-]
-
-const avatarStyle = (index) => avatarPalette[index % avatarPalette.length]
-
-const seenKeys = ref(new Set(JSON.parse(localStorage.getItem('seenIncrementKeys') || '[]')))
-
-function itemKey(item) {
-  return `${item.employee_id}-${item.policy_id}`
+const TYPE_STYLES = {
+  inbox: { icon: ['fas', 'comments'], bg: 'bg-sky-100', text: 'text-sky-700' },
+  inquiry: { icon: ['fas', 'envelope'], bg: 'bg-pink-100', text: 'text-pink-700' },
+  cv: { icon: ['fas', 'file-lines'], bg: 'bg-violet-100', text: 'text-violet-700' },
+  job: { icon: ['fas', 'briefcase'], bg: 'bg-indigo-100', text: 'text-indigo-700' },
+  increment: { icon: ['fas', 'money-bill'], bg: 'bg-amber-100', text: 'text-amber-700' },
+  status: { icon: ['fas', 'user-check'], bg: 'bg-emerald-100', text: 'text-emerald-700' },
+  leave: { icon: ['fas', 'umbrella-beach'], bg: 'bg-indigo-100', text: 'text-indigo-700' },
+  system: { icon: ['fas', 'bell'], bg: 'bg-slate-100', text: 'text-slate-700' },
 }
 
-const unseenCount = computed(() =>
-    policyStore.dueTodayIncrements.filter(item => !seenKeys.value.has(itemKey(item))).length
-)
+function typeStyle(type) {
+  return TYPE_STYLES[type] || TYPE_STYLES.system
+}
 
-function markAllAsSeen() {
-  policyStore.dueTodayIncrements.forEach(item => seenKeys.value.add(itemKey(item)))
-  localStorage.setItem('seenIncrementKeys', JSON.stringify([...seenKeys.value]))
+const unseenCount = computed(() => notificationStore.unreadCount || 0)
+
+function formatNotifTime(iso) {
+  if (!iso) return ''
+  const d = new Date(iso)
+  if (Number.isNaN(d.getTime())) return ''
+  return d.toLocaleString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  })
+}
+
+async function markAllRead() {
+  await notificationStore.markRead([], true)
 }
 
 const props = defineProps({
@@ -302,7 +330,7 @@ const props = defineProps({
   role: { type: String, default: '' },
   notificationCount: { type: Number, default: 0 },
   accountName: { type: String, default: null },
-  settingsRoute: { type: String, default: '/settings' },
+  settingsRoute: { type: String, default: '/admin/account' },
   titleOverride: { type: String, default: null },
   subtitleOverride: { type: String, default: null },
   showBack: { type: Boolean, default: false },
@@ -313,12 +341,21 @@ const emit = defineEmits(['back', 'highlight-employee'])
 
 const router = useRouter()
 
-function handleNotifItemClick(item) {
+async function handleNotifItemClick(item) {
   showNotifMenu.value = false
-  router.push({
-    path: '/admin/employees/salaries',
-    query: { highlightEmployee: item.employee_id }
-  })
+  if (item?.id && !item.is_read) {
+    await notificationStore.markRead([item.id], false)
+  }
+  if (item?.type === 'increment' && item?.payload?.employee_id) {
+    router.push({
+      path: '/admin/employees/salaries',
+      query: { highlightEmployee: item.payload.employee_id },
+    })
+    return
+  }
+  if (item?.link) {
+    router.push(item.link)
+  }
 }
 
 const {
@@ -362,19 +399,75 @@ function getInitials(name) {
   return (parts[0][0] + parts[1][0]).toUpperCase()
 }
 
-const displayName = computed(() => props.userName?.trim() || 'User')
-const initials = computed(() => getInitials(props.userName))
-const userInitials = computed(() => getInitials(props.accountName || props.userName))
+const loggedInUser = computed(() => loginStore.user || null)
+
+const profileDisplayName = computed(() => {
+  const u = loggedInUser.value
+  if (u) {
+    const full = [u.first_name, u.last_name].filter(Boolean).join(' ').trim()
+    if (full) return full
+    if (u.username) return u.username
+    if (u.email) return u.email
+  }
+  return props.accountName?.trim() || props.userName?.trim() || 'User'
+})
+
+const displayName = computed(() => props.userName?.trim() || profileDisplayName.value || 'User')
+const initials = computed(() => getInitials(props.userName || profileDisplayName.value))
+const profileInitials = computed(() => getInitials(profileDisplayName.value))
+
+const profileAvatarUrl = ref(null)
+let profileAvatarObjectUrl = null
+
+function clearProfileAvatar() {
+  if (profileAvatarObjectUrl) {
+    URL.revokeObjectURL(profileAvatarObjectUrl)
+    profileAvatarObjectUrl = null
+  }
+  profileAvatarUrl.value = null
+}
+
+async function loadProfileAvatar() {
+  clearProfileAvatar()
+  const u = loggedInUser.value
+  if (!u?.id || !u?.has_avatar) return
+
+  try {
+    const token = localStorage.getItem('accessToken')
+    const base = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL
+    const res = await fetch(`${base}${API_ENDPOINTS.ACCOUNTS_GET_USER_AVATAR(u.id)}?t=${Date.now()}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    })
+    if (!res.ok) return
+    const blob = await res.blob()
+    profileAvatarObjectUrl = URL.createObjectURL(blob)
+    profileAvatarUrl.value = profileAvatarObjectUrl
+  } catch (err) {
+    console.warn('Failed to load profile avatar', err)
+  }
+}
+
+watch(
+  () => [loggedInUser.value?.id, loggedInUser.value?.has_avatar],
+  () => {
+    loadProfileAvatar()
+  },
+  { immediate: true }
+)
 
 const now = ref(new Date())
 let timer = null
 
 onMounted(() => {
   timer = setInterval(() => (now.value = new Date()), 60000)
-  policyStore.fetchIncrementsDueToday()
+  notificationStore.startPolling()
 })
 
-onUnmounted(() => clearInterval(timer))
+onUnmounted(() => {
+  clearInterval(timer)
+  clearProfileAvatar()
+  notificationStore.stopPolling()
+})
 
 const greeting = computed(() => {
   const h = now.value.getHours()

@@ -1,12 +1,12 @@
 <template>
   <div
-      class="relative bg-white border border-slate-200 rounded-xl p-3 shadow-sm overflow-hidden"
+      class="relative bg-white border border-border rounded-lg p-3 shadow-sm overflow-hidden"
   >
     <!-- Top accent bar with dynamic gradient based on color/variant prop -->
     <div class="absolute top-0 left-0 right-0 h-1" :class="accent.bar"></div>
 
     <div class="flex items-start justify-between">
-      <p class="text-[11px] font-semibold text-slate-500 tracking-wide uppercase">
+      <p class="text-[11px] font-semibold text-text-muted tracking-wide uppercase">
         {{ label }}
       </p>
       <div
@@ -17,16 +17,10 @@
       </div>
     </div>
 
-    <p class="text-2xl font-bold text-slate-900 mt-1.5">{{ value }}</p>
-    <p v-if="subtitle" class="text-xs text-slate-500 mt-1">{{ subtitle }}</p>
+    <p class="text-2xl font-bold text-headingMain mt-1.5">{{ value }}</p>
+    <p v-if="subtitle" class="text-xs text-text-muted mt-1">{{ subtitle }}</p>
 
-    <router-link
-        v-if="link"
-        :to="link"
-        class="text-xs font-medium text-blue-600 hover:underline mt-0.5 inline-block"
-    >
-      {{ linkLabel }}
-    </router-link>
+
   </div>
 </template>
 
@@ -41,7 +35,6 @@ const props = defineProps({
   color: { type: String, default: null },
   variant: { type: String, default: null }, // alias for `color` — supports new naming (peach/lavender/sky/teal)
   link: { type: String, default: null },
-  linkLabel: { type: String, default: 'View more' }
 })
 
 const themes = {

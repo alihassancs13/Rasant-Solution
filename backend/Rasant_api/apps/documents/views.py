@@ -606,6 +606,72 @@ def share_document(request):
         )
 
 
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def remove_shared_document(request):
+    """
+    DELETE: Revoke document/folder access from an employee.
+    Body: { folder_id | file_id, employee_id }
+    """
+    try:
+        folder_id = request.data.get('folder_id')
+        file_id = request.data.get('file_id')
+        employee_id = request.data.get('employee_id')
+
+        if not employee_id:
+            return Response(
+                {'error': 'employee_id is required'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if not folder_id and not file_id:
+            return Response(
+                {'error': 'folder_id or file_id is required'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if folder_id and file_id:
+            return Response(
+                {'error': 'Cannot unshare both folder and file at the same time'},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        employee = get_object_or_404(Employee, id=employee_id)
+
+        if folder_id:
+            get_object_or_404(Folder, id=folder_id)
+            qs = SharedDocument.objects.filter(folder_id=folder_id, employee_id=employee_id)
+            document_type = 'folder'
+        else:
+            get_object_or_404(File, id=file_id)
+            qs = SharedDocument.objects.filter(file_id=file_id, employee_id=employee_id)
+            document_type = 'file'
+
+        share = qs.first()
+        if not share:
+            return Response(
+                {'error': f'Document is not shared with employee ID {employee_id}'},
+                status=status.HTTP_404_NOT_FOUND,
+            )
+
+        share.delete()
+
+        return Response(
+            {
+                'status': 'success',
+                'message': f'Access revoked from {employee.name or employee.email}',
+                'document_type': document_type,
+                'folder_id': folder_id,
+                'file_id': file_id,
+                'employee_id': employee_id,
+            },
+            status=status.HTTP_200_OK,
+        )
+    except Exception as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+
 # documents/views.py
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

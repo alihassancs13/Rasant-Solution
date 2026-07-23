@@ -38,6 +38,13 @@ export default function useDocuments() {
     const viewMode = ref('grid')
     const showNewMenu = ref(false)
     const isDragging = ref(false)
+    const isUploading = ref(false)
+    const uploadPercent = ref(0)
+    const uploadFileName = ref('')
+    const uploadIndex = ref(0)
+    const uploadTotal = ref(0)
+    const uploadStatusText = ref('')
+
     const fileInput = ref(null)
     const zipInput = ref(null)
     const selectedFileId = ref(null)
@@ -50,6 +57,9 @@ export default function useDocuments() {
     const selectedEmployees = ref([])
     const isSharing = ref(false)
     const selectedDocument = ref(null)
+    const showUnshareModal = ref(false)
+    const unshareEmployee = ref(null)
+    const isUnsharing = ref(false)
     const showFolderModal = ref(false)
     const folderName = ref('')
     const isSubmitting = ref(false)
@@ -302,11 +312,11 @@ export default function useDocuments() {
         selectedEmployees.value = []
         shareSearchQuery.value = ''
         isSharing.value = false
+        closeUnshareModal()
     }
 
     const toggleEmployee = (employee) => {
         if (isAlreadyShared(employee.id)) {
-            showToast('This item is already shared with this employee', 'info')
             return
         }
         const index = selectedEmployees.value.findIndex(e => e.id === employee.id)
@@ -319,6 +329,92 @@ export default function useDocuments() {
 
     const isEmployeeSelected = (employeeId) => {
         return selectedEmployees.value.some(e => e.id === employeeId)
+    }
+
+    const openUnshareModal = (employeeId) => {
+        if (!selectedDocument.value) {
+            showToast('No document selected', 'error')
+            return
+        }
+        const employee = employeeStore.employees.find(e => e.id === employeeId)
+        if (!employee) {
+            showToast('Employee not found', 'error')
+            return
+        }
+        unshareEmployee.value = employee
+        showUnshareModal.value = true
+    }
+
+    const closeUnshareModal = () => {
+        showUnshareModal.value = false
+        unshareEmployee.value = null
+        isUnsharing.value = false
+    }
+
+    const unshareSubtitle = computed(() => {
+        const docName = selectedDocument.value?.name || 'this document'
+        const empName = unshareEmployee.value?.full_name
+            || unshareEmployee.value?.name
+            || unshareEmployee.value?.email
+            || 'this employee'
+        return `Remove access to "${docName}" from ${empName}? They will no longer see this in their documents.`
+    })
+
+    const submitUnshare = async () => {
+        if (!selectedDocument.value || !unshareEmployee.value) {
+            showToast('Nothing to unshare', 'error')
+            return
+        }
+
+        isUnsharing.value = true
+        const employeeId = unshareEmployee.value.id
+        const employeeName = unshareEmployee.value.full_name
+            || unshareEmployee.value.name
+            || unshareEmployee.value.email
+            || 'Employee'
+
+        try {
+            const isFolder = selectedDocument.value.isFolder
+            const result = isFolder
+                ? await store.removeDocumentShare(selectedDocument.value.id, null, employeeId)
+                : await store.removeDocumentShare(null, selectedDocument.value.id, employeeId)
+
+            if (result?.error) {
+                showToast(result.error || 'Failed to remove access', 'error')
+                return
+            }
+
+            showToast(`Access removed from ${employeeName}`, 'success')
+
+            if (Array.isArray(selectedDocument.value.shared_with)) {
+                selectedDocument.value = {
+                    ...selectedDocument.value,
+                    shared_with: selectedDocument.value.shared_with.filter((id) => id !== employeeId),
+                }
+            }
+
+            if (store.currentFolderId) {
+                await store.loadFolderContents(store.currentFolderId)
+            } else {
+                await store.loadAllItems()
+            }
+
+            const pool = [...(store.viewItems || []), ...(store.allItems || [])]
+            const match = pool.find(
+                (i) => i.id === selectedDocument.value.id
+                    && Boolean(i.isFolder) === Boolean(selectedDocument.value.isFolder),
+            )
+            if (match) {
+                selectedDocument.value = match
+            }
+
+            closeUnshareModal()
+        } catch (error) {
+            console.error('Error removing document share:', error)
+            showToast(error.message || 'Error removing access', 'error')
+        } finally {
+            isUnsharing.value = false
+        }
     }
 
     const confirmShare = async () => {
@@ -404,24 +500,77 @@ export default function useDocuments() {
         showNewMenu.value = false
     }
 
-    const handleFileUpload = async (event) => {
-        const files = event.target.files
-        if (!files.length) return
+    const formatBytes = (bytes) => {
+        if (!bytes && bytes !== 0) return ''
+        const n = Number(bytes)
+        if (Number.isNaN(n) || n < 0) return ''
+        if (n < 1024) return `${n} B`
+        if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`
+        return `${(n / (1024 * 1024)).toFixed(1)} MB`
+    }
+
+    const resetUploadProgress = () => {
+        isUploading.value = false
+        uploadPercent.value = 0
+        uploadFileName.value = ''
+        uploadIndex.value = 0
+        uploadTotal.value = 0
+        uploadStatusText.value = ''
+    }
+
+    const uploadFilesWithProgress = async (files, successLabel = 'file(s)') => {
+        const list = Array.from(files || [])
+        if (!list.length) return
 
         if (!store.currentFolderId) {
             showToast('Please select a folder first.', 'warning')
-            event.target.value = ''
             return
         }
 
+        isUploading.value = true
+        uploadTotal.value = list.length
+        uploadIndex.value = 0
+        uploadPercent.value = 0
+
         try {
-            for (const file of files) {
-                await store.uploadFile(store.currentFolderId, file)
+            for (let i = 0; i < list.length; i++) {
+                const file = list[i]
+                uploadIndex.value = i + 1
+                uploadFileName.value = file.name
+                uploadPercent.value = 0
+                uploadStatusText.value = `Uploading ${i + 1} of ${list.length}`
+
+                await store.uploadFile(store.currentFolderId, file, ({ percent, loaded, total }) => {
+                    if (percent != null) {
+                        uploadPercent.value = percent
+                        uploadStatusText.value = total
+                            ? `Uploading ${i + 1} of ${list.length} · ${formatBytes(loaded)} / ${formatBytes(total)}`
+                            : `Uploading ${i + 1} of ${list.length}`
+                    } else {
+                        uploadStatusText.value = `Uploading ${i + 1} of ${list.length} · ${formatBytes(loaded)}`
+                    }
+                })
+                uploadPercent.value = 100
             }
-            showToast(`${files.length} file(s) uploaded successfully!`, 'success')
+            showToast(`${list.length} ${successLabel} uploaded successfully!`, 'success')
         } catch (error) {
             console.error('Upload error:', error)
             showToast(error.message || 'Failed to upload file', 'error')
+            throw error
+        } finally {
+            // brief pause so admin sees 100%
+            await new Promise((r) => setTimeout(r, 350))
+            resetUploadProgress()
+        }
+    }
+
+    const handleFileUpload = async (event) => {
+        const files = event.target.files
+        if (!files.length) return
+        try {
+            await uploadFilesWithProgress(files, 'file(s)')
+        } catch (_) {
+            // toast already shown
         }
         event.target.value = ''
     }
@@ -429,21 +578,10 @@ export default function useDocuments() {
     const handleZipUpload = async (event) => {
         const files = event.target.files
         if (!files.length) return
-
-        if (!store.currentFolderId) {
-            showToast('Please select a folder first.', 'warning')
-            event.target.value = ''
-            return
-        }
-
         try {
-            for (const file of files) {
-                await store.uploadFile(store.currentFolderId, file)
-            }
-            showToast(`${files.length} zip file(s) uploaded successfully!`, 'success')
-        } catch (error) {
-            console.error('Zip upload error:', error)
-            showToast(error.message || 'Failed to upload zip file', 'error')
+            await uploadFilesWithProgress(files, 'zip file(s)')
+        } catch (_) {
+            // toast already shown
         }
         event.target.value = ''
     }
@@ -463,13 +601,9 @@ export default function useDocuments() {
         }
 
         try {
-            for (const file of files) {
-                await store.uploadFile(store.currentFolderId, file)
-            }
-            showToast(`${files.length} file(s) uploaded successfully!`, 'success')
-        } catch (error) {
-            console.error('Drop upload error:', error)
-            showToast(error.message || 'Failed to upload files', 'error')
+            await uploadFilesWithProgress(files, 'file(s)')
+        } catch (_) {
+            // toast already shown
         }
     }
 
@@ -949,6 +1083,10 @@ export default function useDocuments() {
         selectedEmployees,
         isSharing,
         selectedDocument,
+        showUnshareModal,
+        unshareEmployee,
+        isUnsharing,
+        unshareSubtitle,
         filteredItems,
         shareFilteredEmployees,
         breadcrumb,
@@ -973,11 +1111,20 @@ export default function useDocuments() {
         toggleEmployee,
         isEmployeeSelected,
         confirmShare,
+        openUnshareModal,
+        closeUnshareModal,
+        submitUnshare,
         uploadFile,
         uploadZip,
         handleFileUpload,
         handleZipUpload,
         handleDrop,
+        isUploading,
+        uploadPercent,
+        uploadFileName,
+        uploadIndex,
+        uploadTotal,
+        uploadStatusText,
         openItem,
         navigateTo,
         navigateToRoot,

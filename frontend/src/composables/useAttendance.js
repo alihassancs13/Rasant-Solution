@@ -86,17 +86,35 @@ function computeInitials(name) {
     return value
 }
 
+function formatClock(value) {
+    if (!value) return '—'
+    const str = String(value)
+    return str.length >= 5 ? str.slice(0, 5) : str
+}
+
 function mapEmployeeRow(row) {
     return {
         id: row.id,
         name: row.name,
-        empNo: String(row.emp_no ?? row.attendance_id ?? ''),
+        empNo: String(row.emp_no ?? row.attendance_id ?? row.employee_number ?? ''),
         dept: row.dept ?? row.department ?? '',
-        status: row.status ?? 'present',
+        status: row.today_status ?? row.status ?? null,
         pct: row.attendance_percentage ?? row.pct ?? 0,
         synced: row.last_synced ?? row.synced ?? '-',
         gradient: gradientFor(row.emp_no ?? row.id),
         initials: computeInitials(row.name),
+        todayClockIn: formatClock(row.today_clock_in),
+        todayClockOut: formatClock(row.today_clock_out),
+        todayStatus: row.today_status || null,
+        todayInOffice: row.today_in_office,
+        todayLocationLabel: row.today_location_label || null,
+        workFromHome: Boolean(row.work_from_home),
+        todayDistance: row.today_distance_meters,
+        todayAddress: row.today_address || '',
+        todayLatitude: row.today_latitude,
+        todayLongitude: row.today_longitude,
+        todayLateMinutes: row.today_late_minutes,
+        hasTodayCheckIn: Boolean(row.today_clock_in),
     }
 }
 
@@ -105,8 +123,24 @@ function mapHistoryRecord(rec) {
         id: rec.id,
         date: rec.date,
         status: rec.status,
-        in: rec.clock_in ?? rec.check_in ?? '-',
-        out: rec.clock_out ?? rec.check_out ?? '-',
+        timetable: rec.timetable || '',
+        late_minutes: rec.late_minutes,
+        overtime_hours: rec.overtime_hours,
+        in: formatClock(rec.clock_in ?? rec.check_in),
+        out: formatClock(rec.clock_out ?? rec.check_out),
+        check_in_in_office: rec.check_in_in_office,
+        check_in_location_label: rec.check_in_location_label,
+        check_in_distance_meters: rec.check_in_distance_meters,
+        check_in_address: rec.check_in_address,
+        check_in_latitude: rec.check_in_latitude,
+        check_in_longitude: rec.check_in_longitude,
+        check_out_in_office: rec.check_out_in_office,
+        check_out_location_label: rec.check_out_location_label,
+        check_out_distance_meters: rec.check_out_distance_meters,
+        check_out_address: rec.check_out_address,
+        check_out_latitude: rec.check_out_latitude,
+        check_out_longitude: rec.check_out_longitude,
+        work_from_home: Boolean(rec.work_from_home),
     }
 }
 
@@ -115,6 +149,7 @@ export const STATUS_META = {
     late: { label: 'Late', className: 'text-[var(--color-danger)] bg-[var(--color-danger-subtle)]' },
     absent: { label: 'Absent', className: 'text-[var(--color-danger)] bg-[var(--color-danger-subtle)]' },
     on_leave: { label: 'On leave', className: 'text-[var(--color-warning)] bg-[var(--color-warning-subtle)]' },
+    holiday: { label: 'Holiday', className: 'text-sky-700 bg-sky-100' },
 }
 
 export function attendanceBarClass(pct) {
@@ -127,6 +162,7 @@ export const historyChips = [
     { value: 'late', label: 'Late' },
     { value: 'absent', label: 'Absent' },
     { value: 'on_leave', label: 'On leave' },
+    { value: 'holiday', label: 'Holiday' },
 ]
 
 const ACCEPTED_EXT = ['csv', 'xlsx', 'xls']
@@ -339,7 +375,7 @@ export function useAttendance() {
         (store.currentHistory?.history ?? []).map(mapHistoryRecord),
     )
     const historyStats = computed(() =>
-        store.currentHistory?.historyStats ?? { present: 0, late: 0, absent: 0, on_leave: 0 },
+        store.currentHistory?.historyStats ?? { present: 0, late: 0, absent: 0, on_leave: 0, holiday: 0 },
     )
 
     const {
@@ -392,10 +428,10 @@ export function useAttendance() {
         return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
     }
 
-    // ---------- inline status dropdown (present / late / on_leave / absent) ----------
+    // ---------- inline status dropdown (present / late / on_leave / absent / holiday) ----------
     const openHistoryStatusId = ref(null)
     const historyDropdownPosition = ref({ top: 0, left: 0 })
-    const historyStatusOptions = ['present', 'late', 'on_leave', 'absent']
+    const historyStatusOptions = ['present', 'late', 'on_leave', 'absent', 'holiday']
 
     function toggleHistoryStatusDropdown(rec, event) {
         if (openHistoryStatusId.value === rec.id) {
@@ -403,7 +439,7 @@ export function useAttendance() {
             return
         }
         const rect = event.currentTarget.getBoundingClientRect()
-        const dropdownHeight = 190 // approx height for 4 items
+        const dropdownHeight = 230
         const spaceBelow = window.innerHeight - rect.bottom
 
         const top = spaceBelow < dropdownHeight
@@ -415,6 +451,14 @@ export function useAttendance() {
     }
     function closeHistoryStatusDropdown() {
         openHistoryStatusId.value = null
+    }
+
+    const selectedCheckIn = ref(null)
+    function openCheckInDetail(rec) {
+        selectedCheckIn.value = rec
+    }
+    function closeCheckInDetail() {
+        selectedCheckIn.value = null
     }
 
     async function updateHistoryStatus(rec, newStatus) {
@@ -455,5 +499,6 @@ export function useAttendance() {
         // inline status dropdown
         openHistoryStatusId, historyDropdownPosition, historyStatusOptions,
         toggleHistoryStatusDropdown, closeHistoryStatusDropdown, updateHistoryStatus,
+        selectedCheckIn, openCheckInDetail, closeCheckInDetail,
     }
 }

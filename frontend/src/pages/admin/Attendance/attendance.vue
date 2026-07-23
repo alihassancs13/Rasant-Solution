@@ -31,7 +31,25 @@ const {
   goToPage, historyNextPage, historyPrevPage, formatDateLabel,
   openHistoryStatusId, historyDropdownPosition, historyStatusOptions,
   toggleHistoryStatusDropdown, closeHistoryStatusDropdown, updateHistoryStatus,
+  selectedCheckIn, openCheckInDetail, closeCheckInDetail,
 } = useAttendance()
+
+function officeTone(inOffice) {
+  if (inOffice === true) return 'text-emerald-700'
+  if (inOffice === false) return 'text-amber-700'
+  return 'text-text-muted'
+}
+
+function officeLabel(inOffice, workFromHome = false) {
+  if (inOffice === true) return 'In office'
+  if (inOffice === false) return workFromHome ? 'Work from home' : 'Not in office'
+  return 'No GPS'
+}
+
+function mapsUrl(lat, lng) {
+  if (lat == null || lng == null || lat === '' || lng === '') return null
+  return `https://www.google.com/maps?q=${lat},${lng}`
+}
 
 onMounted(() => {
   loadEmployees()
@@ -116,6 +134,8 @@ onUnmounted(() => document.removeEventListener('click', closeHistoryStatusDropdo
                 <th class="text-left text-[10.5px] font-bold tracking-wider uppercase text-text-muted px-4.5 py-3.5 border-b border-border-subtle whitespace-nowrap">Employee</th>
                 <th class="text-left text-[10.5px] font-bold tracking-wider uppercase text-text-muted px-4.5 py-3.5 border-b border-border-subtle whitespace-nowrap">Employee No.</th>
                 <th class="text-left text-[10.5px] font-bold tracking-wider uppercase text-text-muted px-4.5 py-3.5 border-b border-border-subtle whitespace-nowrap">Department</th>
+                <th class="text-left text-[10.5px] font-bold tracking-wider uppercase text-text-muted px-4.5 py-3.5 border-b border-border-subtle whitespace-nowrap">Today check-in</th>
+                <th class="text-left text-[10.5px] font-bold tracking-wider uppercase text-text-muted px-4.5 py-3.5 border-b border-border-subtle whitespace-nowrap">Location</th>
                 <th class="text-left text-[10.5px] font-bold tracking-wider uppercase text-text-muted px-4.5 py-3.5 border-b border-border-subtle whitespace-nowrap">Attendance %</th>
                 <th class="text-left text-[10.5px] font-bold tracking-wider uppercase text-text-muted px-4.5 py-3.5 border-b border-border-subtle whitespace-nowrap">Last synced</th>
               </tr>
@@ -123,7 +143,7 @@ onUnmounted(() => document.removeEventListener('click', closeHistoryStatusDropdo
               <tbody>
               <tr
                   v-for="emp in paginatedEmployees"
-                  :key="emp.empNo"
+                  :key="emp.id || emp.empNo"
                   @click="openHistory(emp)"
                   class="hover:bg-surface/60 cursor-pointer"
               >
@@ -140,11 +160,37 @@ onUnmounted(() => document.removeEventListener('click', closeHistoryStatusDropdo
                 </td>
                 <td class="px-4.5 py-3.5 border-b border-border-subtle">
                       <span class="font-mono text-xs font-semibold bg-surface border border-border text-text-secondary px-2.5 py-1 rounded-md">
-                        {{ emp.empNo }}
+                        {{ emp.empNo || '—' }}
                       </span>
                 </td>
                 <td class="px-4.5 py-3.5 border-b border-border-subtle text-[13.5px] text-text-primary">
                   {{ emp.dept }}
+                </td>
+                <td class="px-4.5 py-3.5 border-b border-border-subtle">
+                  <template v-if="emp.hasTodayCheckIn">
+                    <p class="text-[13.5px] font-semibold text-text-primary">
+                      {{ emp.todayClockIn }}
+                      <span class="text-text-muted font-normal">→ {{ emp.todayClockOut }}</span>
+                    </p>
+                    <span
+                      v-if="emp.todayStatus && STATUS_META[emp.todayStatus]"
+                      class="inline-flex mt-1 px-2 py-0.5 rounded-full text-[11px] font-bold"
+                      :class="STATUS_META[emp.todayStatus].className"
+                    >
+                      {{ STATUS_META[emp.todayStatus].label }}
+                    </span>
+                  </template>
+                  <span v-else class="text-xs text-text-muted">Not checked in</span>
+                </td>
+                <td class="px-4.5 py-3.5 border-b border-border-subtle min-w-[160px]">
+                  <template v-if="emp.hasTodayCheckIn">
+                    <p class="text-xs font-semibold" :class="officeTone(emp.todayInOffice)">
+                      {{ emp.todayLocationLabel || officeLabel(emp.todayInOffice, emp.workFromHome) }}
+                      <span v-if="emp.todayDistance != null"> · {{ emp.todayDistance }} m</span>
+                    </p>
+                    <p v-if="emp.todayAddress" class="text-[11px] text-text-muted mt-0.5 line-clamp-2">{{ emp.todayAddress }}</p>
+                  </template>
+                  <span v-else class="text-xs text-text-muted">—</span>
                 </td>
                 <td class="px-4.5 py-3.5 border-b border-border-subtle">
                   <div class="flex items-center gap-2 min-w-[90px]">
@@ -159,12 +205,12 @@ onUnmounted(() => document.removeEventListener('click', closeHistoryStatusDropdo
                 </td>
               </tr>
               <tr v-if="isLoadingList">
-                <td colspan="6" class="text-center text-[13px] text-text-muted py-12">
+                <td colspan="7" class="text-center text-[13px] text-text-muted py-12">
                   Loading attendance…
                 </td>
               </tr>
               <tr v-else-if="!filteredEmployees.length">
-                <td colspan="6" class="text-center text-[13px] text-text-muted py-12">
+                <td colspan="7" class="text-center text-[13px] text-text-muted py-12">
                   No employees match these filters.
                 </td>
               </tr>
@@ -214,7 +260,7 @@ onUnmounted(() => document.removeEventListener('click', closeHistoryStatusDropdo
           <div class="bg-white border border-border rounded-xl shadow-(--shadow-card) overflow-hidden">
             <!-- Stats Cards -->
             <div class="p-4.5 border-b border-border-subtle">
-              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+              <div class="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
                 <StatCard
                     label="Present"
                     :value="historyStats.present"
@@ -238,6 +284,12 @@ onUnmounted(() => document.removeEventListener('click', closeHistoryStatusDropdo
                     :value="historyStats.on_leave"
                     :icon="['fas', 'calendar-day']"
                     color="teal"
+                />
+                <StatCard
+                    label="Holiday"
+                    :value="historyStats.holiday || 0"
+                    :icon="['fas', 'umbrella-beach']"
+                    color="blue"
                 />
               </div>
             </div>
@@ -319,26 +371,70 @@ onUnmounted(() => document.removeEventListener('click', closeHistoryStatusDropdo
             <table v-else-if="historyRecords.length" class="w-full border-collapse">
               <thead>
               <tr>
-                <th class="text-left text-[10.5px] font-bold uppercase tracking-wide text-text-muted px-6 py-4 border-b border-border-subtle bg-surface">Date</th>
-                <th class="text-left text-[10.5px] font-bold uppercase tracking-wide text-text-muted px-6 py-4 border-b border-border-subtle bg-surface">Status</th>
-                <th class="text-left text-[10.5px] font-bold uppercase tracking-wide text-text-muted px-6 py-4 border-b border-border-subtle bg-surface">Check-in</th>
-                <th class="text-left text-[10.5px] font-bold uppercase tracking-wide text-text-muted px-6 py-4 border-b border-border-subtle bg-surface">Check-out</th>
+                <th class="text-left text-[10.5px] font-bold uppercase tracking-wide text-text-muted px-4 py-4 border-b border-border-subtle bg-surface">Date</th>
+                <th class="text-left text-[10.5px] font-bold uppercase tracking-wide text-text-muted px-4 py-4 border-b border-border-subtle bg-surface">Status</th>
+                <th class="text-left text-[10.5px] font-bold uppercase tracking-wide text-text-muted px-4 py-4 border-b border-border-subtle bg-surface">Check-in</th>
+                <th class="text-left text-[10.5px] font-bold uppercase tracking-wide text-text-muted px-4 py-4 border-b border-border-subtle bg-surface">Check-out</th>
+                <th class="text-left text-[10.5px] font-bold uppercase tracking-wide text-text-muted px-4 py-4 border-b border-border-subtle bg-surface">Check-in location</th>
+                <th class="text-left text-[10.5px] font-bold uppercase tracking-wide text-text-muted px-4 py-4 border-b border-border-subtle bg-surface"></th>
               </tr>
               </thead>
               <tbody>
-              <tr v-for="rec in paginatedHistory" :key="rec.date" class="hover:bg-surface/60">
-                <td class="px-6 py-4 text-[13.5px] text-text-primary border-b border-border-subtle">{{ formatDateLabel(rec.date) }}</td>
-                <td class="px-6 py-4 border-b border-border-subtle relative">
-                  <button type="button" @click.stop="toggleHistoryStatusDropdown(rec, $event)"
-                          class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold cursor-pointer transition-all border border-transparent hover:shadow-sm"
-                          :class="STATUS_META[rec.status].className">
+              <tr
+                v-for="rec in paginatedHistory"
+                :key="rec.id || rec.date"
+                class="hover:bg-surface/60 cursor-pointer"
+                @click="openCheckInDetail(rec)"
+              >
+                <td class="px-4 py-4 text-[13.5px] text-text-primary border-b border-border-subtle whitespace-nowrap">
+                  {{ formatDateLabel(rec.date) }}
+                  <p v-if="rec.timetable" class="text-[11px] text-text-muted mt-0.5">Shift {{ rec.timetable }}</p>
+                </td>
+                <td class="px-4 py-4 border-b border-border-subtle relative" @click.stop>
+                  <button
+                    v-if="STATUS_META[rec.status]"
+                    type="button"
+                    @click.stop="toggleHistoryStatusDropdown(rec, $event)"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold cursor-pointer transition-all border border-transparent hover:shadow-sm"
+                    :class="STATUS_META[rec.status].className"
+                  >
                     {{ STATUS_META[rec.status].label }}
                     <font-awesome-icon icon="fa-solid fa-chevron-down" class="w-2 h-2 transition-transform opacity-70"
                                        :class="{ 'rotate-180': openHistoryStatusId === rec.id }" />
                   </button>
+                  <span v-else class="text-xs text-text-muted">—</span>
+                  <p v-if="rec.late_minutes" class="text-[11px] text-amber-700 mt-1">Late {{ rec.late_minutes }} min</p>
                 </td>
-                <td class="px-6 py-4 text-[13.5px] text-text-primary border-b border-border-subtle">{{ rec.in }}</td>
-                <td class="px-6 py-4 text-[13.5px] text-text-primary border-b border-border-subtle">{{ rec.out }}</td>
+                <td class="px-4 py-4 text-[13.5px] font-semibold text-text-primary border-b border-border-subtle">{{ rec.in }}</td>
+                <td class="px-4 py-4 text-[13.5px] text-text-primary border-b border-border-subtle">{{ rec.out }}</td>
+                <td class="px-4 py-4 text-[12.5px] text-text-secondary border-b border-border-subtle min-w-[220px]">
+                  <p class="font-semibold" :class="officeTone(rec.check_in_in_office)">
+                    {{ rec.check_in_location_label || officeLabel(rec.check_in_in_office, rec.work_from_home) }}
+                    <span v-if="rec.check_in_distance_meters != null"> · {{ rec.check_in_distance_meters }} m</span>
+                  </p>
+                  <p v-if="rec.check_in_address" class="text-xs text-text-muted mt-0.5 line-clamp-2">{{ rec.check_in_address }}</p>
+                  <p v-if="rec.check_in_latitude != null" class="text-[11px] text-text-muted mt-0.5 font-mono">
+                    {{ rec.check_in_latitude }}, {{ rec.check_in_longitude }}
+                  </p>
+                  <a
+                    v-if="mapsUrl(rec.check_in_latitude, rec.check_in_longitude)"
+                    :href="mapsUrl(rec.check_in_latitude, rec.check_in_longitude)"
+                    target="_blank"
+                    rel="noopener"
+                    class="text-xs text-primary font-semibold mt-1 inline-block"
+                    @click.stop
+                  >Open map</a>
+                  <p v-else-if="!rec.check_in_latitude" class="text-xs text-text-muted">No GPS on this record</p>
+                </td>
+                <td class="px-4 py-4 border-b border-border-subtle text-right">
+                  <button
+                    type="button"
+                    class="text-xs font-semibold text-primary hover:underline cursor-pointer"
+                    @click.stop="openCheckInDetail(rec)"
+                  >
+                    Details
+                  </button>
+                </td>
               </tr>
               </tbody>
             </table>
@@ -497,6 +593,91 @@ onUnmounted(() => document.removeEventListener('click', closeHistoryStatusDropdo
         </div>
       </div>
     </BaseModal>
+
+    <BaseDetailModal
+      :is-open="!!selectedCheckIn"
+      mode="view"
+      size="md"
+      title="Check-in details"
+      :subtitle="selectedCheckIn ? formatDateLabel(selectedCheckIn.date) : ''"
+      hide-footer
+      @close="closeCheckInDetail"
+    >
+      <div v-if="selectedCheckIn" class="space-y-4 text-sm">
+        <div class="grid grid-cols-2 gap-3">
+          <div class="rounded-lg border border-border p-3">
+            <p class="text-xs text-text-muted uppercase tracking-wide">Status</p>
+            <p class="mt-1 font-semibold capitalize">{{ selectedCheckIn.status || '—' }}</p>
+          </div>
+          <div class="rounded-lg border border-border p-3">
+            <p class="text-xs text-text-muted uppercase tracking-wide">Shift</p>
+            <p class="mt-1 font-semibold">{{ selectedCheckIn.timetable || '—' }}</p>
+          </div>
+          <div class="rounded-lg border border-border p-3">
+            <p class="text-xs text-text-muted uppercase tracking-wide">Check-in</p>
+            <p class="mt-1 font-semibold text-lg">{{ selectedCheckIn.in }}</p>
+            <p v-if="selectedCheckIn.late_minutes" class="text-xs text-amber-700 mt-1">Late by {{ selectedCheckIn.late_minutes }} min</p>
+          </div>
+          <div class="rounded-lg border border-border p-3">
+            <p class="text-xs text-text-muted uppercase tracking-wide">Check-out</p>
+            <p class="mt-1 font-semibold text-lg">{{ selectedCheckIn.out }}</p>
+            <p v-if="selectedCheckIn.overtime_hours" class="text-xs text-text-muted mt-1">OT {{ selectedCheckIn.overtime_hours }} h</p>
+          </div>
+        </div>
+
+        <div class="rounded-lg border border-border p-4 space-y-2">
+          <h4 class="font-bold text-text-primary">Check-in location</h4>
+          <p class="font-semibold" :class="officeTone(selectedCheckIn.check_in_in_office)">
+            {{ selectedCheckIn.check_in_location_label || officeLabel(selectedCheckIn.check_in_in_office, selectedCheckIn.work_from_home) }}
+            <span v-if="selectedCheckIn.check_in_distance_meters != null">
+              · {{ selectedCheckIn.check_in_distance_meters }} m from office
+            </span>
+          </p>
+          <p v-if="selectedCheckIn.check_in_address" class="text-text-secondary">{{ selectedCheckIn.check_in_address }}</p>
+          <p v-if="selectedCheckIn.check_in_latitude != null" class="font-mono text-xs text-text-muted">
+            {{ selectedCheckIn.check_in_latitude }}, {{ selectedCheckIn.check_in_longitude }}
+          </p>
+          <a
+            v-if="mapsUrl(selectedCheckIn.check_in_latitude, selectedCheckIn.check_in_longitude)"
+            :href="mapsUrl(selectedCheckIn.check_in_latitude, selectedCheckIn.check_in_longitude)"
+            target="_blank"
+            rel="noopener"
+            class="inline-flex items-center gap-1.5 text-primary font-semibold text-sm"
+          >
+            <font-awesome-icon icon="fa-solid fa-map-location-dot" />
+            View on Google Maps
+          </a>
+          <p v-else class="text-xs text-text-muted">No GPS captured for this check-in.</p>
+        </div>
+
+        <div class="rounded-lg border border-border p-4 space-y-2">
+          <h4 class="font-bold text-text-primary">Check-out location</h4>
+          <template v-if="selectedCheckIn.out && selectedCheckIn.out !== '—'">
+            <p class="font-semibold" :class="officeTone(selectedCheckIn.check_out_in_office)">
+              {{ selectedCheckIn.check_out_location_label || officeLabel(selectedCheckIn.check_out_in_office, selectedCheckIn.work_from_home) }}
+              <span v-if="selectedCheckIn.check_out_distance_meters != null">
+                · {{ selectedCheckIn.check_out_distance_meters }} m from office
+              </span>
+            </p>
+            <p v-if="selectedCheckIn.check_out_address" class="text-text-secondary">{{ selectedCheckIn.check_out_address }}</p>
+            <p v-if="selectedCheckIn.check_out_latitude != null" class="font-mono text-xs text-text-muted">
+              {{ selectedCheckIn.check_out_latitude }}, {{ selectedCheckIn.check_out_longitude }}
+            </p>
+            <a
+              v-if="mapsUrl(selectedCheckIn.check_out_latitude, selectedCheckIn.check_out_longitude)"
+              :href="mapsUrl(selectedCheckIn.check_out_latitude, selectedCheckIn.check_out_longitude)"
+              target="_blank"
+              rel="noopener"
+              class="inline-flex items-center gap-1.5 text-primary font-semibold text-sm"
+            >
+              <font-awesome-icon icon="fa-solid fa-map-location-dot" />
+              View on Google Maps
+            </a>
+          </template>
+          <p v-else class="text-xs text-text-muted">Employee has not checked out yet.</p>
+        </div>
+      </div>
+    </BaseDetailModal>
 
     <!-- Status Dropdown (Teleported to body) -->
     <Teleport to="body">

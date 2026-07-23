@@ -12,6 +12,7 @@ export const useEmployeeStore = defineStore('employee', {
         searchQuery: '',
         isLoading: false,
         error: null,
+        employmentStatuses: [],
     }),
 
     getters: {
@@ -256,6 +257,30 @@ export const useEmployeeStore = defineStore('employee', {
                 };
             } finally {
                 this.isLoading = false;
+            }
+        },
+        async fetchEmploymentStatuses() {
+            try {
+                const cleanedBaseUrl = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL;
+                const token = getAuthToken();
+                const headers = { 'Content-Type': 'application/json' };
+                if (token) headers['Authorization'] = `Bearer ${token}`;
+                const response = await fetch(`${cleanedBaseUrl}${API_ENDPOINTS.EMPLOYMENT_STATUSES}`, {
+                    method: 'GET',
+                    headers,
+                });
+                if (!response.ok) throw new Error('Failed to load employment statuses');
+                const data = await response.json();
+                this.employmentStatuses = Array.isArray(data) ? data : [];
+                return { success: true, data: this.employmentStatuses };
+            } catch (error) {
+                this.employmentStatuses = [
+                    { id: null, name: 'Intern', code: 'intern', apply_payroll_deductions: false },
+                    { id: null, name: 'Probation', code: 'probation', apply_payroll_deductions: false },
+                    { id: null, name: 'Contract', code: 'contract', apply_payroll_deductions: true },
+                    { id: null, name: 'Permanent', code: 'permanent', apply_payroll_deductions: true },
+                ];
+                return { success: false, error: error.message };
             }
         },
 

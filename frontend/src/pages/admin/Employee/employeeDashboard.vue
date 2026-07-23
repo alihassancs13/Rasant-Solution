@@ -531,10 +531,13 @@
                       v-model="editFormData.status"
                       class="w-full px-4 py-2.5 bg-white rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
                   >
-                    <option value="Intern">Intern</option>
-                    <option value="Probation">Probation</option>
-                    <option value="Contract">Contract</option>
-                    <option value="Permanent">Permanent</option>
+                    <option
+                      v-for="st in employmentStatuses"
+                      :key="st.id || st.code || st.name"
+                      :value="st.name"
+                    >
+                      {{ st.name }}
+                    </option>
                   </select>
                 </div>
 
@@ -547,6 +550,20 @@
                     <option :value="true">Active</option>
                     <option :value="false">Inactive</option>
                   </select>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Work from home</label>
+                  <select
+                      v-model="editFormData.work_from_home"
+                      class="w-full px-4 py-2.5 bg-white rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
+                  >
+                    <option :value="false">No</option>
+                    <option :value="true">Yes</option>
+                  </select>
+                  <p class="text-[11px] text-gray-400">
+                    If Yes, check-ins outside the office radius show as Work from home.
+                  </p>
                 </div>
 
                 <div class="flex flex-col gap-1.5">
@@ -904,6 +921,13 @@
               {{ viewEmployee.is_active ? 'Active' : 'Inactive' }}
             </span>
           </div>
+
+          <div class="p-4 bg-[#f8fafc] border border-[#e2e8f0] rounded-xl flex flex-col justify-center">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400 leading-none mb-1.5">Work from home</span>
+            <span class="text-sm font-bold truncate" :class="viewEmployee.work_from_home ? 'text-sky-600' : 'text-[#1e293b]'">
+              {{ viewEmployee.work_from_home ? 'Yes' : 'No' }}
+            </span>
+          </div>
         </div>
 
         <!-- More details section -->
@@ -970,7 +994,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, onMounted, watch } from 'vue';
+import { ref, reactive, onMounted, onBeforeUnmount, watch, computed } from 'vue';
 import DashboardHeader from '../../../components/header.vue';
 import StateCard from '../../../components/StatCard.vue';
 import AdminSidebar from '../../../components/adminSidebar.vue';
@@ -987,6 +1011,7 @@ const passwordError = ref('');
 const passwordStrength = ref('');
 const passwordStrengthColor = ref('');
 const employeeStore = useEmployeeStore();
+const employmentStatuses = computed(() => employeeStore.employmentStatuses || []);
 const passwordStrengthClass = ref('');
 const showStrongMessage = ref(false);
 let strongMessageTimeout = null;
@@ -1042,6 +1067,7 @@ const editFormData = reactive({
   designation: '',
   status: 'Permanent',
   is_active: true,
+  work_from_home: false,
   salary: '',
   joined_date: '',
   employee_number: '',
@@ -1172,6 +1198,14 @@ const handleCreateEmployee = async () => {
     showToast('Name and Email are required.', 'error');
     return;
   }
+  if (!createFormData.phone_number.trim()) {
+    showToast('Phone number is required.', 'error');
+    return;
+  }
+  if (!createFormData.department.trim()) {
+    showToast('Department is required.', 'error');
+    return;
+  }
 
   isCreating.value = true;
   try {
@@ -1179,8 +1213,17 @@ const handleCreateEmployee = async () => {
     formDataPayload.append('name', createFormData.name.trim());
     formDataPayload.append('email', createFormData.email.trim());
     formDataPayload.append('phone_number', createFormData.phone_number.trim());
-    formDataPayload.append('designation', createFormData.position.trim());
+    formDataPayload.append(
+      'designation',
+      (createFormData.position || '').trim() || 'Employee'
+    );
     formDataPayload.append('department', createFormData.department.trim());
+    formDataPayload.append('status', 'Intern');
+    formDataPayload.append('is_active', 'true');
+    formDataPayload.append(
+      'joined_date',
+      new Date().toISOString().split('T')[0]
+    );
     if (createFormData.salary) {
       formDataPayload.append('salary', parseFloat(createFormData.salary));
     }
@@ -1194,15 +1237,24 @@ const handleCreateEmployee = async () => {
     const result = await employeeStore.addEmployee(formDataPayload);
 
     if (result.success) {
-      showToast('Employee created successfully!', 'success');
+      const emailNote = result.data?.email_sent === false
+        ? ' Create-password email could not be sent — check Email settings.'
+        : ' A create-password link was emailed to the employee.';
+      showToast(`Employee created successfully.${emailNote}`, 'success', 5000);
       closeCreateModal();
-      await loadEmployees();
+      // Refresh list outside create success path so a refresh failure
+      // does not look like a create failure
+      try {
+        await loadEmployees();
+      } catch (refreshErr) {
+        console.error('Employee created but list refresh failed:', refreshErr);
+      }
     } else {
-      showToast(`Error: ${result.error || 'Failed to create employee'}`, 'error');
+      showToast(result.error || 'Failed to create employee', 'error', 6000);
     }
   } catch (error) {
     console.error('Failed to create employee:', error);
-    showToast('Failed to create employee. Please try again.', 'error');
+    showToast(error?.message || 'Failed to create employee. Please try again.', 'error');
   } finally {
     isCreating.value = false;
   }
@@ -1225,6 +1277,7 @@ const openEditModal = (employee) => {
     designation: employee.designation || '',
     status: employee.status || employee.employment_status || 'Permanent',
     is_active: employee.is_active === true || employee.is_active === 'true' || employee.account_status === 'Active',
+    work_from_home: employee.work_from_home === true || employee.work_from_home === 'true',
     salary: employee.salary || '',
     joined_date: employee.joined_date || '',
     employee_number: employee.employee_number || '',
@@ -1286,28 +1339,68 @@ const handleUpdateEmployee = async () => {
 
   isUpdating.value = true;
   try {
-    // Create payload without password if empty
-    const payload = { ...editFormData };
+    const payload = {};
+    const textFields = [
+      'name', 'email', 'phone_number', 'department', 'designation', 'status',
+      'present_address', 'permanent_address', 'emergency_name', 'emergency_relation',
+      'emergency_phone', 'emergency_address', 'bank_name', 'branch_name', 'account_number',
+    ];
+    const nullableTextFields = ['cnic', 'gender', 'emergency_cnic'];
+    const numberFields = ['salary', 'tax', 'insurance_amount'];
 
-    // Remove confirmPassword from payload (not needed in API)
-    delete payload.confirmPassword;
+    textFields.forEach((key) => {
+      const value = editFormData[key];
+      if (value !== undefined && value !== null) {
+        payload[key] = typeof value === 'string' ? value.trim() : value;
+      }
+    });
 
-    // If password is empty, remove it from payload (don't update)
-    if (!payload.password) {
-      delete payload.password;
+    nullableTextFields.forEach((key) => {
+      const value = editFormData[key];
+      if (value === undefined || value === null || value === '') {
+        payload[key] = null;
+      } else {
+        payload[key] = typeof value === 'string' ? value.trim() : value;
+      }
+    });
+
+    // Only send joined_date when it has a real value
+    if (editFormData.joined_date) {
+      payload.joined_date = editFormData.joined_date;
+    }
+
+    numberFields.forEach((key) => {
+      const value = editFormData[key];
+      if (value === '' || value === null || value === undefined) return;
+      const num = Number(value);
+      if (!Number.isNaN(num)) payload[key] = num;
+    });
+
+    payload.is_active = !!editFormData.is_active;
+    payload.work_from_home = !!editFormData.work_from_home;
+
+    if (password) {
+      payload.password = password;
     }
 
     const result = await updateEmployee(selectedEmployee.value.id, payload);
     if (result.success) {
-      showToast('Employee updated successfully!', 'success');
+      showToast(
+        password ? 'Employee and login password updated successfully!' : 'Employee updated successfully!',
+        'success'
+      );
       closeEditModal();
-      await loadEmployees(); // Refresh the list
+      try {
+        await loadEmployees();
+      } catch (refreshErr) {
+        console.error('Updated but list refresh failed:', refreshErr);
+      }
     } else {
-      showToast(`Error: ${result.error || 'Update failed'}`, 'error');
+      showToast(result.error || 'Update failed', 'error', 6000);
     }
   } catch (error) {
     console.error('Update error:', error);
-    showToast('An error occurred while updating.', 'error');
+    showToast(error?.message || 'An error occurred while updating.', 'error');
   } finally {
     isUpdating.value = false;
   }
@@ -1362,7 +1455,13 @@ const copyOnboardingLink = async () => {
 };
 // Lifecycle
 onMounted(() => {
+  employeeStore.fetchEmploymentStatuses();
   loadEmployees();
+  window.addEventListener('employee-created', loadEmployees);
+});
+
+onBeforeUnmount(() => {
+  window.removeEventListener('employee-created', loadEmployees);
 });
 
 // Expose methods to parent if needed

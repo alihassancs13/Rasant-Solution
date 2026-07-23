@@ -197,6 +197,26 @@ export const usePolicyStore = defineStore('policy', {
             } finally {
                  this.isModalLoading = false
              }
-         }
+         },
+
+        async saveEmployeeMonthlyBonus(employeeId, bonusAmount, deductionMonth = null) {
+            this.isModalLoading = true;
+            this.error = null;
+            try {
+                const payload = { bonus_amount: bonusAmount };
+                if (deductionMonth) payload.deduction_month = deductionMonth;
+                const response = await apiClient.patch(
+                    API_ENDPOINTS.EMPLOYEE_MONTHLY_BONUS(employeeId),
+                    payload,
+                );
+                await this.getEmployeeDetail(employeeId);
+                return { success: true, data: response.data };
+            } catch (err) {
+                this.error = err.response?.data?.error || 'Failed to save bonus';
+                return { success: false, error: this.error };
+            } finally {
+                this.isModalLoading = false;
+            }
+        },
     },
 });

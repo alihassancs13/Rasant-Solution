@@ -197,6 +197,29 @@ def send_message(request):
         conversation=conv, is_deleted=True
     ).update(is_deleted=False)
 
+    try:
+        from accounts.notifications import notify_users
+        preview = (content or '').strip()
+        if len(preview) > 120:
+            preview = preview[:120] + '…'
+        sender_name = (
+            f'{sender.first_name or ""} {sender.last_name or ""}'.strip()
+            or sender.username
+            or 'Someone'
+        )
+        recipients = [m.user for m in other_members]
+        notify_users(
+            recipients,
+            type='inbox',
+            title=f'New message from {sender_name}',
+            body=preview,
+            link='/admin/inbox',
+            actor=sender,
+            payload={'conversation_id': conv.id, 'message_id': msg.id},
+        )
+    except Exception as notify_err:
+        print(f'Inbox notification failed: {notify_err}')
+
     return Response(
         MessageSerializer(msg, context={'request': request}).data,
         status=status.HTTP_201_CREATED

@@ -16,6 +16,8 @@ export default defineConfig({
     },
   },
   server: {
+    // Allow Cloudflare quick tunnels (hostnames rotate often)
+    allowedHosts: true,
     proxy: {
       '/api': {
         target: 'http://localhost:8000',

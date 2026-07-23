@@ -23,7 +23,18 @@ from django.db import transaction
 from .serializers import calculate_next_effective_date
 import random
 import string
+import re
 from django.contrib.auth.hashers import make_password
+from accounts.email_service import (
+    send_employee_welcome,
+    send_onboarding_complete,
+    send_employee_status_changed,
+    send_job_published,
+    send_increments_due_digest,
+    send_branded_email,
+)
+from accounts.models import EmailSettings
+from django.conf import settings as django_settings
 from .utils import calculate_status, calculate_late_and_overtime
 
 User = get_user_model()
@@ -40,7 +51,9 @@ from .serializers import (
     IncrementPolicySerializer, EmployeePolicyAssignmentSerializer, EmployeeAttendanceSerializer, AttendanceBulkRowSerializer,
     AttendanceHistorySerializer, PayrollSettingsSerializer
 )
-# ---------- GENRERATE EMPLOYEE NUMBER ----------
+
+
+# ---------- Helper function for employee number generation ----------
 def generate_employee_number():
     now = datetime.datetime.now()
     prefix = f"RS-{now.strftime('%m%y')}-"
@@ -57,212 +70,369 @@ def generate_employee_number():
 
 @api_view(['POST'])
 @parser_classes([MultiPartParser, FormParser, JSONParser])
+@permission_classes([IsAuthenticated])
 def add_employee(request):
+    """Create employee + linked User (employee role) and ensure sidebar modules."""
+    from accounts.employee_access import ensure_employee_modules, ensure_user_is_employee
+
     MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
-    serializer = EmployeeSerializer(data=request.data)
+    file_fields = (
+        "cnic_scan",
+        "emergency_cnic_scan",
+        "matric_certificate",
+        "fsc_certificate",
+        "university_degree",
+        "other_course",
+    )
+    # Build a plain dict — never QueryDict.copy() with uploads (cannot pickle temp files).
+    data = {}
+    for key in request.data.keys():
+        if key in file_fields:
+            continue
+        value = request.data.get(key)
+        if hasattr(value, "read"):
+            continue
+        data[key] = value
+
+    for blank_key in ("cnic", "emergency_cnic", "gender"):
+        if blank_key in data and data.get(blank_key) in ("", None):
+            data[blank_key] = None
+    if "joined_date" in data and data.get("joined_date") in ("", None):
+        data.pop("joined_date", None)
+
+    if "is_active" in data:
+        raw_active = data.get("is_active")
+        if isinstance(raw_active, str):
+            data["is_active"] = raw_active.strip().lower() in ("1", "true", "yes", "on")
+
+    serializer = EmployeeSerializer(data=data)
     if not serializer.is_valid():
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    employee = Employee(**serializer.validated_data)
-    employee.current_salary = employee.salary
-
-    characters = string.ascii_letters + string.digits + "!@#$%^&*"
-    raw_password = ''.join(random.choice(characters) for _ in range(8))
-    employee.password = make_password(raw_password)
-
-    employee_role, _ = Role.objects.get_or_create(name='employee')
-    # Generate unique username
-    base_username = employee.name.replace(' ', '_').lower()
-    username = base_username
-    counter = 1
-    while User.objects.filter(username=username).exists():
-        username = f"{base_username}_{counter}"
-        counter += 1
-
-    try:
-        user_account = User.objects.create(
-            username=username,
-            email=employee.email,
-            is_staff=False,
-            is_active=True,
-        )
-        user_account.set_password(raw_password)
-        user_account.save()
-    except IntegrityError as e:
         return Response(
-            {"error": f"User creation failed: {str(e)}"},
-            status=status.HTTP_400_BAD_REQUEST
+            {"error": "Validation failed.", "errors": serializer.errors},
+            status=status.HTTP_400_BAD_REQUEST,
         )
 
-    employee.user = user_account
+    validated = serializer.validated_data
+    employee_role, _ = Role.objects.get_or_create(name="employee")
+    ensure_employee_modules()
 
-    file_fields = [
-        ('cnic_scan', False),
-        ('emergency_cnic_scan', False),
-        ('matric_certificate', False),
-        ('fsc_certificate', False),
-        ('university_degree', False),
-        ('other_course', False)
-    ]
+    email = validated["email"]
+    name = (validated.get("name") or "").strip() or email.split("@")[0]
+    base_username = re.sub(r"[^a-zA-Z0-9.@+-]", "", email.split("@")[0])[:40] or "employee"
+    username = base_username
+    suffix = 1
+    while User.objects.filter(username=username).exists():
+        username = f"{base_username}{suffix}"
+        suffix += 1
 
-    for field_name, is_mandatory in file_fields:
+    name_parts = name.split(" ", 1)
+    first_name = name_parts[0] if name_parts else ""
+    last_name = name_parts[1] if len(name_parts) > 1 else ""
+
+    file_payload = {}
+    for field_name in file_fields:
         uploaded_file = request.FILES.get(field_name)
         if uploaded_file:
             if uploaded_file.size > MAX_FILE_SIZE:
                 return Response(
-                    {"error": f"The file '{field_name}' exceeds the {MAX_FILE_SIZE // (1024 * 1024)} MB size limit."},
-                    status=status.HTTP_400_BAD_REQUEST
+                    {
+                        "error": (
+                            f"The file '{field_name}' exceeds the "
+                            f"{MAX_FILE_SIZE // (1024 * 1024)} MB size limit."
+                        )
+                    },
+                    status=status.HTTP_400_BAD_REQUEST,
                 )
-            setattr(employee, f"{field_name}_data", uploaded_file.read())
-            setattr(employee, f"{field_name}_name", uploaded_file.name)
-            setattr(employee, f"{field_name}_mimetype", uploaded_file.content_type)
-        elif is_mandatory:
-            return Response(
-                {"error": f"The file '{field_name}' is required."},
-                status=status.HTTP_400_BAD_REQUEST
+            file_payload[field_name] = {
+                "data": uploaded_file.read(),
+                "name": uploaded_file.name,
+                "mimetype": uploaded_file.content_type,
+            }
+
+    try:
+        with transaction.atomic():
+            user_account = User(
+                username=username,
+                email=email,
+                first_name=first_name,
+                last_name=last_name,
+                is_staff=False,
+                is_active=True,
+                role=employee_role,
             )
+            user_account.set_unusable_password()
+            user_account.save()
 
-    for attempt in range(3):
-        new_number = generate_employee_number()
-        employee.employee_number = new_number
-        try:
-            employee.save()
+            employee = Employee(**validated)
+            employee.name = name
+            employee.current_salary = employee.salary
+            employee.password = None
+            employee.user = user_account
 
-            if employee.joined_date:
-                calculate_and_save_deduction(
-                    employee=employee,
-                    tax_percent=employee.tax,
-                    insurance_amount=employee.insurance_amount,
-                    deduction_month=date.today().replace(day=1),
-                    include_attendance=False,
-                )
+            for field_name, meta in file_payload.items():
+                setattr(employee, f"{field_name}_data", meta["data"])
+                setattr(employee, f"{field_name}_name", meta["name"])
+                setattr(employee, f"{field_name}_mimetype", meta["mimetype"])
 
-            return Response(
-                {
-                    "success": True,
-                    "message": "Employee added successfully.",
-                    "employee_number": employee.employee_number,
-                    "name": employee.name,
-                    "password": raw_password
-                },
-                status=status.HTTP_201_CREATED
+            saved = False
+            for _ in range(5):
+                employee.employee_number = generate_employee_number()
+                try:
+                    employee.save()
+                    saved = True
+                    break
+                except IntegrityError:
+                    continue
+
+            if not saved:
+                raise IntegrityError("Could not generate a unique employee number.")
+
+            ensure_user_is_employee(user_account)
+
+            from accounts.password_tokens import create_setup_token, SETUP_TTL_HOURS
+            setup_token = create_setup_token(user_account)
+
+    except IntegrityError as exc:
+        return Response(
+            {"error": str(exc) or "Could not create employee due to a conflict."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    except Exception as exc:
+        return Response(
+            {"error": f"Failed to create employee: {exc}"},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
+
+    try:
+        if employee.joined_date:
+            calculate_and_save_deduction(
+                employee=employee,
+                tax_percent=employee.tax,
+                insurance_amount=employee.insurance_amount,
+                deduction_month=date.today().replace(day=1),
             )
-        except IntegrityError:
-            continue
+    except Exception as ded_err:
+        print(f"Deduction calculation failed after employee create: {ded_err}")
+
+    frontend = getattr(django_settings, "FRONTEND_URL", "http://localhost:5173").rstrip("/")
+    setup_url = f"{frontend}/create-password/{setup_token.token}"
+    email_sent = False
+    try:
+        from accounts.password_tokens import SETUP_TTL_HOURS
+        email_sent = bool(send_employee_welcome(employee, setup_url, ttl_hours=SETUP_TTL_HOURS))
+    except Exception as mail_err:
+        print(f"Welcome email failed after employee create: {mail_err}")
 
     return Response(
-        {"error": "Could not generate a unique employee number after multiple attempts."},
-        status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        {
+            "success": True,
+            "message": "Employee added successfully. A create-password link was emailed.",
+            "employee_number": employee.employee_number,
+            "name": employee.name,
+            "email_sent": email_sent,
+            "status": employee.status.name if employee.status_id else None,
+            "status_id": employee.status_id,
+        },
+        status=status.HTTP_201_CREATED,
     )
 
-@api_view(['GET'])
+
+@api_view(["GET"])
 def list_employees(request):
-    employees = Employee.objects.all().order_by('-created_at').prefetch_related('deduction_history')
+    employees = (
+        Employee.objects.select_related("status")
+        .all()
+        .order_by("-created_at")
+        .prefetch_related("deduction_history")
+    )
+    for emp in employees:
+        try:
+            renew_insurance_cycle(emp)
+        except Exception as renew_err:
+            print(f"Insurance renew failed for {emp.id}: {renew_err}")
     serializer = EmployeeListSerializer(employees, many=True)
-    for employee in employees:
-        renew_insurance_cycle(employee)
     return Response(serializer.data)
 
 
-@api_view(['PATCH'])
+@api_view(["PATCH"])
+@permission_classes([IsAuthenticated])
 def update_employee(request, pk):
+    """Update employee fields; keep linked User on employee role and sync password."""
+    from accounts.employee_access import ensure_employee_modules, ensure_user_is_employee
+
     try:
         employee = Employee.objects.get(pk=pk)
     except Employee.DoesNotExist:
-        return Response(
-            {"error": "Employee not found."},
-            status=status.HTTP_404_NOT_FOUND
-        )
+        return Response({"error": "Employee not found."}, status=status.HTTP_404_NOT_FOUND)
+
     old_tax = employee.tax
     old_insurance_amount = employee.insurance_amount
     old_salary = employee.salary
-    old_password = employee.password
+    old_status_name = employee.status.name if employee.status_id else ""
+
+    raw = request.data
+    file_field_names = {
+        "cnic_scan",
+        "emergency_cnic_scan",
+        "matric_certificate",
+        "fsc_certificate",
+        "university_degree",
+        "other_course",
+    }
+    data = {
+        key: value
+        for key, value in raw.items()
+        if key not in file_field_names and not hasattr(value, "read")
+    }
+
+    for key in (
+        "cnic",
+        "emergency_cnic",
+        "gender",
+        "present_address",
+        "permanent_address",
+        "emergency_name",
+        "emergency_relation",
+        "emergency_phone",
+        "emergency_address",
+        "bank_name",
+        "branch_name",
+        "branch_code",
+        "account_number",
+    ):
+        if key in data and data[key] == "":
+            data[key] = None
+
+    for key in ("salary", "tax", "insurance_amount", "joined_date"):
+        if key in data and data[key] in ("", None):
+            data.pop(key)
+
+    data.pop("confirmPassword", None)
+    data.pop("employee_number", None)
+    data.pop("full_name", None)
+
+    new_password = data.pop("password", None)
+    if new_password == "":
+        new_password = None
 
     serializer = UpdateEmployeeSerializer(
         employee,
-        data=request.data,
+        data=data,
         partial=True,
-        context={'request': request}
+        context={"request": request},
     )
-
-    if serializer.is_valid():
-        updated_employee = serializer.save()
-        updated_employee.current_salary = updated_employee.salary
-        updated_employee.save(update_fields=['current_salary'])
-
-        # Handle password update
-        if 'password' in request.data and request.data['password'] != old_password:
-            new_password = request.data['password']
-            from django.contrib.auth.hashers import make_password
-            from accounts.models import User
-
-            hashed_password = make_password(new_password)
-            updated_employee.password = hashed_password
-            updated_employee.save(update_fields=['password'])
-
-            try:
-                user = User.objects.get(username=updated_employee.name)
-                user.set_password(new_password)
-                user.save()
-                print(f"User updated by username: {user.username}")
-            except User.DoesNotExist:
-                try:
-                    user = User.objects.get(email=updated_employee.email)
-                    user.username = updated_employee.name
-                    user.set_password(new_password)
-                    user.save()
-                    print(f"User updated and username changed to: {user.username}")
-                except User.DoesNotExist:
-                    user = User.objects.create_user(
-                        username=updated_employee.name,
-                        email=updated_employee.email or f"{updated_employee.employee_number}@example.com",
-                        password=new_password,
-                        first_name=updated_employee.name.split()[0] if updated_employee.name else '',
-                        last_name=' '.join(updated_employee.name.split()[1:]) if updated_employee.name else ''
-                    )
-                    print(f"New user created: {user.username}")
-        try:
-            salary_changed = updated_employee.salary != old_salary
-            tax_changed = updated_employee.tax != old_tax
-            insurance_changed = updated_employee.insurance_amount != old_insurance_amount
-            if (salary_changed or tax_changed or insurance_changed):
-                tax_percent = updated_employee.tax or 0
-                insurance_amount = updated_employee.insurance_amount or 0
-
-                print(
-                    f" Recalculating deductions: Salary={updated_employee.salary}, Tax={tax_percent}%, Insurance={insurance_amount}")
-
-                calculate_and_save_deduction(
-                    employee=updated_employee,
-                    tax_percent=tax_percent,
-                    insurance_amount=insurance_amount,
-                    deduction_month=date.today().replace(day=1),
-                )
-        except Exception as e:
-            # Log the error but don't fail the response
-            import traceback
-            print(f" Deduction calculation failed: {e}")
-            print(traceback.format_exc())
-
-        # Return success response with proper data
+    if not serializer.is_valid():
         return Response(
-            {
-                "success": True,
-                "message": "Employee updated successfully.",
-                "employee_number": updated_employee.employee_number,
-                "name": updated_employee.name,
-                "id": updated_employee.id,
-                "email": updated_employee.email,
-                "department": updated_employee.department,
-                "designation": updated_employee.designation,
-                "salary": updated_employee.salary,
-                "status": updated_employee.status
-            },
-            status=status.HTTP_200_OK
+            {"error": "Validation failed.", "errors": serializer.errors},
+            status=status.HTTP_400_BAD_REQUEST,
         )
 
-    # Return validation errors
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    updated_employee = serializer.save()
+    updated_employee.current_salary = updated_employee.salary
+    updated_employee.save(update_fields=["current_salary"])
+
+    ensure_employee_modules()
+    linked_user = updated_employee.user
+    if linked_user is None and updated_employee.email:
+        linked_user = User.objects.filter(email__iexact=updated_employee.email).first()
+        if linked_user:
+            updated_employee.user = linked_user
+            updated_employee.save(update_fields=["user"])
+
+    if linked_user is None and new_password:
+        employee_role, _ = Role.objects.get_or_create(name="employee")
+        name_parts = (updated_employee.name or "").strip().split(" ", 1)
+        base_username = re.sub(
+            r"[^a-zA-Z0-9.@+-]",
+            "",
+            (updated_employee.email or "employee").split("@")[0],
+        )[:40] or "employee"
+        username = base_username
+        suffix = 1
+        while User.objects.filter(username=username).exists():
+            username = f"{base_username}{suffix}"
+            suffix += 1
+        linked_user = User(
+            username=username,
+            email=updated_employee.email,
+            first_name=name_parts[0] if name_parts else "",
+            last_name=name_parts[1] if len(name_parts) > 1 else "",
+            is_staff=False,
+            is_active=True,
+            role=employee_role,
+        )
+        linked_user.set_password(new_password)
+        linked_user.save()
+        updated_employee.user = linked_user
+        updated_employee.save(update_fields=["user"])
+
+    if linked_user:
+        ensure_user_is_employee(linked_user)
+
+    if new_password:
+        hashed_password = make_password(new_password)
+        updated_employee.password = hashed_password
+        updated_employee.save(update_fields=["password"])
+        if linked_user:
+            linked_user.set_password(new_password)
+            linked_user.save()
+
+    try:
+        salary_changed = updated_employee.salary != old_salary
+        tax_changed = updated_employee.tax != old_tax
+        insurance_changed = updated_employee.insurance_amount != old_insurance_amount
+        if salary_changed or tax_changed or insurance_changed:
+            calculate_and_save_deduction(
+                employee=updated_employee,
+                tax_percent=updated_employee.tax or 0,
+                insurance_amount=updated_employee.insurance_amount or 0,
+                deduction_month=date.today().replace(day=1),
+            )
+    except Exception as e:
+        print(f"Deduction calculation failed: {e}")
+
+    try:
+        new_status_name = updated_employee.status.name if updated_employee.status_id else ""
+        if old_status_name != new_status_name:
+            send_employee_status_changed(updated_employee, old_status_name, new_status_name)
+            try:
+                from accounts.notifications import notify_users
+                if updated_employee.user_id:
+                    notify_users(
+                        updated_employee.user,
+                        type='status',
+                        title='Employment status updated',
+                        body=f'Your status changed from {old_status_name} to {new_status_name}.',
+                        link='/employee/overview',
+                        actor=request.user,
+                        payload={
+                            'old_status': old_status_name,
+                            'new_status': new_status_name,
+                        },
+                    )
+            except Exception as notify_err:
+                print(f'Status notification failed: {notify_err}')
+    except Exception as mail_err:
+        print(f"Status change email failed: {mail_err}")
+
+    return Response(
+        {
+            "success": True,
+            "message": "Employee updated successfully.",
+            "employee_number": updated_employee.employee_number,
+            "name": updated_employee.name,
+            "id": updated_employee.id,
+            "email": updated_employee.email,
+            "department": updated_employee.department,
+            "designation": updated_employee.designation,
+            "salary": updated_employee.salary,
+            "status": updated_employee.status.name if updated_employee.status_id else None,
+            "status_id": updated_employee.status_id,
+            "password_updated": bool(new_password),
+        },
+        status=status.HTTP_200_OK,
+    )
+
 
 @api_view(["GET", "POST", "DELETE", "PUT"])
 @parser_classes([MultiPartParser, FormParser, JSONParser])
@@ -303,6 +473,26 @@ def cv_submission_view(request, pk=None):
                 )
 
             serializer.save()
+            try:
+                from accounts.notifications import notify_admins
+                data = serializer.data
+                applicant = data.get('full_name') or data.get('email') or 'Applicant'
+                job_title = ''
+                try:
+                    job = data.get('job')
+                    if isinstance(job, dict):
+                        job_title = job.get('job_title') or ''
+                except Exception:
+                    pass
+                notify_admins(
+                    type='cv',
+                    title='New CV submitted',
+                    body=f'{applicant}' + (f' applied for {job_title}' if job_title else ' submitted a CV'),
+                    link='/admin/career',
+                    payload={'cv_id': data.get('id')},
+                )
+            except Exception as notify_err:
+                print(f'CV notification failed: {notify_err}')
             return Response(
                 {"message": "Application submitted successfully.", "data": serializer.data},
                 status=status.HTTP_201_CREATED,
@@ -430,9 +620,31 @@ def job_update_view(request, pk):
             'message': 'Job opening not found.'
         }, status=status.HTTP_404_NOT_FOUND)
 
+    old_status_name = (job_opening.status.name if job_opening.status else '').lower()
+
     serializer = JobOpeningSerializer(job_opening, data=request.data, partial=True)
     if serializer.is_valid():
         updated_job = serializer.save()
+        new_status_name = (updated_job.status.name if updated_job.status else '').lower()
+
+        if old_status_name == 'draft' and new_status_name == 'published':
+            try:
+                send_job_published(updated_job)
+            except Exception as mail_err:
+                print(f"Job published email failed: {mail_err}")
+            try:
+                from accounts.notifications import notify_admins
+                notify_admins(
+                    type='job',
+                    title='Job published',
+                    body=f'{updated_job.job_title} is now live on careers.',
+                    link='/admin/career',
+                    actor=request.user,
+                    payload={'job_id': updated_job.id},
+                )
+            except Exception as notify_err:
+                print(f'Job notification failed: {notify_err}')
+
         return Response({
             'status': 'success',
             'message': 'Job updated successfully.',
@@ -479,41 +691,19 @@ def send_invitation_email(request):
             status=status.HTTP_404_NOT_FOUND
         )
 
-    BASE_URL = "http://localhost:8000/"
+    frontend = getattr(django_settings, 'FRONTEND_URL', 'http://localhost:5173')
+    onboarding_link = f"{frontend}/onboarding/{employee.employee_number}"
 
-    onboarding_link = (
-        f"{BASE_URL}/html/dashboard-admin.html"
-        f"?onb=emp_{employee.employee_number}#employees"
-    )
-    subject = "Complete your employee onboarding — Rasant Solutions"
-
-    html_message = f"""
-    <html>
-    <body>
-        <p>Dear {employee.name},</p>
-        <p>Welcome to Rasant Solutions! Please complete your employee onboarding form to proceed.</p>
-        <p>Your reference: {employee.employee_number}</p>
-        <p>Open the link below in the admin dashboard onboarding section (your name and email are pre-filled):<br>
-        <a href="{onboarding_link}">{onboarding_link}</a></p>
-        <p>Please have the following documents ready:</p>
-        <ul>
-            <li>CNIC scan copies</li>
-            <li>Educational certificates (Metric, Intermediate, etc.)</li>
-            <li>Bank account details</li>
-        </ul>
-        <p>If you have questions, reply to this email or contact HR.</p>
-        <br>
-        <p>Best regards,<br>Rasant Solutions HR Team</p>
-    </body>
-    </html>
-    """
     try:
-        send_mail(
-            subject=subject,
-            message="",  # plain text version (leave empty if using HTML)
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[employee.email],
-            html_message=html_message,
+        send_branded_email(
+            subject="Complete your employee onboarding — Rasant Solutions",
+            template_name="emails/onboarding_invite.html",
+            context={
+                'employee_name': employee.name,
+                'employee_number': employee.employee_number,
+                'onboarding_link': onboarding_link,
+            },
+            to=employee.email,
             fail_silently=False,
         )
     except Exception as e:
@@ -770,30 +960,79 @@ def increments_due_today_view(request):
     print(data)
     print("=====================================\n")
 
+    # Notify admin once per day when increments are due
+    if data:
+        try:
+            email_cfg = EmailSettings.get_solo()
+            if email_cfg.last_increment_digest_sent != today:
+                try:
+                    from accounts.notifications import notify_admins
+                    names = ', '.join(item['employee_name'] for item in data[:5])
+                    extra = f' (+{len(data) - 5} more)' if len(data) > 5 else ''
+                    notify_admins(
+                        type='increment',
+                        title=f'{len(data)} increment(s) due today',
+                        body=f'{names}{extra}',
+                        link='/admin/employees/salaries',
+                        payload={'count': len(data)},
+                    )
+                except Exception as notify_err:
+                    print(f'Increment notification failed: {notify_err}')
+                try:
+                    send_increments_due_digest(data)
+                except Exception as mail_err:
+                    print(f"Increment digest email failed: {mail_err}")
+                email_cfg.last_increment_digest_sent = today
+                email_cfg.save(update_fields=['last_increment_digest_sent'])
+        except Exception as outer_err:
+            print(f"Increment daily notify failed: {outer_err}")
+
     return Response({"status": "success", "data": data}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
 def get_employee_detail(request, pk):
+    from .payroll import employment_status_name, applies_attendance_payroll_deductions
+
     try:
-        employee = Employee.objects.prefetch_related('deduction_history').get(pk=pk)
+        employee = Employee.objects.select_related("status").prefetch_related("deduction_history").get(pk=pk)
     except Employee.DoesNotExist:
         return Response(
             {"error": "Employee not found."},
             status=status.HTTP_404_NOT_FOUND
         )
 
+    month = date.today().replace(day=1)
+    # Ensure current-month slip exists / is refreshed from attendance
+    try:
+        latest_deduction = calculate_and_save_deduction(
+            employee=employee,
+            tax_percent=employee.tax,
+            insurance_amount=employee.insurance_amount,
+            deduction_month=month,
+        )
+    except Exception as calc_err:
+        print(f"Monthly payroll calc failed for employee {pk}: {calc_err}")
+        latest_deduction = employee.deduction_history.filter(deduction_month=month).first()
+        if not latest_deduction:
+            latest_deduction = employee.deduction_history.first()
 
-    latest_deduction = employee.deduction_history.first()
-
+    status_name = employment_status_name(employee)
     data = {
+        "id": employee.id,
         "employee_number": employee.employee_number,
         "name": employee.name,
         "email": employee.email,
         "phone_number": employee.phone_number,
         "department": employee.department,
         "designation": employee.designation,
-        "status": employee.status,
+        "status": status_name,
+        "status_id": employee.status_id,
+        "employment_status": {
+            "id": employee.status_id,
+            "name": status_name,
+            "apply_payroll_deductions": applies_attendance_payroll_deductions(employee),
+        } if employee.status_id else None,
         "is_active": employee.is_active,
         "joined_date": employee.joined_date,
         "gender": employee.gender,
@@ -804,26 +1043,23 @@ def get_employee_detail(request, pk):
         "tax_amount": latest_deduction.tax_amount if latest_deduction else None,
         "salary_after_tax": latest_deduction.salary_after_tax if latest_deduction else None,
         "insurance_amount": latest_deduction.insurance_amount if latest_deduction else None,
+        "bonus_amount": latest_deduction.bonus_amount if latest_deduction else 0,
         "net_salary": latest_deduction.net_salary if latest_deduction else None,
-        "deduction_month": latest_deduction.deduction_month if latest_deduction else None,
+        "deduction_month": latest_deduction.deduction_month if latest_deduction else month,
+        "deduction_id": latest_deduction.id if latest_deduction else None,
 
-        # ---------- Attendance breakdown (new) ----------
         "total_days": latest_deduction.total_days if latest_deduction else None,
         "present_days": latest_deduction.present_days if latest_deduction else None,
         "paid_leave_days": latest_deduction.paid_leave_days if latest_deduction else None,
         "unpaid_leave_days": latest_deduction.unpaid_leave_days if latest_deduction else None,
         "unpaid_absent_days": latest_deduction.unpaid_absent_days if latest_deduction else None,
-
         "late_count": latest_deduction.late_count if latest_deduction else None,
-        "late_penalty_days": latest_deduction.late_penalty_days if latest_deduction else None,
         "late_penalty_amount": latest_deduction.late_penalty_amount if latest_deduction else None,
-
+        "attendance_deduction_total": latest_deduction.attendance_deduction_total if latest_deduction else None,
         "overtime_hours": latest_deduction.overtime_hours if latest_deduction else None,
         "overtime_amount": latest_deduction.overtime_amount if latest_deduction else None,
+        "payroll_deductions_applied": applies_attendance_payroll_deductions(employee),
 
-        "attendance_deduction_total": latest_deduction.attendance_deduction_total if latest_deduction else None,
-
-        # ---------- Bank Details ----------
         "bank_name": employee.bank_name,
         "branch_name": employee.branch_name,
         "account_number": employee.account_number,
@@ -831,73 +1067,94 @@ def get_employee_detail(request, pk):
 
     return Response(data, status=status.HTTP_200_OK)
 
-def calculate_and_save_deduction(employee, tax_percent=None, insurance_amount=None,
-                                  deduction_month=None, include_attendance=True, force=False):
-    deduction_month = (deduction_month or date.today().replace(day=1)).replace(day=1)
-    current_month = date.today().replace(day=1)
 
+@api_view(["PATCH", "POST"])
+@permission_classes([IsAuthenticated])
+def update_employee_monthly_bonus(request, pk):
+    """Admin sets bonus for the current (or given) month and recalculates the slip."""
+    try:
+        employee = Employee.objects.select_related("status").get(pk=pk)
+    except Employee.DoesNotExist:
+        return Response({"error": "Employee not found."}, status=status.HTTP_404_NOT_FOUND)
+
+    month_raw = request.data.get("deduction_month")
+    if month_raw:
+        try:
+            deduction_month = date.fromisoformat(str(month_raw)[:10]).replace(day=1)
+        except ValueError:
+            return Response({"error": "Invalid deduction_month. Use YYYY-MM-DD."}, status=status.HTTP_400_BAD_REQUEST)
+    else:
+        deduction_month = date.today().replace(day=1)
+
+    if "bonus_amount" not in request.data:
+        return Response({"error": "bonus_amount is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        bonus = Decimal(str(request.data.get("bonus_amount") or 0))
+    except Exception:
+        return Response({"error": "Invalid bonus_amount."}, status=status.HTTP_400_BAD_REQUEST)
+
+    if bonus < 0:
+        return Response({"error": "bonus_amount cannot be negative."}, status=status.HTTP_400_BAD_REQUEST)
+
+    record = calculate_and_save_deduction(
+        employee=employee,
+        tax_percent=employee.tax,
+        insurance_amount=employee.insurance_amount,
+        deduction_month=deduction_month,
+        bonus_amount=bonus,
+    )
+    return Response(
+        {
+            "success": True,
+            "message": "Monthly bonus saved and salary recalculated.",
+            "bonus_amount": str(record.bonus_amount),
+            "net_salary": str(record.net_salary),
+            "deduction_month": str(record.deduction_month),
+            "deduction_id": record.id,
+        },
+        status=status.HTTP_200_OK,
+    )
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def employment_status_list(request):
+    from .models import EmploymentStatus
+    from .serializers import EmploymentStatusSerializer
+
+    qs = EmploymentStatus.objects.filter(is_active=True).order_by("sort_order", "id")
+    return Response(EmploymentStatusSerializer(qs, many=True).data, status=status.HTTP_200_OK)
+
+def calculate_and_save_deduction(
+    employee,
+    tax_percent=None,
+    insurance_amount=None,
+    deduction_month=None,
+    bonus_amount=None,
+    include_attendance=True,
+):
+    """
+    Calculate / upsert the monthly salary slip for an employee.
+    Attendance leave/absent/late deductions follow PayrollSettings only when
+    the employee's EmploymentStatus.apply_payroll_deductions is True.
+    """
+    from .payroll import compute_monthly_attendance_payroll
+    from .models import PayrollSettings
+
+    deduction_month = deduction_month or date.today().replace(day=1)
     if employee.joined_date and not employee.next_insurance_cycle_date:
         employee.next_insurance_cycle_date = (
             employee.joined_date + relativedelta(months=12)
         ).replace(day=1)
         employee.save(update_fields=["next_insurance_cycle_date"])
 
+    gross_salary = Decimal(str(employee.current_salary or employee.salary or 0))
+
     if tax_percent is None:
         tax_percent = employee.tax
     if insurance_amount is None:
         insurance_amount = employee.insurance_amount
-
-    base_salary = employee.current_salary or employee.salary
-    settings_obj = PayrollSettings.get_settings()
-
-    record, created = SalaryDeductionHistory.objects.get_or_create(
-        employee=employee, deduction_month=deduction_month,
-        defaults={'is_finalized': False},
-    )
-    if record.is_finalized:
-        return record
-
-    run_attendance = include_attendance and (force or not record.attendance_synced)
-
-    if run_attendance:
-        att = calculate_is_paid_for_month(employee, deduction_month)
-    elif record.attendance_synced:
-        att = {
-            'total_days': record.total_days,
-            'present_days': record.present_days,
-            'paid_leave_days': record.paid_leave_days,
-            'unpaid_leave_days': record.unpaid_leave_days,
-            'unpaid_absent_days': record.unpaid_absent_days,
-            'late_count': record.late_count,
-            'overtime_hours': record.overtime_hours,
-            'calendar_days_in_month': calendar.monthrange(deduction_month.year, deduction_month.month)[1],
-        }
-    else:
-        days_in_month = calendar.monthrange(deduction_month.year, deduction_month.month)[1]
-        month_start = deduction_month.replace(day=1)
-        month_end = month_start.replace(day=days_in_month)
-        wd = count_working_days(month_start, month_end)
-        att = {
-            'total_days': wd, 'present_days': 0, 'paid_leave_days': 0,
-            'unpaid_leave_days': 0, 'unpaid_absent_days': 0, 'late_count': 0,
-            'overtime_hours': Decimal("0"), 'calendar_days_in_month': days_in_month,
-        }
-
-    per_day_salary = base_salary / Decimal(att['calendar_days_in_month'])
-    half_day_salary = per_day_salary / Decimal("2")
-
-    extra_lates = max(0, att['late_count'] - settings_obj.late_count_threshold)
-    late_penalty_days = Decimal(extra_lates) * Decimal("0.5")
-    late_penalty_amount = late_penalty_days * per_day_salary
-
-    unpaid_days = att['unpaid_leave_days'] + att['unpaid_absent_days']
-    unpaid_deduction = Decimal(unpaid_days) * per_day_salary
-    attendance_deduction_total = unpaid_deduction + late_penalty_amount
-
-    overtime_rate_applied = settings_obj.overtime_rate_per_hour
-    overtime_amount = Decimal(str(att['overtime_hours'])) * overtime_rate_applied
-
-    gross_salary = base_salary - attendance_deduction_total + overtime_amount
 
     tax_amount = Decimal("0")
     if tax_percent:
@@ -908,39 +1165,63 @@ def calculate_and_save_deduction(employee, tax_percent=None, insurance_amount=No
     if employee.joined_date and insurance_amount:
         monthly_insurance = (Decimal(str(insurance_amount)) / Decimal("2")) / Decimal("12")
 
-    net_salary = salary_after_tax - monthly_insurance
+    settings_obj = PayrollSettings.get_settings()
+    attendance_fields = {
+        "total_days": calendar.monthrange(deduction_month.year, deduction_month.month)[1],
+        "present_days": 0,
+        "paid_leave_days": 0,
+        "unpaid_leave_days": 0,
+        "unpaid_absent_days": 0,
+        "late_count": 0,
+        "late_penalty_days": Decimal("0"),
+        "late_penalty_amount": Decimal("0"),
+        "overtime_hours": Decimal("0"),
+        "overtime_rate_applied": Decimal("0"),
+        "overtime_amount": Decimal("0"),
+        "per_day_salary": Decimal("0"),
+        "half_day_salary": Decimal("0"),
+        "base_salary": gross_salary,
+        "attendance_deduction_total": Decimal("0"),
+        "attendance_synced": False,
+    }
+    if include_attendance:
+        computed = compute_monthly_attendance_payroll(employee, deduction_month, settings_obj)
+        computed.pop("payroll_deductions_applied", None)
+        attendance_fields.update(computed)
 
-    record.total_days = att['total_days']
-    record.present_days = att['present_days']
-    record.paid_leave_days = att['paid_leave_days']
-    record.unpaid_leave_days = att['unpaid_leave_days']
-    record.unpaid_absent_days = att['unpaid_absent_days']
-    record.late_count = att['late_count']
-    record.late_penalty_days = late_penalty_days
-    record.late_penalty_amount = late_penalty_amount
-    record.overtime_hours = att['overtime_hours']
-    record.overtime_rate_applied = overtime_rate_applied
-    record.overtime_amount = overtime_amount
-    record.per_day_salary = per_day_salary
-    record.half_day_salary = half_day_salary
-    record.base_salary = base_salary
-    record.attendance_deduction_total = attendance_deduction_total
-    record.gross_salary = gross_salary
-    record.tax_amount = tax_amount
-    record.salary_after_tax = salary_after_tax
-    record.insurance_amount = monthly_insurance
-    record.net_salary = net_salary
+    existing = SalaryDeductionHistory.objects.filter(
+        employee=employee,
+        deduction_month=deduction_month,
+    ).first()
 
-    if run_attendance:
-        record.attendance_synced = True
+    if bonus_amount is None:
+        bonus_value = Decimal(str(existing.bonus_amount)) if existing else Decimal("0")
+    else:
+        bonus_value = Decimal(str(bonus_amount or 0))
 
-    # ---------- Auto-lock: once we're calculating for a month that has
-    # already ended, this is the final word — no caller should ever be
-    # able to touch it again, cron or manual alike.
-    if deduction_month < current_month:
-        record.is_finalized = True
+    net_salary = (
+        salary_after_tax
+        - monthly_insurance
+        - Decimal(str(attendance_fields["attendance_deduction_total"]))
+        + Decimal(str(attendance_fields["overtime_amount"]))
+        + bonus_value
+    )
 
-    record.save()
+    defaults = {
+        "gross_salary": gross_salary,
+        "tax_amount": tax_amount,
+        "salary_after_tax": salary_after_tax,
+        "insurance_amount": monthly_insurance,
+        "bonus_amount": bonus_value,
+        "net_salary": net_salary,
+        **attendance_fields,
+    }
+
+    record, _ = SalaryDeductionHistory.objects.update_or_create(
+        employee=employee,
+        deduction_month=deduction_month,
+        defaults=defaults,
+    )
     return record
 
 def renew_insurance_cycle(employee):
@@ -1041,13 +1322,23 @@ def attendance_bulk_upload(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def employee_attendance_list(request):
-    employees = Employee.objects.filter(attendance_id__isnull=False).prefetch_related('attendance_records')
+    # Include all active employees (self check-in users may not have attendance_id)
+    employees = (
+        Employee.objects.filter(is_active=True)
+        .prefetch_related('attendance_records')
+        .order_by('name')
+    )
 
     search = request.query_params.get('search', '').strip()
     if search:
-        employees = employees.filter(
-            Q(name__icontains=search) | Q(attendance_id__icontains=search)
+        q = (
+            Q(name__icontains=search)
+            | Q(employee_number__icontains=search)
+            | Q(department__icontains=search)
         )
+        if search.isdigit():
+            q |= Q(attendance_id=int(search))
+        employees = employees.filter(q)
     serializer = EmployeeAttendanceSerializer(employees, many=True)
     data = serializer.data
     status_filter = request.query_params.get('status')
@@ -1076,6 +1367,7 @@ def employee_attendance_history(request, id):
         'late': records.filter(status='late').count(),
         'absent': records.filter(status='absent').count(),
         'on_leave': records.filter(status='on_leave').count(),
+        'holiday': records.filter(status='holiday').count(),
     }
 
     if status_filter and status_filter != 'all':
@@ -1087,7 +1379,7 @@ def employee_attendance_history(request, id):
         'employee': {
             'id': employee.id,
             'name': employee.name,
-            'emp_no': employee.attendance_id,
+            'emp_no': employee.attendance_id or employee.employee_number,
             'dept': employee.department,
         },
         'history': serializer.data,
@@ -1099,45 +1391,9 @@ def employee_attendance_history(request, id):
 def attendance_record_update(request, id):
     attendance = get_object_or_404(Attendance, id=id)
 
-    incoming = request.data.copy()
-    clock_in = incoming.get('clock_in', attendance.clock_in)
-    clock_out = incoming.get('clock_out', attendance.clock_out)
-    timetable_text = incoming.get('timetable', attendance.timetable)
-
-    is_weekend = attendance.date.weekday() >= 5
-
-    if 'clock_in' in incoming or 'clock_out' in incoming or 'timetable' in incoming or 'status' in incoming:
-        if is_weekend:
-            incoming.setdefault('status', 'present' if (clock_in and clock_out) else 'absent')
-            incoming['late_minutes'] = None
-            incoming['overtime_hours'] = 0
-        elif 'status' not in incoming:
-            grace_minutes = PayrollSettings.get_settings().grace_minutes
-            incoming['status'] = calculate_status(clock_in, clock_out, timetable_text, grace_minutes)
-            late_minutes, overtime_hours = calculate_late_and_overtime(
-                clock_in, clock_out, timetable_text, grace_minutes
-            )
-            incoming['late_minutes'] = late_minutes
-            incoming['overtime_hours'] = overtime_hours
-
-    serializer = AttendanceHistorySerializer(attendance, data=incoming, partial=True)
+    serializer = AttendanceHistorySerializer(attendance, data=request.data, partial=True)
     if serializer.is_valid():
         serializer.save()
-
-        # ---------- Resync payroll — ONLY for the current, still-open month ----------
-        deduction_month = attendance.date.replace(day=1)
-        current_month = date.today().replace(day=1)
-
-        if deduction_month == current_month:
-            calculate_and_save_deduction(
-                employee=attendance.employee,
-                deduction_month=deduction_month,
-                include_attendance=True,
-                force=True,
-            )
-        # else: this attendance record belongs to a past, already-closed month —
-        # its SalaryDeductionHistory must not be touched retroactively.
-
         return Response({
             'message': 'Attendance record updated successfully.',
             'record': {
@@ -1150,106 +1406,548 @@ def attendance_record_update(request, id):
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-def count_working_days(start_date, end_date):
-    total = 0
-    current = start_date
-    while current <= end_date:
-        if current.weekday() < 5:
-            total += 1
-        current += timedelta(days=1)
-    return total
 
-
-def calculate_is_paid_for_month(employee, deduction_month):
-    settings_obj = PayrollSettings.get_settings()
-    month_start = deduction_month.replace(day=1)
-    days_in_month = calendar.monthrange(month_start.year, month_start.month)[1]   # e.g. 31 for July
-    month_end = month_start.replace(day=days_in_month)
-
-    effective_start = max(month_start, employee.joined_date) if employee.joined_date else month_start
-
-    total_applicable_days = count_working_days(effective_start, month_end)   # numerator — working days only
-
-    records = Attendance.objects.filter(
-        employee=employee, date__gte=effective_start, date__lte=month_end,
-    ).exclude(
-        date__week_day__in=[1, 7]
-    ).order_by('date')
-
-    leave_counter = 0
-    absent_counter = 0
-    present_days = 0
-    paid_leave_days = 0
-    unpaid_leave_days = 0
-    unpaid_absent_days = 0
-    late_count = 0
-    overtime_hours_total = Decimal("0")
-
-    for record in records:
-        if record.date.weekday() >= 5:
-            continue
-
-        if record.status in ('present', 'late'):
-            record.is_paid = True
-            present_days += 1
-            if record.status == 'late':
-                late_count += 1
-
-        elif record.status == 'on_leave':
-            leave_counter += 1
-            if leave_counter <= settings_obj.allowed_leaves_per_month:
-                record.is_paid = True
-                paid_leave_days += 1
-            else:
-                record.is_paid = False
-                unpaid_leave_days += 1
-
-        elif record.status == 'absent':
-            absent_counter += 1
-            if absent_counter <= settings_obj.allowed_absents_per_month:
-                record.is_paid = True
-            else:
-                record.is_paid = False
-                unpaid_absent_days += 1
-
-        overtime_hours_total += Decimal(str(record.overtime_hours or 0))
-        record.save(update_fields=['is_paid'])
-
-    return {
-        'total_days': total_applicable_days,          # numerator — working days only (unchanged)
-        'present_days': present_days,
-        'paid_leave_days': paid_leave_days,
-        'unpaid_leave_days': unpaid_leave_days,
-        'unpaid_absent_days': unpaid_absent_days,
-        'late_count': late_count,
-        'overtime_hours': overtime_hours_total,
-        'calendar_days_in_month': days_in_month,        # ← NEW: divisor source (30/31)
-    }
-
-# ---------- Payroll Settings ----------
-@api_view(['GET', 'PUT'])
+@api_view(['GET', 'PUT', 'PATCH'])
 @permission_classes([IsAuthenticated])
 def payroll_settings_view(request):
+    """Read/update singleton payroll settings used by attendance deductions."""
     settings_obj = PayrollSettings.get_settings()
 
     if request.method == 'GET':
-        serializer = PayrollSettingsSerializer(settings_obj)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    elif request.method == 'PUT':
-        serializer = PayrollSettingsSerializer(
-            settings_obj,
-            data=request.data,
-            partial=True,
-            context={'request': request}
+        return Response(
+            PayrollSettingsSerializer(settings_obj).data,
+            status=status.HTTP_200_OK,
         )
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+
+    serializer = PayrollSettingsSerializer(
+        settings_obj,
+        data=request.data,
+        partial=True,
+        context={'request': request},
+    )
+    if not serializer.is_valid():
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    updated = serializer.save()
+    return Response(
+        PayrollSettingsSerializer(updated).data,
+        status=status.HTTP_200_OK,
+    )
+
+
+def _resolve_employee_for_user(user):
+    if not user or not user.is_authenticated:
+        return None
+    employee = Employee.objects.filter(user=user).first()
+    if employee:
+        return employee
+    email = getattr(user, "email", None)
+    if email:
+        return Employee.objects.filter(email__iexact=email).first()
+    return None
+
+
+def _serialize_today_attendance(record, settings_obj):
+    can_check_in = record is None or record.clock_in is None
+    can_check_out = record is not None and record.clock_in is not None and record.clock_out is None
+    payload = {
+        "date": str(date.today()),
+        "can_check_in": can_check_in,
+        "can_check_out": can_check_out,
+        "office_configured": bool(settings_obj.office_configured),
+        "office_radius_meters": settings_obj.office_radius_meters,
+        "default_timetable": settings_obj.default_timetable,
+        "record": AttendanceHistorySerializer(record).data if record else None,
+    }
+    return payload
+
+
+def _apply_location_fields(record, action, latitude, longitude, address, settings_obj):
+    from .geo import evaluate_office_presence, coerce_coordinate
+
+    lat = coerce_coordinate(latitude)
+    lng = coerce_coordinate(longitude)
+    in_office, distance = evaluate_office_presence(
+        lat,
+        lng,
+        settings_obj.office_latitude,
+        settings_obj.office_longitude,
+        settings_obj.office_radius_meters,
+    )
+    address_text = (address or "").strip()[:500]
+    if action == "check_in":
+        record.check_in_latitude = lat
+        record.check_in_longitude = lng
+        record.check_in_address = address_text
+        record.check_in_in_office = in_office
+        record.check_in_distance_meters = distance
     else:
-        return Response(
-            {"error": "Method not allowed."},
-            status=status.HTTP_405_METHOD_NOT_ALLOWED
+        record.check_out_latitude = lat
+        record.check_out_longitude = lng
+        record.check_out_address = address_text
+        record.check_out_in_office = in_office
+        record.check_out_distance_meters = distance
+    return in_office, distance
+
+
+def _recalculate_attendance_metrics(record, settings_obj):
+    timetable = record.timetable or settings_obj.default_timetable or "10 - 7"
+    record.timetable = timetable
+    grace = settings_obj.grace_minutes or 0
+    if record.clock_in and record.clock_out:
+        record.status = calculate_status(
+            record.clock_in, record.clock_out, timetable, grace
         )
+        late, ot = calculate_late_and_overtime(
+            record.clock_in, record.clock_out, timetable, grace
+        )
+        record.late_minutes = late
+        record.overtime_hours = ot or 0
+    elif record.clock_in:
+        # Provisional status from check-in alone
+        provisional = calculate_status(record.clock_in, record.clock_in, timetable, grace)
+        record.status = provisional if provisional != "absent" else "present"
+        late, _ = calculate_late_and_overtime(
+            record.clock_in, record.clock_in, timetable, grace
+        )
+        # late_and_overtime needs both; compute late vs shift start manually via status
+        if record.status == "late":
+            from .utils import parse_shift_range
+            from datetime import datetime as dt, timedelta as td
+
+            start_time, _ = parse_shift_range(timetable)
+            if start_time:
+                start_dt = dt.combine(date.today(), start_time)
+                clock_dt = dt.combine(date.today(), record.clock_in)
+                record.late_minutes = max(0, int((clock_dt - start_dt).total_seconds() // 60))
+            else:
+                record.late_minutes = None
+        else:
+            record.late_minutes = 0
+        record.overtime_hours = 0
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def my_attendance_today(request):
+    employee = _resolve_employee_for_user(request.user)
+    if not employee:
+        return Response(
+            {"error": "No employee profile is linked to this account."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+    settings_obj = PayrollSettings.get_settings()
+    record = Attendance.objects.filter(employee=employee, date=date.today()).first()
+    return Response(_serialize_today_attendance(record, settings_obj))
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def my_attendance_check_in(request):
+    employee = _resolve_employee_for_user(request.user)
+    if not employee:
+        return Response(
+            {"error": "No employee profile is linked to this account."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    latitude = request.data.get("latitude")
+    longitude = request.data.get("longitude")
+    if latitude is None or longitude is None:
+        return Response(
+            {"error": "Current location (latitude & longitude) is required to check in."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    settings_obj = PayrollSettings.get_settings()
+    today = date.today()
+    record, _ = Attendance.objects.get_or_create(
+        employee=employee,
+        date=today,
+        defaults={
+            "timetable": settings_obj.default_timetable or "10 - 7",
+            "status": "present",
+        },
+    )
+    if record.clock_in:
+        return Response(
+            {
+                "error": "You already checked in today.",
+                "today": _serialize_today_attendance(record, settings_obj),
+            },
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    now = datetime.datetime.now().time().replace(microsecond=0)
+    record.clock_in = now
+    in_office, distance = _apply_location_fields(
+        record,
+        "check_in",
+        latitude,
+        longitude,
+        request.data.get("address"),
+        settings_obj,
+    )
+    _recalculate_attendance_metrics(record, settings_obj)
+    record.save()
+
+    from .geo import location_presence_label
+
+    return Response(
+        {
+            "success": True,
+            "message": "Checked in successfully.",
+            "in_office": in_office,
+            "location_label": location_presence_label(in_office, bool(employee.work_from_home)),
+            "work_from_home": bool(employee.work_from_home),
+            "distance_meters": distance,
+            "today": _serialize_today_attendance(record, settings_obj),
+        },
+        status=status.HTTP_200_OK,
+    )
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def my_attendance_check_out(request):
+    employee = _resolve_employee_for_user(request.user)
+    if not employee:
+        return Response(
+            {"error": "No employee profile is linked to this account."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    latitude = request.data.get("latitude")
+    longitude = request.data.get("longitude")
+    if latitude is None or longitude is None:
+        return Response(
+            {"error": "Current location (latitude & longitude) is required to check out."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    settings_obj = PayrollSettings.get_settings()
+    record = Attendance.objects.filter(employee=employee, date=date.today()).first()
+    if not record or not record.clock_in:
+        return Response(
+            {"error": "Check in first before checking out."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    if record.clock_out:
+        return Response(
+            {
+                "error": "You already checked out today.",
+                "today": _serialize_today_attendance(record, settings_obj),
+            },
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    now = datetime.datetime.now().time().replace(microsecond=0)
+    record.clock_out = now
+    in_office, distance = _apply_location_fields(
+        record,
+        "check_out",
+        latitude,
+        longitude,
+        request.data.get("address"),
+        settings_obj,
+    )
+    _recalculate_attendance_metrics(record, settings_obj)
+    record.save()
+
+    from .geo import location_presence_label
+
+    return Response(
+        {
+            "success": True,
+            "message": "Checked out successfully.",
+            "in_office": in_office,
+            "location_label": location_presence_label(in_office, bool(employee.work_from_home)),
+            "work_from_home": bool(employee.work_from_home),
+            "distance_meters": distance,
+            "today": _serialize_today_attendance(record, settings_obj),
+        },
+        status=status.HTTP_200_OK,
+    )
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def my_attendance_overview(request):
+    """Employee self-service overview: allowances + month analytics + recent history."""
+    employee = _resolve_employee_for_user(request.user)
+    if not employee:
+        return Response(
+            {"error": "No employee profile is linked to this account."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    settings_obj = PayrollSettings.get_settings()
+    today = date.today()
+    month_start = today.replace(day=1)
+    if today.month == 12:
+        month_end = today.replace(year=today.year + 1, month=1, day=1) - timedelta(days=1)
+    else:
+        month_end = today.replace(month=today.month + 1, day=1) - timedelta(days=1)
+
+    month_records = Attendance.objects.filter(
+        employee=employee,
+        date__gte=month_start,
+        date__lte=month_end,
+    )
+    present = month_records.filter(status="present").count()
+    late = month_records.filter(status="late").count()
+    absent = month_records.filter(status="absent").count()
+    on_leave = month_records.filter(status="on_leave").count()
+    in_office_days = month_records.filter(check_in_in_office=True).count()
+    remote_days = month_records.filter(check_in_in_office=False).count()
+
+    recent = Attendance.objects.filter(employee=employee).order_by("-date")[:14]
+    today_record = Attendance.objects.filter(employee=employee, date=today).first()
+
+    return Response(
+        {
+            "employee": {
+                "id": employee.id,
+                "name": employee.name,
+                "department": employee.department,
+                "designation": employee.designation,
+                "employee_number": employee.employee_number,
+                "work_from_home": bool(employee.work_from_home),
+            },
+            "allowances": {
+                "grace_minutes": settings_obj.grace_minutes,
+                "allowed_leaves_per_month": settings_obj.allowed_leaves_per_month,
+                "allowed_absents_per_month": settings_obj.allowed_absents_per_month,
+                "late_count_threshold": settings_obj.late_count_threshold,
+                "overtime_rate_per_hour": str(settings_obj.overtime_rate_per_hour),
+                "default_timetable": settings_obj.default_timetable,
+                "office_radius_meters": settings_obj.office_radius_meters,
+                "office_configured": bool(settings_obj.office_configured),
+                "office_address": settings_obj.office_address or "",
+            },
+            "month": {
+                "label": month_start.strftime("%B %Y"),
+                "present": present,
+                "late": late,
+                "absent": absent,
+                "on_leave": on_leave,
+                "in_office_days": in_office_days,
+                "remote_or_outside_days": remote_days,
+                "total_recorded": month_records.count(),
+                "attendance_pct": (
+                    round(((present + late) / month_records.count()) * 100)
+                    if month_records.count()
+                    else 0
+                ),
+            },
+            "today": _serialize_today_attendance(today_record, settings_obj),
+            "recent": AttendanceHistorySerializer(recent, many=True).data,
+            "work_update": _serialize_work_update(
+                employee.daily_work_updates.filter(date=today).first()
+            ),
+        }
+    )
+
+
+def _serialize_work_update(row):
+    if not row:
+        return {"note": "", "date": str(date.today()), "updated_at": None}
+    return {
+        "id": row.id,
+        "note": row.note or "",
+        "date": str(row.date),
+        "updated_at": row.updated_at.isoformat() if row.updated_at else None,
+    }
+
+
+@api_view(["GET", "PUT", "PATCH"])
+@permission_classes([IsAuthenticated])
+def my_daily_work_update(request):
+    """Employee posts/updates what they are working on today."""
+    from .models import DailyWorkUpdate
+
+    employee = _resolve_employee_for_user(request.user)
+    if not employee:
+        return Response(
+            {"error": "No employee profile is linked to this account."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    today = date.today()
+    row = DailyWorkUpdate.objects.filter(employee=employee, date=today).first()
+
+    if request.method == "GET":
+        return Response(_serialize_work_update(row), status=status.HTTP_200_OK)
+
+    note = (request.data.get("note") or "").strip()
+    if not note:
+        return Response(
+            {"error": "Please describe what you are working on today."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+    if len(note) > 2000:
+        return Response(
+            {"error": "Work update is too long (max 2000 characters)."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    if row:
+        row.note = note
+        row.save(update_fields=["note", "updated_at"])
+    else:
+        row = DailyWorkUpdate.objects.create(employee=employee, date=today, note=note)
+
+    return Response(
+        {
+            "success": True,
+            "message": "Today’s work update saved.",
+            "work_update": _serialize_work_update(row),
+        },
+        status=status.HTTP_200_OK,
+    )
+
+
+@api_view(["GET", "PATCH", "PUT"])
+@permission_classes([IsAuthenticated])
+def my_work_from_home(request):
+    """Employee self-service: read/update own Work from home flag."""
+    employee = _resolve_employee_for_user(request.user)
+    if not employee:
+        return Response(
+            {"error": "No employee profile is linked to this account."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    if request.method == "GET":
+        return Response(
+            {"work_from_home": bool(employee.work_from_home)},
+            status=status.HTTP_200_OK,
+        )
+
+    if "work_from_home" not in request.data:
+        return Response(
+            {"error": "work_from_home is required."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    raw = request.data.get("work_from_home")
+    if isinstance(raw, str):
+        value = raw.strip().lower() in ("1", "true", "yes", "on")
+    else:
+        value = bool(raw)
+
+    employee.work_from_home = value
+    employee.save(update_fields=["work_from_home"])
+    return Response(
+        {
+            "success": True,
+            "work_from_home": bool(employee.work_from_home),
+            "message": (
+                "Work from home enabled."
+                if employee.work_from_home
+                else "Work from home disabled."
+            ),
+        },
+        status=status.HTTP_200_OK,
+    )
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def my_attendance_history(request):
+    """Employee self-service attendance history (own records only)."""
+    employee = _resolve_employee_for_user(request.user)
+    if not employee:
+        return Response(
+            {"error": "No employee profile is linked to this account."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    records = employee.attendance_records.all()
+    date_from = request.query_params.get("date_from")
+    date_to = request.query_params.get("date_to")
+    status_filter = request.query_params.get("status")
+
+    if date_from:
+        records = records.filter(date__gte=date_from)
+    if date_to:
+        records = records.filter(date__lte=date_to)
+
+    history_stats = {
+        "present": records.filter(status="present").count(),
+        "late": records.filter(status="late").count(),
+        "absent": records.filter(status="absent").count(),
+        "on_leave": records.filter(status="on_leave").count(),
+        "holiday": records.filter(status="holiday").count(),
+    }
+
+    if status_filter and status_filter != "all":
+        records = records.filter(status=status_filter)
+
+    serializer = AttendanceHistorySerializer(records.order_by("-date"), many=True)
+    return Response(
+        {
+            "employee": {
+                "id": employee.id,
+                "name": employee.name,
+                "emp_no": employee.attendance_id or employee.employee_number,
+                "dept": employee.department,
+            },
+            "history": serializer.data,
+            "historyStats": history_stats,
+        },
+        status=status.HTTP_200_OK,
+    )
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def set_office_location(request):
+    """Admin captures current GPS pin as the office location."""
+    role_name = (request.user.role.name if getattr(request.user, "role", None) else "").lower()
+    if not (
+        role_name in ("admin", "administrator")
+        or request.user.is_superuser
+        or request.user.is_staff
+    ):
+        return Response({"error": "Admin access required."}, status=status.HTTP_403_FORBIDDEN)
+
+    latitude = request.data.get("latitude")
+    longitude = request.data.get("longitude")
+    if latitude is None or longitude is None:
+        return Response(
+            {"error": "latitude and longitude are required."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    from .geo import coerce_coordinate
+    from django.utils import timezone as dj_tz
+
+    lat = coerce_coordinate(latitude)
+    lng = coerce_coordinate(longitude)
+    if lat is None or lng is None:
+        return Response({"error": "Invalid coordinates."}, status=status.HTTP_400_BAD_REQUEST)
+
+    settings_obj = PayrollSettings.get_settings()
+    settings_obj.office_latitude = lat
+    settings_obj.office_longitude = lng
+    if "office_radius_meters" in request.data and request.data.get("office_radius_meters") not in ("", None):
+        try:
+            settings_obj.office_radius_meters = max(20, int(request.data.get("office_radius_meters")))
+        except (TypeError, ValueError):
+            pass
+    if "office_address" in request.data:
+        settings_obj.office_address = (request.data.get("office_address") or "").strip()[:500]
+    if "default_timetable" in request.data and request.data.get("default_timetable"):
+        settings_obj.default_timetable = str(request.data.get("default_timetable"))[:50]
+    settings_obj.office_set_at = dj_tz.now()
+    settings_obj.updated_by = request.user
+    settings_obj.save()
+
+    return Response(
+        {
+            "success": True,
+            "message": "Office location saved.",
+            "data": PayrollSettingsSerializer(settings_obj).data,
+        }
+    )

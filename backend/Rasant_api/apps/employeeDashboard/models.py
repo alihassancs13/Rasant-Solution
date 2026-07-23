@@ -3,18 +3,33 @@ from django.conf import settings
 from datetime import date
 
 
+class EmploymentStatus(models.Model):
+    """Lookup table for employee post/status (Intern, Probation, etc.)."""
+    name = models.CharField(max_length=50, unique=True)
+    code = models.SlugField(max_length=50, unique=True)
+    apply_payroll_deductions = models.BooleanField(
+        default=True,
+        help_text="If false, leave/absent/late payroll settings do not apply (e.g. Intern, Probation).",
+    )
+    sort_order = models.PositiveIntegerField(default=0)
+    is_active = models.BooleanField(default=True)
+
+    class Meta:
+        db_table = "employment_status"
+        ordering = ["sort_order", "id"]
+        verbose_name = "Employment Status"
+        verbose_name_plural = "Employment Statuses"
+
+    def __str__(self):
+        return self.name
+
+
 class Employee(models.Model):
 
     GENDER_CHOICES = [
         ('Male', 'Male'),
         ('Female', 'Female'),
         ('Other', 'Other'),
-    ]
-    STATUS_CHOICES = [
-        ('Intern', 'Intern'),
-        ('Probation', 'Probation'),
-        ('Contract', 'Contract'),
-        ('Permanent', 'Permanent'),
     ]
     employee_number = models.CharField(
         max_length=20,
@@ -39,6 +54,10 @@ class Employee(models.Model):
     department = models.CharField(max_length=100, default='Unassigned')
     designation = models.CharField(max_length=100, default='Unassigned')
     is_active = models.BooleanField(default=True)
+    work_from_home = models.BooleanField(
+        default=False,
+        help_text="If true, attendance outside the office radius is labeled Work from home.",
+    )
     salary = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     tax = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     insurance_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -46,7 +65,13 @@ class Employee(models.Model):
     increment_applied_on = models.DateField(null=True, blank=True)
     current_salary = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     joined_date = models.DateField(default=date.today)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Intern')
+    status = models.ForeignKey(
+        EmploymentStatus,
+        on_delete=models.PROTECT,
+        related_name="employees",
+        null=True,
+        blank=True,
+    )
 
     # ---------- Emergency Contact ----------
     emergency_name = models.CharField(max_length=255, null=True, blank=True)
@@ -354,8 +379,8 @@ class SalaryDeductionHistory(models.Model):
     # --- Attendance summary ---
     total_days = models.PositiveIntegerField(default=30)
     present_days = models.PositiveIntegerField(default=0)
-    paid_leave_days = models.PositiveIntegerField(default=0)
-    unpaid_leave_days = models.PositiveIntegerField(default=0)
+    paid_leave_days = models.DecimalField(max_digits=5, decimal_places=1, default=0)
+    unpaid_leave_days = models.DecimalField(max_digits=5, decimal_places=1, default=0)
     unpaid_absent_days = models.PositiveIntegerField(default=0)
 
     # --- Late penalty ---
@@ -375,6 +400,8 @@ class SalaryDeductionHistory(models.Model):
     base_salary = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     attendance_deduction_total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
 
+    bonus_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+
     # --- Lock ---
     is_finalized = models.BooleanField(default=False)
 
@@ -383,6 +410,7 @@ class SalaryDeductionHistory(models.Model):
     class Meta:
         db_table = "salary_deduction_history"
         ordering = ["-deduction_month"]
+        unique_together = ("employee", "deduction_month")
 
     def __str__(self):
         return f"{self.employee.name} — {self.deduction_month.strftime('%b %Y')}"
@@ -398,6 +426,21 @@ class PayrollSettings(models.Model):
         default=3,
         help_text="Free lates per month before half-day penalty starts"
     )
+
+    default_timetable = models.CharField(
+        max_length=50,
+        default="10 - 7",
+        help_text='Shift used for employee self check-in (e.g. "10 - 7")',
+    )
+
+    office_latitude = models.DecimalField(max_digits=10, decimal_places=7, null=True, blank=True)
+    office_longitude = models.DecimalField(max_digits=10, decimal_places=7, null=True, blank=True)
+    office_radius_meters = models.PositiveIntegerField(
+        default=150,
+        help_text="Distance from office pin within which check-in counts as In Office",
+    )
+    office_address = models.CharField(max_length=500, blank=True, default="")
+    office_set_at = models.DateTimeField(null=True, blank=True)
 
     updated_by = models.ForeignKey(
         settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True
@@ -416,6 +459,10 @@ class PayrollSettings(models.Model):
         obj, _ = cls.objects.get_or_create(pk=1)
         return obj
 
+    @property
+    def office_configured(self):
+        return self.office_latitude is not None and self.office_longitude is not None
+
     def __str__(self):
         return "Payroll Settings"
 
@@ -426,6 +473,7 @@ class Attendance(models.Model):
         ('late', 'Late'),
         ('absent', 'Absent'),
         ('on_leave', 'On leave'),
+        ('holiday', 'Holiday'),
     ]
 
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='attendance_records')
@@ -438,6 +486,20 @@ class Attendance(models.Model):
     late_minutes = models.PositiveIntegerField(null=True, blank=True)
     overtime_hours = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     is_paid = models.BooleanField(null=True, blank=True)
+    # True when an approved half-day leave applies (counts as 0.5 leave day in payroll)
+    is_half_day = models.BooleanField(default=False)
+
+    check_in_latitude = models.DecimalField(max_digits=10, decimal_places=7, null=True, blank=True)
+    check_in_longitude = models.DecimalField(max_digits=10, decimal_places=7, null=True, blank=True)
+    check_in_address = models.CharField(max_length=500, blank=True, default="")
+    check_in_in_office = models.BooleanField(null=True, blank=True)
+    check_in_distance_meters = models.PositiveIntegerField(null=True, blank=True)
+
+    check_out_latitude = models.DecimalField(max_digits=10, decimal_places=7, null=True, blank=True)
+    check_out_longitude = models.DecimalField(max_digits=10, decimal_places=7, null=True, blank=True)
+    check_out_address = models.CharField(max_length=500, blank=True, default="")
+    check_out_in_office = models.BooleanField(null=True, blank=True)
+    check_out_distance_meters = models.PositiveIntegerField(null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -449,3 +511,122 @@ class Attendance(models.Model):
 
     def __str__(self):
         return f"{self.employee.name} — {self.date} ({self.status})"
+class DailyWorkUpdate(models.Model):
+    """What an employee is working on for a given calendar day (visible to admin)."""
+
+    employee = models.ForeignKey(
+        Employee,
+        on_delete=models.CASCADE,
+        related_name='daily_work_updates',
+    )
+    date = models.DateField(default=date.today)
+    note = models.TextField(
+        help_text='What the employee is working on today.',
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'daily_work_updates'
+        ordering = ['-updated_at']
+        unique_together = ('employee', 'date')
+
+    def __str__(self):
+        return f'{self.employee.name} — {self.date}'
+
+class CompanyHoliday(models.Model):
+    """Admin-defined non-working day — attendance auto-marked Holiday (no deductions)."""
+
+    date = models.DateField(unique=True, db_index=True)
+    name = models.CharField(max_length=255, default='Holiday')
+    note = models.TextField(blank=True, default='')
+    created_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='company_holidays_created',
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'company_holidays'
+        ordering = ['-date']
+
+    def __str__(self):
+        return f'{self.date} — {self.name}'
+
+class LeaveRequest(models.Model):
+    STATUS_PENDING = 'pending'
+    STATUS_APPROVED = 'approved'
+    STATUS_REJECTED = 'rejected'
+    STATUS_CHOICES = [
+        (STATUS_PENDING, 'Pending'),
+        (STATUS_APPROVED, 'Approved'),
+        (STATUS_REJECTED, 'Rejected'),
+    ]
+
+    HALF_DAY_MORNING = 'morning'
+    HALF_DAY_AFTERNOON = 'afternoon'
+    HALF_DAY_PERIOD_CHOICES = [
+        (HALF_DAY_MORNING, 'Morning'),
+        (HALF_DAY_AFTERNOON, 'Afternoon'),
+    ]
+
+    employee = models.ForeignKey(
+        Employee,
+        on_delete=models.CASCADE,
+        related_name='leave_requests',
+    )
+    start_date = models.DateField()
+    end_date = models.DateField()
+    is_half_day = models.BooleanField(
+        default=False,
+        help_text='When true, leave is for half of a single day (0.5 day).',
+    )
+    half_day_period = models.CharField(
+        max_length=20,
+        choices=HALF_DAY_PERIOD_CHOICES,
+        blank=True,
+        default='',
+        help_text='Morning or afternoon when is_half_day is true.',
+    )
+    subject = models.CharField(max_length=255, default='Leave request')
+    reason = models.TextField(help_text='Leave proposal / reasoning for admin review.')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=STATUS_PENDING, db_index=True)
+    admin_note = models.TextField(blank=True, default='')
+    reviewed_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='leave_reviews',
+    )
+    reviewed_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'leave_requests'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        kind = 'half-day' if self.is_half_day else 'full'
+        return f'{self.employee.name} {self.start_date}→{self.end_date} ({kind}, {self.status})'
+
+    @property
+    def duration_days(self):
+        if self.is_half_day:
+            return 0.5
+        if not self.start_date or not self.end_date:
+            return 0
+        return (self.end_date - self.start_date).days + 1
+
+    @property
+    def duration_label(self):
+        if self.is_half_day:
+            period = dict(self.HALF_DAY_PERIOD_CHOICES).get(self.half_day_period, '')
+            return f'Half day ({period})' if period else 'Half day'
+        days = int(self.duration_days or 0)
+        return f'{days} day' if days == 1 else f'{days} days'

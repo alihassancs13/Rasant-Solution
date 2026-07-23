@@ -296,40 +296,32 @@ def _fetch_all_worklogs_for_issue(domain, headers, issue_key):
 
 # Get last years whole work logs
 
-def fetch_worklogs(user, month=None, year=None):
+def fetch_worklogs_for_range(user, date_from, date_to):
+    """
+    Fetch the authenticated user's own worklogs from Jira for [date_from, date_to].
+    Returns a flat list of worklog dicts (not grouped by date).
+    """
     domain, headers = get_jira_creds(user)
 
     if not domain:
         raise ValueError("Jira not connected. Please connect first.")
 
-    today = date.today()
+    if isinstance(date_from, str):
+        date_from = datetime.strptime(date_from, "%Y-%m-%d").date()
+    if isinstance(date_to, str):
+        date_to = datetime.strptime(date_to, "%Y-%m-%d").date()
 
-    # -------------------------
-    # If no filter is provided
-    # use current month
-    # -------------------------
-    if not month:
-        month = today.month
-    else:
-        month = int(month)
-
-    if not year:
-        year = today.year
-    else:
-        year = int(year)
-
-    start_date = date(year, month, 1)
-    end_date = date(year, month, calendar.monthrange(year, month)[1])
+    if date_to < date_from:
+        date_from, date_to = date_to, date_from
 
     jql = (
         f'worklogAuthor = currentUser() '
-        f'AND worklogDate >= "{start_date}" '
-        f'AND worklogDate <= "{end_date}"'
+        f'AND worklogDate >= "{date_from}" '
+        f'AND worklogDate <= "{date_to}"'
     )
 
     account_id = _get_current_account_id(user)
-
-    logs_by_date = {}
+    entries = []
     next_page_token = None
 
     while True:
@@ -357,10 +349,8 @@ def fetch_worklogs(user, month=None, year=None):
         data = r.json()
 
         for issue in data.get("issues", []):
-
             issue_key = issue.get("key")
             summary = issue["fields"].get("summary")
-
             issue_type = issue["fields"].get("issuetype", {})
             issue_type_icon = issue_type.get("iconUrl")
 
@@ -375,50 +365,81 @@ def fetch_worklogs(user, month=None, year=None):
                 )
 
             for wl in worklogs:
-
                 if wl.get("author", {}).get("accountId") != account_id:
                     continue
 
-                date_str = wl.get("started", "")[:10]
-
-                if not (str(start_date) <= date_str <= str(end_date)):
+                date_str = (wl.get("started") or "")[:10]
+                if not date_str or not (str(date_from) <= date_str <= str(date_to)):
                     continue
 
                 started_str = wl.get("started")
+                try:
+                    started_dt = datetime.strptime(
+                        started_str,
+                        "%Y-%m-%dT%H:%M:%S.000%z",
+                    )
+                except (TypeError, ValueError):
+                    # Fallback for slight format differences from Jira
+                    try:
+                        started_dt = datetime.fromisoformat(
+                            started_str.replace("Z", "+00:00")
+                        )
+                    except Exception:
+                        continue
 
-                started_dt = datetime.strptime(
-                    started_str,
-                    "%Y-%m-%dT%H:%M:%S.000%z",
-                )
+                seconds = int(wl.get("timeSpentSeconds") or 0)
+                ended_dt = started_dt + timedelta(seconds=seconds)
 
-                ended_dt = started_dt + timedelta(
-                    seconds=wl.get("timeSpentSeconds", 0)
-                )
-
-                logs_by_date.setdefault(date_str, []).append({
+                entries.append({
                     "worklog_id": wl.get("id"),
                     "issue_key": issue_key,
                     "issue_id": issue.get("id"),
                     "summary": summary,
                     "issue_type_icon": issue_type_icon,
                     "time_spent": wl.get("timeSpent"),
-                    "time_spent_seconds": wl.get("timeSpentSeconds"),
-                    "comment": _extract_text_from_adf(
-                        wl.get("comment")
-                    ),
+                    "time_spent_seconds": seconds,
+                    "comment": _extract_text_from_adf(wl.get("comment")),
                     "started": started_str,
-                    "ended": ended_dt.strftime(
-                        "%Y-%m-%dT%H:%M:%S.000%z"
-                    ),
+                    "ended": ended_dt.strftime("%Y-%m-%dT%H:%M:%S.000%z"),
+                    "date": date_str,
                 })
 
         if data.get("isLast", True):
             break
 
         next_page_token = data.get("nextPageToken")
-
         if not next_page_token:
             break
+
+    return entries
+
+
+def fetch_worklogs(user, month=None, year=None):
+    """
+    Get worklogs for a month/year, grouped by date (calendar UI shape).
+    """
+    today = date.today()
+
+    if not month:
+        month = today.month
+    else:
+        month = int(month)
+
+    if not year:
+        year = today.year
+    else:
+        year = int(year)
+
+    start_date = date(year, month, 1)
+    end_date = date(year, month, calendar.monthrange(year, month)[1])
+
+    entries = fetch_worklogs_for_range(user, start_date, end_date)
+
+    logs_by_date = {}
+    for entry in entries:
+        date_str = entry.get("date") or (entry.get("started") or "")[:10]
+        row = {k: v for k, v in entry.items() if k != "date"}
+        logs_by_date.setdefault(date_str, []).append(row)
 
     return logs_by_date
 

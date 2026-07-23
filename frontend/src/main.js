@@ -43,7 +43,22 @@ app.mixin({
     }
 })
 router.afterEach((to) => {
-    document.title = to.meta.title || 'Rasant Solutions';
+    // Browser tab: apple-touch-icon.png + module name (e.g. "Leave | Rasant Solutions")
+    const moduleName = to.meta?.module || null
+    const fallbackTitle = to.meta?.title || 'Rasant Solutions'
+    document.title = moduleName
+        ? `${moduleName} | Rasant Solutions`
+        : fallbackTitle
+
+    const iconHref = '/apple-touch-icon.png'
+    let icon = document.querySelector("link[rel='icon']")
+    if (!icon) {
+        icon = document.createElement('link')
+        icon.setAttribute('rel', 'icon')
+        document.head.appendChild(icon)
+    }
+    icon.setAttribute('type', 'image/png')
+    icon.setAttribute('href', iconHref)
 });
 
 app.component('font-awesome-icon', FontAwesomeIcon)

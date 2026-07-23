@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from . import analytics_views
 
 urlpatterns = [
     path('jira/connect/', views.connect_jira),
@@ -22,6 +23,10 @@ urlpatterns = [
     path('jira/check-jira-connection/', views.check_jira_connection, name='check-jira-connection'),
     path('jira/attachment/<str:attachment_id>/', views.proxy_attachment , name='get_single_attachment'),
     path('worklogs/calendar/<int:year>/<int:month>/', views.get_calendar_worklogs, name='get_calendar_worklogs_path'),
+    path('worklogs/analytics/', analytics_views.worklog_analytics_overview, name='worklog-analytics-overview'),
+    path('worklogs/analytics/employee/<int:user_id>/', analytics_views.worklog_analytics_employee, name='worklog-analytics-employee'),
+    path('worklogs/analytics/export-settings/', analytics_views.worklog_export_settings_view, name='worklog-export-settings'),
+    path('worklogs/analytics/export/', analytics_views.worklog_analytics_export, name='worklog-analytics-export'),
     path('worklogs/create-worklogs/', views.create_worklog_view, name='create_worklogs'),
     path('worklogs/<str:worklog_id>/update/', views.update_worklog_view, name='update_worklogs'),
     path("worklogs/<str:worklog_id>/delete/", views.delete_worklog_view, name="delete-worklog"),

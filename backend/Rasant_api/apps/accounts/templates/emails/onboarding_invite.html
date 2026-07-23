@@ -1,0 +1,20 @@
+{% extends "emails/base.html" %}
+{% block title %}Onboarding invite — Rasant Solutions{% endblock %}
+{% block content %}
+  <h1 style="margin:0 0 12px;font-size:22px;color:#1E3A5F;">Complete your onboarding</h1>
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.6;color:#475569;">
+    Dear {{ employee_name }}, welcome to Rasant Solutions. Please complete your employee onboarding form to proceed.
+  </p>
+  <p style="margin:0 0 18px;font-size:14px;color:#334155;">
+    Your reference: <strong>{{ employee_number }}</strong>
+  </p>
+  <p style="margin:0 0 10px;font-size:14px;color:#64748B;">Please have these documents ready:</p>
+  <ul style="margin:0 0 22px;padding-left:18px;color:#475569;font-size:14px;line-height:1.7;">
+    <li>CNIC scan copies</li>
+    <li>Educational certificates (Matric, Intermediate, etc.)</li>
+    <li>Bank account details</li>
+  </ul>
+  <a href="{{ onboarding_link }}" style="display:inline-block;background:#D45A1A;color:#ffffff;text-decoration:none;font-weight:700;font-size:14px;padding:12px 22px;border-radius:10px;">
+    Open onboarding form
+  </a>
+{% endblock %}

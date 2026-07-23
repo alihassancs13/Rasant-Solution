@@ -15,9 +15,22 @@ apiClient.interceptors.request.use((config) => {
     return config;
 });
 
+function flattenModules(modules = []) {
+    const flat = [];
+    modules.forEach((m) => {
+        flat.push(m);
+        if (Array.isArray(m?.children)) {
+            m.children.forEach((c) => flat.push(c));
+        }
+    });
+    return flat;
+}
+
 export const useSidebarStore = defineStore('sidebar', {
     state: () => ({
-        modules: [], // Always initialize as array
+        modules: [],
+        accountModules: [],
+        projectModules: [],
         isLoading: false,
         error: null,
     }),
@@ -25,15 +38,22 @@ export const useSidebarStore = defineStore('sidebar', {
     getters: {
         hasModules: (state) => state.modules?.length > 0,
         getModuleByName: (state) => (name) => {
-            if (!state.modules || !Array.isArray(state.modules)) return null;
-            return state.modules.find(m => m?.name?.trim() === name?.trim());
+            const all = [
+                ...flattenModules(state.modules),
+                ...(state.accountModules || []),
+                ...(state.projectModules || []),
+            ];
+            return all.find((m) => m?.name?.trim() === name?.trim()) || null;
         },
         getModuleRoute: (state) => (name) => {
-            if (!state.modules || !Array.isArray(state.modules)) {
-                return `/admin/${name?.toLowerCase().replace(/ /g, '-')}`;
-            }
-            const module = state.modules.find(m => m?.name?.trim() === name?.trim());
-            return module?.link || `/admin/${name?.toLowerCase().replace(/ /g, '-')}`;
+            const all = [
+                ...flattenModules(state.modules),
+                ...(state.accountModules || []),
+                ...(state.projectModules || []),
+            ];
+            const module = all.find((m) => m?.name?.trim() === name?.trim());
+            if (module?.link) return module.link;
+            return `/admin/${name?.toLowerCase().replace(/ /g, '-')}`;
         },
     },
 
@@ -44,42 +64,26 @@ export const useSidebarStore = defineStore('sidebar', {
 
             try {
                 const response = await apiClient.get(API_ENDPOINTS.USER_MODULES);
+                const data = response.data?.data || response.data || {};
 
-                // Handle different response formats
-                let modulesData = response.data;
-
-                // If response has a data property with modules
-                if (response.data?.data?.modules) {
-                    modulesData = response.data.data.modules;
-                }
-                // If response has modules directly
-                else if (response.data?.modules) {
+                let modulesData = data.modules;
+                if (!Array.isArray(modulesData) && Array.isArray(response.data?.modules)) {
                     modulesData = response.data.modules;
                 }
-                // If response has data property that is an array
-                else if (response.data?.data && Array.isArray(response.data.data)) {
-                    modulesData = response.data.data;
-                }
-                // If response itself is an object with status and data
-                else if (response.data?.status && response.data?.data?.modules) {
-                    modulesData = response.data.data.modules;
+                if (!Array.isArray(modulesData) && Array.isArray(data)) {
+                    modulesData = data;
                 }
 
-                // Ensure we have an array
-                if (Array.isArray(modulesData)) {
-                    this.modules = modulesData;
-                    return { success: true, data: modulesData };
-                } else {
-                    console.error('Unexpected modules format:', response.data);
-                    this.modules = [];
-                    return {
-                        success: false,
-                        error: 'Invalid modules data format'
-                    };
-                }
+                this.modules = Array.isArray(modulesData) ? modulesData : [];
+                this.accountModules = Array.isArray(data.account_modules) ? data.account_modules : [];
+                this.projectModules = Array.isArray(data.project_modules) ? data.project_modules : [];
+
+                return { success: true, data: this.modules };
             } catch (error) {
                 this.error = error.response?.data?.message || 'Failed to fetch modules';
-                this.modules = []; // Reset to empty array on error
+                this.modules = [];
+                this.accountModules = [];
+                this.projectModules = [];
                 return { success: false, error: this.error };
             } finally {
                 this.isLoading = false;
@@ -88,6 +92,8 @@ export const useSidebarStore = defineStore('sidebar', {
 
         clearModules() {
             this.modules = [];
+            this.accountModules = [];
+            this.projectModules = [];
             this.error = null;
         },
     },

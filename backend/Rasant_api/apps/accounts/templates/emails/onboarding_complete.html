@@ -1,0 +1,29 @@
+{% extends "emails/base.html" %}
+{% block title %}Onboarding — Rasant Solutions{% endblock %}
+{% block content %}
+  {% if recipient_is_admin %}
+    <h1 style="margin:0 0 12px;font-size:22px;color:#1E3A5F;">Onboarding form completed</h1>
+    <p style="margin:0 0 18px;font-size:15px;line-height:1.6;color:#475569;">
+      <strong>{{ employee_name }}</strong> has submitted their employee onboarding form.
+    </p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:12px;">
+      <tr>
+        <td style="padding:18px 20px;font-size:14px;color:#334155;line-height:1.7;">
+          <div><strong>Employee ID:</strong> {{ employee_number }}</div>
+          <div><strong>Email:</strong> {{ employee_email }}</div>
+          {% if phone_number %}<div><strong>Phone:</strong> {{ phone_number }}</div>{% endif %}
+          {% if department %}<div><strong>Department:</strong> {{ department }}</div>{% endif %}
+          {% if designation %}<div><strong>Designation:</strong> {{ designation }}</div>{% endif %}
+        </td>
+      </tr>
+    </table>
+  {% else %}
+    <h1 style="margin:0 0 12px;font-size:22px;color:#1E3A5F;">Thanks, {{ employee_name }}!</h1>
+    <p style="margin:0 0 18px;font-size:15px;line-height:1.6;color:#475569;">
+      We received your onboarding details (ref: <strong>{{ employee_number }}</strong>). Our HR team will review your information shortly.
+    </p>
+    <p style="margin:0;font-size:14px;line-height:1.6;color:#64748B;">
+      If anything needs correction, reply to this email or contact HR.
+    </p>
+  {% endif %}
+{% endblock %}

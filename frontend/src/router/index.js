@@ -15,7 +15,8 @@ const routes = [
     name: "Home",
     component: Home,
     meta: {
-      title: "Rasant Solutions - Home",
+      module: "Home",
+      title: "Home | Rasant Solutions",
       requiresAuth: false
     }
   },
@@ -24,7 +25,28 @@ const routes = [
     name: "Login",
     component: Login,
     meta: {
-      title: "Login - Rasant Solutions",
+      module: "Login",
+      title: "Login | Rasant Solutions",
+      requiresAuth: false
+    }
+  },
+  {
+    path: "/forgot-password",
+    name: "ForgotPassword",
+    component: () => import("../pages/Home/forgotPassword.vue"),
+    meta: {
+      module: "Forgot Password",
+      title: "Forgot Password | Rasant Solutions",
+      requiresAuth: false
+    }
+  },
+  {
+    path: "/create-password/:token",
+    name: "CreatePassword",
+    component: () => import("../pages/Home/createPassword.vue"),
+    meta: {
+      module: "Create Password",
+      title: "Create Password | Rasant Solutions",
       requiresAuth: false
     }
   },
@@ -33,7 +55,8 @@ const routes = [
     name: "Contact",
     component: Contact,
     meta: {
-      title: "Contact - Rasant Solutions",
+      module: "Contact",
+      title: "Contact | Rasant Solutions",
       requiresAuth: false
     }
   },
@@ -42,7 +65,8 @@ const routes = [
     name: "ai-agent",
     component: () => import("../pages/Home/ai-agent.vue"),
     meta: {
-      title: "AI Agent - Rasant Solutions",
+      module: "AI Agent",
+      title: "AI Agent | Rasant Solutions",
       requiresAuth: false
     }
   },
@@ -52,7 +76,8 @@ const routes = [
     name: "Orchestri",
     component: () => import("../pages/Home/sdlc-orchestri.vue"),
     meta: {
-      title: "Orchestri - Rasant Solutions",
+      module: "Orchestri",
+      title: "Orchestri | Rasant Solutions",
       requiresAuth: false
     }
   },
@@ -61,7 +86,8 @@ const routes = [
     name: "Careers",
     component: () => import("../pages/Home/careers.vue"),
     meta: {
-      title: "Careers- Rasant Solutions",
+      module: "Careers",
+      title: "Careers | Rasant Solutions",
       requiresAuth: false
     }
   },
@@ -70,7 +96,8 @@ const routes = [
     name: "JobDetails",
     component: () => import("../pages/Home/jobDetails.vue"),
     meta: {
-      title: "Job Details - Rasant Solutions",
+      module: "Job Details",
+      title: "Job Details | Rasant Solutions",
       requiresAuth: false
     }
   },
@@ -79,7 +106,8 @@ const routes = [
     name: "Chatbot",
     component: () => import("../pages/Home/chatbot.vue"),
     meta: {
-      title: "Chatbot - Rasant Solutions",
+      module: "Chatbot",
+      title: "Chatbot | Rasant Solutions",
       requiresAuth: false
     }
   },
@@ -88,7 +116,8 @@ const routes = [
     name: "sentraAI",
     component: () => import("../pages/Home/sentraAI.vue"),
     meta: {
-      title: "SentraAI - Rasant Solutions",
+      module: "SentraAI",
+      title: "SentraAI | Rasant Solutions",
       requiresAuth: false
     }
   },
@@ -97,7 +126,8 @@ const routes = [
     name: "omnipost",
     component: () => import("../pages/Home/omnipost.vue"),
     meta: {
-      title: "OmniPost - Rasant Solutions",
+      module: "OmniPost",
+      title: "OmniPost | Rasant Solutions",
       requiresAuth: false
     }
   },
@@ -105,36 +135,47 @@ const routes = [
     path: "/admin/overview",
     name: "AdminOverview",
     component: () => import("../pages/admin/Overview/overview.vue"),
-    meta: { title: "Admin Overview - Rasant Solutions", requiresAuth: true }
+    meta: { module: "Overview", title: "Overview | Rasant Solutions", requiresAuth: true }
+  },
+  {
+    path: '/admin/account',
+    name: 'ManageAccount',
+    component: () => import('../pages/admin/Account/manageAccount.vue'),
+    meta: { module: "Account", title: "Account | Rasant Solutions", requiresAuth: true }
+  },
+  {
+    path: '/settings',
+    redirect: '/admin/account',
   },
   {
     path: '/admin/career',
     component: () => import('../pages/admin/Employee/employeeCareer.vue'),
-    meta: { title: "Admin Career - Rasant Solutions", requiresAuth: true }
+    meta: { module: "Career", title: "Career | Rasant Solutions", requiresAuth: true }
   },
   {
     path: '/admin/inquiries',
     component: () => import('../pages/admin/Inquiries/Inquiries.vue'),
-    meta: { title: "Admin Inquiries - Rasant Solutions", requiresAuth: true }
+    meta: { module: "Inquiries", title: "Inquiries | Rasant Solutions", requiresAuth: true }
   },
   {
     path: '/admin/employees/salaries',
     name: 'Salaries',
     component: () => import('../pages/admin/Employee/employeeSalaries.vue'),
-    meta: { title: "Salaries - Rasant Solutions", requiresAuth: true }
+    meta: { module: "Salaries", title: "Salaries | Rasant Solutions", requiresAuth: true }
   },
   {
     path: '/admin/inbox',
     name: 'Inbox',
     component: () => import('../pages/admin/Inbox/inbox.vue'),
-    meta: { title: "Salaries - Rasant Solutions", requiresAuth: true }
+    meta: { module: "Inbox", title: "Inbox | Rasant Solutions", requiresAuth: true }
   },
   {
     path: '/services/:slug',
     name: 'ServiceDetail',
     component: () => import('../pages/Home/ServiceDetail.vue'),
     meta: {
-      title: 'Services - Rasant Solutions',
+      module: "Services",
+      title: "Services | Rasant Solutions",
       requiresAuth: false,
     },
   },
@@ -142,49 +183,79 @@ const routes = [
     path: '/admin/employees/dashboard',
     name: 'EmployeeDashboard',
     component: EmployeeDashboard,
-    meta: { title: "Dashboard - Rasant Solutions",requiresAuth: true, role: 'admin' }
+    meta: { module: "Employees", title: "Employees | Rasant Solutions", requiresAuth: true, role: 'admin' }
   },
   {
     path: '/admin/employees/attendance',
     name: 'EmployeeAttendance',
     component: EmployeeAttendance,
-    meta: { title: "Attendance - Rasant Solutions",requiresAuth: true, role: 'admin' }
+    meta: { module: "Attendance", title: "Attendance | Rasant Solutions", requiresAuth: true, role: 'admin' }
+  },
+  {
+    path: '/admin/employees/leave',
+    name: 'AdminLeaveRequests',
+    component: () => import('../pages/admin/Employee/employeeLeave.vue'),
+    meta: { module: "Leave", title: "Leave | Rasant Solutions", requiresAuth: true, role: 'admin' }
   },
   {
     path: '/admin/documents',
     name: 'Documents',
     component: Documents,
-    meta: {title: "Documents - Rasant Solutions", requiresAuth: true, role: 'admin' }
+    meta: { module: "Documents", title: "Documents | Rasant Solutions", requiresAuth: true, role: 'admin' }
   },
   {
     path: '/admin/credentialsvault',
     name: 'Vault',
     component: Vault,
-    meta: {title: "credentials - Rasant Solutions", requiresAuth: true, role: 'admin' }
+    meta: { module: "Credentials", title: "Credentials | Rasant Solutions", requiresAuth: true, role: 'admin' }
+  },
+  {
+    path: '/employee/overview',
+    name: 'EmployeeOverview',
+    component: () => import('../pages/Employee/employeeOverview.vue'),
+    meta: { module: "Overview", title: "Overview | Rasant Solutions", requiresAuth: true, role: 'employee' }
+  },
+  {
+    path: '/employee/attendance',
+    name: 'MyAttendance',
+    component: () => import('../pages/Employee/employeeAttendance.vue'),
+    meta: { module: "Attendance", title: "Attendance | Rasant Solutions", requiresAuth: true, role: 'employee' }
+  },
+  {
+    path: '/employee/leave',
+    name: 'MyLeave',
+    component: () => import('../pages/Employee/employeeLeave.vue'),
+    meta: { module: "Leave", title: "Leave | Rasant Solutions", requiresAuth: true, role: 'employee' }
   },
   {
     path: '/employee/credentialsvault',
     name: 'Credential',
     component: Credential,
-    meta: {title: "employee-credentials - Rasant Solutions", requiresAuth: true, role: 'employee' }
+    meta: { module: "Credentials", title: "Credentials | Rasant Solutions", requiresAuth: true, role: 'employee' }
   },
   {
     path: '/onboarding/:token?',
     name: 'EmployeeOnboarding',
     component: () => import('@/pages/admin/Employee/employeeRegistrationModel.vue'),
-    meta: { requiresAuth: false } // or true depending on your needs
-  },
-  {
-    path: '/admin/jira',
-    name: 'Jira',
-    component: () => import('@/pages/admin/jira/jira.vue'),
-    meta: { requiresAuth: true, role: 'employee' }
+    meta: { module: "Onboarding", title: "Onboarding | Rasant Solutions", requiresAuth: false }
   },
   {
     path: '/admin/worklogs',
     name: 'Worklogs',
     component: () => import('@/pages/admin/worklogs/worklog.vue'),
-    meta: { requiresAuth: true, role: 'employee' }
+    meta: { module: "Worklogs", title: "Worklogs | Rasant Solutions", requiresAuth: true }
+  },
+  {
+    path: '/admin/worklogs/analytics',
+    name: 'WorklogAnalytics',
+    component: () => import('@/pages/admin/worklogs/worklogAnalytics.vue'),
+    meta: { module: "Worklog Analytics", title: "Worklog Analytics | Rasant Solutions", requiresAuth: true, role: 'admin' }
+  },
+  {
+    path: '/admin/jira',
+    name: 'Jira',
+    component: () => import('@/pages/admin/jira/jira.vue'),
+    meta: { module: "Jira", title: "Jira | Rasant Solutions", requiresAuth: true },
   },
 ];
 
