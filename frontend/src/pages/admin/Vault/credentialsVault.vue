@@ -111,125 +111,74 @@
                   </div>
                 </div>
               </div>
-              <!-- Table - Desktop View -->
-              <div class="hidden md:block overflow-y-auto flex-1">
-                <table class="w-full min-w-[700px] lg:min-w-[800px]">
-                  <thead class="bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
-                  <tr>
-                    <th class="px-4 sm:px-6 py-3 text-left font-bold text-xs text-gray-500 uppercase tracking-wider">Project name</th>
-                    <th class="px-4 sm:px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Username</th>
-                    <th class="px-4 sm:px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Email</th>
-                    <th class="px-4 sm:px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Password</th>
-                    <th class="px-4 sm:px-6 py-3 text-center text-xs font-bold text-gray-500 uppercase tracking-wider">Action</th>
-                  </tr>
-                  </thead>
-                  <tbody class="bg-white divide-y divide-gray-200">
-                  <!-- No Data -->
-                  <tr v-if="paginatedCredentials && paginatedCredentials.length === 0">
-                    <td colspan="5" class="px-6 py-12 text-center">
-                      <div class="flex flex-col items-center">
-                        <i class="fas fa-lock text-4xl text-gray-300 mb-3"></i>
-                        <h4 class="text-lg font-medium text-gray-700">No credentials found</h4>
-                        <p class="text-sm text-gray-500">Try a different search, or add a new credential for this project.</p>
-                      </div>
-                    </td>
-                  </tr>
-                  <!-- Data Rows -->
-                  <tr v-for="cred in paginatedCredentials" :key="cred.id" class="hover:bg-gray-50 transition-colors">
-                    <td class="px-4 sm:px-6 py-4">
-                      <div class="flex items-center gap-2 sm:gap-3">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center text-white font-bold text-xs sm:text-sm flex-shrink-0"
-                             :style="{ backgroundColor: '#3B82F6' }">
-                          {{ getInitials(cred.name) }}
-                        </div>
-                        <div class="min-w-0">
-                          <strong class="text-xs sm:text-sm block truncate max-w-[120px] sm:max-w-[200px]">{{ cred.name }}</strong>
-                          <a :href="cred.link" target="_blank" rel="noopener" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 truncate max-w-[120px] sm:max-w-[200px]">
-                            {{ cred.link }}
-                            <i class="fas fa-arrow-up-right-from-square text-[10px] flex-shrink-0"></i>
-                          </a>
-                        </div>
-                      </div>
-                    </td>
-                    <td class="px-4 sm:px-6 py-4">
-                      <span class="text-xs sm:text-sm truncate block max-w-[150px]">{{ cred.username }}</span>
-                    </td>
-                    <td class="px-4 sm:px-6 py-4">
-                      <span class="text-xs sm:text-sm truncate block max-w-[120px] sm:max-w-[200px]">{{ cred.email }}</span>
-                    </td>
-                    <td class="px-4 sm:px-6 py-4">
-                      <div class="flex items-center gap-2 whitespace-nowrap">
-                        <span class="text-xs sm:text-sm font-mono inline-block min-w-[85px] sm:min-w-[95px]">{{ cred.showPassword ? cred.password_display : '••••••••' }}</span>
-                        <button @click="togglePassword(cred.id)" class="text-gray-400 cursor-pointer hover:text-gray-600 transition-colors flex-shrink-0">
-                          <i :class="cred.showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
-                        </button>
-                      </div>
-                    </td>
-                    <td class="px-4 sm:px-6 py-4 text-center">
-                      <button
-                          @click="openShareModal(cred)"
-                          class="text-indigo-600 hover:text-indigo-800 cursor-pointer transition-colors p-1.5 rounded-lg hover:bg-indigo-50"
-                          title="Share credential"
-                      >
-                        <i class="fas fa-share-alt text-sm sm:text-base"></i>
-                      </button>
-                    </td>
-                  </tr>
-                  </tbody>
-                </table>
-              </div>
 
-              <!-- Mobile Card View -->
-              <div class="md:hidden overflow-y-auto flex-1 space-y-3 p-3">
+              <!-- Card Grid View -->
+              <div class="overflow-y-auto flex-1 p-4">
+                <!-- No Data -->
                 <div v-if="paginatedCredentials && paginatedCredentials.length === 0" class="text-center py-12">
                   <i class="fas fa-lock text-4xl text-gray-300 mb-3"></i>
                   <h4 class="text-lg font-medium text-gray-700">No credentials found</h4>
-                  <p class="text-sm text-gray-500">Try a different search, or add a new credential.</p>
+                  <p class="text-sm text-gray-500">Try a different search, or add a new credential for this project.</p>
                 </div>
-                <div
-                    v-for="cred in paginatedCredentials"
-                    :key="cred.id"
-                    class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 hover:shadow-md transition-shadow"
-                >
-                  <div class="flex items-start justify-between gap-2">
-                    <div class="flex items-center gap-3 min-w-0">
-                      <div class="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
-                           :style="{ backgroundColor: '#3B82F6' }">
-                        {{ getInitials(cred.name) }}
-                      </div>
-                      <div class="min-w-0">
-                        <strong class="text-sm block truncate">{{ cred.name }}</strong>
-                        <a :href="cred.link" target="_blank" rel="noopener" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 truncate">
-                          {{ cred.link }}
-                          <i class="fas fa-arrow-up-right-from-square text-[10px] flex-shrink-0"></i>
-                        </a>
-                      </div>
-                    </div>
-                    <button
-                        @click="openShareModal(cred)"
-                        class="text-indigo-600 hover:text-indigo-800 transition-colors p-2 rounded-lg hover:bg-indigo-50 flex-shrink-0"
-                        title="Share credential"
-                    >
-                      <i class="fas fa-share-alt"></i>
-                    </button>
-                  </div>
 
-                  <div class="mt-3 grid grid-cols-2 gap-3 text-sm border-t border-gray-100 pt-3">
-                    <div class="min-w-0">
-                      <p class="text-xs text-gray-500 font-medium">Username</p>
-                      <p class="font-medium text-gray-800 truncate">{{ cred.username }}</p>
-                    </div>
-                    <div class="min-w-0">
-                      <p class="text-xs text-gray-500 font-medium">Email</p>
-                      <p class="font-medium text-gray-800 truncate">{{ cred.email }}</p>
-                    </div>
-                    <div class="col-span-2">
-                      <p class="text-xs text-gray-500 font-medium">Password</p>
-                      <div class="flex items-center gap-2">
-                        <span class="font-mono text-sm inline-block min-w-[85px]">{{ cred.showPassword ? cred.password_display : '••••••••' }}</span>
-                        <button @click="togglePassword(cred.id)" class="text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0">
-                          <i :class="cred.showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                <!-- Card Grid - Responsive -->
+                <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  <div
+                      v-for="cred in paginatedCredentials"
+                      :key="cred.id"
+                      class="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-lg transition-shadow duration-200 overflow-hidden flex flex-col"
+                  >
+                    <!-- Card Header -->
+                    <div class="p-4 border-b border-gray-100">
+                      <div class="flex items-start justify-between gap-2">
+                        <div class="flex items-center gap-3 min-w-0 flex-1">
+                          <div class="w-10 h-10 rounded-lg flex items-center justify-center dash-topbar-profile font-bold text-sm flex-shrink-0"
+                               :style="{ backgroundColor: '#3B82F6' }">
+                            {{ getInitials(cred.name) }}
+                          </div>
+                          <div class="min-w-0">
+                            <h4 class="text-sm font-semibold text-gray-800 truncate">{{ cred.name }}</h4>
+                            <a :href="cred.link" target="_blank" rel="noopener" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 truncate">
+                              {{ cred.link }}
+                              <i class="fas fa-arrow-up-right-from-square text-[10px] flex-shrink-0"></i>
+                            </a>
+                          </div>
+                        </div>
+                        <button
+                            @click="openShareModal(cred)"
+                            class="text-indigo-600 hover:text-indigo-800 transition-colors p-2 rounded-lg hover:bg-indigo-50 flex-shrink-0"
+                            title="Share credential"
+                        >
+                          <i class="fas fa-share-alt text-sm"></i>
                         </button>
+                      </div>
+                    </div>
+
+                    <!-- Card Body -->
+                    <div class="p-4 flex-1">
+                      <div class="space-y-2">
+                        <div>
+                          <p class="text-xs text-gray-500 font-medium">Username</p>
+                          <p class="text-sm text-gray-800 truncate">{{ cred.username || 'N/A' }}</p>
+                        </div>
+                        <div>
+                          <p class="text-xs text-gray-500 font-medium">Email</p>
+                          <p class="text-sm text-gray-800 truncate">{{ cred.email || 'N/A' }}</p>
+                        </div>
+                        <div>
+                          <p class="text-xs text-gray-500 font-medium">Password</p>
+                          <div class="flex items-center gap-2">
+                            <span class="text-sm font-mono inline-block min-w-[80px]">{{ cred.showPassword ? cred.password_display : '••••••••' }}</span>
+                            <button @click="togglePassword(cred.id)" class="text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0">
+                              <i :class="cred.showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                            </button>
+                          </div>
+                        </div>
+                        <!-- Description (optional) -->
+                        <div v-if="cred.description" class="pt-1">
+                          <p class="text-xs text-gray-500 font-medium">Description</p>
+                          <p class="text-xs text-gray-600 truncate">{{ cred.description }}</p>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -376,66 +325,113 @@
               </p>
             </div>
           </div>
+
+          <!-- Description field -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Description <span class="text-gray-400 text-xs font-normal">(optional)</span></label>
+            <textarea
+                v-model="form.description"
+                rows="3"
+                placeholder="Add any additional notes, purpose, or details about this credential..."
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none resize-y"
+            ></textarea>
+            <p v-if="fieldErrors.description" class="text-xs mt-1 text-red-500">{{ fieldErrors.description }}</p>
+          </div>
         </div>
       </form>
     </BaseModal>
+
     <!-- Share Modal using BaseModal -->
     <BaseModal
         :isOpen="showShareModal"
         mode="form"
         title="Share Credential"
-        :subtitle="`Share '${selectedCredential?.name || ''}' with employees`"
+        :subtitle="`Share credential with employees`"
         :submitText="isSharing ? 'Sharing...' : 'Share'"
         :cancelText="'Cancel'"
         :loading="isSharing"
+        class="max-w-5xl"
         @close="closeShareModal"
         @save="confirmShare"
-     >
-      <div class="space-y-4">
+    >
+      <div class="space-y-5">
         <!-- Search Bar -->
         <div class="relative">
-          <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
           <input
               type="search"
               v-model="shareSearchQuery"
               placeholder="Search employees by name or email..."
-              class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+              class="w-full pl-4 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
           />
         </div>
 
+        <!-- Credential Details Section -->
+        <div v-if="selectedCredential" class="bg-indigo-50/50 border border-indigo-200 rounded-xl p-4">
+          <h4 class="text-sm font-semibold text-indigo-700 mb-3">Credential Details</h4>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Row 1: Title, Username, Link -->
+            <div>
+              <p class="text-xs text-gray-500">Title</p>
+              <p class="text-sm font-medium text-gray-800">{{ selectedCredential.name || 'N/A' }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500">Username</p>
+              <p class="text-sm font-medium text-gray-800">{{ selectedCredential.username || 'N/A' }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500">Link</p>
+              <p class="text-sm font-medium text-gray-800 truncate" :title="selectedCredential.link">
+                {{ selectedCredential.link || 'N/A' }}
+              </p>
+            </div>
+
+            <!-- Row 2: Email, Password, (empty) -->
+            <div>
+              <p class="text-xs text-gray-500">Email</p>
+              <p class="text-sm font-medium text-gray-800">{{ selectedCredential.email || 'N/A' }}</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-500">Password</p>
+              <p class="text-sm font-medium text-gray-800">{{ selectedCredential.password_display || 'N/A' }}</p>
+            </div>
+            <div></div>
+
+            <!-- Row 3: Description - full width -->
+            <div class="col-span-1 md:col-span-3">
+              <p class="text-xs text-gray-500">Description</p>
+              <p class="text-sm text-gray-700 break-words whitespace-pre-wrap">{{ selectedCredential.description || 'N/A' }}</p>
+            </div>
+          </div>
+        </div>
+
         <!-- Selected Count -->
-        <div v-if="selectedEmployees.length > 0" class="text-sm text-indigo-600">
-          <i class="fas fa-check-circle mr-1"></i>
+        <div v-if="selectedEmployees.length > 0" class="text-sm text-indigo-600 font-medium">
           {{ selectedEmployees.length }} employee(s) selected
         </div>
 
-        <!-- Employee List - Grid View with 2 columns -->
-        <div class="border border-gray-200 rounded-lg">
-          <!-- Loading State -->
+        <!-- Employee List -->
+        <!-- Employee List -->
+        <div class="border border-gray-200 rounded-lg max-h-[280px] overflow-y-auto">
           <div v-if="employeeStore.isLoading" class="flex justify-center items-center py-12">
-            <i class="fas fa-spinner fa-spin text-2xl text-indigo-600"></i>
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
           </div>
 
-          <!-- No Employees -->
           <div v-else-if="shareFilteredEmployees.length === 0" class="text-center py-12">
-            <i class="fas fa-users text-4xl text-gray-300 mb-3"></i>
             <h4 class="text-lg font-medium text-gray-700">No employees found</h4>
             <p class="text-sm text-gray-500">Try adjusting your search</p>
           </div>
 
-          <!-- Employee Grid - 2 columns -->
           <div v-else class="grid grid-cols-2 gap-2 p-3">
             <div
                 v-for="emp in shareFilteredEmployees"
                 :key="emp.id"
-                @click="toggleEmployee(emp)"
                 class="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors border"
                 :class="[
-        isAlreadyShared(emp.id)
-            ? 'bg-gray-50 border-gray-100 opacity-60 cursor-not-allowed'
+          isAlreadyShared(emp.id)
+            ? 'bg-green-50 border-green-200 hover:bg-green-100'
             : 'hover:bg-gray-50 border-gray-100 cursor-pointer',
-        isEmployeeSelected(emp.id) ? 'bg-indigo-50 border-indigo-200' : ''
-     ]"
+          isEmployeeSelected(emp.id) ? 'bg-indigo-50 border-indigo-200' : ''
+        ]"
             >
               <div class="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold text-xs">
                 {{ getInitials(emp.full_name || emp.email || 'U') }}
@@ -446,19 +442,28 @@
                 </p>
                 <p class="text-[10px] text-gray-500 truncate">{{ emp.email }}</p>
                 <p v-if="isAlreadyShared(emp.id)" class="text-[10px] text-green-600 font-medium mt-0.5">
-                  <i class="fas fa-check-circle"></i> Already shared
+                  ✓ Already shared
                 </p>
               </div>
               <div class="flex-shrink-0">
-                <div v-if="isAlreadyShared(emp.id)" class="w-4 h-4 rounded-full bg-green-100 flex items-center justify-center">
-                  <i class="fas fa-check text-green-600 text-[8px]"></i>
-                </div>
+                <!-- For already shared - show remove button -->
+                <button
+                    v-if="isAlreadyShared(emp.id)"
+                    @click.stop="confirmRemoveShare(emp.id)"
+                    class="w-6 h-6 rounded-full bg-red-100 hover:bg-red-200 flex items-center justify-center transition-colors"
+                    title="Remove access"
+                    type="button"
+                >
+                  <i class="fas fa-times text-red-600 text-[10px]"></i>
+                </button>
+                <!-- For not shared - show selection checkbox -->
                 <div
                     v-else
-                    class="w-4 h-4 rounded-full border-2 flex items-center justify-center"
+                    class="w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors"
                     :class="isEmployeeSelected(emp.id) ? 'border-indigo-600 bg-indigo-600' : 'border-gray-300'"
+                    @click="toggleEmployee(emp)"
                 >
-                  <i v-if="isEmployeeSelected(emp.id)" class="fas fa-check text-white text-[8px]"></i>
+                  <span v-if="isEmployeeSelected(emp.id)" class="text-white text-[8px]">✓</span>
                 </div>
               </div>
             </div>
@@ -466,24 +471,24 @@
         </div>
 
         <!-- Selected Employees List -->
-        <div v-if="selectedEmployees.length > 0" class="bg-green-50 border border-green-200 rounded-lg p-3 max-h-[100px] overflow-y-auto">
+        <div v-if="selectedEmployees.length > 0" class="bg-green-50 border border-green-200 rounded-lg p-3 max-h-[80px] overflow-y-auto">
           <p class="text-xs text-green-800 font-medium mb-1">Selected employees:</p>
           <div class="flex flex-wrap gap-1">
-                <span
-                    v-for="emp in selectedEmployees"
-                    :key="emp.id"
-                    class="inline-flex items-center gap-1 bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full"
-                >
-                    {{ emp.full_name || emp.email }}
-                    <button @click="toggleEmployee(emp)" class="hover:text-red-600">
-                        <i class="fas fa-times text-[10px]"></i>
-                    </button>
-                </span>
+            <span
+                v-for="emp in selectedEmployees"
+                :key="emp.id"
+                class="inline-flex items-center gap-1 bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full"
+            >
+              {{ emp.full_name || emp.email }}
+              <button @click="toggleEmployee(emp)" class="hover:text-red-600" type="button">
+                ✕
+              </button>
+            </span>
           </div>
         </div>
 
         <!-- Share button disabled state info -->
-        <div v-if="selectedEmployees.length === 0" class="text-sm text-gray-500 text-center">
+        <div v-if="selectedEmployees.length === 0" class="text-sm text-gray-500 text-center py-1">
           Please select at least one employee to share
         </div>
       </div>

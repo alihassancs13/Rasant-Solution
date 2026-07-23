@@ -80,6 +80,7 @@ export const API_ENDPOINTS = {
         GET_ALL: '/api/credentials/get_all_credentials/',
         CREATE: '/api/credentials/create/',
         SHARE: '/api/credentials/share_credentials/',
+        REMOVE_SHARE: '/api/credentials/remove_share/',
         GET_EMPLOYEE_CREDENTIALS: (employeeId) => `/api/credentials/get_credentials/${employeeId}/`,
     }
 };

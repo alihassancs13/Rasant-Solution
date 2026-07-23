@@ -159,6 +159,7 @@ def get_employee_credentials(request, employee_id):
                 'shared_at': shared.shared_at,
                 'created_at': cred.created_at,
 
+
             })
 
         return Response({
@@ -173,3 +174,55 @@ def get_employee_credentials(request, employee_id):
             'status': 'error',
             'message': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def remove_shared_credential(request):
+    """
+    DELETE: Revoke/Remove a shared credential from an employee
+    """
+    try:
+        # Get data from request
+        credential_id = request.data.get('credential_id')
+        employee_id = request.data.get('employee_id')
+
+        # Validate required fields
+        if not credential_id or not employee_id:
+            return Response(
+                {'error': 'credential_id and employee_id are required'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Check if credential exists
+        credential = get_object_or_404(CredentialStore, id=credential_id)
+
+        # Check if employee exists
+        employee = get_object_or_404(Employee, id=employee_id)
+
+        # Find the shared credential
+        try:
+            shared_credential = SharedCredential.objects.get(
+                credential=credential,
+                employee_id=employee_id
+            )
+        except SharedCredential.DoesNotExist:
+            return Response(
+                {'error': f'Credential is not shared with employee ID {employee_id}'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        # Delete the shared credential
+        shared_credential.delete()
+
+        return Response({
+            'status': 'success',
+            'message': f'Credential access revoked from employee {employee.username or employee.email}',
+            'credential_id': credential_id,
+            'employee_id': employee_id
+        }, status=status.HTTP_200_OK)
+
+    except Exception as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

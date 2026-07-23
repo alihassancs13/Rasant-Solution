@@ -34,7 +34,8 @@ export default function useCredentialsVault() {
         email: '',
         password: '',
         confirmPassword: '',
-        project: 'sentra'
+        project: '',
+        description: '',
     })
     const isAlreadyShared = (employeeId) => {
         if (!selectedCredential.value?.shared_with) return false
@@ -135,7 +136,20 @@ export default function useCredentialsVault() {
         if (!form.value.username?.trim()) errors.username = 'Username is required'
         if (!form.value.email?.trim()) errors.email = 'Email is required'
         if (!form.value.password) errors.password = 'Password is required'
+        const existingCred = credentials.value.find(c =>
+            c.username === form.value.username && c.id !== form.value.id
+        )
+        if (existingCred) {
+            errors.username = 'This username is already taken. Please use a different username.'
+        }
 
+        // Check if email already exists (client-side)
+        const existingEmail = credentials.value.find(c =>
+            c.email === form.value.email && c.id !== form.value.id
+        )
+        if (existingEmail) {
+            errors.email = 'This email is already registered. Please use a different email.'
+        }
         if (!form.value.confirmPassword) {
             errors.confirmPassword = 'Confirm password is required'
         } else if (form.value.password !== form.value.confirmPassword) {
@@ -195,7 +209,8 @@ export default function useCredentialsVault() {
             email: '',
             password: '',
             confirmPassword: '',
-            project: 'sentra'
+            description: '',
+            project: ''
         }
         showModal.value = true
     }
@@ -211,7 +226,8 @@ export default function useCredentialsVault() {
             email: '',
             password: '',
             confirmPassword: '',
-            project: 'sentra'
+            project: '',
+            description: ''
         }
     }
 
@@ -227,6 +243,57 @@ export default function useCredentialsVault() {
 
         showShareModal.value = true
     }
+    const confirmRemoveShare = async (employeeId) => {
+        if (!selectedCredential.value) {
+            showToast('No credential selected', 'error', 3000)
+            return
+        }
+
+        const employee = employeeStore.employees.find(e => e.id === employeeId)
+        const employeeName = employee?.full_name || employee?.email || 'Employee'
+
+        // Show confirmation using the toast with confirm option
+        if (!confirm(`Are you sure you want to remove "${selectedCredential.value.name}" access from ${employeeName}?`)) {
+            return
+        }
+
+        try {
+            const result = await store.removeCredentialShare(
+                selectedCredential.value.id,
+                employeeId
+            )
+
+            if (result.success) {
+                showToast(`Access removed from ${employeeName} successfully!`, 'success', 3000)
+
+                // Remove from selected employees list if present
+                const index = selectedEmployees.value.findIndex(e => e.id === employeeId)
+                if (index > -1) {
+                    selectedEmployees.value.splice(index, 1)
+                }
+
+                // Refresh credentials to update shared_with list
+                await store.fetchCredentials()
+
+                // Update the selected credential with fresh data
+                const updatedCred = credentials.value.find(c => c.id === selectedCredential.value.id)
+                if (updatedCred) {
+                    selectedCredential.value = updatedCred
+                }
+
+                // Close modal if no more employees selected
+                if (selectedEmployees.value.length === 0 && !shareSearchQuery.value) {
+                    // Don't close automatically, let user decide
+                }
+            } else {
+                showToast(result.error || 'Failed to remove access', 'error', 3000)
+            }
+        } catch (error) {
+            console.error('Error removing share:', error)
+            showToast('Error removing access', 'error', 3000)
+        }
+    }
+
 
     const closeShareModal = () => {
         showShareModal.value = false
@@ -316,6 +383,7 @@ export default function useCredentialsVault() {
                 username: form.value.username,
                 email: form.value.email,
                 password: form.value.password,
+                description: form.value.description,
                 project: form.value.project
             }
 
@@ -326,12 +394,14 @@ export default function useCredentialsVault() {
                 showToast('Credential created successfully!', 'success', 3000)
                 await store.fetchCredentials()
             } else {
+                // Show the specific error message from the backend
+                const errorMsg = result?.error || 'Failed to create credential'
+                showToast(errorMsg, 'error', 5000)
                 console.error('Error saving credential:', result?.error)
-                showToast('Failed to create credential: ' + (result?.error || 'Unknown error'), 'error', 3000)
             }
         } catch (error) {
             console.error('Error saving credential:', error)
-            showToast('Error creating credential', 'error', 3000)
+            showToast(error.message || 'Error creating credential', 'error', 5000)
         } finally {
             isSaving.value = false
         }
@@ -480,5 +550,6 @@ export default function useCredentialsVault() {
         isSharing,
         employeeStore,
         isAlreadyShared,
+        confirmRemoveShare
     }
 }

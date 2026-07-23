@@ -5,12 +5,36 @@ import base64
 class CredentialSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, required=True)
     password_display = serializers.SerializerMethodField(read_only=True)
-    shared_with = serializers.SerializerMethodField(read_only=True)   # NEW
+    shared_with = serializers.SerializerMethodField(read_only=True)
+    description = serializers.CharField(required=False, allow_blank=True, allow_null=True)  # ADD THIS LINE
 
     class Meta:
         model = CredentialStore
-        fields = ['id', 'name', 'link', 'username', 'email', 'password', 'password_display', 'shared_with', 'created_at']  # added shared_with
+        fields = ['id', 'name', 'link', 'username', 'email', 'password', 'password_display', 'description', 'shared_with', 'created_at']
         read_only_fields = ['id', 'created_at']
+
+    def validate_username(self, value):
+        """Check if username is unique"""
+        if self.instance:
+            # For update operations, exclude current instance
+            if CredentialStore.objects.filter(username=value).exclude(id=self.instance.id).exists():
+                raise serializers.ValidationError("This username is already taken. Please use a different username.")
+        else:
+            # For create operations
+            if CredentialStore.objects.filter(username=value).exists():
+                raise serializers.ValidationError("This username is already taken. Please use a different username.")
+        return value
+
+    def validate_email(self, value):
+        """Check if email is unique"""
+        if value:  # Only validate if email is provided
+            if self.instance:
+                if CredentialStore.objects.filter(email=value).exclude(id=self.instance.id).exists():
+                    raise serializers.ValidationError("This email is already registered. Please use a different email.")
+            else:
+                if CredentialStore.objects.filter(email=value).exists():
+                    raise serializers.ValidationError("This email is already registered. Please use a different email.")
+        return value
 
     def create(self, validated_data):
         password = validated_data.pop('password')
@@ -58,7 +82,6 @@ class CredentialSerializer(serializers.ModelSerializer):
                 'employee_email': getattr(emp, 'email', None) if emp else None,
             })
         return result
-
 
 class SharedCredentialSerializer(serializers.ModelSerializer):
     credential_name = serializers.CharField(source='credential.name', read_only=True)

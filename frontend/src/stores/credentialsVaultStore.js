@@ -81,7 +81,7 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
                 email: item.email || '',
                 password: item.password || '',
                 password_display: item.password_display || item.password || '',
-                project: item.project || item.project_name || 'Uncategorized',
+                description: item.description || '',
                 showPassword: false,
                 needsRotation: item.needsRotation || false,
                 created_at: item.created_at || item.createdAt || new Date().toISOString(),
@@ -95,6 +95,102 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
         } catch (err) {
             error.value = err.message
             console.error('Error fetching credentials:', err)
+            return { success: false, error: err.message }
+        } finally {
+            loading.value = false
+        }
+    }
+    //remove share credential
+    const revokeCredentialShare = async (credentialId, employeeId) => {
+        loading.value = true
+        error.value = null
+        try {
+            const token = getAuthToken()
+            if (!token) {
+                throw new Error('No authentication token found. Please login again.')
+            }
+
+            const url = `${BASE_URL}/api/credentials/revoke-share/`
+
+            const response = await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    credential_id: credentialId,
+                    employee_id: employeeId
+                })
+            })
+
+            if (response.status === 401) {
+                localStorage.removeItem('access_token')
+                localStorage.removeItem('accessToken')
+                localStorage.removeItem('token')
+                window.location.href = '/login'
+                throw new Error('Session expired. Please login again.')
+            }
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}))
+                throw new Error(errorData.message || `Failed to revoke share: ${response.status}`)
+            }
+
+            const data = await response.json()
+            return { success: true, data }
+
+        } catch (err) {
+            error.value = err.message
+            console.error('Error revoking credential share:', err)
+            return { success: false, error: err.message }
+        } finally {
+            loading.value = false
+        }
+    }
+    const removeCredentialShare = async (credentialId, employeeId) => {
+        loading.value = true
+        error.value = null
+        try {
+            const token = getAuthToken()
+            if (!token) {
+                throw new Error('No authentication token found. Please login again.')
+            }
+
+            const cleanedBaseUrl = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL
+            const url = `${cleanedBaseUrl}${API_ENDPOINTS.CREDENTIALS.REMOVE_SHARE}`
+
+            const response = await fetch(url, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    credential_id: credentialId,
+                    employee_id: employeeId
+                })
+            })
+
+            if (response.status === 401) {
+                localStorage.removeItem('access_token')
+                localStorage.removeItem('accessToken')
+                localStorage.removeItem('token')
+                window.location.href = '/login'
+                throw new Error('Session expired. Please login again.')
+            }
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}))
+                throw new Error(errorData.message || `Failed to remove share: ${response.status}`)
+            }
+
+            const data = await response.json()
+            return { success: true, data }
+
+        } catch (err) {
+            error.value = err.message
+            console.error('Error removing credential share:', err)
             return { success: false, error: err.message }
         } finally {
             loading.value = false
@@ -188,7 +284,25 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}))
-                throw new Error(errorData.message || `Failed to create credential: ${response.status}`)
+
+                // Check for field-specific validation errors
+                let errorMessage = errorData.message || `Failed to create credential: ${response.status}`
+
+                // Handle Django serializer validation errors
+                if (errorData.errors) {
+                    const fieldErrors = []
+                    if (errorData.errors.username) {
+                        fieldErrors.push(errorData.errors.username.join(' '))
+                    }
+                    if (errorData.errors.email) {
+                        fieldErrors.push(errorData.errors.email.join(' '))
+                    }
+                    if (fieldErrors.length > 0) {
+                        errorMessage = fieldErrors.join(' ')
+                    }
+                }
+
+                throw new Error(errorMessage)
             }
 
             const data = await response.json()
@@ -207,6 +321,7 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
                 username: newCred.username || credentialData.username || '',
                 email: newCred.email || credentialData.email || '',
                 password: newCred.password || credentialData.password || '',
+                description: newCred.description || credentialData.description || '',
                 project: newCred.project || credentialData.project || 'Uncategorized',
                 showPassword: false,
                 needsRotation: false,
@@ -299,6 +414,7 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
         createCredential,
         shareCredential,
         togglePassword,
-        clearError
+        clearError,
+        removeCredentialShare
     }
 })
