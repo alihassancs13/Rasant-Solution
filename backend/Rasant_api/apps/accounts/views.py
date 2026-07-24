@@ -634,26 +634,36 @@ def admin_overview_stats(request):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def password_forgot(request):
-    """Send a 6-digit OTP to the user's email (always returns generic success)."""
     from .password_tokens import create_reset_otp, find_user_by_email, OTP_TTL_MINUTES
     from .email_service import send_password_reset_otp
 
     email = (request.data.get('email') or '').strip()
-    generic = {
-        'success': True,
-        'message': 'If an account exists for that email, a verification code has been sent.',
-    }
+
     if not email:
         return Response({'error': 'Email is required.'}, status=status.HTTP_400_BAD_REQUEST)
 
     user = find_user_by_email(email)
-    if user and user.is_active:
-        try:
-            _, code = create_reset_otp(user)
-            send_password_reset_otp(user, code, ttl_minutes=OTP_TTL_MINUTES)
-        except Exception as exc:
-            print(f'password_forgot email failed: {exc}')
-    return Response(generic, status=status.HTTP_200_OK)
+
+    if not user or not user.is_active:
+        return Response(
+            {'error': 'No account found with this email address.', 'errorType': 'email_not_found'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    try:
+        _, code = create_reset_otp(user)
+        send_password_reset_otp(user, code, ttl_minutes=OTP_TTL_MINUTES)
+    except Exception as exc:
+        print(f'password_forgot email failed: {exc}')
+        return Response(
+            {'error': 'Could not send verification code. Please try again.'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+    return Response(
+        {'success': True, 'message': 'Verification code sent to your email.'},
+        status=status.HTTP_200_OK
+    )
 
 
 @api_view(['POST'])

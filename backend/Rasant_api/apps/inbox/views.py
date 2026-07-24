@@ -129,6 +129,27 @@ def list_conversations(request):
     return Response(
         ConversationSerializer(conversations, many=True, context={'request': request}).data
     )
+def _deleted_for_me_ids(conv, user):
+    return frozenset(
+        MessageDeleteFor.objects.filter(
+            message__conversation=conv, user=user
+        ).values_list('message_id', flat=True)
+    )
+
+
+def _get_last_message_for_user(conv, user):
+    last = Message.objects.filter(conversation=conv).exclude(
+        deleted_for__user=user
+    ).order_by('-created_at').first()
+    if not last:
+        return None
+    return {
+        'id': last.id,
+        'content': last.content,
+        'sender_id': last.sender_id,
+        'created_at': last.created_at.isoformat(),
+        'deleted_for_everyone': last.deleted_for_everyone,
+    }
 
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
@@ -495,6 +516,7 @@ def inbox_sse_stream(request):
         last_avatar_hashes = {}
         last_members_hash = {}
         last_member_avatar_hashes = {}
+        last_deleted_for_me_ids = {}
         heartbeat = 0
 
         member_conv_ids = list(
@@ -514,6 +536,7 @@ def inbox_sse_stream(request):
             last_avatar_hashes[conv.id] = _avatar_hash(conv.avatar)
             last_members_hash[conv.id] = _members_hash(conv)
             last_member_avatar_hashes[conv.id] = _current_member_avatars(conv)
+            last_deleted_for_me_ids[conv.id] = _deleted_for_me_ids(conv, user)
 
         already_deleted_ids = set(
             Message.objects.filter(
@@ -546,6 +569,7 @@ def inbox_sse_stream(request):
                         last_avatar_hashes[new_conv_id] = _avatar_hash(new_conv.avatar)
                         last_members_hash[new_conv_id] = _members_hash(new_conv)
                         last_member_avatar_hashes[new_conv_id] = _current_member_avatars(new_conv)
+                        last_deleted_for_me_ids[new_conv_id] = _deleted_for_me_ids(new_conv, user)
                         data = {
                             'type': 'added_to_conversation',
                             'conversation_id': new_conv_id,
@@ -605,6 +629,20 @@ def inbox_sse_stream(request):
                         last_member_avatar_hashes[conv.id] = current_member_avatars
                     except Exception:
                         logger.exception('member_avatar_updated event failed for conversation %s (user %s)', conv.id, user.id)
+
+                    try:
+                        current_deleted_ids = _deleted_for_me_ids(conv, user)
+                        previous_deleted_ids = last_deleted_for_me_ids.get(conv.id, frozenset())
+                        if current_deleted_ids != previous_deleted_ids:
+                            last_deleted_for_me_ids[conv.id] = current_deleted_ids
+                            data = {
+                                'type': 'last_message_updated',
+                                'conversation_id': conv.id,
+                                'last_message': _get_last_message_for_user(conv, user),
+                            }
+                            yield f"data: {json.dumps(data)}\n\n"
+                    except Exception:
+                        logger.exception('last_message_updated event failed for conversation %s (user %s)', conv.id, user.id)
 
                     new_msgs = Message.objects.filter(
                         conversation=conv,

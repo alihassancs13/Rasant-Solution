@@ -22,18 +22,26 @@
           <div>
             <label class="mb-1.5 block text-[0.7rem] font-bold tracking-wider text-[#1E3A5F] uppercase">Email</label>
             <input
-              v-model="email"
-              type="email"
-              required
-              autocomplete="email"
-              placeholder="your.email@company.com"
-              class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm outline-none focus:border-[#4A90E2] focus:ring-4 focus:ring-[#4A90E2]/15"
+                v-model="email"
+                type="email"
+                required
+                autocomplete="email"
+                placeholder="your.email@company.com"
+                :class="[
+                'w-full rounded-xl border bg-slate-50 px-3.5 py-2.5 text-sm outline-none',
+                emailLiveError
+                  ? 'border-red-500 ring-2 ring-red-500/20 bg-red-50 focus:border-red-500 focus:ring-red-500/30 focus:bg-red-50'
+                  : 'border-slate-200 focus:border-[#4A90E2] focus:ring-4 focus:ring-[#4A90E2]/15'
+              ]"
             />
+            <p v-if="emailLiveError" class="mt-1.5 text-xs font-medium text-red-600">
+              {{ emailLiveError }}
+            </p>
           </div>
           <button
-            type="submit"
-            class="w-full rounded-xl bg-[#1E3A5F] text-white font-semibold py-2.5 text-sm hover:bg-[#2A5F9E] disabled:opacity-50 cursor-pointer"
-            :disabled="loading"
+              type="submit"
+              class="w-full rounded-xl bg-[#1E3A5F] text-white font-semibold py-2.5 text-sm hover:bg-[#2A5F9E] disabled:opacity-50 cursor-pointer"
+              :disabled="loading || hasEmailError"
           >
             {{ loading ? 'Sending…' : 'Send verification code' }}
           </button>
@@ -44,20 +52,20 @@
           <div>
             <label class="mb-1.5 block text-[0.7rem] font-bold tracking-wider text-[#1E3A5F] uppercase">Verification code</label>
             <input
-              v-model="code"
-              type="text"
-              inputmode="numeric"
-              maxlength="6"
-              required
-              placeholder="6-digit code"
-              class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm tracking-[0.3em] text-center font-semibold outline-none focus:border-[#4A90E2] focus:ring-4 focus:ring-[#4A90E2]/15"
+                v-model="code"
+                type="text"
+                inputmode="numeric"
+                maxlength="6"
+                required
+                placeholder="6-digit code"
+                class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm tracking-[0.3em] text-center font-semibold outline-none focus:border-[#4A90E2] focus:ring-4 focus:ring-[#4A90E2]/15"
             />
             <p class="text-xs text-slate-500 mt-1.5">Sent to {{ email }}</p>
           </div>
           <button
-            type="submit"
-            class="w-full rounded-xl bg-[#1E3A5F] text-white font-semibold py-2.5 text-sm hover:bg-[#2A5F9E] disabled:opacity-50 cursor-pointer"
-            :disabled="loading"
+              type="submit"
+              class="w-full rounded-xl bg-[#1E3A5F] text-white font-semibold py-2.5 text-sm hover:bg-[#2A5F9E] disabled:opacity-50 cursor-pointer"
+              :disabled="loading"
           >
             {{ loading ? 'Verifying…' : 'Verify code' }}
           </button>
@@ -71,29 +79,61 @@
           <div>
             <label class="mb-1.5 block text-[0.7rem] font-bold tracking-wider text-[#1E3A5F] uppercase">New password</label>
             <input
-              v-model="newPassword"
-              type="password"
-              required
-              minlength="8"
-              autocomplete="new-password"
-              class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm outline-none focus:border-[#4A90E2] focus:ring-4 focus:ring-[#4A90E2]/15"
+                v-model="newPassword"
+                type="password"
+                required
+                autocomplete="new-password"
+                :class="[
+                'w-full rounded-xl border bg-slate-50 px-3.5 py-2.5 text-sm outline-none',
+                passwordLiveError
+                  ? 'border-red-500 ring-2 ring-red-500/20 bg-red-50 focus:border-red-500 focus:ring-red-500/30 focus:bg-red-50'
+                  : 'border-slate-200 focus:border-[#4A90E2] focus:ring-4 focus:ring-[#4A90E2]/15'
+              ]"
             />
+
+            <!-- Real-time red error (hard requirements not met) -->
+            <p v-if="passwordLiveError" class="mt-1.5 text-xs font-medium text-red-600">
+              {{ passwordLiveError }}
+            </p>
+
+            <!-- Real-time single-line strength label (only when requirements are met) -->
+            <p
+                v-else-if="passwordStrengthLabel"
+                class="mt-1.5 text-xs font-medium"
+                :class="passwordStrengthLabel.color"
+            >
+              {{ passwordStrengthLabel.text }}
+            </p>
+
+            <!-- Default static hint before typing starts -->
+            <p v-else class="mt-1.5 text-xs text-slate-400">
+              8–32 characters, at least 1 capital letter and 1 special character.
+            </p>
           </div>
+
           <div>
             <label class="mb-1.5 block text-[0.7rem] font-bold tracking-wider text-[#1E3A5F] uppercase">Confirm password</label>
             <input
-              v-model="confirmPassword"
-              type="password"
-              required
-              minlength="8"
-              autocomplete="new-password"
-              class="w-full rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-sm outline-none focus:border-[#4A90E2] focus:ring-4 focus:ring-[#4A90E2]/15"
+                v-model="confirmPassword"
+                type="password"
+                required
+                autocomplete="new-password"
+                :class="[
+                'w-full rounded-xl border bg-slate-50 px-3.5 py-2.5 text-sm outline-none',
+                confirmMismatchError
+                  ? 'border-red-500 ring-2 ring-red-500/20 bg-red-50 focus:border-red-500 focus:ring-red-500/30 focus:bg-red-50'
+                  : 'border-slate-200 focus:border-[#4A90E2] focus:ring-4 focus:ring-[#4A90E2]/15'
+              ]"
             />
+            <p v-if="confirmMismatchError" class="mt-1.5 text-xs font-medium text-red-600">
+              {{ confirmMismatchError }}
+            </p>
           </div>
+
           <button
-            type="submit"
-            class="w-full rounded-xl bg-[#1E3A5F] text-white font-semibold py-2.5 text-sm hover:bg-[#2A5F9E] disabled:opacity-50 cursor-pointer"
-            :disabled="loading"
+              type="submit"
+              class="w-full rounded-xl bg-[#1E3A5F] text-white font-semibold py-2.5 text-sm hover:bg-[#2A5F9E] disabled:opacity-50 cursor-pointer"
+              :disabled="loading || hasPasswordError"
           >
             {{ loading ? 'Saving…' : 'Set new password' }}
           </button>
@@ -111,8 +151,13 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { authAPI } from '@/services/loginApi.js'
+import { useValidation } from '@/composables/useValidation.js'
 
 const router = useRouter()
+const validation = useValidation()
+const { LENGTH_LIMITS, getEmailError, getPasswordStrengthError } = validation
+const getPasswordStrengthLabel = validation.getPasswordStrengthLabel || (() => null)
+
 const step = ref(1)
 const email = ref('')
 const code = ref('')
@@ -123,6 +168,31 @@ const loading = ref(false)
 const error = ref('')
 const info = ref('')
 
+const emailLiveError = computed(() => getEmailError(email.value, LENGTH_LIMITS.emailOrUsername.max))
+const hasEmailError = computed(() => !!emailLiveError.value || !email.value.trim())
+
+// Live password strength check: min 8, max 32, 1 capital, 1 special character
+const passwordLiveError = computed(() => {
+  if (!newPassword.value) return null // don't show error before user starts typing
+  return getPasswordStrengthError(newPassword.value, LENGTH_LIMITS.password)
+})
+
+// Live single-line strength label (Weak / Medium / Strong) — only when no hard error
+const passwordStrengthLabel = computed(() => {
+  if (!newPassword.value || passwordLiveError.value) return null
+  return getPasswordStrengthLabel(newPassword.value)
+})
+
+// Live confirm-password mismatch check
+const confirmMismatchError = computed(() => {
+  if (!confirmPassword.value) return null
+  return confirmPassword.value !== newPassword.value ? 'Passwords do not match.' : null
+})
+
+const hasPasswordError = computed(() => {
+  return !!getPasswordStrengthError(newPassword.value, LENGTH_LIMITS.password) || newPassword.value !== confirmPassword.value
+})
+
 const stepTitle = computed(() => {
   if (step.value === 1) return 'Forgot password'
   if (step.value === 2) return 'Enter verification code'
@@ -132,12 +202,18 @@ const stepTitle = computed(() => {
 const stepSubtitle = computed(() => {
   if (step.value === 1) return 'Enter your account email and we’ll send a verification code.'
   if (step.value === 2) return 'Check your inbox for the 6-digit code.'
-  return 'Choose a new password for your account (min. 8 characters).'
+  return 'Choose a new password for your account.'
 })
 
 async function sendCode() {
   error.value = ''
   info.value = ''
+
+  if (hasEmailError.value) {
+    error.value = emailLiveError.value
+    return
+  }
+
   loading.value = true
   try {
     const { data } = await authAPI.forgotPassword(email.value.trim())
@@ -169,14 +245,17 @@ async function verifyCode() {
 async function resetPassword() {
   error.value = ''
   info.value = ''
+
+  const strengthError = getPasswordStrengthError(newPassword.value, LENGTH_LIMITS.password)
+  if (strengthError) {
+    error.value = strengthError
+    return
+  }
   if (newPassword.value !== confirmPassword.value) {
     error.value = 'Passwords do not match.'
     return
   }
-  if (newPassword.value.length < 8) {
-    error.value = 'Password must be at least 8 characters.'
-    return
-  }
+
   loading.value = true
   try {
     const { data } = await authAPI.resetPassword({

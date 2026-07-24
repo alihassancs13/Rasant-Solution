@@ -1,13 +1,21 @@
 // composables/useLogin.js
-import { ref, computed } from 'vue';
+import { ref, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { useLoginStore } from '../stores/loginStore';
 import { useToast } from '@/composables/useToast.js';
+import { useValidation } from '@/composables/useValidation.js';
 
 export function useLogin() {
     const router = useRouter();
     const loginStore = useLoginStore();
     const { showToast } = useToast(); // Initialize toast
+    const {
+        LENGTH_LIMITS,
+        getLengthError,
+        isValidEmail,
+        getEmailError,
+        getPasswordStrengthError,
+    } = useValidation(); // Initialize validation
 
     const emailOrUsername = ref('');
     const password = ref('');
@@ -21,26 +29,58 @@ export function useLogin() {
         password: false
     });
 
+    // Real-time length validation (updates as user types)
+    const emailLengthError = computed(() => {
+        return getLengthError(emailOrUsername.value, 'Email/Username', LENGTH_LIMITS.emailOrUsername.max);
+    });
+
+    const passwordLengthError = computed(() => {
+        return getLengthError(password.value, 'Password', LENGTH_LIMITS.password.max);
+    });
+
+    // Full email format validation (only applies once input looks like an email,
+    // i.e. contains '@' — so usernames don't get flagged with email-format errors)
+    const emailFormatError = computed(() => {
+        const val = emailOrUsername.value;
+        if (!val?.includes('@')) return null;
+        return getEmailError(val, LENGTH_LIMITS.emailOrUsername.max);
+    });
+
+    // Combined live error for the email/username field
+    const emailLiveError = computed(() => emailLengthError.value || emailFormatError.value);
+
+    // Live password strength validation (min/max length + capital + special char)
+    const passwordStrengthError = computed(() => {
+        return getPasswordStrengthError(password.value, LENGTH_LIMITS.password);
+    });
+
+    // True the moment either field exceeds its max length
+    const hasLengthError = computed(() => {
+        return !!emailLengthError.value || !!passwordLengthError.value;
+    });
+
+    // Re-sync fieldErrors on every keystroke — so a stale error (e.g. left over
+    // from a failed submit) clears the instant the value becomes valid again,
+    // and no error shows while the value is still within the allowed limits.
+    watch(emailOrUsername, () => {
+        fieldErrors.value.emailOrUsername = !!emailLiveError.value;
+    });
+
+    watch(password, () => {
+        fieldErrors.value.password = !!passwordLengthError.value;
+    });
+
     const togglePasswordVisibility = () => {
         isPasswordVisible.value = !isPasswordVisible.value;
     };
 
-    // Email validation function
-    const isValidEmail = (email) => {
-        const atIndex = email.indexOf('@');
-        const dotIndex = email.lastIndexOf('.');
-
-        if (atIndex === -1 || dotIndex === -1) return false;
-        if (atIndex === 0 || atIndex === email.length - 1) return false;
-        if (dotIndex <= atIndex + 1) return false;
-        if (dotIndex === email.length - 1) return false;
-        if (email.length - dotIndex - 1 < 2) return false;
-        if (email.includes(' ')) return false;
-
-        return true;
-    };
-
     const handleLoginSubmit = async () => {
+        // Block submit entirely if a length error is currently active
+        if (hasLengthError.value) {
+            showToast(emailLengthError.value || passwordLengthError.value, 'error');
+            return;
+        }
+
         // Clear previous field errors
         fieldErrors.value = { emailOrUsername: false, password: false };
 
@@ -70,15 +110,18 @@ export function useLogin() {
             return;
         }
 
-        // Check 4: Check if it's a valid email format
-        const isEmail = isValidEmail(trimmedInput);
-
-        // If input contains @ but is not a valid email, show error and stop
-        if (trimmedInput.includes('@') && !isEmail) {
-            showToast('Please enter a valid email address (e.g., user@example.com).', 'error');
-            fieldErrors.value.emailOrUsername = true;
-            return;
+        // Check 4: Full email format validation (only when input looks like an email)
+        if (trimmedInput.includes('@')) {
+            const emailErr = getEmailError(trimmedInput, LENGTH_LIMITS.emailOrUsername.max);
+            if (emailErr) {
+                showToast(emailErr, 'error');
+                fieldErrors.value.emailOrUsername = true;
+                return;
+            }
         }
+
+        // Check 5: Confirm valid email format flag (for choosing email vs username field on submit)
+        const isEmail = isValidEmail(trimmedInput);
 
         console.log('Submitting login form...');
         console.log('Input:', trimmedInput);
@@ -153,7 +196,7 @@ export function useLogin() {
                     }
                 }
 
-               showToast(errorMsg, 'error');
+                showToast(errorMsg, 'error');
 
                 // Highlight the specific field based on error type
                 if (errorType === 'email_not_found') {
@@ -199,6 +242,11 @@ export function useLogin() {
         isPasswordVisible,
         isLoading,
         fieldErrors,
+        emailLengthError,
+        emailLiveError,
+        passwordLengthError,
+        passwordStrengthError,
+        hasLengthError,
         togglePasswordVisibility,
         handleLoginSubmit,
         logout,

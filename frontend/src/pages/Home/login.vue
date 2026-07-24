@@ -78,135 +78,138 @@
         </div>
 
         <div class="relative z-10 flex w-full min-h-0 flex-1 flex-col items-center justify-center">
-        <div class="w-full max-w-[400px] min-w-0 animate-login-card sm:max-w-[420px] lg:max-w-[400px] [animation-delay:60ms]">
+          <div class="w-full max-w-[400px] min-w-0 animate-login-card sm:max-w-[420px] lg:max-w-[400px] [animation-delay:60ms]">
 
-          <div class="mb-4 flex justify-center">
-            <img
-                src="../../assets/images/rasant-logo.png"
-                alt="Rasant Solutions"
-                width="212"
-                height="42"
-                decoding="async"
-                class="h-10 w-auto max-w-[180px] object-contain"
-            />
-          </div>
-
-          <div class="mb-4 sm:mb-5">
-            <div class="inline-flex items-center gap-1.5 rounded-full border border-primary-200 bg-primary-50 px-3 py-1 text-[0.68rem] font-bold tracking-widest text-primary-700 uppercase">
-              <font-awesome-icon icon="fa-solid fa-shield-halved" class="text-[0.65rem] text-primary-500 animate-shield-pulse" />
-              Secure Sign-In
+            <div class="mb-4 flex justify-center">
+              <img
+                  src="../../assets/images/rasant-logo.png"
+                  alt="Rasant Solutions"
+                  width="212"
+                  height="42"
+                  decoding="async"
+                  class="h-10 w-auto max-w-[180px] object-contain"
+              />
             </div>
-            <h2 class="mt-2 font-display text-xl font-bold text-headingMain animate-login-fade-up [animation-delay:120ms] sm:mt-3 sm:text-2xl">Welcome back</h2>
-            <p class="mt-1 text-sm leading-relaxed text-textBody animate-login-fade-up [animation-delay:180ms]">
-              Sign in to access your Rasant Solutions workspace.
-            </p>
-          </div>
 
-          <form @submit.prevent="handleLoginSubmit" novalidate class="space-y-3 sm:space-y-4">
-            <div class="animate-login-fade-up [animation-delay:220ms]">
-              <label for="username" class="mb-1.5 block text-[0.7rem] font-bold tracking-wider text-headingMain uppercase">
-                Email or Username
-              </label>
-              <div class="relative group">
+            <div class="mb-4 sm:mb-5">
+              <div class="inline-flex items-center gap-1.5 rounded-full border border-primary-200 bg-primary-50 px-3 py-1 text-[0.68rem] font-bold tracking-widest text-primary-700 uppercase">
+                <font-awesome-icon icon="fa-solid fa-shield-halved" class="text-[0.65rem] text-primary-500 animate-shield-pulse" />
+                Secure Sign-In
+              </div>
+              <h2 class="mt-2 font-display text-xl font-bold text-headingMain animate-login-fade-up [animation-delay:120ms] sm:mt-3 sm:text-2xl">Welcome back</h2>
+              <p class="mt-1 text-sm leading-relaxed text-textBody animate-login-fade-up [animation-delay:180ms]">
+                Sign in to access your Rasant Solutions workspace.
+              </p>
+            </div>
+
+            <form @submit.prevent="handleLoginSubmit" novalidate class="space-y-3 sm:space-y-4">
+              <div class="animate-login-fade-up [animation-delay:220ms]">
+                <label for="username" class="mb-1.5 block text-[0.7rem] font-bold tracking-wider text-headingMain uppercase">
+                  Email or Username
+                </label>
+                <div class="relative group">
                 <span class="pointer-events-none absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-sm text-primary-500 transition-transform duration-200 group-focus-within:scale-110">
                   <font-awesome-icon icon="fa-solid fa-user" />
                 </span>
-                <input
-                    id="emailOrusername"
-                    v-model="emailOrUsername"
-                    type="text"
-                    placeholder="Enter your email or username"
-                    required
-                    autocomplete="username"
-                    :class="[
-                    'login-input w-full rounded-xl border border-borderDefault bg-neutral-100 py-2.5 pr-3 pl-10 text-[0.9375rem] text-headingMain outline-none transition-all duration-200 placeholder:text-textSupporting focus:border-primary-500 focus:bg-section-white focus:ring-4 focus:ring-primary-500/12 focus:shadow-[0_0_0_4px_rgba(74,144,226,0.08),0_2px_8px_rgba(74,144,226,0.12)]',
-                    fieldErrors.emailOrUsername ? 'border-error ring-2 ring-error/20 bg-error/5' : ''
+                  <input
+                      id="emailOrusername"
+                      v-model="emailOrUsername"
+                      type="text"
+                      placeholder="Enter your email or username"
+                      required
+                      autocomplete="username"
+                      :class="[
+                    'login-input w-full rounded-xl border border-borderDefault bg-neutral-100 py-2.5 pr-3 pl-10 text-[0.9375rem] text-headingMain outline-none transition-all duration-200 placeholder:text-textSupporting',
+                    fieldErrors.emailOrUsername
+                      ? 'border-error ring-2 ring-error/20 bg-error/5 focus:border-error focus:ring-error/30 focus:bg-error/5'
+                      : 'focus:border-primary-500 focus:bg-section-white focus:ring-4 focus:ring-primary-500/12 focus:shadow-[0_0_0_4px_rgba(74,144,226,0.08),0_2px_8px_rgba(74,144,226,0.12)]'
                   ]"
-                    @focus="fieldErrors.emailOrUsername = false"
-                    @input="fieldErrors.emailOrUsername = false"
-                />
-
-
+                  />
+                </div>
+                <p v-if="emailLiveError" class="mt-1 text-xs font-medium text-error animate-shake">
+                  {{ emailLiveError }}
+                </p>
               </div>
-            </div>
 
-            <div class="animate-login-fade-up [animation-delay:280ms]">
-              <div class="mb-1.5 flex items-center justify-between">
-                <label for="password" class="text-[0.7rem] font-bold tracking-wider text-headingMain uppercase">
-                  Password
-                </label>
-                <router-link
-                    to="/forgot-password"
-                    class="text-xs font-semibold text-secondary-500 transition-all duration-200 hover:text-accent-4 hover:underline hover:underline-offset-2"
-                >
-                  Forgot password?
-                </router-link>
-              </div>
-              <div class="relative group">
+              <div class="animate-login-fade-up [animation-delay:280ms]">
+                <div class="mb-1.5 flex items-center justify-between">
+                  <label for="password" class="text-[0.7rem] font-bold tracking-wider text-headingMain uppercase">
+                    Password
+                  </label>
+                  <router-link
+                      to="/forgot-password"
+                      class="text-xs font-semibold text-secondary-500 transition-all duration-200 hover:text-accent-4 hover:underline hover:underline-offset-2"
+                  >
+                    Forgot password?
+                  </router-link>
+                </div>
+                <div class="relative group">
                 <span class="pointer-events-none absolute top-1/2 left-3.5 z-10 -translate-y-1/2 text-sm text-primary-500 transition-transform duration-200 group-focus-within:scale-110">
                   <font-awesome-icon icon="fa-solid fa-lock" />
                 </span>
-                <input
-                    id="password"
-                    v-model="password"
-                    :type="isPasswordVisible ? 'text' : 'password'"
-                    placeholder="Enter your password"
-                    required
-                    autocomplete="current-password"
-                    :class="[
-                    'login-input w-full rounded-xl border border-borderDefault bg-neutral-100 py-2.5 pr-11 pl-10 text-[0.9375rem] text-headingMain outline-none transition-all duration-200 placeholder:text-textSupporting focus:border-primary-500 focus:bg-section-white focus:ring-4 focus:ring-primary-500/12 focus:shadow-[0_0_0_4px_rgba(74,144,226,0.08),0_2px_8px_rgba(74,144,226,0.12)]',
-                    fieldErrors.password ? 'border-error ring-2 ring-error/20 bg-error/5' : ''
+                  <input
+                      id="password"
+                      v-model="password"
+                      :type="isPasswordVisible ? 'text' : 'password'"
+                      placeholder="Enter your password"
+                      required
+                      autocomplete="current-password"
+                      :class="[
+                    'login-input w-full rounded-xl border border-borderDefault bg-neutral-100 py-2.5 pr-11 pl-10 text-[0.9375rem] text-headingMain outline-none transition-all duration-200 placeholder:text-textSupporting',
+                    fieldErrors.password
+                      ? 'border-error ring-2 ring-error/20 bg-error/5 focus:border-error focus:ring-error/30 focus:bg-error/5'
+                      : 'focus:border-primary-500 focus:bg-section-white focus:ring-4 focus:ring-primary-500/12 focus:shadow-[0_0_0_4px_rgba(74,144,226,0.08),0_2px_8px_rgba(74,144,226,0.12)]'
                   ]"
-                    @focus="fieldErrors.password = false"
-                    @input="fieldErrors.password = false"
-                />
-                <button
-                    type="button"
-                    class="absolute top-1/2 right-0 flex h-full w-10 -translate-y-1/2 items-center justify-center rounded-r-xl text-accent-3 transition-all duration-200 hover:bg-primary-500/10 hover:text-primary-600 active:scale-90"
-                    :aria-label="isPasswordVisible ? 'Hide password' : 'Show password'"
-                    @click="togglePasswordVisibility"
-                >
-                  <font-awesome-icon
-                      :icon="isPasswordVisible ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'"
-                      class="text-[0.95rem] transition-transform duration-200"
-                      :class="isPasswordVisible ? 'scale-90' : 'scale-100'"
                   />
-                </button>
-
+                  <button
+                      type="button"
+                      class="absolute top-1/2 right-0 flex h-full w-10 -translate-y-1/2 items-center justify-center rounded-r-xl text-accent-3 transition-all duration-200 hover:bg-primary-500/10 hover:text-primary-600 active:scale-90"
+                      :aria-label="isPasswordVisible ? 'Hide password' : 'Show password'"
+                      @click="togglePasswordVisibility"
+                  >
+                    <font-awesome-icon
+                        :icon="isPasswordVisible ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'"
+                        class="text-[0.95rem] transition-transform duration-200"
+                        :class="isPasswordVisible ? 'scale-90' : 'scale-100'"
+                    />
+                  </button>
+                </div>
+                <p v-if="passwordLengthError" class="mt-1 text-xs font-medium text-error animate-shake">
+                  {{ passwordLengthError }}
+                </p>
               </div>
-            </div>
 
-            <label class="inline-flex cursor-pointer items-center gap-2.5 text-sm text-textBody select-none group animate-login-fade-up [animation-delay:320ms]">
-              <input v-model="rememberMe" type="checkbox" class="h-4 w-4 cursor-pointer accent-primary-500 transition-transform duration-150 group-hover:scale-110" />
-              <span class="transition-colors duration-200 group-hover:text-primary-700">Remember me on this device</span>
-            </label>
+              <label class="inline-flex cursor-pointer items-center gap-2.5 text-sm text-textBody select-none group animate-login-fade-up [animation-delay:320ms]">
+                <input v-model="rememberMe" type="checkbox" class="h-4 w-4 cursor-pointer accent-primary-500 transition-transform duration-150 group-hover:scale-110" />
+                <span class="transition-colors duration-200 group-hover:text-primary-700">Remember me on this device</span>
+              </label>
 
-            <div class="animate-login-fade-up [animation-delay:360ms]">
-              <ShineButton
-                  type="submit"
-                  size="md"
-                  shape="xl"
-                  class="w-full! transition-transform duration-150 active:scale-[0.98]"
-                  :disabled="isLoading"
-              >
+              <div class="animate-login-fade-up [animation-delay:360ms]">
+                <ShineButton
+                    type="submit"
+                    size="md"
+                    shape="xl"
+                    class="w-full! transition-transform duration-150 active:scale-[0.98]"
+                    :disabled="isLoading || hasLengthError"
+                >
                 <span v-if="isLoading">
                   <font-awesome-icon icon="fa-solid fa-spinner" class="mr-2 animate-spin" />
                   Signing in...
                 </span>
-                <span v-else>Sign In</span>
-              </ShineButton>
-            </div>
-          </form>
+                  <span v-else>Sign In</span>
+                </ShineButton>
+              </div>
+            </form>
 
-          <div class="mt-4 text-center animate-login-fade-up [animation-delay:400ms]">
-            <p class="text-sm text-textBody">
-              Need access?
-              <router-link to="/contact" class="font-semibold text-secondary-500 transition-all duration-200 hover:text-accent-4 hover:underline hover:underline-offset-2">
-                Contact sales
-              </router-link>
-            </p>
+            <div class="mt-4 text-center animate-login-fade-up [animation-delay:400ms]">
+              <p class="text-sm text-textBody">
+                Need access?
+                <router-link to="/contact" class="font-semibold text-secondary-500 transition-all duration-200 hover:text-accent-4 hover:underline hover:underline-offset-2">
+                  Contact sales
+                </router-link>
+              </p>
+            </div>
           </div>
-        </div>
         </div>
 
         <router-link
@@ -333,6 +336,10 @@ const {
   isPasswordVisible,
   isLoading,
   fieldErrors,
+  emailLengthError,
+  emailLiveError,
+  passwordLengthError,
+  hasLengthError,
   togglePasswordVisibility,
   handleLoginSubmit,
 } = useLogin();

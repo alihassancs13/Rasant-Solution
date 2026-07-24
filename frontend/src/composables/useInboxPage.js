@@ -253,6 +253,7 @@ export function useInboxPage() {
             const pending = thread.messages.filter(m => m.status === 'pending');
             thread.messages = [...msgs.map(m => msgToUi(m, currentUserId.value)), ...pending];
             thread.messagesLoaded = true;
+            thread.messages.forEach((m) => autoloadImageAttachments(m.attachments));
         }
         if (thread.unread > 0) {
             await inboxStore.markMessagesRead(id);
@@ -398,6 +399,12 @@ export function useInboxPage() {
                 try {
                     const saved = await inboxStore.sendMessage(thread.id, captionForThisFile, [f.file]);
                     const uiMsg = msgToUi(saved, currentUserId.value);
+                    uiMsg.attachments.forEach((att) => {
+                        if (att.media_type === 'image' && f.mediaType === 'image' && f.previewUrl) {
+                            att.url = f.previewUrl;
+                        }
+                    });
+
                     const idx = thread.messages.findIndex((m) => m.id === tempId);
                     if (idx !== -1) thread.messages.splice(idx, 1, uiMsg);
                     autoloadImageAttachments(uiMsg.attachments);
