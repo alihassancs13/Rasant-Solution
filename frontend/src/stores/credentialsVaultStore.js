@@ -100,54 +100,7 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
             loading.value = false
         }
     }
-    //remove share credential
-    const revokeCredentialShare = async (credentialId, employeeId) => {
-        loading.value = true
-        error.value = null
-        try {
-            const token = getAuthToken()
-            if (!token) {
-                throw new Error('No authentication token found. Please login again.')
-            }
 
-            const url = `${BASE_URL}/api/credentials/revoke-share/`
-
-            const response = await fetch(url, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    credential_id: credentialId,
-                    employee_id: employeeId
-                })
-            })
-
-            if (response.status === 401) {
-                localStorage.removeItem('access_token')
-                localStorage.removeItem('accessToken')
-                localStorage.removeItem('token')
-                window.location.href = '/login'
-                throw new Error('Session expired. Please login again.')
-            }
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}))
-                throw new Error(errorData.message || `Failed to revoke share: ${response.status}`)
-            }
-
-            const data = await response.json()
-            return { success: true, data }
-
-        } catch (err) {
-            error.value = err.message
-            console.error('Error revoking credential share:', err)
-            return { success: false, error: err.message }
-        } finally {
-            loading.value = false
-        }
-    }
     const removeCredentialShare = async (credentialId, employeeId) => {
         loading.value = true
         error.value = null

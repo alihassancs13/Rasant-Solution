@@ -89,7 +89,7 @@ class FolderSerializer(serializers.ModelSerializer):
 class FileSerializer(serializers.ModelSerializer):
     size_formatted = serializers.SerializerMethodField()
     full_name = serializers.SerializerMethodField()
-    shared_with = serializers.SerializerMethodField()   # NEW
+    shared_with = serializers.SerializerMethodField()
 
     class Meta:
         model = File
@@ -104,7 +104,7 @@ class FileSerializer(serializers.ModelSerializer):
             'size_formatted',
             'mime_type',
             'full_name',
-            'shared_with',   # NEW
+            'shared_with',
             'created_at',
             'updated_at'
         ]
@@ -145,13 +145,22 @@ class FileSerializer(serializers.ModelSerializer):
     def validate(self, data):
         folder = data.get('folder')
         name = data.get('name')
+        request = self.context.get('request')
+        user = request.user if request else None
+        query = File.objects.filter(name__iexact=name)
 
-        if File.objects.filter(
-                folder=folder,
-                name__iexact=name
-        ).exists():
+        if folder:
+            query = query.filter(folder=folder)
+        else:
+            query = query.filter(folder__isnull=True, user=user)
+
+        if self.instance:
+            query = query.exclude(id=self.instance.id)
+
+        if query.exists():
+            location = f"folder '{folder.name}'" if folder else "root"
             raise serializers.ValidationError(
-                f"A file with name '{name}' already exists in this folder"
+                f"A file with name '{name}' already exists in {location}"
             )
 
         return data

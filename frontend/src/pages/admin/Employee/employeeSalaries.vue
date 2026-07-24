@@ -13,7 +13,6 @@ import {useEmployeeStore} from '@/stores/employeeStore.js'
 import { usePolicyStore } from '@/stores/policyStore'
 import { usePayrollSettingsStore } from '../../../stores/payrollStore.js'
 import { getCurrentPosition, reverseGeocodeLabel } from '@/composables/useGeolocation.js'
-import { useToast } from '@/composables/useToast.js'
 import ToastContainer from '@/components/ToastContainer.vue'
 
 const policyStore = usePolicyStore()
@@ -24,7 +23,6 @@ const payrollSettingsStore = usePayrollSettingsStore()
 const employees = computed(() => employeeStore.employees)
 const employeesLoading = computed(() => employeeStore.isLoading)
 import { useToast } from '@/composables/useToast.js'
-const { showToast } = useToast()
 
 const showSaveSettingsModal = ref(false)
 const employeesCovered = ref(3)

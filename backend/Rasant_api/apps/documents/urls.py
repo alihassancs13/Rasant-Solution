@@ -12,6 +12,7 @@ urlpatterns = [
     path('files/upload/', views.upload_file, name='upload-file'),
     path('files/<int:pk>/download/', views.download_file, name='download-file'),
     path('files/<int:pk>/preview/', views.preview_file, name='preview-file'),
+    path('files/<int:pk>/update/', views.update_file, name='update_file'),
     path('files/<int:pk>/delete/', views.delete_file, name='delete-file'),
     path('files/extension/<str:extension>/', views.get_files_by_extension, name='files-by-extension'),
     path('all/', views.get_all_items, name='all-items'),
@@ -21,4 +22,5 @@ urlpatterns = [
     path('share_document/', views.share_document, name='share_document'),
     path('remove_share/', views.remove_shared_document, name='remove_shared_document'),
     path('get_employee_document/<int:employee_id>/', views.get_employee_documents, name='get_employee_documents'),
+    path('remove-shared-document/', views.remove_shared_document, name='remove_shared_document'),
 ]

@@ -515,15 +515,20 @@
                       class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
                   />
                 </div>
-
                 <div class="flex flex-col gap-1.5">
-                  <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Designation</label>
-                  <input
-                      type="text"
-                      v-model="editFormData.designation"
-                      class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
-                  />
+                  <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Work from home</label>
+                  <select
+                      v-model="editFormData.work_from_home"
+                      class="w-full px-4 py-2.5 bg-white rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
+                  >
+                    <option :value="false">No</option>
+                    <option :value="true">Yes</option>
+                  </select>
+                  <p class="text-[11px] text-gray-400">
+                    If Yes, check-ins outside the office radius show as Work from home.
+                  </p>
                 </div>
+
 
                 <div class="flex flex-col gap-1.5">
                   <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Employment Status</label>
@@ -541,29 +546,15 @@
                   </select>
                 </div>
 
-                <div class="flex flex-col gap-1.5">
-                  <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Account Status</label>
-                  <select
-                      v-model="editFormData.is_active"
-                      class="w-full px-4 py-2.5 bg-white rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
-                  >
-                    <option :value="true">Active</option>
-                    <option :value="false">Inactive</option>
-                  </select>
-                </div>
+
 
                 <div class="flex flex-col gap-1.5">
-                  <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Work from home</label>
-                  <select
-                      v-model="editFormData.work_from_home"
-                      class="w-full px-4 py-2.5 bg-white rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
-                  >
-                    <option :value="false">No</option>
-                    <option :value="true">Yes</option>
-                  </select>
-                  <p class="text-[11px] text-gray-400">
-                    If Yes, check-ins outside the office radius show as Work from home.
-                  </p>
+                  <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Designation</label>
+                  <input
+                      type="text"
+                      v-model="editFormData.designation"
+                      class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
+                  />
                 </div>
 
                 <div class="flex flex-col gap-1.5">

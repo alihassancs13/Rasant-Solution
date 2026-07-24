@@ -1,7 +1,5 @@
 from django.db import models
 # Create your models here.
-
-
 from django.db import models
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
@@ -41,7 +39,7 @@ class Folder(models.Model):
 
 class File(models.Model):
     """File model for storing files"""
-    folder = models.ForeignKey(Folder, on_delete=models.CASCADE, related_name='files')
+    folder = models.ForeignKey(Folder, on_delete=models.CASCADE, related_name='files',null=True,blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='files')
     name = models.CharField(max_length=255)
     extension = models.CharField(max_length=50)
@@ -193,3 +191,5 @@ class SharedDocument(models.Model):
 
     def __str__(self):
         return f"{self.shared_item_name} → Employee #{self.employee_id}"
+
+

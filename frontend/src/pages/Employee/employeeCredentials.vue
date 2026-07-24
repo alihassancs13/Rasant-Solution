@@ -107,108 +107,64 @@
                 </div>
               </div>
 
-              <!-- Table - Desktop View -->
-              <div class="hidden md:block overflow-y-auto flex-1">
-                <table class="w-full min-w-[700px] lg:min-w-[800px]">
-                  <thead class="bg-gray-50 border-b border-gray-200 sticky top-0 z-10">
-                  <tr>
-                    <th class="px-4 sm:px-6 py-3 text-left font-bold text-xs text-gray-500 uppercase tracking-wider">Project name</th>
-                    <th class="px-4 sm:px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Username</th>
-                    <th class="px-4 sm:px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Email</th>
-                    <th class="px-4 sm:px-6 py-3 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Password</th>
-                  </tr>
-                  </thead>
-                  <tbody class="bg-white divide-y divide-gray-200">
-                  <!-- No Data -->
-                  <tr v-if="paginatedCredentials && paginatedCredentials.length === 0">
-                    <td colspan="4" class="px-6 py-12 text-center">
-                      <div class="flex flex-col items-center">
-                        <i class="fas fa-lock text-4xl text-gray-300 mb-3"></i>
-                        <h4 class="text-lg font-medium text-gray-700">No credentials shared with you</h4>
-                        <p class="text-sm text-gray-500">Your admin will share credentials with you as needed.</p>
-                      </div>
-                    </td>
-                  </tr>
-                  <!-- Data Rows -->
-                  <tr v-for="cred in paginatedCredentials" :key="cred.id" class="hover:bg-gray-50 transition-colors">
-                    <td class="px-4 sm:px-6 py-4">
-                      <div class="flex items-center gap-2 sm:gap-3">
-                        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center text-white font-bold text-xs sm:text-sm flex-shrink-0"
-                             :style="{ backgroundColor: '#3B82F6' }">
-                          {{ getInitials(cred.name) }}
-                        </div>
-                        <div class="min-w-0">
-                          <strong class="text-xs sm:text-sm block truncate max-w-[120px] sm:max-w-[200px]">{{ cred.name }}</strong>
-                          <a :href="cred.link" target="_blank" rel="noopener" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 truncate max-w-[120px] sm:max-w-[200px]">
-                            {{ cred.link }}
-                            <i class="fas fa-arrow-up-right-from-square text-[10px] flex-shrink-0"></i>
-                          </a>
-                        </div>
-                      </div>
-                    </td>
-                    <td class="px-4 sm:px-6 py-4">
-                      <span class="text-xs sm:text-sm truncate block max-w-[150px]">{{ cred.username }}</span>
-                    </td>
-                    <td class="px-4 sm:px-6 py-4">
-                      <span class="text-xs sm:text-sm truncate block max-w-[120px] sm:max-w-[200px]">{{ cred.email }}</span>
-                    </td>
-                    <td class="px-4 sm:px-6 py-4">
-                      <div class="flex items-center gap-2 whitespace-nowrap">
-                        <span class="text-xs sm:text-sm font-mono inline-block min-w-[85px] sm:min-w-[95px]">{{ cred.showPassword ? cred.password : '••••••••' }}</span>
-                        <button @click="togglePassword(cred.id)" class="text-gray-400 cursor-pointer hover:text-gray-600 transition-colors flex-shrink-0">
-                          <i :class="cred.showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              <!-- Mobile Card View -->
-              <div class="md:hidden overflow-y-auto flex-1 space-y-3 p-3">
+              <!-- Card Grid View -->
+              <div class="overflow-y-auto flex-1 p-4">
+                <!-- No Data -->
                 <div v-if="paginatedCredentials && paginatedCredentials.length === 0" class="text-center py-12">
                   <i class="fas fa-lock text-4xl text-gray-300 mb-3"></i>
                   <h4 class="text-lg font-medium text-gray-700">No credentials shared with you</h4>
                   <p class="text-sm text-gray-500">Your admin will share credentials with you as needed.</p>
                 </div>
-                <div
-                    v-for="cred in paginatedCredentials"
-                    :key="cred.id"
-                    class="bg-white rounded-xl border border-gray-200 shadow-sm p-4 hover:shadow-md transition-shadow"
-                >
-                  <div class="flex items-start justify-between gap-2">
-                    <div class="flex items-center gap-3 min-w-0">
-                      <div class="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-sm flex-shrink-0"
-                           :style="{ backgroundColor: '#3B82F6' }">
-                        {{ getInitials(cred.name) }}
-                      </div>
-                      <div class="min-w-0">
-                        <strong class="text-sm block truncate">{{ cred.name }}</strong>
-                        <a :href="cred.link" target="_blank" rel="noopener" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 truncate">
-                          {{ cred.link }}
-                          <i class="fas fa-arrow-up-right-from-square text-[10px] flex-shrink-0"></i>
-                        </a>
-                      </div>
-                    </div>
-                  </div>
 
-                  <div class="mt-3 grid grid-cols-2 gap-3 text-sm border-t border-gray-100 pt-3">
-                    <div class="min-w-0">
-                      <p class="text-xs text-gray-500 font-medium">Username</p>
-                      <p class="font-medium text-gray-800 truncate">{{ cred.username }}</p>
+                <!-- Card Grid - Responsive -->
+                <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  <div
+                      v-for="cred in paginatedCredentials"
+                      :key="cred.id"
+                      class="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-lg transition-shadow duration-200 overflow-hidden flex flex-col"
+                  >
+                    <!-- Card Header -->
+                    <div class="p-4 border-b border-gray-100">
+                      <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-10 h-10 rounded-lg flex items-center justify-center dash-topbar-profile font-bold text-sm flex-shrink-0"
+                             :style="{ backgroundColor: '#3B82F6' }">
+                          {{ getInitials(cred.name) }}
+                        </div>
+                        <div class="min-w-0 flex-1">
+                          <h4 class="text-sm font-semibold text-gray-800 truncate">{{ cred.name }}</h4>
+                          <a :href="cred.link" target="_blank" rel="noopener" class="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 truncate">
+                            {{ cred.link }}
+                            <i class="fas fa-arrow-up-right-from-square text-[10px] flex-shrink-0"></i>
+                          </a>
+                        </div>
+                      </div>
                     </div>
-                    <div class="min-w-0">
-                      <p class="text-xs text-gray-500 font-medium">Email</p>
-                      <p class="font-medium text-gray-800 truncate">{{ cred.email }}</p>
-                    </div>
-                    <div class="col-span-2">
-                      <p class="text-xs text-gray-500 font-medium">Password</p>
-                      <div class="flex items-center gap-2">
-                        <span class="font-mono text-sm inline-block min-w-[85px]">{{ cred.showPassword ? cred.password : '••••••••' }}</span>
-                        <button @click="togglePassword(cred.id)" class="text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0">
-                          <i :class="cred.showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
-                        </button>
+
+                    <!-- Card Body -->
+                    <div class="p-4 flex-1">
+                      <div class="space-y-2">
+                        <div>
+                          <p class="text-xs text-gray-500 font-medium">Username</p>
+                          <p class="text-sm text-gray-800 truncate">{{ cred.username || 'N/A' }}</p>
+                        </div>
+                        <div>
+                          <p class="text-xs text-gray-500 font-medium">Email</p>
+                          <p class="text-sm text-gray-800 truncate">{{ cred.email || 'N/A' }}</p>
+                        </div>
+                        <div>
+                          <p class="text-xs text-gray-500 font-medium">Password</p>
+                          <div class="flex items-center gap-2">
+                            <span class="text-sm font-mono inline-block min-w-[80px]">{{ cred.showPassword ? cred.password : '••••••••' }}</span>
+                            <button @click="togglePassword(cred.id)" class="text-gray-400 hover:text-gray-600 transition-colors flex-shrink-0">
+                              <i :class="cred.showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                            </button>
+                          </div>
+                        </div>
+                        <!-- Description (optional) -->
+                        <div v-if="cred.description" class="pt-1">
+                          <p class="text-xs text-gray-500 font-medium">Description</p>
+                          <p class="text-xs text-gray-600 truncate">{{ cred.description }}</p>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -281,3 +237,7 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+/* Add custom styles if needed */
+</style>

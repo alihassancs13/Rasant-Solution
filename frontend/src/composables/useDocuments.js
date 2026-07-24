@@ -35,7 +35,7 @@ export default function useDocuments() {
     const searchQuery = ref('')
     const currentFilter = ref('all')
     const sortBy = ref('name')
-    const viewMode = ref('grid')
+    const viewMode = ref('list')
     const showNewMenu = ref(false)
     const isDragging = ref(false)
     const isUploading = ref(false)
@@ -70,6 +70,10 @@ export default function useDocuments() {
     const showDeleteModal = ref(false)
     const deleteItemData = ref(null)
     const isDeleting = ref(false)
+    const showFileEditModal = ref(false)
+    const editFileId = ref(null)
+    const editFileName = ref('')
+    const isEditingFile = ref(false)
 
     const filters = [
         { value: 'all', label: 'All' },
@@ -220,6 +224,60 @@ export default function useDocuments() {
         editFolderName.value = ''
         isEditing.value = false
     }
+    const openFileEditModal = (item) => {
+        if (isEmployee.value) {
+            showToast('You do not have permission to edit files', 'error')
+            return
+        }
+        if (item.isFolder) {
+            // Use folder edit instead
+            openEditModal(item)
+            return
+        }
+        editFileId.value = item.id
+        editFileName.value = item.name
+        showFileEditModal.value = true
+    }
+
+    const closeFileEditModal = () => {
+        showFileEditModal.value = false
+        editFileId.value = null
+        editFileName.value = ''
+        isEditingFile.value = false
+    }
+
+    const submitFileEdit = async () => {
+        if (isEmployee.value) {
+            showToast('You do not have permission to edit files', 'error')
+            return
+        }
+        if (!editFileName.value || !editFileName.value.trim()) {
+            showToast('Please enter a file name', 'error')
+            return
+        }
+
+        const trimmedName = editFileName.value.trim()
+
+        // Check if name changed
+        const currentItem = store.allItems.find(i => i.id === editFileId.value)
+        if (currentItem && trimmedName === currentItem.name) {
+            showToast('No changes made', 'info')
+            closeFileEditModal()
+            return
+        }
+
+        isEditingFile.value = true
+        try {
+            await store.updateFile(editFileId.value, trimmedName)
+            showToast(`File renamed to "${trimmedName}"`, 'success')
+            closeFileEditModal()
+        } catch (error) {
+            console.error('Edit file error:', error)
+            showToast(error.message || 'Failed to rename file', 'error')
+        } finally {
+            isEditingFile.value = false
+        }
+    }
 
     const submitEdit = async () => {
         if (isEmployee.value) {
@@ -230,6 +288,7 @@ export default function useDocuments() {
             showToast('Please enter a folder name', 'error')
             return
         }
+
 
         const trimmedName = editFolderName.value.trim()
 
@@ -386,6 +445,7 @@ export default function useDocuments() {
 
             showToast(`Access removed from ${employeeName}`, 'success')
 
+            // Update shared_with locally
             if (Array.isArray(selectedDocument.value.shared_with)) {
                 selectedDocument.value = {
                     ...selectedDocument.value,
@@ -393,12 +453,14 @@ export default function useDocuments() {
                 }
             }
 
+            // Refresh the view
             if (store.currentFolderId) {
                 await store.loadFolderContents(store.currentFolderId)
             } else {
                 await store.loadAllItems()
             }
 
+            // Update selected document reference
             const pool = [...(store.viewItems || []), ...(store.allItems || [])]
             const match = pool.find(
                 (i) => i.id === selectedDocument.value.id
@@ -479,10 +541,6 @@ export default function useDocuments() {
             showToast('You do not have permission to upload files', 'error')
             return
         }
-        if (!store.currentFolderId) {
-            showToast('Please open a folder first before uploading files.', 'warning')
-            return
-        }
         fileInput.value?.click()
         showNewMenu.value = false
     }
@@ -492,10 +550,7 @@ export default function useDocuments() {
             showToast('You do not have permission to upload files', 'error')
             return
         }
-        if (!store.currentFolderId) {
-            showToast('Please open a folder first before uploading files.', 'warning')
-            return
-        }
+        // Remove the folder check - allow upload without folder
         zipInput.value?.click()
         showNewMenu.value = false
     }
@@ -521,11 +576,6 @@ export default function useDocuments() {
     const uploadFilesWithProgress = async (files, successLabel = 'file(s)') => {
         const list = Array.from(files || [])
         if (!list.length) return
-
-        if (!store.currentFolderId) {
-            showToast('Please select a folder first.', 'warning')
-            return
-        }
 
         isUploading.value = true
         uploadTotal.value = list.length
@@ -595,15 +645,17 @@ export default function useDocuments() {
         const files = event.dataTransfer.files
         if (!files.length) return
 
-        if (!store.currentFolderId) {
-            showToast('Please open a folder first before uploading files.', 'warning')
-            return
-        }
+        // If no folder selected, upload to root (parent_id = null)
+        const folderId = store.currentFolderId || null
 
         try {
-            await uploadFilesWithProgress(files, 'file(s)')
-        } catch (_) {
-            // toast already shown
+            for (const file of files) {
+                await store.uploadFile(folderId, file)
+            }
+            showToast(`${files.length} file(s) uploaded successfully!`, 'success')
+        } catch (error) {
+            console.error('Drop upload error:', error)
+            showToast(error.message || 'Failed to upload files', 'error')
         }
     }
 
@@ -637,6 +689,9 @@ export default function useDocuments() {
             store.navigateTo(item.id);
         }
     }
+
+
+
     const navigateTo = (folderId) => {
         if (isEmployee.value) {
             return
@@ -1083,10 +1138,6 @@ export default function useDocuments() {
         selectedEmployees,
         isSharing,
         selectedDocument,
-        showUnshareModal,
-        unshareEmployee,
-        isUnsharing,
-        unshareSubtitle,
         filteredItems,
         shareFilteredEmployees,
         breadcrumb,
@@ -1111,20 +1162,11 @@ export default function useDocuments() {
         toggleEmployee,
         isEmployeeSelected,
         confirmShare,
-        openUnshareModal,
-        closeUnshareModal,
-        submitUnshare,
         uploadFile,
         uploadZip,
         handleFileUpload,
         handleZipUpload,
         handleDrop,
-        isUploading,
-        uploadPercent,
-        uploadFileName,
-        uploadIndex,
-        uploadTotal,
-        uploadStatusText,
         openItem,
         navigateTo,
         navigateToRoot,
@@ -1149,6 +1191,20 @@ export default function useDocuments() {
         getInitials,
         employeeStore,
         showEmployeeBackButton,
-        isAlreadyShared
+        isAlreadyShared,
+        showFileEditModal,
+        editFileId,
+        editFileName,
+        isEditingFile,
+        openFileEditModal,
+        closeFileEditModal,
+        submitFileEdit,
+        showUnshareModal,
+        unshareEmployee,
+        isUnsharing,
+        unshareSubtitle,
+        openUnshareModal,
+        closeUnshareModal,
+        submitUnshare,
     }
 }

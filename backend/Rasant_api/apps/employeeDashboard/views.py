@@ -23,6 +23,7 @@ from django.db import transaction
 from .serializers import calculate_next_effective_date
 import random
 import string
+from django.utils import timezone
 import re
 from django.contrib.auth.hashers import make_password
 from accounts.email_service import (
@@ -286,19 +287,19 @@ def update_employee(request, pk):
     }
 
     for key in (
-        "cnic",
-        "emergency_cnic",
-        "gender",
-        "present_address",
-        "permanent_address",
-        "emergency_name",
-        "emergency_relation",
-        "emergency_phone",
-        "emergency_address",
-        "bank_name",
-        "branch_name",
-        "branch_code",
-        "account_number",
+            "cnic",
+            "emergency_cnic",
+            "gender",
+            "present_address",
+            "permanent_address",
+            "emergency_name",
+            "emergency_relation",
+            "emergency_phone",
+            "emergency_address",
+            "bank_name",
+            "branch_name",
+            "branch_code",
+            "account_number",
     ):
         if key in data and data[key] == "":
             data[key] = None
@@ -331,6 +332,29 @@ def update_employee(request, pk):
     updated_employee.current_salary = updated_employee.salary
     updated_employee.save(update_fields=["current_salary"])
 
+    # Sync is_active, name, email, and date_joined to User table
+    if updated_employee.user:
+        user_updated = False
+        # Sync is_active
+        if updated_employee.user.is_active != updated_employee.is_active:
+            updated_employee.user.is_active = updated_employee.is_active
+            user_updated = True
+        # Sync email
+        if updated_employee.user.email != updated_employee.email:
+            updated_employee.user.email = updated_employee.email
+            user_updated = True
+        # Sync username from employee name
+        if updated_employee.name and updated_employee.user.username != updated_employee.name:
+            updated_employee.user.username = updated_employee.name
+            user_updated = True
+        # Sync date_joined from joined_date
+        if updated_employee.joined_date and updated_employee.user.date_joined != updated_employee.joined_date:
+            updated_employee.user.date_joined = updated_employee.joined_date
+            user_updated = True
+
+        if user_updated:
+            updated_employee.user.save()
+
     ensure_employee_modules()
     linked_user = updated_employee.user
     if linked_user is None and updated_employee.email:
@@ -358,7 +382,8 @@ def update_employee(request, pk):
             first_name=name_parts[0] if name_parts else "",
             last_name=name_parts[1] if len(name_parts) > 1 else "",
             is_staff=False,
-            is_active=True,
+            is_active=updated_employee.is_active,
+            date_joined=updated_employee.joined_date or timezone.now(),
             role=employee_role,
         )
         linked_user.set_password(new_password)
@@ -432,7 +457,6 @@ def update_employee(request, pk):
         },
         status=status.HTTP_200_OK,
     )
-
 
 @api_view(["GET", "POST", "DELETE", "PUT"])
 @parser_classes([MultiPartParser, FormParser, JSONParser])

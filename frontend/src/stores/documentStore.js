@@ -364,26 +364,28 @@ export const useDocumentStore = defineStore('documents', {
             }
         },
 
-        async uploadFile(folderId, file, onProgress = null) {
+        async uploadFile(folderId, file) {
             if (this.isEmployeeView) {
                 throw new Error('Employees cannot upload files');
-            }
-
-            if (!folderId) {
-                throw new Error('Please select a folder first');
             }
 
             this.isLoading = true;
             this.error = null;
             try {
                 const formData = new FormData();
-                formData.append('folder_id', folderId);
+                if (folderId) {
+                    formData.append('folder_id', folderId);
+                }
+
                 formData.append('file', file);
 
-                const response = await this._uploadWithProgress(
+                const response = await this._apiRequest(
                     API_ENDPOINTS.DOCUMENTS.FILES.UPLOAD,
-                    formData,
-                    onProgress,
+                    {
+                        method: 'POST',
+                        body: formData,
+                        isFormData: true,
+                    }
                 );
                 const newFile = {
                     ...response.data,
@@ -391,17 +393,25 @@ export const useDocumentStore = defineStore('documents', {
                     type: 'file',
                     shared_with: [],
                 };
+
                 this.allItems.push(newFile);
                 if (this.currentFolderId === folderId) {
                     this.viewItems.push(newFile);
                 }
-                const folderInAll = this.allItems.find(item => item.id === folderId && item.isFolder);
-                if (folderInAll) {
-                    folderInAll.children_count = (folderInAll.children_count || 0) + 1;
-                }
-                const folderInView = this.viewItems.find(item => item.id === folderId && item.isFolder);
-                if (folderInView) {
-                    folderInView.children_count = (folderInView.children_count || 0) + 1;
+                if (folderId) {
+                    const folderInAll = this.allItems.find(item => item.id === folderId && item.isFolder);
+                    if (folderInAll) {
+                        folderInAll.children_count = (folderInAll.children_count || 0) + 1;
+                    }
+
+                    const folderInView = this.viewItems.find(item => item.id === folderId && item.isFolder);
+                    if (folderInView) {
+                        folderInView.children_count = (folderInView.children_count || 0) + 1;
+                    }
+                } else {
+                    if (!this.currentFolderId) {
+                        await this.loadAllItems();
+                    }
                 }
 
                 return newFile;
@@ -413,61 +423,43 @@ export const useDocumentStore = defineStore('documents', {
             }
         },
 
-        _uploadWithProgress(endpoint, formData, onProgress) {
-            const cleanedBaseUrl = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL;
-            let endpointPath = endpoint;
-            if (!endpointPath.startsWith('/')) endpointPath = `/${endpointPath}`;
-            const fullUrl = `${cleanedBaseUrl}${endpointPath}`;
-            const token = getAuthToken();
+        async updateFile(fileId, newName) {
+            this.isLoading = true;
+            this.error = null;
+            try {
+                const response = await this._apiRequest(
+                    API_ENDPOINTS.DOCUMENTS.FILES.UPDATE(fileId),
+                    {
+                        method: 'PUT',
+                        body: JSON.stringify({ name: newName }),
+                    }
+                );
 
-            return new Promise((resolve, reject) => {
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', fullUrl);
-
-                if (token) {
-                    xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+                // Update the file in allItems
+                const index = this.allItems.findIndex(item => item.id === fileId && !item.isFolder);
+                if (index !== -1) {
+                    this.allItems[index] = {
+                        ...this.allItems[index],
+                        name: newName
+                    };
                 }
 
-                xhr.upload.onprogress = (event) => {
-                    if (!onProgress) return;
-                    if (event.lengthComputable) {
-                        const percent = Math.min(100, Math.round((event.loaded / event.total) * 100));
-                        onProgress({
-                            percent,
-                            loaded: event.loaded,
-                            total: event.total,
-                        });
-                    } else {
-                        onProgress({ percent: null, loaded: event.loaded, total: null });
-                    }
-                };
+                // Update in viewItems if present
+                const viewIndex = this.viewItems.findIndex(item => item.id === fileId && !item.isFolder);
+                if (viewIndex !== -1) {
+                    this.viewItems[viewIndex] = {
+                        ...this.viewItems[viewIndex],
+                        name: newName
+                    };
+                }
 
-                xhr.onload = () => {
-                    let payload = null;
-                    try {
-                        payload = xhr.responseText ? JSON.parse(xhr.responseText) : {};
-                    } catch (e) {
-                        payload = {};
-                    }
-
-                    if (xhr.status >= 200 && xhr.status < 300) {
-                        if (onProgress) onProgress({ percent: 100, loaded: null, total: null });
-                        resolve(payload);
-                        return;
-                    }
-
-                    const errorMessage =
-                        payload?.error ||
-                        payload?.message ||
-                        payload?.detail ||
-                        `HTTP ${xhr.status}: ${xhr.statusText || 'Upload failed'}`;
-                    reject(new Error(errorMessage));
-                };
-
-                xhr.onerror = () => reject(new Error('Network error while uploading. Please try again.'));
-                xhr.onabort = () => reject(new Error('Upload cancelled.'));
-                xhr.send(formData);
-            });
+                return response;
+            } catch (error) {
+                this.error = error.message;
+                throw error;
+            } finally {
+                this.isLoading = false;
+            }
         },
 
         async updateFolder(folderId, name) {

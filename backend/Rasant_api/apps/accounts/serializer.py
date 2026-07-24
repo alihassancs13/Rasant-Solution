@@ -1,7 +1,5 @@
 from rest_framework import serializers
 from .models import User, Role, ContactMessage, EmailSettings
-
-
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField(required=False)
     username = serializers.CharField(required=False)

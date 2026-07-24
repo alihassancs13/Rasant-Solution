@@ -99,7 +99,7 @@
             />
           </div>
 
-          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div class="grid grid-cols-[1fr_2fr] gap-4">
             <section class="lg:col-span-1 bg-white border border-border rounded-lg shadow-sm p-5">
               <h3 class="text-base font-bold text-headingMain mb-1">Attendance today</h3>
               <p class="text-xs text-textSupporting mb-4">Live pulse from attendance records</p>
@@ -125,63 +125,64 @@
               </router-link>
             </section>
 
-            <section class="lg:col-span-2 bg-white border border-border rounded-lg shadow-sm p-5">
-              <h3 class="text-base font-bold text-headingMain mb-1">Quick modules</h3>
-              <p class="text-xs text-textSupporting mb-4">Jump to the areas you use most</p>
-              <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                <router-link
-                    v-for="item in quickLinks"
-                    :key="item.to"
-                    :to="item.to"
-                    class="group rounded-md border border-border p-4 hover:border-primary hover:bg-primary-subtle/50 transition-colors"
-                >
-                  <div class="w-9 h-9 rounded-lg flex items-center justify-center mb-3" :class="item.bg">
-                    <font-awesome-icon :icon="item.icon" class="text-sm" :class="item.color" />
-                  </div>
-                  <p class="text-sm font-semibold text-text-primary group-hover:text-primary">{{ item.label }}</p>
-                  <p class="text-xs text-text-muted mt-0.5">{{ item.desc }}</p>
-                </router-link>
+            <section class="w-full bg-white border border-border rounded-lg shadow-sm overflow-hidden">
+              <div class="px-5 py-4 border-b border-border flex items-center justify-between gap-3">
+                <div>
+                  <h3 class="text-base font-bold text-headingMain">Today's work updates</h3>
+                  <p class="text-xs text-textSupporting">
+                    What employees say they're working on · {{ stats.today_work_updates_count ?? 0 }} update(s)
+                  </p>
+                </div>
               </div>
+              <ul v-if="stats.today_work_updates?.length" class="divide-y divide-border max-h-[300px] overflow-y-auto w-full">
+                <li
+                    v-for="item in stats.today_work_updates"
+                    :key="item.id"
+                    class="px-5 py-3.5"
+                >
+                  <div class="flex items-start gap-3">
+                    <div class="w-9 h-9 rounded-md bg-primary-subtle text-primary text-xs font-bold flex items-center justify-center shrink-0">
+                      {{ initials(item.name) }}
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <div class="flex flex-wrap items-baseline justify-between gap-2">
+                        <p class="text-sm font-semibold text-text-primary truncate">{{ item.name }}</p>
+                        <span class="text-[10px] text-text-muted shrink-0">{{ formatShortTime(item.updated_at) }}</span>
+                      </div>
+                      <p class="text-xs text-text-muted truncate">
+                        {{ item.department || '—' }}
+                        <span v-if="item.designation"> · {{ item.designation }}</span>
+                      </p>
+                      <p class="text-sm text-text-secondary mt-1.5 whitespace-pre-wrap">{{ item.note }}</p>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+              <p v-else class="w-full py-10 text-center text-sm text-text-muted">
+                No work updates posted today yet.
+              </p>
             </section>
           </div>
 
-          <section class="bg-white border border-border rounded-lg shadow-sm overflow-hidden">
-            <div class="px-5 py-4 border-b border-border flex items-center justify-between gap-3">
-              <div>
-                <h3 class="text-base font-bold text-headingMain">Today’s work updates</h3>
-                <p class="text-xs text-textSupporting">
-                  What employees say they’re working on · {{ stats.today_work_updates_count ?? 0 }} update(s)
-                </p>
-              </div>
-            </div>
-            <ul v-if="stats.today_work_updates?.length" class="divide-y divide-border max-h-[420px] overflow-y-auto">
-              <li
-                v-for="item in stats.today_work_updates"
-                :key="item.id"
-                class="px-5 py-3.5"
+          <section class="lg:col-span-2 bg-white border border-border rounded-lg shadow-sm p-5">
+            <h3 class="text-base font-bold text-headingMain mb-1">Quick modules</h3>
+            <p class="text-xs text-textSupporting mb-4">Jump to the areas you use most</p>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+              <router-link
+                  v-for="item in quickLinks"
+                  :key="item.to"
+                  :to="item.to"
+                  class="group rounded-md border border-border p-4 hover:border-primary hover:bg-primary-subtle/50 transition-colors"
               >
-                <div class="flex items-start gap-3">
-                  <div class="w-9 h-9 rounded-md bg-primary-subtle text-primary text-xs font-bold flex items-center justify-center shrink-0">
-                    {{ initials(item.name) }}
-                  </div>
-                  <div class="min-w-0 flex-1">
-                    <div class="flex flex-wrap items-baseline justify-between gap-2">
-                      <p class="text-sm font-semibold text-text-primary truncate">{{ item.name }}</p>
-                      <span class="text-[10px] text-text-muted shrink-0">{{ formatShortTime(item.updated_at) }}</span>
-                    </div>
-                    <p class="text-xs text-text-muted truncate">
-                      {{ item.department || '—' }}
-                      <span v-if="item.designation"> · {{ item.designation }}</span>
-                    </p>
-                    <p class="text-sm text-text-secondary mt-1.5 whitespace-pre-wrap">{{ item.note }}</p>
-                  </div>
+                <div class="w-9 h-9 rounded-lg flex items-center justify-center mb-3" :class="item.bg">
+                  <font-awesome-icon :icon="item.icon" class="text-sm" :class="item.color" />
                 </div>
-              </li>
-            </ul>
-            <p v-else class="py-10 text-center text-sm text-text-muted">
-              No work updates posted today yet.
-            </p>
+                <p class="text-sm font-semibold text-text-primary group-hover:text-primary">{{ item.label }}</p>
+                <p class="text-xs text-text-muted mt-0.5">{{ item.desc }}</p>
+              </router-link>
+            </div>
           </section>
+
 
           <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
             <section class="bg-white border border-border rounded-lg shadow-sm overflow-hidden">

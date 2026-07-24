@@ -221,7 +221,7 @@ export const useInboxStore = defineStore('inbox', {
             }
 
             const token = getAuthToken();
-            const url = `${BASE_URL}${API_ENDPOINTS.INBOX_SSE_STREAM.slice(1)}?token=${token}`;
+            const url = `${BASE_URL}${API_ENDPOINTS.INBOX_SSE_STREAM}?token=${token}`;
             this.eventSource = new EventSource(url);
 
             this.eventSource.onopen = () => {

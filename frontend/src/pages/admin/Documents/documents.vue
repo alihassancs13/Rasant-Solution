@@ -90,13 +90,14 @@
               </select>
 
               <div class="flex bg-gray-100 rounded-lg p-0.5 sm:p-1">
-                <button @click="viewMode = 'grid'" class="px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-md transition"
-                        :class="viewMode === 'grid' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-600 hover:text-gray-800'">
-                  <i class="fas fa-table-cells-large text-xs sm:text-sm"></i>
-                </button>
+
                 <button @click="viewMode = 'list'" class="hidden sm:block px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-md transition"
-                        :class="viewMode === 'list' ? 'bg-white shadow-sm text-gray-800' : 'text-gray-600 hover:text-gray-800'">
+                        :class="viewMode === 'list' ? 'dash-topbar-profile shadow-sm text-gray-800' : 'text-gray-600 hover:text-gray-800'">
                   <i class="fas fa-list text-xs sm:text-sm"></i>
+                </button>
+                <button @click="viewMode = 'grid'" class="px-2 sm:px-2.5 py-1 sm:py-1.5 rounded-md transition"
+                        :class="viewMode === 'grid' ? 'dash-topbar-profile shadow-sm text-gray-800' : 'text-gray-600 hover:text-gray-800'">
+                  <i class="fas fa-table-cells-large text-xs sm:text-sm"></i>
                 </button>
               </div>
 
@@ -164,7 +165,7 @@
                             title="Share">
                       <i class="fas fa-share-alt"></i>
                     </button>
-                    <button @click.stop="editItem(item)" class="w-5 h-5 cursor-pointer sm:w-7 sm:h-7 bg-white rounded-full shadow hover:bg-gray-50 text-[8px] sm:text-xs text-gray-600">
+                    <button @click.stop="item.isFolder ? openEditModal(item) : openFileEditModal(item)" class="w-5 h-5 cursor-pointer sm:w-7 sm:h-7 bg-white rounded-full shadow hover:bg-gray-50 text-[8px] sm:text-xs text-gray-600">
                       <i class="fas fa-pen"></i>
                     </button>
                     <button @click.stop="deleteItem(item)" class="w-5 h-5 cursor-pointer sm:w-7 sm:h-7 bg-white rounded-full shadow hover:bg-red-50 text-[8px] sm:text-xs text-red-500">
@@ -442,6 +443,37 @@
       </div>
     </BaseModal>
 
+    <!-- File Edit Modal -->
+    <BaseModal
+        :isOpen="showFileEditModal"
+        mode="form"
+        title="Rename File"
+        :subtitle="`Enter new name for the file`"
+        submitText="Rename"
+        cancelText="Cancel"
+        :loading="isEditingFile"
+        @close="closeFileEditModal"
+        @save="submitFileEdit"
+    >
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            File Name
+          </label>
+          <input
+              v-model="editFileName"
+              type="text"
+              placeholder="Enter new file name (without extension)"
+              class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+              @keyup.enter="submitFileEdit"
+          />
+          <p class="text-xs text-gray-500 mt-1">
+            Extension (.{{ currentItem?.extension }}) will be preserved
+          </p>
+        </div>
+      </div>
+    </BaseModal>
+
     <!-- ===== DELETE MODAL ===== -->
     <BaseModal
         :is-open="showDeleteModal"
@@ -497,48 +529,48 @@
             <p class="text-sm text-gray-500">Try adjusting your search</p>
           </div>
 
-          <div v-else class="grid grid-cols-2 gap-2 p-3">
-            <div
-                v-for="emp in shareFilteredEmployees"
-                :key="emp.id"
-                class="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors border"
-                :class="[
+          <div
+              v-for="emp in shareFilteredEmployees"
+              :key="emp.id"
+              class="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors border"
+              :class="[
         isAlreadyShared(emp.id)
-            ? 'bg-green-50 border-green-200 hover:bg-green-100'
+            ? 'bg-green-50 border-green-200'  // Changed to show it's shared
             : 'hover:bg-gray-50 border-gray-100 cursor-pointer',
         isEmployeeSelected(emp.id) ? 'bg-indigo-50 border-indigo-200' : ''
     ]"
-                @click="!isAlreadyShared(emp.id) && toggleEmployee(emp)"
-            >
-              <div class="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold text-xs">
-                {{ getInitials(emp.full_name || emp.email || 'U') }}
-              </div>
-              <div class="flex-1 min-w-0">
-                <p class="text-xs font-medium text-gray-800 truncate">
-                  {{ emp.full_name || emp.email || 'No name' }}
-                </p>
-                <p class="text-[10px] text-gray-500 truncate">{{ emp.email }}</p>
-                <p v-if="isAlreadyShared(emp.id)" class="text-[10px] text-green-600 font-medium mt-0.5">
-                  <i class="fas fa-check-circle"></i> Already shared
-                </p>
-              </div>
-              <div class="flex-shrink-0">
-                <button
-                    v-if="isAlreadyShared(emp.id)"
-                    type="button"
-                    class="w-6 h-6 rounded-full bg-red-100 hover:bg-red-200 flex items-center justify-center transition-colors"
-                    title="Remove access"
-                    @click.stop="openUnshareModal(emp.id)"
-                >
-                  <i class="fas fa-times text-red-600 text-[10px]"></i>
-                </button>
-                <div
-                    v-else
-                    class="w-4 h-4 rounded-full border-2 flex items-center justify-center"
-                    :class="isEmployeeSelected(emp.id) ? 'border-indigo-600 bg-indigo-600' : 'border-gray-300'"
-                >
-                  <i v-if="isEmployeeSelected(emp.id)" class="fas fa-check text-white text-[8px]"></i>
-                </div>
+          >
+            <div class="flex-shrink-0 w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-semibold text-xs">
+              {{ getInitials(emp.full_name || emp.email || 'U') }}
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-xs font-medium text-gray-800 truncate">
+                {{ emp.full_name || emp.email || 'No name' }}
+              </p>
+              <p class="text-[10px] text-gray-500 truncate">{{ emp.email }}</p>
+              <p v-if="isAlreadyShared(emp.id)" class="text-[10px] text-green-600 font-medium mt-0.5">
+                <i class="fas fa-check-circle"></i> Already shared
+              </p>
+            </div>
+            <div class="flex-shrink-0">
+              <!-- For already shared - show X button -->
+              <button
+                  v-if="isAlreadyShared(emp.id)"
+                  @click.stop="openUnshareModal(emp.id)"
+                  class="w-6 h-6 rounded-full bg-red-100 hover:bg-red-200 flex items-center justify-center transition-colors"
+                  title="Remove access"
+                  type="button"
+              >
+                <i class="fas fa-times text-red-600 text-[10px]"></i>
+              </button>
+              <!-- For not shared - show selection checkbox -->
+              <div
+                  v-else
+                  class="w-4 h-4 rounded-full border-2 flex items-center justify-center transition-colors"
+                  :class="isEmployeeSelected(emp.id) ? 'border-indigo-600 bg-indigo-600' : 'border-gray-300'"
+                  @click="toggleEmployee(emp)"
+              >
+                <i v-if="isEmployeeSelected(emp.id)" class="fas fa-check text-white text-[8px]"></i>
               </div>
             </div>
           </div>

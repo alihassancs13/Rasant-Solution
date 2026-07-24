@@ -7,6 +7,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User, Module, ContactMessage, EmailSettings
+from .employee_access import build_sidebar_modules_for_role, ensure_user_is_employee
 from .serializer import (
     LoginSerializer,
     UserSerializer,
@@ -20,8 +21,6 @@ from .models import User, Module,ContactMessage ,InquiryStatus
 from .serializer import LoginSerializer, UserSerializer,ContactMessageSerializer
 from django.http import  HttpResponse
 from employeeDashboard.models import Employee
-from django.core.mail import send_mail
-from django.conf import settings
 from .email_service import send_test_email, send_inquiry_reply_email
 
 def _is_admin(user):
@@ -32,7 +31,6 @@ def _is_admin(user):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def login_user(request):
-    # Validate input using serializer
     serializer = LoginSerializer(data=request.data)
 
     if not serializer.is_valid():
@@ -78,6 +76,14 @@ def login_user(request):
             "message": "User not found with provided credentials"
         }, status=status.HTTP_404_NOT_FOUND)
 
+    # Check if user account is active
+    if not user.is_active:
+        return Response({
+            "status": False,
+            "message": "Your account has been suspended. Please contact administrator.",
+            "error_type": "account_suspended"
+        }, status=status.HTTP_403_FORBIDDEN)
+
     # Check password
     if not user.check_password(password):
         return Response({
@@ -92,14 +98,9 @@ def login_user(request):
     user_data = UserSerializer(user).data
 
     try:
-        # Try to get employee from the Employee model
         employee = Employee.objects.get(user=user)
         user_data['employee_id'] = employee.id
-
-        # Only add employee fields if they exist
         employee_data = {'id': employee.id}
-
-        # Safely add fields if they exist
         if hasattr(employee, 'name'):
             employee_data['name'] = employee.name
         if hasattr(employee, 'email'):
@@ -114,17 +115,14 @@ def login_user(request):
         user_data['employee'] = employee_data
 
     except Employee.DoesNotExist:
-        # User is not an employee (admin or other role)
         user_data['employee_id'] = None
         user_data['employee'] = None
     except Exception as e:
-        # If any other error occurs, do not pretend user.id is an employee id
         print(f"Error getting employee: {e}")
         user_data['employee_id'] = None
         user_data['employee'] = None
 
-    # Get modules for the user's role (same shape as get_user_modules)
-    from .employee_access import build_sidebar_modules_for_role, ensure_user_is_employee
+
 
     try:
         if user_data.get('employee_id') and user.role and user.role.name.lower() == 'employee':
@@ -150,7 +148,6 @@ def login_user(request):
             "project_modules": sidebar.get("project_modules", []),
         }
     }, status=status.HTTP_200_OK)
-
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

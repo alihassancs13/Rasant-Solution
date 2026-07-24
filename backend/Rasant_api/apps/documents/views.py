@@ -151,6 +151,54 @@ def update_folder(request, pk):
     }, status=status.HTTP_200_OK)
 
 
+@api_view(['PUT'])
+@permission_classes([IsAuthenticated])
+def update_file(request, pk):
+    try:
+        file_obj = File.objects.get(id=pk, user=request.user)
+    except File.DoesNotExist:
+        return Response(
+            {'error': 'File not found'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    name = request.data.get('name')
+    if not name or not name.strip():
+        return Response(
+            {'error': 'File name is required'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    name = name.strip()
+    if file_obj.folder:
+        if File.objects.filter(
+                folder=file_obj.folder,
+                name__iexact=name
+        ).exclude(id=pk).exists():
+            return Response(
+                {'error': f"A file with name '{name}' already exists in this folder"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    else:
+        if File.objects.filter(
+                user=request.user,
+                folder__isnull=True,
+                name__iexact=name
+        ).exclude(id=pk).exists():
+            return Response(
+                {'error': f"A file with name '{name}' already exists in root"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    file_obj.name = name
+    file_obj.save()
+
+    serializer = FileSerializer(file_obj, context={'request': request})
+    return Response({
+        'message': 'File renamed successfully',
+        'data': serializer.data
+    }, status=status.HTTP_200_OK)
+
+
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def delete_folder(request, pk):
@@ -178,39 +226,43 @@ def delete_folder(request, pk):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def upload_file(request):
-    """Upload a file to a folder"""
-    folder_id = request.data.get('folder_id')
     uploaded_file = request.FILES.get('file')
-
-    if not folder_id:
-        return Response(
-            {'error': 'folder_id is required'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
-
-    try:
-        folder = Folder.objects.get(id=folder_id, user=request.user)
-    except Folder.DoesNotExist:
-        return Response(
-            {'error': 'Folder not found'},
-            status=status.HTTP_404_NOT_FOUND
-        )
 
     if not uploaded_file:
         return Response(
             {'error': 'No file uploaded'},
             status=status.HTTP_400_BAD_REQUEST
         )
+
+    folder_id = request.data.get('folder_id')
+    folder = None
+
+    if folder_id:
+        try:
+            folder = Folder.objects.get(id=folder_id, user=request.user)
+        except Folder.DoesNotExist:
+            return Response(
+                {'error': 'Folder not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
     name, extension = os.path.splitext(uploaded_file.name)
     extension = extension[1:].lower()  # Remove dot
 
     if not extension:
         extension = 'unknown'
-    if File.objects.filter(folder=folder, name__iexact=name).exists():
-        return Response(
-            {'error': f"File '{name}' already exists in this folder"},
-            status=status.HTTP_400_BAD_REQUEST
-        )
+    if folder:
+        if File.objects.filter(folder=folder, name__iexact=name).exists():
+            return Response(
+                {'error': f"File '{name}' already exists in this folder"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    else:
+        if File.objects.filter(folder__isnull=True, user=request.user, name__iexact=name).exists():
+            return Response(
+                {'error': f"File '{name}' already exists in root"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
     file_obj = File.objects.create(
         folder=folder,
         user=request.user,
@@ -226,7 +278,6 @@ def upload_file(request):
         'message': 'File uploaded successfully',
         'data': serializer.data
     }, status=status.HTTP_201_CREATED)
-
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -672,16 +723,21 @@ def remove_shared_document(request):
         )
 
 
-# documents/views.py
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_employee_documents(request, employee_id):
     try:
-
+        # Get shared folders
         shared_folders = SharedDocument.objects.filter(
             employee_id=employee_id,
             folder__isnull=False
         ).select_related('folder')
+
+        shared_files = SharedDocument.objects.filter(
+            employee_id=employee_id,
+            file__isnull=False
+        ).select_related('file')
 
         documents = []
 
@@ -715,11 +771,33 @@ def get_employee_documents(request, employee_id):
                     'is_presentation': file.is_presentation,
                     'is_archive': file.is_archive,
                     'folder_id': file.folder_id,
-                    # Convert content to base64 for viewing
                     'content': base64.b64encode(file.content).decode('utf-8') if file.content else None,
                 })
-
             documents.append(folder_data)
+        for shared in shared_files:
+            file = shared.file
+            file_data = {
+                'type': 'file',
+                'id': file.id,
+                'name': file.full_name,
+                'extension': file.extension,
+                'size': file.size,
+                'size_formatted': file.size_formatted,
+                'mime_type': file.mime_type,
+                'created_at': file.created_at,
+                'updated_at': file.updated_at,
+                'is_image': file.is_image,
+                'is_document': file.is_document,
+                'is_spreadsheet': file.is_spreadsheet,
+                'is_presentation': file.is_presentation,
+                'is_archive': file.is_archive,
+                'folder_id': file.folder_id,
+                'shared_at': shared.shared_at,
+                'content': base64.b64encode(file.content).decode('utf-8') if file.content else None,
+                'is_shared_file': True,  # Flag to identify this is a directly shared file
+                'files': []  # Empty array for consistency with folder structure
+            }
+            documents.append(file_data)
 
         return Response({
             'status': 'success',
@@ -733,3 +811,96 @@ def get_employee_documents(request, employee_id):
             'status': 'error',
             'message': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def remove_shared_document(request):
+    """
+    DELETE: Revoke/Remove a shared document (file or folder) from an employee
+    """
+    try:
+        document_id = request.data.get('document_id')
+        employee_id = request.data.get('employee_id')
+        folder_id = request.data.get('folder_id')
+        file_id = request.data.get('file_id')
+        if document_id:
+            shared_document = get_object_or_404(SharedDocument, id=document_id)
+            if shared_document.folder:
+                if shared_document.folder.user != request.user:
+                    return Response(
+                        {'error': 'You do not have permission to revoke this shared document'},
+                        status=status.HTTP_403_FORBIDDEN
+                    )
+            elif shared_document.file:
+                if shared_document.file.user != request.user:
+                    return Response(
+                        {'error': 'You do not have permission to revoke this shared document'},
+                        status=status.HTTP_403_FORBIDDEN
+                    )
+            employee_label = f"Employee #{shared_document.employee_id}"
+            item_name = shared_document.shared_item_name
+            item_type = shared_document.shared_item_type
+            shared_document.delete()
+
+            return Response({
+                'status': 'success',
+                'message': f'{item_type.capitalize()} "{item_name}" access revoked from {employee_label}',
+                'shared_document_id': document_id,
+                'employee_id': shared_document.employee_id,
+                'item_name': item_name,
+                'item_type': item_type
+            }, status=status.HTTP_200_OK)
+
+        elif folder_id and employee_id:
+            folder = get_object_or_404(Folder, id=folder_id, user=request.user)
+            try:
+                shared_document = SharedDocument.objects.get(
+                    folder=folder,
+                    employee_id=employee_id
+                )
+            except SharedDocument.DoesNotExist:
+                return Response(
+                    {'error': f'Folder "{folder.name}" is not shared with employee ID {employee_id}'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            shared_document.delete()
+
+            return Response({
+                'status': 'success',
+                'message': f'Folder "{folder.name}" access revoked from employee ID {employee_id}',
+                'folder_id': folder_id,
+                'employee_id': employee_id
+            }, status=status.HTTP_200_OK)
+
+        elif file_id and employee_id:
+            file = get_object_or_404(File, id=file_id, user=request.user)
+            try:
+                shared_document = SharedDocument.objects.get(
+                    file=file,
+                    employee_id=employee_id
+                )
+            except SharedDocument.DoesNotExist:
+                return Response(
+                    {'error': f'File "{file.full_name}" is not shared with employee ID {employee_id}'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            shared_document.delete()
+
+            return Response({
+                'status': 'success',
+                'message': f'File "{file.full_name}" access revoked from employee ID {employee_id}',
+                'file_id': file_id,
+                'employee_id': employee_id
+            }, status=status.HTTP_200_OK)
+
+        else:
+            return Response(
+                {
+                    'error': 'Either document_id OR (folder_id and employee_id) OR (file_id and employee_id) must be provided'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+    except Exception as e:
+        return Response(
+            {'error': str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )

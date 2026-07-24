@@ -61,19 +61,14 @@ def get_all_credentials(request):
 @permission_classes([IsAuthenticated])
 def share_credential(request):
     try:
-        # Get data from request
         credential_id = request.data.get('credential_id')
         employee_ids = request.data.get('employee_id')
-
-        # Validate required fields
         if not credential_id or not employee_ids:
             return Response(
                 {'error': 'credential_id and employee_id are required'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         credential = get_object_or_404(CredentialStore, id=credential_id)
-
-        # Convert single employee_id to list
         if not isinstance(employee_ids, list):
             employee_ids = [employee_ids]
         employee_ids = list(set(employee_ids))
@@ -87,8 +82,6 @@ def share_credential(request):
                 {'error': f'Invalid employee IDs: {list(invalid_ids)}'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-
-        # Check for already shared credentials
         already_shared = []
         for employee in employees:
             if SharedCredential.objects.filter(
@@ -102,8 +95,6 @@ def share_credential(request):
                 {'error': f'Credential already shared with employee(s): {already_shared}'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-
-        # Create shares for all employees
         created_shares = []
         for employee in employees:
             shared_credential = SharedCredential.objects.create(
@@ -117,11 +108,19 @@ def share_credential(request):
                 'employee_email': employee.email,
                 'shared_at': shared_credential.shared_at
             })
-
-        # Return response
         return Response({
+            'status': 'success',
             'message': f'Credential shared with {len(created_shares)} employee(s)',
-            'shared': created_shares
+            'shared': created_shares,
+            'credential': {
+                'id': credential.id,
+                'name': credential.name,
+                'link': credential.link,
+                'username': credential.username,
+                'email': credential.email,
+                'description': credential.description or '',
+                'created_at': credential.created_at
+            }
         }, status=status.HTTP_201_CREATED)
 
     except Exception as e:
@@ -129,7 +128,6 @@ def share_credential(request):
             {'error': str(e)},
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )
-
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -156,10 +154,9 @@ def get_employee_credentials(request, employee_id):
                 'username': cred.username,
                 'email': cred.email,
                 'password': decoded_password,
+                'description': cred.description or '',  # ← ADDED DESCRIPTION
                 'shared_at': shared.shared_at,
                 'created_at': cred.created_at,
-
-
             })
 
         return Response({
@@ -182,7 +179,6 @@ def remove_shared_credential(request):
     DELETE: Revoke/Remove a shared credential from an employee
     """
     try:
-        # Get data from request
         credential_id = request.data.get('credential_id')
         employee_id = request.data.get('employee_id')
 
@@ -192,14 +188,8 @@ def remove_shared_credential(request):
                 {'error': 'credential_id and employee_id are required'},
                 status=status.HTTP_400_BAD_REQUEST
             )
-
-        # Check if credential exists
         credential = get_object_or_404(CredentialStore, id=credential_id)
-
-        # Check if employee exists
         employee = get_object_or_404(Employee, id=employee_id)
-
-        # Find the shared credential
         try:
             shared_credential = SharedCredential.objects.get(
                 credential=credential,
@@ -210,8 +200,6 @@ def remove_shared_credential(request):
                 {'error': f'Credential is not shared with employee ID {employee_id}'},
                 status=status.HTTP_404_NOT_FOUND
             )
-
-        # Delete the shared credential
         shared_credential.delete()
 
         employee_label = getattr(employee, 'name', None) or getattr(employee, 'email', None) or employee_id

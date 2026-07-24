@@ -75,11 +75,12 @@ export const API_ENDPOINTS = {
             UPLOAD: '/api/documents/files/upload/',
             VIEW: (id) => `/api/documents/files/${id}/view/`,
             DELETE: (id) => `/api/documents/files/${id}/delete/`,
+            UPDATE: (id) => `/api/documents/files/${id}/update/`,
             ALL: '/api/documents/files/all/',
         },
         ALL: '/api/documents/all/',
         SHARE: '/api/documents/share_document/',
-        REMOVE_SHARE: '/api/documents/remove_share/',
+        REMOVE_SHARE: '/api/documents/remove-shared-document/',
         GET_EMPLOYEE_DOCUMENTS: (employeeId) => `/api/documents/get_employee_document/${employeeId}/`,
     },
 
