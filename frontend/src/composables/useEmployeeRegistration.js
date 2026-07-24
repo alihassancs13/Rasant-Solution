@@ -137,7 +137,7 @@ export function useEmployeeRegistration() {
             gender: formData.value.gender || 'Male',
             email: (formData.value.email || '').trim(),
             department: (formData.value.department || '').trim() || 'Unassigned',
-            department: (formData.value.department || '').trim(),
+
             designation: (formData.value.designation || '').trim() || 'Employee',
             salary: parseFloat(formData.value.salary) || 0,
             joined_date: formData.value.joined_date || new Date().toISOString().split('T')[0],

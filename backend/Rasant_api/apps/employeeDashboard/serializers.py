@@ -39,6 +39,14 @@ class EmploymentStatusSerializer(serializers.ModelSerializer):
         fields = ["id", "name", "code", "apply_payroll_deductions", "sort_order"]
 
 
+class EmployeeStatusUpdateSerializer(serializers.ModelSerializer):
+    status = serializers.PrimaryKeyRelatedField(queryset=EmploymentStatus.objects.all())
+
+    class Meta:
+        model = Employee
+        fields = ['status', 'feedback']
+
+
 class FlexibleEmploymentStatusField(serializers.Field):
     """Accept EmploymentStatus id, code, or name from the client."""
 

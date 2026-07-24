@@ -284,5 +284,83 @@ export const useEmployeeStore = defineStore('employee', {
             }
         },
 
+        async updateEmployeeStatus(employeeId, statusData) {
+            this.isLoading = true;
+            this.error = null;
+            try {
+                const cleanedBaseUrl = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL;
+                const endpoint = API_ENDPOINTS.CHANGE_EMPLOYMENT_STATUS(employeeId);
+                const fullUrl = `${cleanedBaseUrl}${endpoint}`;
+
+                const token = getAuthToken();
+                const headers = {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                };
+                if (token) headers['Authorization'] = `Bearer ${token}`;
+
+                const response = await fetch(fullUrl, {
+                    method: 'PATCH',
+                    headers,
+                    body: JSON.stringify(statusData)
+                });
+
+                let responseData;
+                const text = await response.text();
+
+                try {
+                    responseData = JSON.parse(text);
+                } catch (parseError) {
+                    console.error('Failed to parse response:', text);
+                    throw new Error('Invalid response from server');
+                }
+
+                if (!response.ok) {
+                    let errorMsg = `HTTP Error: ${response.status}`;
+                    if (responseData && responseData.error) {
+                        errorMsg = responseData.error;
+                    } else if (responseData && responseData.message) {
+                        errorMsg = responseData.message;
+                    } else if (responseData && typeof responseData === 'object') {
+                        const errors = Object.entries(responseData)
+                            .map(([field, msgs]) => {
+                                if (Array.isArray(msgs)) {
+                                    return `${field}: ${msgs.join(', ')}`;
+                                }
+                                return `${field}: ${msgs}`;
+                            })
+                            .join('; ');
+                        if (errors) errorMsg = errors;
+                    }
+                    throw new Error(errorMsg);
+                }
+
+                // Update local employee data
+                if (responseData && responseData.id) {
+                    const index = this.employees.findIndex(emp => emp.id === employeeId);
+                    if (index !== -1) {
+                        this.employees[index] = {
+                            ...this.employees[index],
+                            status: responseData.status,
+                            feedback: responseData.feedback || this.employees[index].feedback
+                        };
+                    }
+                }
+
+                return { success: true, data: responseData };
+
+            } catch (error) {
+                console.error('Update employee status error:', error);
+                this.error = error.message || 'Failed to update employee status';
+                return {
+                    success: false,
+                    error: this.error,
+                    data: null
+                };
+            } finally {
+                this.isLoading = false;
+            }
+        }
+
     },
 });

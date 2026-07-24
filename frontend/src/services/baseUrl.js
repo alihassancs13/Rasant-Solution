@@ -38,6 +38,7 @@ export const API_ENDPOINTS = {
     GET_EMPLOYEE_DETAIL: (pk) => `/api/employeeDashboard/salaries/get_employee_detail/${pk}/`,
     EMPLOYEE_MONTHLY_BONUS: (pk) => `/api/employeeDashboard/salaries/employees/${pk}/bonus/`,
     EMPLOYMENT_STATUSES: '/api/employeeDashboard/employment-statuses/',
+    CHANGE_EMPLOYMENT_STATUS: (employeeId) => `/api/employeeDashboard/change_employeement_status/${employeeId}/`,
 
     PAYROLL_SETTINGS: '/api/employeeDashboard/salaries/payroll-settings/',
     HOLIDAYS: '/api/employeeDashboard/holidays/',

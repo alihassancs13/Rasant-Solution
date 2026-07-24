@@ -52,4 +52,5 @@ urlpatterns = [
     path('holidays/<int:pk>/', holiday_views.company_holiday_detail, name='company-holiday-detail'),
 
     path('salaries/payroll-settings/', views.payroll_settings_view, name='payroll-settings'),
+    path('change_employeement_status/<int:employee_id>/', views.update_employee_status, name='update-employee-status'),
 ]

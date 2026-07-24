@@ -72,6 +72,11 @@ class Employee(models.Model):
         null=True,
         blank=True,
     )
+    feedback = models.TextField(
+        null=True,
+        blank=True,
+        help_text="Feedback/reason for employment status changes (especially for resignation)"
+    )
 
     # ---------- Emergency Contact ----------
     emergency_name = models.CharField(max_length=255, null=True, blank=True)

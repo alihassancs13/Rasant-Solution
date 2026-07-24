@@ -20,9 +20,7 @@ from django.conf import settings
 from collections import defaultdict
 from decimal import Decimal
 from django.db import transaction
-from .serializers import calculate_next_effective_date
-import random
-import string
+from .serializers import calculate_next_effective_date, EmploymentStatusSerializer, EmployeeStatusUpdateSerializer
 from django.utils import timezone
 import re
 from django.contrib.auth.hashers import make_password
@@ -44,7 +42,7 @@ User = get_user_model()
 from .models import (
     Employee, CVSubmission, JobOpening, JobStatus,
     IncrementType, IncrementPolicy, CycleTiming, ApplicationMode, EmployeePolicyAssignment,
-    SalaryIncrementHistory,SalaryDeductionHistory, Attendance, PayrollSettings,
+    SalaryIncrementHistory, SalaryDeductionHistory, Attendance, PayrollSettings, EmploymentStatus,
 )
 from .serializers import (
     EmployeeSerializer, EmployeeListSerializer, UpdateEmployeeSerializer,
@@ -1968,3 +1966,29 @@ def set_office_location(request):
             "data": PayrollSettingsSerializer(settings_obj).data,
         }
     )
+
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def update_employee_status(request, employee_id):
+    """Update employee status with feedback"""
+    try:
+        employee = Employee.objects.get(id=employee_id)
+    except Employee.DoesNotExist:
+        return Response({'error': 'Employee not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    serializer = EmployeeStatusUpdateSerializer(employee, data=request.data, partial=True)
+
+    if serializer.is_valid():
+        if serializer.validated_data.get('status') and \
+                serializer.validated_data['status'].code == 'resign' and \
+                not serializer.validated_data.get('feedback'):
+            return Response(
+                {'feedback': 'Feedback is required for resignation'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        serializer.save()
+        return Response(serializer.data)
+
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
