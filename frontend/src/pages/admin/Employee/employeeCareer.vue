@@ -260,7 +260,7 @@ const openEmailModal = (applicant) => {
   emailForm.value = {
     to: applicant.email,
     subject: 'Regarding your application',
-    message: `Hello,\n\nThank you for applying. We wanted to reach out regarding your application.\n\nBest regards,\nRasant Solutions`,
+    message: `Thank you for applying. We wanted to reach out regarding your application.`,
   }
   showEmailModal.value = true
 }

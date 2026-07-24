@@ -288,19 +288,28 @@ def send_leave_decision(leave_request, *, approved: bool):
         to=emp.email,
     )
 def send_inquiry_reply_email(inquiry, subject: str, body: str):
-    """
-    Send inquiry reply email.
-    body: The reply message from the modal (what user typed)
-    """
     return send_branded_email(
-        subject=subject,  # Directly from modal
+        subject=subject,
         template_name='emails/inquiry_reply.html',
         context={
             'recipient_name': inquiry.full_name or 'Customer',
-            'subject': subject,  # Modal ka subject
-            'message': body,     # Modal ka message
-            'original_message': inquiry.message,  # Optional: original inquiry
+            'subject': subject,
+            'message': body,
+            'original_message': inquiry.message,
         },
         to=inquiry.email,
+        fail_silently=False,
+    )
+
+def send_candidate_reply_email(to_email: str, subject: str, body: str, recipient_name: str = ''):
+    return send_branded_email(
+        subject=subject,
+        template_name='emails/candidate_reply.html',
+        context={
+            'recipient_name': recipient_name or 'there',
+            'subject': subject,
+            'message': body,
+        },
+        to=to_email,
         fail_silently=False,
     )

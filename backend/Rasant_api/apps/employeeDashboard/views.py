@@ -33,6 +33,7 @@ from accounts.email_service import (
     send_job_published,
     send_increments_due_digest,
     send_branded_email,
+    send_candidate_reply_email,
 )
 from accounts.models import EmailSettings
 from django.conf import settings as django_settings
@@ -561,27 +562,19 @@ def cv_submission_view(request, pk=None):
 @permission_classes([IsAuthenticated])
 def send_candidate_email_view(request):
     if request.method == 'POST':
-        to_email = request.data.get('email')
-        subject = request.data.get('subject')
-        message = request.data.get('message')
+        to_email = (request.data.get('email') or '').strip()
+        subject = (request.data.get('subject') or '').strip()
+        message = (request.data.get('message') or '').strip()
+        recipient_name = (request.data.get('name') or '').strip()
 
         if not all([to_email, subject, message]):
             return Response({
                 'status': 'error',
                 'message': 'Email, subject, and message are required.'
             }, status=status.HTTP_400_BAD_REQUEST)
+
         try:
-            send_mail(
-                subject=subject,
-                message=message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[to_email],
-                fail_silently=False,
-            )
-            return Response({
-                'status': 'success',
-                'message': 'Email sent successfully.'
-            }, status=status.HTTP_200_OK)
+            send_candidate_reply_email(to_email, subject, message, recipient_name)
         except Exception as e:
             return Response({
                 'status': 'error',
@@ -589,10 +582,10 @@ def send_candidate_email_view(request):
                 'error': str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-    elif request.method == 'GET':
-        cv = CVSubmission.objects.all()
-        serializer = CVSubmissionSerializer(cv, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({
+            'status': 'success',
+            'message': 'Email sent successfully.'
+        }, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
