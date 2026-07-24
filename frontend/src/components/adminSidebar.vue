@@ -75,22 +75,22 @@
           </div>
         </div>
 
-        <!-- Loading State -->
-        <div v-if="loading" class="text-center py-10">
+        <!-- Loading State (only when we have nothing to show yet) -->
+        <div v-if="loading && !companyModules.length" class="text-center py-10">
           <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent"></div>
           <p class="text-sm text-text-muted mt-2" v-show="!showCollapsed">Loading menu...</p>
         </div>
 
         <!-- Error State -->
-        <div v-if="error" class="text-center py-10">
+        <div v-if="error && !companyModules.length" class="text-center py-10">
           <p class="text-danger text-sm" v-show="!showCollapsed">{{ error }}</p>
-          <button @click="loadModules" class="mt-2 text-primary hover:underline text-sm" v-show="!showCollapsed">
+          <button @click="() => loadModules({ force: true })" class="mt-2 text-primary hover:underline text-sm" v-show="!showCollapsed">
             Retry
           </button>
         </div>
 
         <!-- Navigation -->
-        <nav v-if="!loading && !error" class="space-y-3">
+        <nav v-if="companyModules.length || (!loading && !error)" class="space-y-3">
           <!-- DRILL-DOWN MODE: Show only employee children -->
           <template v-if="isDrillDown">
             <div>

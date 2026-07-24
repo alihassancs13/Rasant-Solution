@@ -1,4 +1,8 @@
-export const BASE_URL = 'http://localhost:8000/';
+const fallbackApi = import.meta.env.DEV
+  ? 'http://localhost:8000'
+  : 'https://api.rasantsol.com';
+
+export const BASE_URL = (import.meta.env.VITE_API_URL || fallbackApi).replace(/\/?$/, '/');
 
 export const API_ENDPOINTS = {
     LOGIN: '/api/accounts/login/',
@@ -110,6 +114,7 @@ export const API_ENDPOINTS = {
     OVERVIEW_STATS: '/api/accounts/overview-stats/',
     NOTIFICATIONS: '/api/accounts/notifications/',
     NOTIFICATIONS_MARK_READ: '/api/accounts/notifications/mark-read/',
+    NOTIFICATIONS_CLEAR: '/api/accounts/notifications/clear/',
     WORKLOG_ANALYTICS: '/api/worklogs/analytics/',
     WORKLOG_ANALYTICS_EMPLOYEE: (userId) => `/api/worklogs/analytics/employee/${userId}/`,
     WORKLOG_EXPORT_SETTINGS: '/api/worklogs/analytics/export-settings/',

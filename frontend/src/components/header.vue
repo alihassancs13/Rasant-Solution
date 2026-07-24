@@ -169,7 +169,13 @@
                 v-if="notificationStore.items.length"
                 class="px-5 py-3 bg-surface border-t border-border flex items-center justify-between gap-2"
             >
-              <p class="text-xs text-text-muted">Inbox, inquiries, hiring &amp; more</p>
+              <button
+                  type="button"
+                  class="text-xs font-semibold text-danger hover:underline cursor-pointer"
+                  @click.stop="clearAllNotifications"
+              >
+                Clear notifications
+              </button>
               <button
                   v-if="unseenCount > 0"
                   type="button"
@@ -288,8 +294,30 @@ const { isSidebarOpen, toggleSidebar } = useAdminSidebar()
 function toggleNotifMenu() {
   showNotifMenu.value = !showNotifMenu.value
   if (showNotifMenu.value) {
-    notificationStore.fetchNotifications()
+    openNotifications()
+  } else {
+    // Closing after viewing → clear what was seen
+    clearSeenNotifications()
   }
+}
+
+async function openNotifications() {
+  await notificationStore.fetchNotifications({ force: true })
+  // Opening the panel counts as "seen" → clear unread badge immediately
+  if (notificationStore.unreadCount > 0) {
+    await notificationStore.markRead([], true)
+  }
+}
+
+async function clearSeenNotifications() {
+  // After the user has viewed the panel, remove those notifications
+  if (!notificationStore.items.length) return
+  await notificationStore.clearNotifications({ clearAll: true })
+}
+
+async function clearAllNotifications() {
+  await notificationStore.clearNotifications({ clearAll: true })
+  showNotifMenu.value = false
 }
 
 const TYPE_STYLES = {
@@ -343,9 +371,8 @@ const router = useRouter()
 
 async function handleNotifItemClick(item) {
   showNotifMenu.value = false
-  if (item?.id && !item.is_read) {
-    await notificationStore.markRead([item.id], false)
-  }
+  // Clicking an item means the panel was seen — clear all, then navigate
+  await notificationStore.clearNotifications({ clearAll: true })
   if (item?.type === 'increment' && item?.payload?.employee_id) {
     router.push({
       path: '/admin/employees/salaries',
@@ -513,7 +540,10 @@ function handleClickOutside(event) {
     showUserMenu.value = false
   }
   if (notifRef.value && !notifRef.value.contains(event.target)) {
-    showNotifMenu.value = false
+    if (showNotifMenu.value) {
+      showNotifMenu.value = false
+      clearSeenNotifications()
+    }
   }
 }
 

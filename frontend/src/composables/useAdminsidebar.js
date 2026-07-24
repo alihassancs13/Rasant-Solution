@@ -213,23 +213,25 @@ export function useAdminSidebar() {
         }
     };
 
-    const loadModules = async () => {
+    const loadModules = async (opts = {}) => {
         try {
-            await store.fetchModules();
+            await store.fetchModules(opts);
             checkDrillDownOnRoute();
         } catch (err) {
             console.error('Failed to load sidebar modules:', err);
         }
 
         try {
-            await inboxStore.fetchConversations();
+            // Soft refresh for unread badge — skipped when recently fetched
+            await inboxStore.fetchConversations({ force: Boolean(opts.force) });
         } catch (err) {
             console.error('Failed to load conversations for sidebar badge:', err);
         }
     };
 
     onMounted(() => {
-        loadModules();
+        // Never force on remount — Pinia cache prevents flicker/refetch while fresh
+        loadModules({ force: false });
     });
 
     return {
@@ -256,7 +258,7 @@ export function useAdminSidebar() {
         goBackFromDrillDown,
         getUserRole,
         unreadConversationsCount,
-        refreshModules: store.fetchModules,
+        refreshModules: () => store.fetchModules({ force: true }),
         currentUserRole,
         loadModules,
         userRoleId,

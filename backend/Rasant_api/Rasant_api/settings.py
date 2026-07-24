@@ -57,6 +57,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'Rasant_api.cors_middleware.EnsureCorsMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -93,16 +94,49 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
     ),
+    'EXCEPTION_HANDLER': 'Rasant_api.exception_handler.api_exception_handler',
 }
 WSGI_APPLICATION = 'Rasant_api.wsgi.application'
 
-CORS_ALLOW_ALL_ORIGINS = True
+# Frontend: https://rasantsol.com  ·  API: https://api.rasantsol.com
+CORS_ALLOW_ALL_ORIGINS = False
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",  # Your Vite frontend
+    "https://rasantsol.com",
+    "https://www.rasantsol.com",
+    "https://app.rasantsol.com",
+    "http://rasantsol.com",
+    "http://www.rasantsol.com",
+    "http://localhost:5173",
     "http://localhost:3000",
     "http://127.0.0.1:5173",
-    "http://192.168.18.21:8000"
+    "http://192.168.18.21:8000",
+]
+CORS_ALLOWED_ORIGIN_REGEXES = [
+    r"^https://([a-z0-9-]+\.)?rasantsol\.com$",
+    r"^http://localhost:\d+$",
+    r"^http://127\.0\.0\.1:\d+$",
+]
+CORS_ALLOW_HEADERS = list({
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+})
+CORS_ALLOW_METHODS = ["DELETE", "GET", "OPTIONS", "PATCH", "POST", "PUT"]
+CORS_PREFLIGHT_MAX_AGE = 86400
+
+CSRF_TRUSTED_ORIGINS = [
+    "https://rasantsol.com",
+    "https://www.rasantsol.com",
+    "https://api.rasantsol.com",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
 ]
 
 # Database
@@ -131,8 +165,7 @@ EMAIL_USE_SSL = True
 EMAIL_HOST_USER = 'danialali@rasantsol.com'
 EMAIL_HOST_PASSWORD = ''
 DEFAULT_FROM_EMAIL = 'Rasant Solutions <danialali@rasantsol.com>'
-FRONTEND_URL = 'http://localhost:5173'
-
+FRONTEND_URL = 'https://rasantsol.com'
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

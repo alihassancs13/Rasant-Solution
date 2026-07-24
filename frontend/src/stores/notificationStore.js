@@ -20,6 +20,7 @@ export const useNotificationStore = defineStore('notifications', {
         isLoading: false,
         error: null,
         pollTimer: null,
+        lastFetchedAt: 0,
     }),
 
     getters: {
@@ -27,13 +28,20 @@ export const useNotificationStore = defineStore('notifications', {
     },
 
     actions: {
-        async fetchNotifications() {
-            this.isLoading = true;
+        async fetchNotifications(opts = {}) {
+            const force = Boolean(opts.force);
+            const TTL = 30 * 1000;
+            if (!force && this.lastFetchedAt && Date.now() - this.lastFetchedAt < TTL) {
+                return { success: true, cached: true };
+            }
+
+            this.isLoading = !this.lastFetchedAt;
             this.error = null;
             try {
                 const { data } = await api.get(API_ENDPOINTS.NOTIFICATIONS);
                 this.items = Array.isArray(data.notifications) ? data.notifications : [];
                 this.unreadCount = Number(data.unread_count || 0);
+                this.lastFetchedAt = Date.now();
                 return { success: true, data };
             } catch (error) {
                 this.error = error.response?.data?.error || 'Failed to load notifications';
@@ -62,11 +70,44 @@ export const useNotificationStore = defineStore('notifications', {
             }
         },
 
+        /**
+         * Delete notifications.
+         * @param {{ clearAll?: boolean, ids?: number[], readOnly?: boolean }} [opts]
+         */
+        async clearNotifications(opts = {}) {
+            const ids = Array.isArray(opts.ids) ? opts.ids : [];
+            const readOnly = Boolean(opts.readOnly);
+            const clearAll = Boolean(opts.clearAll) || (!ids.length && !readOnly);
+            const payload = {
+                clear_all: clearAll,
+                read_only: readOnly,
+                ids,
+            };
+            try {
+                const { data } = await api.post(API_ENDPOINTS.NOTIFICATIONS_CLEAR, payload);
+                if (clearAll) {
+                    this.items = [];
+                    this.unreadCount = 0;
+                } else if (ids.length) {
+                    const set = new Set(ids);
+                    this.items = this.items.filter((n) => !set.has(n.id));
+                    this.unreadCount = Number(data.unread_count ?? this.items.filter((n) => !n.is_read).length);
+                } else if (readOnly) {
+                    this.items = this.items.filter((n) => !n.is_read);
+                    this.unreadCount = Number(data.unread_count ?? this.items.length);
+                }
+                this.lastFetchedAt = Date.now();
+                return { success: true, deleted: data.deleted || 0 };
+            } catch (error) {
+                return { success: false, error: error.response?.data?.error || 'Failed to clear notifications' };
+            }
+        },
+
         startPolling(intervalMs = 45000) {
-            this.stopPolling();
+            if (this.pollTimer) return; // already polling globally
             this.fetchNotifications();
             this.pollTimer = setInterval(() => {
-                this.fetchNotifications();
+                this.fetchNotifications({ force: true });
             }, intervalMs);
         },
 

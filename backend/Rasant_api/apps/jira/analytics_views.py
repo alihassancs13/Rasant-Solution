@@ -6,10 +6,13 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import date, datetime, timezone
 from io import BytesIO
 import calendar
+import re
 
 from django.http import HttpResponse
 from openpyxl import Workbook
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
+from openpyxl.chart import BarChart, Reference
+from openpyxl.worksheet.hyperlink import Hyperlink
 
 from django.contrib.auth import get_user_model
 from rest_framework.decorators import api_view, permission_classes
@@ -224,74 +227,131 @@ def _resolve_export_names(rows):
     return names
 
 
+def _safe_sheet_title(name: str, used: set[str]) -> str:
+    """Excel sheet titles: max 31 chars, no \\ / ? * [ ]."""
+    cleaned = re.sub(r'[\\/*?:\[\]]', " ", str(name or "Employee")).strip() or "Employee"
+    cleaned = " ".join(cleaned.split())
+    base = cleaned[:28]
+    title = base
+    n = 2
+    while title in used:
+        suffix = f" ({n})"
+        title = f"{base[: 31 - len(suffix)]}{suffix}"
+        n += 1
+    used.add(title)
+    return title
+
+
+def _add_weekly_bar_chart(ws, *, title, data_col, cat_col, header_row, anchor, color="4A90E2"):
+    """
+    Build a column chart from a vertical Week/Hours table.
+    header_row has labels; data is header_row+1 .. header_row+5 (W1..W5).
+    """
+    chart = BarChart()
+    chart.type = "col"
+    chart.style = 10
+    chart.title = title
+    chart.y_axis.title = "Hours"
+    chart.legend = None
+    data_ref = Reference(ws, min_col=data_col, min_row=header_row, max_row=header_row + 5)
+    cats_ref = Reference(ws, min_col=cat_col, min_row=header_row + 1, max_row=header_row + 5)
+    chart.add_data(data_ref, titles_from_data=True)
+    chart.set_categories(cats_ref)
+    chart.width = 12
+    chart.height = 8
+    try:
+        if chart.series:
+            chart.series[0].graphicalProperties.solidFill = color
+    except Exception:
+        pass
+    ws.add_chart(chart, anchor)
+    return chart
+
+
 def _build_worklog_export_workbook(*, settings_obj, rows, date_from, date_to):
     """
-    Compact review-friendly workbook:
-      1) Summary  — project + employee weekly totals (W1..W5 + MD)
-      2) Month Grid — one row per employee, columns = day numbers
-      3) Tickets   — aggregated ticket hours (not every daily line)
+    Workbook layout:
+      1) Summary — project + employee weekly totals (click employee → their sheet)
+      2) One sheet per employee:
+           LEFT  = full timesheet detail table
+           RIGHT = weekly analytics table + bar chart
     """
     wb = Workbook()
     summary_ws = wb.active
     summary_ws.title = "Summary"
-    grid_ws = wb.create_sheet("Month Grid")
-    tickets_ws = wb.create_sheet("Tickets")
 
     month_label = date_from.strftime("%B %Y")
     project_name = settings_obj.project_name or "Project"
     project_number = settings_obj.project_number or "—"
     week_keys = ["W1", "W2", "W3", "W4", "W5"]
-    days_in_month = calendar.monthrange(date_from.year, date_from.month)[1]
     name_by_user = _resolve_export_names(rows)
 
     project_totals = {k: 0.0 for k in week_keys}
     employee_week = defaultdict(lambda: {k: 0.0 for k in week_keys + ["MD"]})
     employee_day = defaultdict(lambda: defaultdict(float))
-    tickets = {}
+    employee_details = defaultdict(list)
+    employee_tickets = defaultdict(set)
 
     for row in rows:
-        user = row.user
-        day = row.started.date() if row.started else None
+        user = getattr(row, "user", None)
+        started = getattr(row, "started", None)
+        day = started.date() if started else None
         if not user or not day:
             continue
+
         employee_name = name_by_user.get(user.id) or (
-            f"{user.first_name} {user.last_name}".strip()
+            f"{getattr(user, 'first_name', '')} {getattr(user, 'last_name', '')}".strip()
             or getattr(user, "username", "")
+            or getattr(user, "email", "")
             or "Unknown"
         )
-        hours = _hours(row.time_spent_seconds)
+        hours = _hours(getattr(row, "time_spent_seconds", 0))
         week_key = _week_bucket(day)
+        issue_key = (getattr(row, "issue_key", None) or "").strip()
+        summary = getattr(row, "summary", None) or ""
+        comment = getattr(row, "comment", None) or ""
 
         project_totals[week_key] += hours
         employee_week[employee_name][week_key] += hours
         employee_week[employee_name]["MD"] += hours
         employee_day[employee_name][day.day] += hours
+        if issue_key:
+            employee_tickets[employee_name].add(issue_key)
 
-        ticket_key = (row.issue_key or "—", employee_name)
-        if ticket_key not in tickets:
-            tickets[ticket_key] = {
-                "ticket_no": row.issue_key or "—",
-                "description": _clip(row.summary, 70),
+        employee_details[employee_name].append(
+            {
+                "date": day,
+                "date_label": day.strftime("%d-%b-%Y"),
+                "project": project_name,
+                "project_number": project_number,
+                "hours": hours,
+                "ticket_no": issue_key or "—",
+                "ticket_description": _clip(summary, 100) or "—",
+                "details": _clip(comment, 100) or "—",
                 "responsible": employee_name,
-                "hours": 0.0,
+                "week": week_key,
             }
-        tickets[ticket_key]["hours"] += hours
-        if row.summary and not tickets[ticket_key]["description"]:
-            tickets[ticket_key]["description"] = _clip(row.summary, 70)
+        )
 
     employee_names = sorted(employee_week.keys())
     project_md = round(sum(project_totals.values()), 3)
 
+    used_titles: set[str] = {"Summary"}
+    sheet_title_by_name = {name: _safe_sheet_title(name, used_titles) for name in employee_names}
+
     # ─── Summary ─────────────────────────────────────────────────────
     summary_ws.merge_cells("A1:H1")
     summary_ws["A1"] = f"Timesheet Summary — {month_label}"
-    summary_ws["A1"].font = Font(bold=True, size=13, color="FFFFFF", name="Calibri")
+    summary_ws["A1"].font = Font(bold=True, size=14, color="FFFFFF", name="Calibri")
     summary_ws["A1"].fill = PatternFill("solid", fgColor="1E3A5F")
     summary_ws["A1"].alignment = Alignment(horizontal="left", vertical="center")
-    summary_ws.row_dimensions[1].height = 22
+    summary_ws.row_dimensions[1].height = 24
 
     summary_ws.merge_cells("A2:H2")
-    summary_ws["A2"] = f"Project: {project_name}   |   Project No: {project_number}"
+    summary_ws["A2"] = (
+        f"Project: {project_name}   |   Project No: {project_number}   |   "
+        f"Click an employee name to open their timesheet"
+    )
     summary_ws["A2"].font = Font(bold=True, size=10, color="1E3A5F", name="Calibri")
     summary_ws["A2"].fill = PatternFill("solid", fgColor="EAF3FF")
     summary_ws.row_dimensions[2].height = 18
@@ -332,8 +392,13 @@ def _build_worklog_export_workbook(*, settings_obj, rows, date_from, date_to):
         row_vals = [name] + [round(vals[k], 3) for k in week_keys] + [round(vals["MD"], 3)]
         fill = "FFFFFF" if r % 2 else "F8FBFF"
         for idx, value in enumerate(row_vals, start=1):
-            _style_cell(summary_ws.cell(r, idx, value), fill=fill, align="center" if idx >= 2 else "left")
-        summary_ws.row_dimensions[r].height = 16
+            cell = summary_ws.cell(r, idx, value)
+            _style_cell(cell, fill=fill, align="center" if idx >= 2 else "left")
+            if idx == 1:
+                title = sheet_title_by_name[name]
+                cell.hyperlink = Hyperlink(ref=cell.coordinate, location=f"'{title}'!A1")
+                cell.font = Font(bold=True, color="0563C1", underline="single", size=10, name="Calibri")
+        summary_ws.row_dimensions[r].height = 17
         r += 1
 
     total_vals = ["Total"] + [round(week_running[k], 3) for k in week_keys] + [round(week_running["MD"], 3)]
@@ -346,143 +411,225 @@ def _build_worklog_export_workbook(*, settings_obj, rows, date_from, date_to):
             align="center" if idx >= 2 else "left",
         )
 
-    _autosize(summary_ws, {"A": 28, "B": 18, "C": 8, "D": 8, "E": 8, "F": 8, "G": 8, "H": 9})
+    # Visible weekly chart panel on the right (NOT on hidden columns)
+    summary_ws.merge_cells("J4:K4")
+    summary_ws["J4"] = "Weekly Hours"
+    summary_ws["J4"].font = Font(bold=True, size=11, color="FFFFFF", name="Calibri")
+    summary_ws["J4"].fill = PatternFill("solid", fgColor="4A90E2")
+    _style_cell(summary_ws.cell(5, 10, "Week"), fill="DCEBFF", bold=True, color="1E3A5F", align="center")
+    _style_cell(summary_ws.cell(5, 11, "Hours"), fill="DCEBFF", bold=True, color="1E3A5F", align="center")
+    for i, wk in enumerate(week_keys):
+        _style_cell(summary_ws.cell(6 + i, 10, wk), fill="F8FBFF", align="center")
+        _style_cell(summary_ws.cell(6 + i, 11, round(project_totals[wk], 3)), fill="F8FBFF", align="center")
+
+    _add_weekly_bar_chart(
+        summary_ws,
+        title=f"Project Weekly Hours — {month_label}",
+        data_col=11,
+        cat_col=10,
+        header_row=5,
+        anchor="J12",
+        color="4A90E2",
+    )
+
+    _autosize(summary_ws, {"A": 28, "B": 18, "C": 9, "D": 9, "E": 9, "F": 9, "G": 9, "H": 10, "J": 10, "K": 10})
     summary_ws.freeze_panes = "A4"
     summary_ws.page_setup.orientation = "landscape"
     summary_ws.page_setup.fitToPage = True
     summary_ws.page_setup.fitToWidth = 1
     summary_ws.page_setup.fitToHeight = 1
 
-    # ─── Month Grid (1 row per employee) ─────────────────────────────
-    last_col = days_in_month + 2
-    grid_ws.merge_cells(start_row=1, start_column=1, end_row=1, end_column=last_col)
-    grid_ws["A1"] = f"Monthly Hours Grid — {month_label}  ·  {project_name} ({project_number})"
-    grid_ws["A1"].font = Font(bold=True, size=12, color="FFFFFF", name="Calibri")
-    grid_ws["A1"].fill = PatternFill("solid", fgColor="1E3A5F")
-    grid_ws["A1"].alignment = Alignment(horizontal="left", vertical="center")
-    grid_ws.row_dimensions[1].height = 22
+    detail_headers = [
+        "Date",
+        "Project",
+        "Project No.",
+        "No. of hours",
+        "Ticket no.",
+        "Ticket Description",
+        "Details",
+        "Responsible",
+    ]
 
-    _style_cell(grid_ws.cell(2, 1, "Employee"), fill="DCEBFF", bold=True, color="1E3A5F", align="center")
-    for day_num in range(1, days_in_month + 1):
-        d = date(date_from.year, date_from.month, day_num)
-        weekend = d.weekday() >= 5
-        _style_cell(
-            grid_ws.cell(2, day_num + 1, day_num),
-            fill="F3E8FF" if weekend else "DCEBFF",
-            bold=True,
-            color="1E3A5F",
-            align="center",
-            size=9,
-        )
-    _style_cell(grid_ws.cell(2, last_col, "Total"), fill="DCEBFF", bold=True, color="1E3A5F", align="center")
-
-    day_column_totals = {d: 0.0 for d in range(1, days_in_month + 1)}
-    r = 3
+    # ─── Per-employee sheets: LEFT detail | RIGHT analytics ───────────
     for name in employee_names:
-        fill = "FFFFFF" if r % 2 else "F8FBFF"
-        _style_cell(grid_ws.cell(r, 1, name), fill=fill, bold=True, align="left", size=9)
-        row_total = 0.0
-        for day_num in range(1, days_in_month + 1):
-            h = round(employee_day[name].get(day_num, 0.0), 3)
-            row_total += h
-            day_column_totals[day_num] += h
-            d = date(date_from.year, date_from.month, day_num)
-            weekend = d.weekday() >= 5
-            if h:
-                cell_fill = "F5F0FF" if weekend else "EEF6FF"
-            else:
-                cell_fill = "F8F5FF" if weekend else fill
-            cell = grid_ws.cell(r, day_num + 1, h if h else "")
-            _style_cell(cell, fill=cell_fill, align="center", size=8)
-        _style_cell(
-            grid_ws.cell(r, last_col, round(row_total, 3)),
-            fill="E8F3E8",
-            bold=True,
-            color="14532D",
-            align="center",
-            size=9,
+        title = sheet_title_by_name[name]
+        ws = wb.create_sheet(title)
+        vals = employee_week[name]
+        details = sorted(
+            employee_details.get(name, []),
+            key=lambda d: (d["date"], d.get("ticket_no") or ""),
         )
-        grid_ws.row_dimensions[r].height = 15
-        r += 1
+        days_worked = len([d for d, h in employee_day[name].items() if h > 0])
+        ticket_count = len(employee_tickets[name])
+        total_hours = round(vals["MD"], 3)
+        week_hours = [round(vals[k], 3) for k in week_keys]
+        week_entry_counts = {k: 0 for k in week_keys}
+        for item in details:
+            week_entry_counts[item["week"]] += 1
 
-    _style_cell(grid_ws.cell(r, 1, "Total"), fill="E8F3E8", bold=True, color="14532D", align="left", size=9)
-    grand = 0.0
-    for day_num in range(1, days_in_month + 1):
-        h = round(day_column_totals[day_num], 3)
-        grand += h
-        _style_cell(
-            grid_ws.cell(r, day_num + 1, h if h else ""),
-            fill="E8F3E8",
-            bold=True,
-            color="14532D",
-            align="center",
-            size=8,
-        )
-    _style_cell(
-        grid_ws.cell(r, last_col, round(grand, 3)),
-        fill="C8E6C9",
-        bold=True,
-        color="14532D",
-        align="center",
-        size=9,
-    )
+        # Full-width header
+        ws.merge_cells("A1:P1")
+        ws["A1"] = f"Timesheet Detail — {month_label}  ·  {project_name} ({project_number})"
+        ws["A1"].font = Font(bold=True, size=13, color="FFFFFF", name="Calibri")
+        ws["A1"].fill = PatternFill("solid", fgColor="1E3A5F")
+        ws["A1"].alignment = Alignment(horizontal="left", vertical="center")
+        ws.row_dimensions[1].height = 24
 
-    grid_ws.column_dimensions["A"].width = 24
-    for day_num in range(1, days_in_month + 1):
-        grid_ws.column_dimensions[grid_ws.cell(2, day_num + 1).column_letter].width = 3.6
-    grid_ws.column_dimensions[grid_ws.cell(2, last_col).column_letter].width = 8
-    grid_ws.freeze_panes = "B3"
-    grid_ws.page_setup.orientation = "landscape"
-    grid_ws.page_setup.fitToPage = True
-    grid_ws.page_setup.fitToWidth = 1
-    grid_ws.page_setup.fitToHeight = 1
-    grid_ws.print_title_rows = "1:2"
-    grid_ws.print_title_cols = "A:A"
+        ws.merge_cells("A2:H2")
+        back = ws["A2"]
+        back.value = "Back to Summary"
+        back.hyperlink = Hyperlink(ref="A2", location="'Summary'!A1")
+        back.font = Font(bold=True, color="0563C1", underline="single", size=10, name="Calibri")
+        back.fill = PatternFill("solid", fgColor="EAF3FF")
 
-    # ─── Tickets (aggregated) ────────────────────────────────────────
-    tickets_ws.merge_cells("A1:D1")
-    tickets_ws["A1"] = f"Ticket Summary — {month_label}  ·  {project_name} ({project_number})"
-    tickets_ws["A1"].font = Font(bold=True, size=12, color="FFFFFF", name="Calibri")
-    tickets_ws["A1"].fill = PatternFill("solid", fgColor="1E3A5F")
-    tickets_ws["A1"].alignment = Alignment(horizontal="left", vertical="center")
-    tickets_ws.row_dimensions[1].height = 22
+        ws.merge_cells("J2:P2")
+        ws["J2"] = f"Employee: {name}"
+        ws["J2"].font = Font(bold=True, size=10, color="1E3A5F", name="Calibri")
+        ws["J2"].fill = PatternFill("solid", fgColor="EAF3FF")
 
-    for idx, label in enumerate(["Ticket no.", "Ticket Description", "No. of hours", "Responsible"], start=1):
-        _style_cell(tickets_ws.cell(2, idx, label), fill="DCEBFF", bold=True, color="1E3A5F", align="center")
+        # LEFT — timesheet detail (starts immediately, no empty gap)
+        ws.merge_cells("A3:H3")
+        ws["A3"] = "Timesheet Entries"
+        ws["A3"].font = Font(bold=True, size=11, color="FFFFFF", name="Calibri")
+        ws["A3"].fill = PatternFill("solid", fgColor="1E3A5F")
+        ws["A3"].alignment = Alignment(horizontal="left", vertical="center")
 
-    ticket_rows = sorted(tickets.values(), key=lambda t: (-t["hours"], t["ticket_no"], t["responsible"]))
-    r = 3
-    ticket_hours_total = 0.0
-    for item in ticket_rows:
-        fill = "FFFFFF" if r % 2 else "F8FBFF"
-        hours = round(item["hours"], 3)
-        ticket_hours_total += hours
-        values = [item["ticket_no"], item["description"], hours, item["responsible"]]
-        for idx, value in enumerate(values, start=1):
+        header_row = 4
+        for idx, label in enumerate(detail_headers, start=1):
             _style_cell(
-                tickets_ws.cell(r, idx, value),
-                fill=fill,
-                align="center" if idx == 3 else "left",
+                ws.cell(header_row, idx, label),
+                fill="DCEBFF",
+                bold=True,
+                color="1E3A5F",
+                align="center",
                 size=9,
             )
-        tickets_ws.row_dimensions[r].height = 15
-        r += 1
 
-    for idx in range(1, 5):
-        cell = tickets_ws.cell(r, idx)
-        if idx == 1:
-            cell.value = "Total"
-        elif idx == 3:
-            cell.value = round(ticket_hours_total, 3)
-        _style_cell(cell, fill="E8F3E8", bold=True, color="14532D", align="center" if idx == 3 else "left")
+        detail_start = header_row + 1
+        if not details:
+            _style_cell(
+                ws.cell(detail_start, 1, "No worklog entries for this employee in the selected month."),
+                fill="FFF7ED",
+                color="9A3412",
+                align="left",
+                size=9,
+            )
+            ws.merge_cells(start_row=detail_start, start_column=1, end_row=detail_start, end_column=8)
+            total_row = detail_start + 1
+        else:
+            for row_idx, payload in enumerate(details, start=detail_start):
+                values = [
+                    payload["date_label"],
+                    payload["project"],
+                    payload["project_number"],
+                    payload["hours"],
+                    payload["ticket_no"],
+                    payload["ticket_description"],
+                    payload["details"],
+                    payload["responsible"],
+                ]
+                fill = "FFFFFF" if row_idx % 2 else "F8FBFF"
+                for col_idx, value in enumerate(values, start=1):
+                    align = "center" if col_idx in (1, 4) else "left"
+                    _style_cell(ws.cell(row_idx, col_idx, value), fill=fill, align=align, size=9)
+                ws.row_dimensions[row_idx].height = 15
+            total_row = detail_start + len(details)
 
-    _autosize(tickets_ws, {"A": 14, "B": 42, "C": 12, "D": 24})
-    tickets_ws.freeze_panes = "A3"
-    tickets_ws.auto_filter.ref = f"A2:D{max(tickets_ws.max_row, 2)}"
-    tickets_ws.page_setup.orientation = "landscape"
-    tickets_ws.page_setup.fitToPage = True
-    tickets_ws.page_setup.fitToWidth = 1
-    tickets_ws.page_setup.fitToHeight = 0
+        for idx in range(1, 9):
+            cell = ws.cell(total_row, idx)
+            if idx == 1:
+                cell.value = "Total"
+            elif idx == 4:
+                cell.value = total_hours
+            _style_cell(cell, fill="E8F3E8", bold=True, color="14532D", align="center" if idx == 4 else "left")
+
+        # RIGHT — weekly analytics + chart
+        ws.merge_cells("J3:P3")
+        ws["J3"] = "Weekly Analytics"
+        ws["J3"].font = Font(bold=True, size=11, color="FFFFFF", name="Calibri")
+        ws["J3"].fill = PatternFill("solid", fgColor="4A90E2")
+        ws["J3"].alignment = Alignment(horizontal="left", vertical="center")
+
+        meta = [
+            ("Total Hours", total_hours),
+            ("Days Worked", days_worked),
+            ("Tickets", ticket_count),
+            ("Entries", len(details)),
+            ("Avg hrs / day", round(total_hours / days_worked, 3) if days_worked else 0),
+        ]
+        for i, (label, value) in enumerate(meta):
+            _style_cell(ws.cell(4 + i, 10, label), fill="DCEBFF", bold=True, color="1E3A5F", align="left", size=9)
+            _style_cell(ws.cell(4 + i, 11, value), fill="F8FBFF", bold=True, align="center", size=10)
+
+        # Weekly breakdown table (also chart source)
+        analytics_header = 10
+        _style_cell(ws.cell(analytics_header, 10, "Week"), fill="DCEBFF", bold=True, color="1E3A5F", align="center")
+        _style_cell(ws.cell(analytics_header, 11, "Hours"), fill="DCEBFF", bold=True, color="1E3A5F", align="center")
+        _style_cell(ws.cell(analytics_header, 12, "% of month"), fill="DCEBFF", bold=True, color="1E3A5F", align="center")
+        _style_cell(ws.cell(analytics_header, 13, "Entries"), fill="DCEBFF", bold=True, color="1E3A5F", align="center")
+
+        for i, wk in enumerate(week_keys):
+            h = week_hours[i]
+            pct = round((h / total_hours) * 100, 1) if total_hours else 0
+            fill = "FFFFFF" if i % 2 == 0 else "F8FBFF"
+            _style_cell(ws.cell(analytics_header + 1 + i, 10, wk), fill=fill, align="center")
+            _style_cell(ws.cell(analytics_header + 1 + i, 11, h), fill=fill, align="center")
+            _style_cell(ws.cell(analytics_header + 1 + i, 12, f"{pct}%"), fill=fill, align="center")
+            _style_cell(
+                ws.cell(analytics_header + 1 + i, 13, week_entry_counts[wk]),
+                fill=fill,
+                align="center",
+            )
+
+        total_analytics_row = analytics_header + 6
+        _style_cell(ws.cell(total_analytics_row, 10, "MD"), fill="E8F3E8", bold=True, color="14532D", align="center")
+        _style_cell(ws.cell(total_analytics_row, 11, total_hours), fill="E8F3E8", bold=True, color="14532D", align="center")
+        _style_cell(ws.cell(total_analytics_row, 12, "100%"), fill="E8F3E8", bold=True, color="14532D", align="center")
+        _style_cell(
+            ws.cell(total_analytics_row, 13, len(details)),
+            fill="E8F3E8",
+            bold=True,
+            color="14532D",
+            align="center",
+        )
+
+        _add_weekly_bar_chart(
+            ws,
+            title=f"{name} — Weekly Hours",
+            data_col=11,
+            cat_col=10,
+            header_row=analytics_header,
+            anchor="J18",
+            color="1E3A5F",
+        )
+
+        _autosize(
+            ws,
+            {
+                "A": 12,
+                "B": 14,
+                "C": 16,
+                "D": 11,
+                "E": 12,
+                "F": 28,
+                "G": 24,
+                "H": 18,
+                "J": 14,
+                "K": 10,
+                "L": 12,
+                "M": 10,
+            },
+        )
+        ws.column_dimensions["I"].width = 3  # spacer between left/right panels
+        ws.freeze_panes = "A5"
+        if details:
+            last_data_row = max(total_row - 1, header_row)
+            ws.auto_filter.ref = f"A{header_row}:H{last_data_row}"
+        ws.page_setup.orientation = "landscape"
+        ws.page_setup.fitToPage = True
+        ws.page_setup.fitToWidth = 1
+        ws.page_setup.fitToHeight = 0
+        ws.print_title_rows = f"{header_row}:{header_row}"
 
     return wb
 

@@ -519,13 +519,19 @@ onUnmounted(() => document.removeEventListener('click', closeMonthPickerOnOutsid
   const openEditModal = (entry) => {
     editingWorklogId.value = entry.worklog_id
 
-    editIssueSearchQuery.value = `${entry.issue_key} - ${entry.summary}`
+    editWorklogForm.issue_key = entry.issue_key || ''
+    editIssueSearchQuery.value = entry.summary
+      ? `${entry.issue_key} - ${entry.summary}`
+      : (entry.issue_key || '')
     editWorklogForm.start_date = isoToDateInput(entry.started)
     editWorklogForm.start_time = isoToTimeInput(entry.started)
-    editWorklogForm.end_date = editWorklogForm.start_date
+    editWorklogForm.end_date = isoToDateInput(entry.ended) || editWorklogForm.start_date
     editWorklogForm.end_time = isoToTimeInput(entry.ended)
-    editWorklogForm.worklog_description = entry.comment || ''
-    isEditIssueSelected.value = true
+    editWorklogForm.worklog_description =
+      typeof entry.comment === 'string'
+        ? entry.comment
+        : extractCommentText(entry.comment)
+    isEditIssueSelected.value = Boolean(editWorklogForm.issue_key)
     isEditIssueDropdownOpen.value = false
 
     isEditModalOpen.value = true
@@ -657,44 +663,84 @@ onUnmounted(() => document.removeEventListener('click', closeMonthPickerOnOutsid
 
 
    const extractCommentText = (comment) => {
-  if (!comment || typeof comment !== 'object') return ''
+  if (!comment) return ''
+  if (typeof comment === 'string') return comment.trim()
+  if (typeof comment !== 'object') return ''
   return (comment.content || [])
     .flatMap(block => (block.content || []).map(node => node.text || ''))
     .join(' ')
     .trim()
 }
 
+const safeIsoFromStartedSeconds = (started, seconds) => {
+  if (!started || !seconds) return null
+  const ms = new Date(started).getTime()
+  if (Number.isNaN(ms)) return null
+  return new Date(ms + Number(seconds) * 1000).toISOString()
+}
+
+const normalizeWorklogDetail = (entry, raw = null) => {
+  const w = raw && typeof raw === 'object' ? raw : {}
+  const seconds =
+    w.timeSpentSeconds ??
+    w.time_spent_seconds ??
+    entry?.time_spent_seconds ??
+    0
+  const started = w.started || entry?.started || null
+  const ended =
+    w.ended ||
+    entry?.ended ||
+    safeIsoFromStartedSeconds(started, seconds)
+
+  const rawComment = w.comment ?? entry?.comment
+  const comment =
+    typeof rawComment === 'string'
+      ? rawComment.trim()
+      : extractCommentText(rawComment)
+
+  return {
+    issue_key: w.issue_key || entry?.issue_key || '',
+    summary: w.summary || entry?.summary || '',
+    worklog_id: w.worklog_id || w.id || entry?.worklog_id || '',
+    time_spent: w.timeSpent || w.time_spent || entry?.time_spent || '',
+    time_spent_seconds: Number(seconds) || 0,
+    started,
+    ended,
+    comment: comment || '',
+    source: w.source || entry?.source || '',
+  }
+}
+
 const openViewModal = async (entry) => {
+  if (!entry) return
+
+  isViewModalOpen.value = true
   isLoadingWorklog.value = true
+  // Show calendar row immediately so the modal never looks empty on API mismatch
+  selectedViewWorklog.value = normalizeWorklogDetail(entry)
 
   try {
+    if (!entry.worklog_id) return
+
     const response = await worklogStore.getWorklog(
       entry.worklog_id,
       entry.issue_key
     )
-    const w = response.data
-
-    const ended = w.started
-      ? new Date(new Date(w.started).getTime() + w.timeSpentSeconds * 1000).toISOString()
-      : null
-
-    selectedViewWorklog.value = {
-      issue_key: entry.issue_key,
-      summary: entry.summary || '',
-      worklog_id: w.id,
-      time_spent: w.timeSpent,
-      time_spent_seconds: w.timeSpentSeconds,
-      started: w.started,
-      ended,
-      comment: extractCommentText(w.comment),
+    // Store returns axios body: { success, data } or nested shapes
+    const payload = response?.data?.data || response?.data || response
+    if (payload && typeof payload === 'object') {
+      selectedViewWorklog.value = normalizeWorklogDetail(entry, payload)
     }
-
-    isViewModalOpen.value = true
   } catch (error) {
-    showToast(
-      error?.response?.data?.message || "Failed to load worklog.",
-      "error"
-    )
+    // Keep calendar fallback; only toast if we have nothing useful
+    console.warn('Worklog detail fetch failed, using list data', error)
+    if (!selectedViewWorklog.value?.worklog_id) {
+      showToast(
+        error?.response?.data?.message || 'Failed to load worklog.',
+        'error'
+      )
+      isViewModalOpen.value = false
+    }
   } finally {
     isLoadingWorklog.value = false
   }

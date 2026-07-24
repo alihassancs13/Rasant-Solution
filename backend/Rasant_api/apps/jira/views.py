@@ -1192,6 +1192,8 @@ def get_worklog_view(request, worklog_id):
     user = request.user
 
     local = Worklog.objects.filter(user=user, worklog_id=worklog_id).first()
+    if not local and str(worklog_id).isdigit():
+        local = Worklog.objects.filter(user=user, pk=int(worklog_id)).first()
     if local:
         return Response(
             {

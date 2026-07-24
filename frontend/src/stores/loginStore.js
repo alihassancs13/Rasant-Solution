@@ -70,6 +70,8 @@ export const useLoginStore = defineStore('login', {
                     const { access_token, refresh_token, user } = data;
                     this.setTokens(access_token, refresh_token);
                     this.setUser(user);
+                    // Hydrate sidebar once from login payload — avoids remount refetch
+                    useSidebarStore().setModulesFromLogin(data);
                     const policyStore = usePolicyStore();
                     policyStore.checkInsuranceRenewals();
                     return { success: true, user, message: message || 'Login successful' };

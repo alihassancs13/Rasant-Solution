@@ -156,36 +156,47 @@ def get_user_modules(request):
     Get all modules for the logged-in user based on their role.
     Nesting (e.g. Employees children) is prepared on the backend.
     """
-    from .employee_access import (
-        build_sidebar_modules_for_role,
-        ensure_employee_modules,
-        ensure_user_is_employee,
-    )
+    empty = {"modules": [], "account_modules": [], "project_modules": []}
+    try:
+        from .employee_access import (
+            build_sidebar_modules_for_role,
+            ensure_admin_leave_module,
+            ensure_employee_modules,
+            ensure_user_is_employee,
+        )
 
-    user = request.user
-    if not user.role:
+        user = request.user
+        role = getattr(user, "role", None)
+        if not role:
+            return Response({
+                "status": True,
+                "message": "No role assigned",
+                "data": empty,
+            })
+
+        try:
+            role_name = (role.name or "").lower()
+            if role_name == "employee":
+                ensure_user_is_employee(user)
+            else:
+                ensure_employee_modules()
+                ensure_admin_leave_module()
+        except Exception as sync_err:
+            print(f"Module sync on get_user_modules failed: {sync_err}")
+
+        payload = build_sidebar_modules_for_role(role)
         return Response({
             "status": True,
-            "message": "No role assigned",
-            "data": {"modules": [], "account_modules": [], "project_modules": []},
+            "message": "Modules fetched successfully",
+            "data": payload,
         })
-
-    try:
-        role_name = (user.role.name or "").lower()
-        if role_name == "employee":
-            ensure_user_is_employee(user)
-        else:
-            ensure_employee_modules()
-    except Exception as sync_err:
-        print(f"Module sync on get_user_modules failed: {sync_err}")
-
-    payload = build_sidebar_modules_for_role(user.role)
-
-    return Response({
-        "status": True,
-        "message": "Modules fetched successfully",
-        "data": payload,
-    })
+    except Exception as exc:
+        print(f"get_user_modules failed: {exc}")
+        return Response({
+            "status": False,
+            "message": f"Failed to load modules: {exc}",
+            "data": empty,
+        }, status=status.HTTP_200_OK)
 
 
 @api_view(['POST', 'GET'])
@@ -459,128 +470,166 @@ def get_user_avatar(request, user_id):
         return Response({'error': 'User not found'}, status=404)
     if not user.avatar:
         return Response({'error': 'No avatar set'}, status=404)
-    return HttpResponse(bytes(user.avatar), content_type=user.avatar_content_type or 'image/png')
+    try:
+        raw = user.avatar
+        if isinstance(raw, memoryview):
+            data = raw.tobytes()
+        elif isinstance(raw, (bytes, bytearray)):
+            data = bytes(raw)
+        else:
+            data = bytes(raw)
+    except Exception as exc:
+        print(f'get_user_avatar encode failed: {exc}')
+        return Response({'error': 'Avatar could not be read.'}, status=500)
+    response = HttpResponse(data, content_type=user.avatar_content_type or 'image/png')
+    response['Cache-Control'] = 'private, max-age=300'
+    return response
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def admin_overview_stats(request):
     """Aggregate stats for the admin Overview dashboard."""
-    role_name = (request.user.role.name if request.user.role else '') or ''
-    if role_name.lower() not in ('admin', 'administrator') and not (request.user.is_superuser or request.user.is_staff):
-        return Response({'status': False, 'message': 'Admin access required.'}, status=403)
+    try:
+        role_name = (request.user.role.name if request.user.role else '') or ''
+        if role_name.lower() not in ('admin', 'administrator') and not (request.user.is_superuser or request.user.is_staff):
+            return Response({'status': False, 'message': 'Admin access required.'}, status=403)
 
-    from datetime import date, timedelta
-    from employeeDashboard.models import Employee, JobOpening, CVSubmission, Attendance, DailyWorkUpdate
-    from jira.models import JiraCredential
-    from jira.services import fetch_worklogs_for_range
+        from datetime import date, timedelta
+        from django.db import DatabaseError
+        from employeeDashboard.models import Employee, JobOpening, CVSubmission, Attendance
 
-    today = date.today()
-    month_start = today.replace(day=1)
+        today = date.today()
+        month_start = today.replace(day=1)
 
-    total_employees = Employee.objects.count()
-    active_employees = Employee.objects.filter(is_active=True).count()
-    inactive_employees = total_employees - active_employees
+        total_employees = Employee.objects.count()
+        active_employees = Employee.objects.filter(is_active=True).count()
+        inactive_employees = total_employees - active_employees
 
-    open_jobs = JobOpening.objects.filter(status__name__iexact='Published').count()
-    draft_jobs = JobOpening.objects.filter(status__name__iexact='Draft').count()
-    new_cvs = CVSubmission.objects.filter(application_status_id=1).count()
-    total_inquiries = ContactMessage.objects.count()
-    recent_inquiries = ContactMessage.objects.filter(
-        created_at__date__gte=today - timedelta(days=7)
-    ).count()
-
-    attendance_today = Attendance.objects.filter(date=today)
-    present_today = attendance_today.filter(status='present').count()
-    late_today = attendance_today.filter(status='late').count()
-    absent_today = attendance_today.filter(status='absent').count()
-
-    # Live Jira totals for current month (same source as Worklog Analytics)
-    worklog_seconds = 0
-    worklog_entries = 0
-    for cred in JiraCredential.objects.select_related('auth_user_id').exclude(
-        domain__isnull=True
-    ).exclude(domain='').exclude(api_token__isnull=True).exclude(api_token=''):
-        user = cred.auth_user_id
-        if not user or not cred.email:
-            continue
         try:
-            entries = fetch_worklogs_for_range(user, month_start, today)
-            worklog_entries += len(entries)
-            worklog_seconds += sum(int(e.get('time_spent_seconds') or 0) for e in entries)
-        except Exception:
-            continue
-    worklog_hours = round(worklog_seconds / 3600, 1)
+            open_jobs = JobOpening.objects.filter(status__name__iexact='Published').count()
+            draft_jobs = JobOpening.objects.filter(status__name__iexact='Draft').count()
+        except DatabaseError:
+            open_jobs = draft_jobs = 0
 
-    today_work_updates = []
-    for row in (
-        DailyWorkUpdate.objects.filter(date=today)
-        .select_related('employee')
-        .order_by('-updated_at')[:50]
-    ):
-        emp = row.employee
-        today_work_updates.append({
-            'id': row.id,
-            'employee_id': emp.id,
-            'name': emp.name,
-            'department': emp.department or '',
-            'designation': emp.designation or '',
-            'note': row.note,
-            'updated_at': row.updated_at.isoformat() if row.updated_at else None,
+        try:
+            new_cvs = CVSubmission.objects.filter(application_status_id=1).count()
+        except DatabaseError:
+            new_cvs = 0
+
+        total_inquiries = ContactMessage.objects.count()
+        recent_inquiries = ContactMessage.objects.filter(
+            created_at__date__gte=today - timedelta(days=7)
+        ).count()
+
+        try:
+            attendance_today = Attendance.objects.filter(date=today)
+            present_today = attendance_today.filter(status='present').count()
+            late_today = attendance_today.filter(status='late').count()
+            absent_today = attendance_today.filter(status='absent').count()
+        except DatabaseError:
+            present_today = late_today = absent_today = 0
+
+        # Prefer local synced worklogs (fast / reliable). Fall back to 0 on schema issues.
+        worklog_seconds = 0
+        worklog_entries = 0
+        try:
+            from jira.models import Worklog
+            from django.db.models import Sum, Count
+            from datetime import datetime, time as dtime, timezone as dt_tz
+
+            start_dt = datetime.combine(month_start, dtime.min, tzinfo=dt_tz.utc)
+            end_dt = datetime.combine(today, dtime.max, tzinfo=dt_tz.utc)
+            agg = Worklog.objects.filter(started__gte=start_dt, started__lte=end_dt).aggregate(
+                total_seconds=Sum('time_spent_seconds'),
+                total_entries=Count('id'),
+            )
+            worklog_seconds = int(agg.get('total_seconds') or 0)
+            worklog_entries = int(agg.get('total_entries') or 0)
+        except Exception as wl_err:
+            print(f'overview worklog aggregate failed: {wl_err}')
+
+        worklog_hours = round(worklog_seconds / 3600, 1)
+
+        today_work_updates = []
+        try:
+            from employeeDashboard.models import DailyWorkUpdate
+            for row in (
+                DailyWorkUpdate.objects.filter(date=today)
+                .select_related('employee')
+                .order_by('-updated_at')[:50]
+            ):
+                emp = row.employee
+                today_work_updates.append({
+                    'id': row.id,
+                    'employee_id': emp.id,
+                    'name': emp.name,
+                    'department': emp.department or '',
+                    'designation': emp.designation or '',
+                    'note': row.note,
+                    'updated_at': row.updated_at.isoformat() if row.updated_at else None,
+                })
+        except Exception as upd_err:
+            print(f'overview daily work updates failed: {upd_err}')
+
+        recent_employees = list(
+            Employee.objects.order_by('-created_at')[:5].values(
+                'id', 'name', 'email', 'department', 'designation', 'is_active', 'created_at'
+            )
+        )
+        for row in recent_employees:
+            if row.get('created_at'):
+                row['created_at'] = row['created_at'].isoformat()
+
+        recent_messages = list(
+            ContactMessage.objects.order_by('-created_at')[:5].values(
+                'id', 'full_name', 'email', 'message', 'created_at'
+            )
+        )
+        for row in recent_messages:
+            if row.get('created_at'):
+                row['created_at'] = row['created_at'].isoformat()
+            if row.get('message') and len(row['message']) > 120:
+                row['message'] = row['message'][:120] + '…'
+
+        return Response({
+            'status': True,
+            'data': {
+                'employees': {
+                    'total': total_employees,
+                    'active': active_employees,
+                    'inactive': inactive_employees,
+                },
+                'hiring': {
+                    'published_jobs': open_jobs,
+                    'draft_jobs': draft_jobs,
+                    'new_cvs': new_cvs,
+                },
+                'inquiries': {
+                    'total': total_inquiries,
+                    'last_7_days': recent_inquiries,
+                },
+                'attendance_today': {
+                    'present': present_today,
+                    'late': late_today,
+                    'absent': absent_today,
+                },
+                'worklogs_month': {
+                    'hours': worklog_hours,
+                    'entries': worklog_entries,
+                },
+                'today_work_updates': today_work_updates,
+                'today_work_updates_count': len(today_work_updates),
+                'recent_employees': recent_employees,
+                'recent_inquiries': recent_messages,
+            },
         })
-
-    recent_employees = list(
-        Employee.objects.order_by('-created_at')[:5].values(
-            'id', 'name', 'email', 'department', 'designation', 'is_active', 'created_at'
+    except Exception as exc:
+        print(f'admin_overview_stats failed: {exc}')
+        return Response(
+            {'status': False, 'message': f'Failed to load overview stats: {exc}', 'data': {}},
+            status=status.HTTP_200_OK,
         )
-    )
-    for row in recent_employees:
-        if row.get('created_at'):
-            row['created_at'] = row['created_at'].isoformat()
-
-    recent_messages = list(
-        ContactMessage.objects.order_by('-created_at')[:5].values(
-            'id', 'full_name', 'email', 'message', 'created_at'
-        )
-    )
-    for row in recent_messages:
-        if row.get('created_at'):
-            row['created_at'] = row['created_at'].isoformat()
-        if row.get('message') and len(row['message']) > 120:
-            row['message'] = row['message'][:120] + '…'
-
-    return Response({
-        'status': True,
-        'data': {
-            'employees': {
-                'total': total_employees,
-                'active': active_employees,
-                'inactive': inactive_employees,
-            },
-            'hiring': {
-                'published_jobs': open_jobs,
-                'draft_jobs': draft_jobs,
-                'new_cvs': new_cvs,
-            },
-            'inquiries': {
-                'total': total_inquiries,
-                'last_7_days': recent_inquiries,
-            },
-            'attendance_today': {
-                'present': present_today,
-                'late': late_today,
-                'absent': absent_today,
-            },
-            'worklogs_month': {
-                'hours': worklog_hours,
-                'entries': worklog_entries,
-            },
-            'today_work_updates': today_work_updates,
-            'today_work_updates_count': len(today_work_updates),
-            'recent_employees': recent_employees,
-            'recent_inquiries': recent_messages,
-        },
-    })
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -723,31 +772,101 @@ def password_setup_confirm(request, token):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def notification_list(request):
-    from .models import Notification
-    from .notifications import serialize_notification
+    from django.db import DatabaseError
 
-    qs = Notification.objects.filter(recipient=request.user).order_by('-created_at')[:50]
-    unread = Notification.objects.filter(recipient=request.user, is_read=False).count()
-    return Response({
-        'success': True,
-        'unread_count': unread,
-        'notifications': [serialize_notification(n) for n in qs],
-    })
+    try:
+        from .models import Notification
+        from .notifications import serialize_notification
+
+        qs = Notification.objects.filter(recipient=request.user).order_by('-created_at')[:50]
+        unread = Notification.objects.filter(recipient=request.user, is_read=False).count()
+        return Response({
+            'success': True,
+            'unread_count': unread,
+            'notifications': [serialize_notification(n) for n in qs],
+        })
+    except DatabaseError as exc:
+        print(f'notification_list DB error: {exc}')
+        return Response({
+            'success': False,
+            'unread_count': 0,
+            'notifications': [],
+            'error': 'Notifications table missing. Run: python manage.py migrate accounts',
+        }, status=status.HTTP_200_OK)
+    except Exception as exc:
+        print(f'notification_list failed: {exc}')
+        return Response({
+            'success': False,
+            'unread_count': 0,
+            'notifications': [],
+            'error': str(exc),
+        }, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def notification_mark_read(request):
+    from django.db import DatabaseError
     from .models import Notification
 
     ids = request.data.get('ids') or []
     mark_all = bool(request.data.get('mark_all'))
-    qs = Notification.objects.filter(recipient=request.user, is_read=False)
-    if mark_all:
-        updated = qs.update(is_read=True)
-    else:
-        if not isinstance(ids, (list, tuple)):
-            return Response({'error': 'ids must be a list.'}, status=status.HTTP_400_BAD_REQUEST)
-        updated = qs.filter(id__in=ids).update(is_read=True)
-    unread = Notification.objects.filter(recipient=request.user, is_read=False).count()
-    return Response({'success': True, 'updated': updated, 'unread_count': unread})
+    try:
+        qs = Notification.objects.filter(recipient=request.user, is_read=False)
+        if mark_all:
+            updated = qs.update(is_read=True)
+        else:
+            if not isinstance(ids, (list, tuple)):
+                return Response({'error': 'ids must be a list.'}, status=status.HTTP_400_BAD_REQUEST)
+            updated = qs.filter(id__in=ids).update(is_read=True)
+        unread = Notification.objects.filter(recipient=request.user, is_read=False).count()
+        return Response({'success': True, 'updated': updated, 'unread_count': unread})
+    except DatabaseError as exc:
+        print(f'notification_mark_read DB error: {exc}')
+        return Response({
+            'success': False,
+            'updated': 0,
+            'unread_count': 0,
+            'error': 'Notifications table missing. Run migrate accounts.',
+        }, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def notification_clear(request):
+    """
+    Delete notifications for the current user.
+    Body:
+      - clear_all: true  → delete every notification
+      - ids: [1,2,…]     → delete specific ids
+      - read_only: true  → delete only already-read notifications
+    Default (no flags): delete all notifications for the user.
+    """
+    from django.db import DatabaseError
+    from .models import Notification
+
+    try:
+        qs = Notification.objects.filter(recipient=request.user)
+        ids = request.data.get('ids')
+        clear_all = request.data.get('clear_all', None)
+        read_only = bool(request.data.get('read_only'))
+
+        if isinstance(ids, (list, tuple)) and len(ids) > 0:
+            qs = qs.filter(id__in=ids)
+        elif read_only:
+            qs = qs.filter(is_read=True)
+        elif clear_all is False and not read_only:
+            # explicit false with no ids → nothing to do
+            return Response({'success': True, 'deleted': 0, 'unread_count': qs.filter(is_read=False).count()})
+
+        deleted, _ = qs.delete()
+        unread = Notification.objects.filter(recipient=request.user, is_read=False).count()
+        return Response({'success': True, 'deleted': deleted, 'unread_count': unread})
+    except DatabaseError as exc:
+        print(f'notification_clear DB error: {exc}')
+        return Response({
+            'success': False,
+            'deleted': 0,
+            'unread_count': 0,
+            'error': 'Notifications table missing. Run migrate accounts.',
+        }, status=status.HTTP_200_OK)

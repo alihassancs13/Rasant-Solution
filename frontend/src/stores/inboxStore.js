@@ -24,6 +24,8 @@ export const useInboxStore = defineStore('inbox', {
         eventSource: null,
         sseConnected: false,
         userAvatars: {},
+        conversationsFetchedAt: 0,
+        _conversationsInflight: null,
     }),
 
     getters: {
@@ -33,15 +35,34 @@ export const useInboxStore = defineStore('inbox', {
     },
 
     actions: {
-        async fetchConversations() {
-            this.loadingConversations = true;
-            try {
-                const response = await apiClient.get(API_ENDPOINTS.INBOX_LIST_CONVERSATIONS);
-                this.conversations = response.data;
-                return response.data;
-            } finally {
-                this.loadingConversations = false;
+        async fetchConversations(opts = {}) {
+            const force = Boolean(opts.force);
+            const TTL = 60 * 1000; // badge can stay a minute without refetch
+            const fresh =
+                this.conversationsFetchedAt &&
+                Date.now() - this.conversationsFetchedAt < TTL;
+
+            if (!force && fresh) {
+                return this.conversations;
             }
+            if (this._conversationsInflight) {
+                return this._conversationsInflight;
+            }
+
+            this.loadingConversations = this.conversations.length === 0;
+            this._conversationsInflight = (async () => {
+                try {
+                    const response = await apiClient.get(API_ENDPOINTS.INBOX_LIST_CONVERSATIONS);
+                    this.conversations = response.data;
+                    this.conversationsFetchedAt = Date.now();
+                    return response.data;
+                } finally {
+                    this.loadingConversations = false;
+                    this._conversationsInflight = null;
+                }
+            })();
+
+            return this._conversationsInflight;
         },
 
         async createDirectConversation(receiverId) {
