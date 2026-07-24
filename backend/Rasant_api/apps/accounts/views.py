@@ -16,9 +16,13 @@ from .serializer import (
     EmailSettingsSerializer,
 )
 from django.http import HttpResponse
+from .models import User, Module,ContactMessage ,InquiryStatus
+from .serializer import LoginSerializer, UserSerializer,ContactMessageSerializer
+from django.http import  HttpResponse
 from employeeDashboard.models import Employee
-from .email_service import send_test_email
-
+from django.core.mail import send_mail
+from django.conf import settings
+from .email_service import send_test_email, send_inquiry_reply_email
 
 def _is_admin(user):
     role_name = (user.role.name if user.role else '').lower()
@@ -214,6 +218,17 @@ def contact_message_view(request):
         serializer = ContactMessageSerializer(messages, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_inquiry(request, pk):
+    try:
+        inquiry = ContactMessage.objects.get(pk=pk)
+    except ContactMessage.DoesNotExist:
+        return Response({'error': 'Inquiry not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    inquiry.delete()
+    return Response({'status': True, 'message': 'Inquiry deleted successfully.'}, status=status.HTTP_200_OK)
+
 
 @api_view(['GET', 'PATCH'])
 @permission_classes([IsAuthenticated])
@@ -365,6 +380,59 @@ def test_email_settings(request):
             status=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
+
+@api_view(['PATCH'])
+@permission_classes([IsAuthenticated])
+def update_inquiry_status(request, pk):
+    try:
+        inquiry = ContactMessage.objects.get(pk=pk)
+    except ContactMessage.DoesNotExist:
+        return Response({'error': 'Inquiry not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    code = request.data.get('status')
+    try:
+        new_status = InquiryStatus.objects.get(code=code)
+    except InquiryStatus.DoesNotExist:
+        return Response({'error': f"Invalid status '{code}'."}, status=status.HTTP_400_BAD_REQUEST)
+
+    inquiry.status = new_status
+    inquiry.save(update_fields=['status'])
+
+    return Response(ContactMessageSerializer(inquiry).data, status=status.HTTP_200_OK)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def send_inquiry_reply(request, pk):
+    try:
+        inquiry = ContactMessage.objects.get(pk=pk)
+    except ContactMessage.DoesNotExist:
+        return Response({'error': 'Inquiry not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+    body = (request.data.get('body') or '').strip()
+    subject = (request.data.get('subject') or '').strip() or "Re: Your inquiry to Rasant Solutions"
+
+    if not body:
+        return Response({'error': 'Reply body is required.'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        send_inquiry_reply_email(inquiry, subject, body)
+    except Exception as e:
+        return Response(
+            {'error': f'Failed to send email: {str(e)}'},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+    replied_status, _ = InquiryStatus.objects.get_or_create(code='replied', defaults={'name': 'Replied'})
+    inquiry.status = replied_status
+    inquiry.save(update_fields=['status'])
+
+    return Response(ContactMessageSerializer(inquiry).data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_inquiry_statuses(request):
+    statuses = InquiryStatus.objects.all().values('id', 'code', 'name')
+    return Response({'status': True, 'data': list(statuses)}, status=status.HTTP_200_OK)
 
 @api_view(['POST'])
 @parser_classes([MultiPartParser, FormParser])

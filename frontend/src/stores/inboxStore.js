@@ -59,13 +59,39 @@ export const useInboxStore = defineStore('inbox', {
             return response.data;
         },
 
-        async sendMessage(conversationId, content) {
+        async sendMessage(conversationId, content, files = []) {
+            if (files.length) {
+                const formData = new FormData();
+                formData.append('conversation_id', conversationId);
+                formData.append('content', content || '');
+                files.forEach((file) => formData.append('files', file));
+
+                const response = await apiClient.post(API_ENDPOINTS.INBOX_SEND_MESSAGE, formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                });
+                return response.data;
+            }
+
             const response = await apiClient.post(API_ENDPOINTS.INBOX_SEND_MESSAGE, {
                 conversation_id: conversationId,
                 content,
             });
             return response.data;
         },
+
+        async fetchAttachmentBlob(attachmentId) {
+            try {
+                const response = await apiClient.get(
+                    API_ENDPOINTS.INBOX_GET_ATTACHMENT(attachmentId),
+                    { responseType: 'blob' }
+                );
+                return { blob: response.data, url: URL.createObjectURL(response.data) };
+            } catch (err) {
+                console.error('Failed to fetch attachment:', err);
+                return null;
+            }
+        },
+
 
         async fetchContacts() {
             const response = await apiClient.get(API_ENDPOINTS.INBOX_LIST_USERS);

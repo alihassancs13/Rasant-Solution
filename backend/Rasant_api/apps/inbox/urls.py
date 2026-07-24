@@ -18,4 +18,5 @@ urlpatterns = [
     path('conversations/<int:conversation_id>/avatar/image/', views.get_group_avatar, name='get-group-avatar'),
     path('conversations/<int:conversation_id>/leave/', views.leave_group, name='leave-group'),
     path('conversations/<int:conversation_id>/add-members/', views.add_group_members, name='add-group-members'),
+    path('messages/attachments/<int:attachment_id>/', views.get_attachment, name='get-attachment'),
 ]

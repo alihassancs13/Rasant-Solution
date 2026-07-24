@@ -98,6 +98,12 @@ import {
   faChartBar,
   faUserPlus,
   faBuilding,
+    faPaperclip,
+    faFile,
+    faFileVideo,
+    faFileAudio,
+    faCirclePlay,
+
 } from '@fortawesome/free-solid-svg-icons'
 
 import {
@@ -248,4 +254,9 @@ library.add(
     faChartBar,
     faUserPlus,
     faBuilding,
+    faPaperclip,
+    faFile,
+    faFileVideo,
+    faFileAudio,
+    faCirclePlay,
 )

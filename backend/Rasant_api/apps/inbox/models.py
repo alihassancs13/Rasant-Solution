@@ -114,7 +114,7 @@ class Message(models.Model):
         on_delete=models.CASCADE,
         related_name='sent_messages',
     )
-    content = models.TextField()
+    content = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     deleted_for_everyone = models.BooleanField(default=False)
 
@@ -195,3 +195,45 @@ class MessageDeleteFor(models.Model):
 
     def __str__(self):
         return f'Msg #{self.message_id} hidden for {self.user_id}'
+
+class MessageAttachment(models.Model):
+
+    MEDIA_TYPE_CHOICES = (
+        ('image', 'Image'),
+        ('video', 'Video'),
+        ('audio', 'Audio'),
+        ('document', 'Document'),
+    )
+
+    message = models.ForeignKey(
+        Message,
+        on_delete=models.CASCADE,
+        related_name='attachments',
+    )
+    file_data = models.BinaryField()
+    file_name = models.CharField(max_length=255)
+    content_type = models.CharField(max_length=100)
+    media_type = models.CharField(max_length=10, choices=MEDIA_TYPE_CHOICES)
+    file_size = models.PositiveIntegerField()
+    thumbnail_data = models.BinaryField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'message_attachments'
+        ordering = ['id']
+        indexes = [
+            models.Index(fields=['message']),
+        ]
+
+    def __str__(self):
+        return f'Attachment #{self.pk} ({self.file_name}) on Msg #{self.message_id}'
+
+    @staticmethod
+    def detect_media_type(content_type):
+        if content_type.startswith('image/'):
+            return 'image'
+        if content_type.startswith('video/'):
+            return 'video'
+        if content_type.startswith('audio/'):
+            return 'audio'
+        return 'document'

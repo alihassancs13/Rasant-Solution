@@ -9,7 +9,7 @@ import {
   historyChips,
   COLUMN_LABELS,
   attendanceBarClass,
-} from '@/composables/useAttendance'
+} from '@/composables/useAttendance.js'
 import BaseModal from '@/components/baseModal.vue'
 import BaseDetailModal from '@/components/baseDetailModal.vue'
 

@@ -1,7 +1,7 @@
 <script setup>
 import AppHeader from '../../../components/header.vue'
 import AdminSidebar from '@/components/adminSidebar.vue'
-import { useInboxPage } from '../../../composables/useInboxPage.js'
+import { useInboxPage } from '@/composables/useInboxPage.js'
 
 const {
   isLoading, threads, contacts, activeThreadId, searchQuery, messageText, mobileChatOpen, messagesContainer,
@@ -24,6 +24,8 @@ const {
   openAddMembersPanel, closeAddMembersPanel, toggleNewMemberSelection, isNewMemberSelected, submitAddMembers,
   requestLeaveGroup, activeGroupMembers,
   myAvatar, uploadingMyAvatar, myAvatarInput, triggerMyAvatarUpload, handleMyAvatarChange,
+  selectedFiles, attachFileInput, triggerFileAttach, handleFilesSelected,
+  removeSelectedFile, clearSelectedFiles, attachmentAction, loadAttachmentUrl,lightboxImage, closeImageLightbox, downloadLightboxImage,
 
 } = useInboxPage()
 </script>
@@ -203,9 +205,55 @@ const {
                          @contextmenu="openContextMenu($event, msg, activeThread.id)"
                          @touchstart="handleTouchStart($event, msg, activeThread.id)"
                          @touchmove="handleTouchMove($event)" @touchend="handleTouchEnd($event)">
-                      <span :class="msg.deletedForEveryone ? (msg.fromMe ? 'italic text-white/70' : 'italic text-text-muted') : ''">
-                        <i v-if="msg.deletedForEveryone" class="fa-solid fa-ban mr-1 text-[11px]"></i>{{ msg.text }}
-                      </span>
+                      <p v-if="msg.deletedForEveryone" class="italic opacity-70">
+                        <i class="fa-solid fa-ban mr-1 text-[11px]"></i> This message was deleted
+                      </p>
+                      <p v-else-if="msg.text" class="whitespace-pre-wrap break-words">{{ msg.text }}</p>
+                      <div v-if="msg.attachments?.length && !msg.deletedForEveryone" class="mt-1.5 space-y-1.5">
+                        <div v-for="att in msg.attachments" :key="att.id">
+                          <!-- Image -->
+                          <div v-if="att.media_type === 'image'" class="overflow-hidden rounded-lg cursor-pointer" @click="attachmentAction(att)">
+                            <img v-if="att.url" :src="att.url" class="max-h-64 w-full object-cover" />
+                            <div v-else class="flex h-32 w-48 items-center justify-center bg-black/10">
+                              <font-awesome-icon :icon="['fas', 'spinner']" spin class="text-[18px]" :class="msg.fromMe ? 'text-white/80' : 'text-text-muted'" />
+                            </div>
+                          </div>
+
+                          <!-- Video -->
+                          <div v-else-if="att.media_type === 'video'" class="overflow-hidden rounded-lg">
+                            <video v-if="att.url" :src="att.url" controls class="max-h-64 w-full rounded-lg"></video>
+                            <button v-else type="button" @click="loadAttachmentUrl(att)"
+                                    class="flex h-32 w-48 items-center justify-center rounded-lg bg-black/10 cursor-pointer">
+                              <font-awesome-icon :icon="['fas', att.loading ? 'spinner' : 'circle-play']" :spin="att.loading" class="text-[20px]" :class="msg.fromMe ? 'text-white/80' : 'text-text-muted'" />
+                            </button>
+                          </div>
+
+                          <!-- Audio -->
+                          <div v-else-if="att.media_type === 'audio'" class="w-85">
+                            <audio v-if="att.url" :src="att.url" controls class="w-full"></audio>
+                            <button v-else type="button" @click="loadAttachmentUrl(att)"
+                                    class="flex w-full items-center gap-2 rounded-lg px-3 py-2 cursor-pointer"
+                                    :class="msg.fromMe ? 'bg-white/15 text-white' : 'bg-surface-alt text-text-primary'">
+                              <font-awesome-icon :icon="['fas', att.loading ? 'spinner' : 'circle-play']" :spin="att.loading" class="text-[16px]" />
+                              <span class="truncate text-xs">{{ att.file_name }}</span>
+                            </button>
+                          </div>
+
+                          <!-- Document (catch-all: zip, exe, sql, pdf, etc.) -->
+                          <button v-else type="button" @click="attachmentAction(att)"
+                                  class="flex w-56 items-center gap-2.5 rounded-lg px-3 py-2.5 cursor-pointer"
+                                  :class="msg.fromMe ? 'bg-white/15 text-white hover:bg-white/20' : 'bg-surface-alt text-text-primary hover:bg-surface'">
+                            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg" :class="msg.fromMe ? 'bg-white/20' : 'bg-primary/10 text-primary'">
+                              <font-awesome-icon :icon="['fas', att.loading ? 'spinner' : 'file']" :spin="att.loading" class="text-[16px]" />
+                            </div>
+                            <div class="min-w-0 flex-1 text-left">
+                              <p class="truncate text-xs font-medium">{{ att.file_name }}</p>
+                              <p class="text-[10px] opacity-70">{{ (att.file_size / 1024).toFixed(0) }} KB</p>
+                            </div>
+                            <font-awesome-icon :icon="['fas', 'download']" class="text-[12px] shrink-0 opacity-70" />
+                          </button>
+                        </div>
+                      </div>
                       <div class="mt-1 flex items-center justify-end gap-1 text-[10px]" :class="msg.fromMe ? 'text-white/70' : 'text-text-muted'">
                         <span>{{ formatBubbleTime(msg.timestamp) }}</span>
                         <i v-if="msg.fromMe && !msg.deletedForEveryone" class="text-[12px] leading-none"
@@ -216,11 +264,31 @@ const {
                   <div v-if="!activeThread.messages.length" class="flex h-full items-center justify-center text-sm text-text-muted">No messages yet</div>
                 </div>
 
-                <form @submit.prevent="sendMessage" class="flex items-center gap-2 border-t border-border bg-card px-3 py-3">
+                <!-- Selected files preview strip -->
+                <div v-if="selectedFiles.length" class="flex items-center gap-2 overflow-x-auto border-t border-border bg-card px-3 pt-3">
+                  <div v-for="f in selectedFiles" :key="f.id" class="relative flex shrink-0 items-center gap-2 rounded-xl border border-border bg-surface-alt px-2 py-1.5">
+                    <img v-if="f.mediaType === 'image'" :src="f.previewUrl" class="h-10 w-10 shrink-0 rounded-lg object-cover" />
+                    <div v-else class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                      <font-awesome-icon :icon="['fas', f.mediaType === 'video' ? 'file-video' : f.mediaType === 'audio' ? 'file-audio' : 'file']" class="text-[16px]" />
+                    </div>
+                    <span class="max-w-[100px] truncate text-xs text-text-secondary">{{ f.file.name }}</span>
+                    <button type="button" @click="removeSelectedFile(f.id)" aria-label="Remove file"
+                            class="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-text-muted/20 text-text-secondary hover:bg-danger/20 hover:text-danger cursor-pointer">
+                      <font-awesome-icon :icon="['fas', 'xmark']" class="text-[10px]" />
+                    </button>
+                  </div>
+                </div>
+
+                <form @submit.prevent="sendMessage" class="flex items-center gap-2 border-t border-border bg-card px-3 py-3" :class="selectedFiles.length && 'border-t-0'">
+                  <input ref="attachFileInput" type="file" multiple class="hidden" @change="handleFilesSelected" />
+                  <button type="button" @click="triggerFileAttach" aria-label="Attach file"
+                          class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-text-secondary hover:bg-surface-alt cursor-pointer">
+                    <font-awesome-icon :icon="['fas', 'paperclip']" class="text-[16px]" />
+                  </button>
                   <input v-model="messageText" type="text" placeholder="Message..." autocomplete="off" enterkeyhint="send"
                          class="flex-1 rounded-full border border-border bg-surface-alt px-4 py-2 text-sm text-text-primary placeholder:text-text-muted focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20" />
-                  <button type="submit" aria-label="Send" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-primary text-white hover:bg-primary-hover cursor-pointer">
-                    <i class="fa-solid fa-paper-plane text-[14px]"></i>
+                  <button type="submit" aria-label="Send" class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-chat-bubble-me-gradient hover:opacity-90  text-white hover:opacity-90 shadow-[0_6px_16px_rgba(27,85,226,0.3)] transition-colors cursor-pointer">
+                    <font-awesome-icon :icon="['fas', 'paper-plane']" class="text-[14px]" />
                   </button>
                 </form>
               </template>
@@ -309,27 +377,7 @@ const {
                   </div>
                 </div>
 
-                <!-- Your photo (direct chats only) -->
-                <div v-else class="flex-1 px-2 py-2">
-                  <p class="px-3 py-2 text-xs font-medium uppercase tracking-wide text-text-muted">Your photo</p>
-                  <button type="button" @click="triggerMyAvatarUpload"
-                          class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left hover:bg-surface-alt cursor-pointer">
-                    <div class="relative h-11 w-11 shrink-0 overflow-hidden rounded-full">
-                      <img v-if="myAvatar" :src="myAvatar" class="h-full w-full object-cover" />
-                      <div v-else class="flex h-full w-full items-center justify-center bg-neutral-200 text-xs font-semibold text-neutral-600">Me</div>
-                      <div v-if="uploadingMyAvatar" class="absolute inset-0 flex items-center justify-center bg-black/40">
-                        <i class="fa-solid fa-spinner fa-spin text-white text-xs"></i>
-                      </div>
-                    </div>
-                    <div class="min-w-0 flex-1">
-                      <span class="block text-sm font-medium text-text-primary">Change your photo</span>
-                      <span class="block text-xs text-text-secondary">Update your profile picture</span>
-                    </div>
-                    <i class="fa-solid fa-chevron-right text-[11px] text-text-muted"></i>
-                  </button>
-                </div>
 
-                <!-- Action buttons (group only) -->
                 <div v-if="activeThread.type === 'group'" class="border-t border-border-subtle px-2 py-2">
                   <button
                       v-if="isCurrentUserGroupAdmin"
@@ -446,6 +494,26 @@ const {
             <button type="button" @click="runConfirmedAction" class="rounded-full bg-danger px-4 py-2 text-sm font-medium text-white hover:opacity-90 cursor-pointer">{{ confirmModal.confirmLabel }}</button>
           </div>
         </div>
+      </div>
+    </Teleport>
+
+    <Teleport to="body">
+      <div v-if="lightboxImage" @click="closeImageLightbox"
+           class="fixed inset-0 z-[80] flex items-center justify-center bg-black/80 px-4 cursor-zoom-out">
+
+        <div class="absolute right-4 top-4 flex items-center gap-2">
+          <button type="button" @click.stop="downloadLightboxImage" aria-label="Download"
+                  class="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 cursor-pointer">
+            <i class="fa-solid fa-download text-[18px]"></i>
+          </button>
+          <button type="button" @click.stop="closeImageLightbox" aria-label="Close"
+                  class="flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20 cursor-pointer">
+            <i class="fa-solid fa-xmark text-[20px]"></i>
+          </button>
+        </div>
+
+        <img :src="lightboxImage.url" :alt="lightboxImage.fileName"
+             class="max-h-[85vh] max-w-[90vw] rounded-lg object-contain" @click.stop />
       </div>
     </Teleport>
   </div>

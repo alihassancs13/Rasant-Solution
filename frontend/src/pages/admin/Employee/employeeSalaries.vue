@@ -23,8 +23,10 @@ const payrollSettingsStore = usePayrollSettingsStore()
 // ⚠️ IMPORTANT: Define employees FIRST before using it in composables
 const employees = computed(() => employeeStore.employees)
 const employeesLoading = computed(() => employeeStore.isLoading)
+import { useToast } from '@/composables/useToast.js'
+const { showToast } = useToast()
 
-// ── Now define other refs ──
+const showSaveSettingsModal = ref(false)
 const employeesCovered = ref(3)
 const dueNow = ref(1)
 const highlightedEmployeeId = ref(null)
@@ -167,6 +169,25 @@ const avatarPalette = [
   { bg: 'bg-amber-200', text: 'text-amber-700' },
 ]
 const avatarStyle = (index) => avatarPalette[index % avatarPalette.length]
+
+function openSaveSettingsModal() {
+  showSaveSettingsModal.value = true
+}
+
+function closeSaveSettingsModal() {
+  showSaveSettingsModal.value = false
+}
+
+async function confirmSavePayrollSettings() {
+  const result = await payrollSettingsStore.saveSettings(payrollSettingsStore.settings)
+  showSaveSettingsModal.value = false
+
+  if (result.success) {
+    showToast('Payroll settings saved successfully.', 'success')
+  } else {
+    showToast(result.error || 'Failed to save payroll settings.', 'error')
+  }
+}
 
 const initials = (name) =>
     name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()
@@ -801,7 +822,7 @@ watch(() => route.query.highlightEmployee, (newVal) => {
             </div>
 
             <div class="sm:col-span-2 flex justify-end pt-2">
-              <ShineButton variant="teal" shape="xl" size="sm" :loading="isSavingPayrollSettings" @click="savePayrollSettings">
+              <ShineButton variant="teal" shape="xl" size="sm" @click="openSaveSettingsModal">
                 <font-awesome-icon :icon="['fas', 'floppy-disk']" class="w-3 h-3" />
                 Save Settings
               </ShineButton>
@@ -1175,6 +1196,26 @@ watch(() => route.query.highlightEmployee, (newVal) => {
             </div>
           </label>
         </div>
+      </div>
+    </BaseModal>
+
+    <!-- Save Payroll Settings Confirmation -->
+    <BaseModal
+        :is-open="showSaveSettingsModal"
+        mode="form"
+        title="Save payroll settings?"
+        subtitle="This will update the active payroll rules."
+        submit-text="Yes, save settings"
+        :loading="isSavingPayrollSettings"
+        @close="closeSaveSettingsModal"
+        @save="confirmSavePayrollSettings"
+    >
+      <div class="space-y-2 text-sm text-text-secondary">
+        <div class="flex justify-between"><span>Grace Minutes</span><span class="font-semibold text-text-primary">{{ payrollSettings.grace_minutes }}</span></div>
+        <div class="flex justify-between"><span>Allowed Paid Leaves / Month</span><span class="font-semibold text-text-primary">{{ payrollSettings.allowed_leaves_per_month }}</span></div>
+        <div class="flex justify-between"><span>Allowed Unpaid-Free Absents / Month</span><span class="font-semibold text-text-primary">{{ payrollSettings.allowed_absents_per_month }}</span></div>
+        <div class="flex justify-between"><span>Overtime Rate / Hour</span><span class="font-semibold text-text-primary">{{ formatCurrency(payrollSettings.overtime_rate_per_hour) }}</span></div>
+        <div class="flex justify-between"><span>Free Lates Before Penalty</span><span class="font-semibold text-text-primary">{{ payrollSettings.late_count_threshold }}</span></div>
       </div>
     </BaseModal>
 

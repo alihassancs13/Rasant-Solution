@@ -68,12 +68,12 @@ def _logo_cid_payload():
 
 
 def send_branded_email(
-    *,
-    subject: str,
-    template_name: str,
-    context: dict,
-    to: list[str] | str,
-    fail_silently: bool = True,
+        *,
+        subject: str,
+        template_name: str,
+        context: dict,
+        to: list[str] | str,
+        fail_silently: bool = True,
 ):
     """
     Render a branded HTML template and send via configured SMTP.
@@ -286,4 +286,21 @@ def send_leave_decision(leave_request, *, approved: bool):
             'portal_url': f'{frontend}/employee/leave',
         },
         to=emp.email,
+    )
+def send_inquiry_reply_email(inquiry, subject: str, body: str):
+    """
+    Send inquiry reply email.
+    body: The reply message from the modal (what user typed)
+    """
+    return send_branded_email(
+        subject=subject,  # Directly from modal
+        template_name='emails/inquiry_reply.html',
+        context={
+            'recipient_name': inquiry.full_name or 'Customer',
+            'subject': subject,  # Modal ka subject
+            'message': body,     # Modal ka message
+            'original_message': inquiry.message,  # Optional: original inquiry
+        },
+        to=inquiry.email,
+        fail_silently=False,
     )

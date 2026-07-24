@@ -1,15 +1,10 @@
 import { ref, computed, watch } from 'vue'
 import { useInquiriesStore } from '../stores/useInquiriesStore.js'
-
-export const STATUS_OPTIONS = [
-    { value: 'new', label: 'New' },
-    { value: 'in_progress', label: 'In Progress' },
-    { value: 'replied', label: 'Replied' },
-    { value: 'quoted', label: 'Quoted' },
-]
+import { useToast } from './useToast.js'
 
 export function useInquiries() {
     const store = useInquiriesStore()
+    const { showToast } = useToast()
 
     // --- list / search / pagination ---
     const searchQuery = ref('')
@@ -75,11 +70,8 @@ export function useInquiries() {
 
     function selectMessage(msg) {
         selectedId.value = msg.id
-        replyText.value = ''
     }
 
-    // auto-select the first row once data loads, and keep selection valid
-    // if the currently-open inquiry gets deleted
     watch(
         () => store.messages,
         (msgs) => {
@@ -94,21 +86,69 @@ export function useInquiries() {
         { immediate: true }
     )
 
-    // --- reply drafting ---
-    const replyText = ref('')
+    // --- statuses (dynamic, from DB) ---
+    const statuses = computed(() => store.statuses)
+    const fetchStatuses = store.fetchStatuses
+
+    const statusIconPalette = ['inbox', 'spinner', 'reply', 'file-invoice-dollar', 'circle-check', 'flag']
+    const statusColorPalette = ['blue', 'amber', 'teal', 'purple', 'pink', 'indigo']
+
+    const statusCards = computed(() =>
+        statuses.value.map((s, i) => ({
+            key: s.code,
+            label: s.name,
+            icon: ['fas', statusIconPalette[i % statusIconPalette.length]],
+            color: statusColorPalette[i % statusColorPalette.length],
+        }))
+    )
+
+    function statusLabel(code) {
+        return statuses.value.find((s) => s.code === code)?.name || code
+    }
+
+    // --- email modal ---
+    const showEmailModal = ref(false)
+    const emailForm = ref({ to: '', subject: '', message: '' })
+
+    function openEmailModal(msg) {
+        const target = msg || selectedMessage.value
+        if (!target) return
+        emailForm.value = {
+            to: target.email,
+            subject: 'Re: Your inquiry to Rasant Solutions',
+            message: `Hello ${target.full_name},Thank you for reaching out to Rasant Solutions.`,
+        }
+        showEmailModal.value = true
+    }
+
+    function closeEmailModal() {
+        showEmailModal.value = false
+    }
+
     const sendingReply = computed(() =>
         selectedId.value ? store.sendingReplyIds.includes(selectedId.value) : false
     )
 
     async function handleSendReply() {
-        if (!selectedMessage.value || !replyText.value.trim()) {
-            return { success: false, message: 'Write a reply before sending.' }
+        if (!selectedMessage.value) {
+            showToast('No inquiry selected.', 'error')
+            return
         }
-        const result = await store.sendReply(selectedMessage.value.id, replyText.value.trim())
+        if (!emailForm.value.message.trim()) {
+            showToast('Write a message before sending.', 'error')
+            return
+        }
+        const result = await store.sendReply(
+            selectedMessage.value.id,
+            emailForm.value.message.trim(),
+            emailForm.value.subject.trim()
+        )
         if (result.success) {
-            replyText.value = ''
+            showToast('Reply sent successfully.', 'success')
+            closeEmailModal()
+        } else {
+            showToast(result.message || 'Failed to send email reply.', 'error')
         }
-        return result
     }
 
     // --- status changes ---
@@ -118,19 +158,47 @@ export function useInquiries() {
 
     async function handleStatusChange(status) {
         if (!selectedMessage.value) {
-            return { success: false, message: 'No inquiry selected.' }
+            showToast('No inquiry selected.', 'error')
+            return
         }
-        return store.updateStatus(selectedMessage.value.id, status)
+        const result = await store.updateStatus(selectedMessage.value.id, status)
+        if (result.success) {
+            showToast('Status updated.', 'success')
+        } else {
+            showToast(result.message || 'Failed to update status.', 'error')
+        }
     }
 
-    // --- delete ---
+    // --- delete (with confirmation, career-page style) ---
+    const showDeleteConfirm = ref(false)
+    const pendingDeleteMsg = ref(null)
+
     const deleting = computed(() =>
-        selectedId.value ? store.deletingIds.includes(selectedId.value) : false
+        pendingDeleteMsg.value ? store.deletingIds.includes(pendingDeleteMsg.value.id) : false
     )
 
-    async function handleDelete(msg) {
-        if (!msg) return { success: false, message: 'No inquiry selected.' }
-        return store.deleteMessage(msg.id)
+    function requestDelete(msg) {
+        const target = msg || selectedMessage.value
+        if (!target) return
+        pendingDeleteMsg.value = target
+        showDeleteConfirm.value = true
+    }
+
+    function cancelDelete() {
+        showDeleteConfirm.value = false
+        pendingDeleteMsg.value = null
+    }
+
+    async function confirmDelete() {
+        if (!pendingDeleteMsg.value) return
+        const result = await store.deleteMessage(pendingDeleteMsg.value.id)
+        if (result.success) {
+            showToast('Inquiry deleted.', 'success')
+            showDeleteConfirm.value = false
+            pendingDeleteMsg.value = null
+        } else {
+            showToast(result.message || 'Failed to delete inquiry.', 'error')
+        }
     }
 
     // --- formatting helpers ---
@@ -166,6 +234,8 @@ export function useInquiries() {
             .join('')
     }
 
+
+
     return {
         // store passthrough
         messages: computed(() => store.messages),
@@ -173,6 +243,12 @@ export function useInquiries() {
         error: computed(() => store.error),
         statusCounts: computed(() => store.statusCounts),
         fetchMessages: store.fetchMessages,
+
+        // statuses
+        statuses,
+        fetchStatuses,
+        statusCards,
+        statusLabel,
 
         // list / search / pagination
         searchQuery,
@@ -194,19 +270,24 @@ export function useInquiries() {
         selectedMessage,
         selectMessage,
 
-        // reply
-        replyText,
+        // email modal
+        showEmailModal,
+        emailForm,
+        openEmailModal,
+        closeEmailModal,
         sendingReply,
         handleSendReply,
 
         // status
-        STATUS_OPTIONS,
         updatingStatus,
         handleStatusChange,
 
         // delete
         deleting,
-        handleDelete,
+        showDeleteConfirm,
+        requestDelete,
+        cancelDelete,
+        confirmDelete,
 
         // formatting
         formatDate,

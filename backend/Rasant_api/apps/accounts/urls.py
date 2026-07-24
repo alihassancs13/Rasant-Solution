@@ -18,6 +18,11 @@ from .views import (
     password_setup_confirm,
     notification_list,
     notification_mark_read,
+    get_user_avatar,
+    update_inquiry_status,
+    send_inquiry_reply,
+    get_inquiry_statuses,
+    delete_inquiry,
 )
 
 urlpatterns = [
@@ -32,6 +37,11 @@ urlpatterns = [
     path('notifications/mark-read/', notification_mark_read, name='notification-mark-read'),
     path('get_user_modules/', get_user_modules, name='user-modules'),
     path('contact/', contact_message_view, name='contact-message'),
+    path('contact/<int:pk>/status/', update_inquiry_status, name='inquiry-status-update'),
+    path('contact/<int:pk>/reply/', send_inquiry_reply, name='inquiry-reply'),
+    path('inquiry-statuses/', get_inquiry_statuses, name='inquiry-statuses-list'),
+    path('contact/<int:pk>/', delete_inquiry, name='inquiry-delete'),
+
 
     path('profile/', my_profile, name='my-profile'),
     path('profile/change-password/', change_my_password, name='change-my-password'),

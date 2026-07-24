@@ -9,19 +9,19 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.contrib.auth import get_user_model
-from .models import Conversation, ConversationMember, Message, MessageReceipt, MessageDeleteFor
-from .serializers import ConversationSerializer,ConversationCreateSerializer, MessageSerializer
+from .models import Conversation, ConversationMember, Message, MessageReceipt, MessageDeleteFor, MessageAttachment
+from .serializers import ConversationSerializer,ConversationCreateSerializer, MessageSerializer, MessageAttachmentSerializer
 from django.core.cache import cache
 from django.http import StreamingHttpResponse, HttpResponseForbidden, HttpResponse
 from django.views.decorators.http import require_GET
 from django.utils import timezone
-from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
 
 logger = logging.getLogger(__name__)
 
 User = get_user_model()
-
+MAX_ATTACHMENT_SIZE = 50 * 1024 * 1024
 
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
@@ -133,21 +133,36 @@ def list_conversations(request):
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
+@parser_classes([MultiPartParser, FormParser, JSONParser])
 def send_message(request):
     sender = request.user
     conversation_id = request.data.get('conversation_id')
-    content = request.data.get('content')
+    content = (request.data.get('content') or '').strip()
+    files = request.FILES.getlist('files')
 
-    if not content or not content.strip():
-        return Response(
-            {'error': 'Content cannot be empty'},
-            status=status.HTTP_400_BAD_REQUEST
-        )
     if not conversation_id:
         return Response(
             {'error': 'conversation_id is required'},
             status=status.HTTP_400_BAD_REQUEST
         )
+
+    if not content and not files:
+        return Response(
+            {'error': 'Message must have content or at least one attachment'},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    for f in files:
+        if f.size > MAX_ATTACHMENT_SIZE:
+            return Response(
+                {'error': f'"{f.name}" exceeds the 50MB limit'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        if f.size == 0:
+            return Response(
+                {'error': f'"{f.name}" is empty'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
     try:
         conv = Conversation.objects.get(id=conversation_id)
@@ -173,9 +188,19 @@ def send_message(request):
             status=status.HTTP_403_FORBIDDEN
         )
 
-    msg = Message.objects.create(conversation=conv, sender=sender, content=content.strip())
+    msg = Message.objects.create(conversation=conv, sender=sender, content=content)
 
-    # baaki active members ke liye receipts banao
+    for f in files:
+        content_type = f.content_type or 'application/octet-stream'
+        MessageAttachment.objects.create(
+            message=msg,
+            file_data=f.read(),
+            file_name=f.name,
+            content_type=content_type,
+            media_type=MessageAttachment.detect_media_type(content_type),
+            file_size=f.size,
+        )
+
     other_members = ConversationMember.objects.filter(
         conversation=conv, left_at__isnull=True
     ).exclude(user=sender).select_related('user')
@@ -224,6 +249,26 @@ def send_message(request):
         MessageSerializer(msg, context={'request': request}).data,
         status=status.HTTP_201_CREATED
     )
+
+@api_view(['GET'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def get_attachment(request, attachment_id):
+    try:
+        attachment = MessageAttachment.objects.select_related('message__conversation').get(id=attachment_id)
+    except MessageAttachment.DoesNotExist:
+        return Response({'error': 'Attachment not found'}, status=status.HTTP_404_NOT_FOUND)
+
+    membership = ConversationMember.objects.filter(
+        conversation=attachment.message.conversation, user=request.user
+    ).first()
+
+    if not membership:
+        return Response({'error': "You don't have access to this chat"}, status=status.HTTP_403_FORBIDDEN)
+
+    response = HttpResponse(bytes(attachment.file_data), content_type=attachment.content_type)
+    response['Content-Disposition'] = f'inline; filename="{attachment.file_name}"'
+    return response
 
 @api_view(['GET'])
 @authentication_classes([JWTAuthentication])
@@ -564,7 +609,7 @@ def inbox_sse_stream(request):
                     new_msgs = Message.objects.filter(
                         conversation=conv,
                         id__gt=last_id
-                    ).select_related('sender').order_by('id')
+                    ).select_related('sender').prefetch_related('attachments').order_by('id')
 
                     for msg in new_msgs:
                         last_message_ids[conv.id] = msg.id
@@ -586,6 +631,16 @@ def inbox_sse_stream(request):
                             'content': msg.content,
                             'created_at': msg.created_at.isoformat(),
                             'deleted_for_everyone': msg.deleted_for_everyone,
+                            'attachments': [
+                                {
+                                    'id': a.id,
+                                    'file_name': a.file_name,
+                                    'content_type': a.content_type,
+                                    'media_type': a.media_type,
+                                    'file_size': a.file_size,
+                                }
+                                for a in msg.attachments.all()
+                            ],
                         }
                         yield f"data: {json.dumps(data)}\n\n"
 
@@ -664,7 +719,7 @@ def inbox_sse_stream(request):
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAuthenticated])
-@parser_classes([MultiPartParser, FormParser])
+@parser_classes([MultiPartParser, FormParser, JSONParser])
 def update_group_avatar(request, conversation_id):
     try:
         conv = Conversation.objects.get(id=conversation_id)

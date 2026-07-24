@@ -59,11 +59,27 @@ class Module(models.Model):
 
     def __str__(self):
         return self.name
+
+class InquiryStatus(models.Model):
+    name = models.CharField(max_length=20, unique=True)
+    code = models.SlugField(max_length=20, unique=True)
+
+    class Meta:
+        db_table = 'inquiry_status'
+        ordering = ['id']
+
+    def __str__(self):
+        return self.name
+
 class ContactMessage(models.Model):
     full_name = models.CharField(max_length=100)
     email = models.EmailField()
     phone = models.CharField(max_length=20, blank=True, null=True)
     message = models.TextField()
+    status = models.ForeignKey(
+        InquiryStatus, on_delete=models.PROTECT, related_name='inquiries',
+        null=True, blank=True
+    )
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

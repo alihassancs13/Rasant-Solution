@@ -96,10 +96,14 @@ class RoleSerializer(serializers.ModelSerializer):
 
 
 class ContactMessageSerializer(serializers.ModelSerializer):
+    status = serializers.CharField(source='status.code', read_only=True)
+    status_label = serializers.CharField(source='status.name', read_only=True)
+
     class Meta:
         model = ContactMessage
-        fields = ['id', 'full_name', 'email', 'phone', 'message', 'created_at']
+        fields = ['id', 'full_name', 'email', 'phone', 'message', 'status', 'status_label', 'created_at']
         read_only_fields = ['id', 'created_at']
+
 
 
 class EmailSettingsSerializer(serializers.ModelSerializer):

@@ -6,7 +6,7 @@ import EmployeeDashboard from '../pages/admin/Employee/employeeDashboard.vue';
 import Documents from '../pages/admin/Documents/documents.vue';
 import Vault from '../pages/admin/Vault/credentialsVault.vue';
 import Credential from '../pages/Employee/employeeCredentials.vue';
-import EmployeeAttendance from '../pages/admin/Attendance/attendance.vue';
+import EmployeeEmployeeAttendance from '../pages/admin/Employee/employeeAttendance.vue';
 import { useLoginStore } from '../stores/loginStore.js';
 import JobDetails from '../pages/Home/jobDetails.vue';
 const routes = [
@@ -188,7 +188,7 @@ const routes = [
   {
     path: '/admin/employees/attendance',
     name: 'EmployeeAttendance',
-    component: EmployeeAttendance,
+    component: EmployeeEmployeeAttendance,
     meta: { module: "Attendance", title: "Attendance | Rasant Solutions", requiresAuth: true, role: 'admin' }
   },
   {

@@ -7,6 +7,7 @@ from .models import (
     Message,
     MessageReceipt,
     MessageDeleteFor,
+    MessageAttachment,
 )
 
 User = get_user_model()
@@ -66,10 +67,25 @@ class MessageDeleteForSerializer(serializers.ModelSerializer):
         fields = ['id', 'message', 'user', 'deleted_at']
         read_only_fields = fields
 
+class MessageAttachmentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = MessageAttachment
+        fields = [
+            'id',
+            'message',
+            'file_name',
+            'content_type',
+            'media_type',
+            'file_size',
+            'created_at',
+        ]
+        read_only_fields = fields
 
 class MessageSerializer(serializers.ModelSerializer):
     sender = UserBriefSerializer(read_only=True)
     receipts = MessageReceiptSerializer(many=True, read_only=True)
+    attachments = MessageAttachmentSerializer(many=True, read_only=True)
     is_deleted_for_me = serializers.SerializerMethodField()
 
     class Meta:
@@ -82,9 +98,10 @@ class MessageSerializer(serializers.ModelSerializer):
             'created_at',
             'deleted_for_everyone',
             'receipts',
+            'attachments',
             'is_deleted_for_me',
         ]
-        read_only_fields = ['sender', 'created_at', 'deleted_for_everyone', 'receipts']
+        read_only_fields = ['sender', 'created_at', 'deleted_for_everyone', 'receipts', 'attachments']
 
     def get_is_deleted_for_me(self, obj):
         request = self.context.get('request')

@@ -244,8 +244,7 @@
           Login
         </router-link>
 
-        <ShineButton to="/contact" shape="pill" @click="closeMobileMenu">Get Quote</ShineButton>
-      </div>
+        <ShineButton to="/contact" shape="pill" @click="handleGetQuoteClick">Get Quote</ShineButton>      </div>
 
       <!-- ===== HAMBURGER ===== -->
       <button
@@ -468,6 +467,14 @@ const navigateToServicesSection = (sectionId = 'services') => {
         if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 300);
     });
+  }
+};
+
+// ---------- Get Quote button ----------
+const handleGetQuoteClick = () => {
+  closeMobileMenu();
+  if (route.path === '/contact') {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 };
 </script>

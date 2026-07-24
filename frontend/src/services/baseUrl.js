@@ -98,6 +98,8 @@ export const API_ENDPOINTS = {
     INBOX_GET_GROUP_AVATAR: (conversationId) => `/api/inbox/conversations/${conversationId}/avatar/image/`,
     INBOX_LEAVE_GROUP: (conversationId) => `/api/inbox/conversations/${conversationId}/leave/`,
     INBOX_ADD_MEMBERS: (conversationId) => `/api/inbox/conversations/${conversationId}/add-members/`,
+    INBOX_GET_ATTACHMENT: (attachmentId) => `/api/inbox/messages/attachments/${attachmentId}/`,
+    INQUIRY_STATUSES: '/api/accounts/inquiry-statuses/',
     ACCOUNTS_UPDATE_MY_AVATAR: '/api/accounts/profile/avatar/',
     ACCOUNTS_GET_USER_AVATAR: (userId) => `/api/accounts/users/${userId}/avatar/`,
     PROFILE: '/api/accounts/profile/',

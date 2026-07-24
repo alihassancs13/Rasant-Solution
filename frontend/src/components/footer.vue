@@ -54,8 +54,7 @@
         <div class="col-span-2 lg:col-span-1">
           <h4 class="footer-heading">Contact</h4>
           <ul class="space-y-1.5 sm:space-y-2.5">
-            <li><router-link to="/contact" class="footer-link">Get a Quote</router-link></li>
-            <li>
+            <li><router-link to="/contact" class="footer-link" @click="scrollToTopIfSamePage">Get a Quote</router-link></li>            <li>
               <a href="mailto:career@rasantsol.com" class="footer-link footer-link-external">career@rasantsol.com</a>
             </li>
             <li>
@@ -217,3 +216,15 @@
   50% { transform: translate(12px, -10px) scale(1.05); }
 }
 </style>
+
+<script setup>
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+
+function scrollToTopIfSamePage() {
+  if (route.path === '/contact') {
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+}
+</script>

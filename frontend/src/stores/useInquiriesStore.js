@@ -1,43 +1,61 @@
 // stores/inquiries.js
 import { defineStore } from 'pinia'
 import axios from 'axios'
-import { BASE_URL, API_ENDPOINTS } from '@/services/baseUrl'  // adjust path as needed
+import { BASE_URL, API_ENDPOINTS } from '../services/baseUrl.js'
+
+const getAuthToken = () => localStorage.getItem('accessToken')
+
+const apiClient = axios.create({ baseURL: BASE_URL })
+
+apiClient.interceptors.request.use((config) => {
+    const token = getAuthToken()
+    if (token) config.headers.Authorization = `Bearer ${token}`
+    return config
+})
 
 export const useInquiriesStore = defineStore('inquiries', {
     state: () => ({
         messages: [],
+        statuses: [],       // [{ id, code, name }] — fetched from DB
         loading: false,
         error: null,
 
-        // per-inquiry action flags, keyed by id, so one row's spinner
-        // doesn't lock up the whole list
         deletingIds: [],
         sendingReplyIds: [],
         updatingStatusIds: [],
     }),
 
     getters: {
-        // status pipeline counts for the 4 top cards (New / In Progress / Replied / Quoted)
+        // status pipeline counts — built dynamically from whatever statuses exist in DB
         statusCounts: (state) => {
-            const counts = { new: 0, in_progress: 0, replied: 0, quoted: 0 }
+            const counts = {}
+            for (const s of state.statuses) counts[s.code] = 0
             for (const msg of state.messages) {
-                const status = msg.status || 'new'
-                if (counts[status] !== undefined) counts[status]++
+                const code = msg.status || 'new'
+                if (counts[code] !== undefined) counts[code]++
             }
             return counts
         },
     },
 
     actions: {
+        async fetchStatuses() {
+            try {
+                const response = await apiClient.get(API_ENDPOINTS.INQUIRY_STATUSES)
+                this.statuses = response.data?.data || response.data || []
+                return { success: true, data: this.statuses }
+            } catch (err) {
+                return { success: false, error: 'Failed to load statuses.' }
+            }
+        },
+
         async fetchMessages() {
             this.loading = true
             this.error = null
             try {
-                // GET /api/contact/
-                const response = await axios.get(`${BASE_URL}${API_ENDPOINTS.CONTACT}`)
+                const response = await apiClient.get(API_ENDPOINTS.CONTACT)
 
                 let messagesData = []
-                // Handle different response structures
                 if (Array.isArray(response.data)) {
                     messagesData = response.data
                 } else if (response.data?.data) {
@@ -63,8 +81,7 @@ export const useInquiriesStore = defineStore('inquiries', {
         async deleteMessage(id) {
             this.deletingIds.push(id)
             try {
-                // DELETE /api/contact/<id>/
-                await axios.delete(`${BASE_URL}${API_ENDPOINTS.CONTACT}${id}/`)
+                await apiClient.delete(`${API_ENDPOINTS.CONTACT}${id}/`)
                 this.messages = this.messages.filter((m) => m.id !== id)
                 return { success: true }
             } catch (err) {
@@ -77,13 +94,12 @@ export const useInquiriesStore = defineStore('inquiries', {
             }
         },
 
-        async sendReply(id, body) {
+        async sendReply(id, replyBody, subject) {
             this.sendingReplyIds.push(id)
             try {
-                // POST /api/contact/<id>/reply/   (adjust endpoint if needed)
-                const response = await axios.post(
-                    `${BASE_URL}${API_ENDPOINTS.CONTACT}${id}/reply/`,
-                    body
+                const response = await apiClient.post(
+                    `${API_ENDPOINTS.CONTACT}${id}/reply/`,
+                    { body: replyBody, subject }
                 )
 
                 let updated = null
@@ -107,7 +123,7 @@ export const useInquiriesStore = defineStore('inquiries', {
             } catch (err) {
                 return {
                     success: false,
-                    message: err.response?.data?.message || 'Failed to send email reply.',
+                    message: err.response?.data?.error || err.response?.data?.message || 'Failed to send email reply.',
                 }
             } finally {
                 this.sendingReplyIds = this.sendingReplyIds.filter((i) => i !== id)
@@ -117,9 +133,8 @@ export const useInquiriesStore = defineStore('inquiries', {
         async updateStatus(id, status) {
             this.updatingStatusIds.push(id)
             try {
-                // PATCH /api/contact/<id>/status/   (adjust endpoint if needed)
-                const response = await axios.patch(
-                    `${BASE_URL}${API_ENDPOINTS.CONTACT}${id}/status/`,
+                const response = await apiClient.patch(
+                    `${API_ENDPOINTS.CONTACT}${id}/status/`,
                     { status }
                 )
 

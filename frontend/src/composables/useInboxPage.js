@@ -6,6 +6,24 @@ const PENDING_KEY = 'inbox_pending_messages_';
 const RETRY_MS = 3000;
 const LONG_PRESS_MS = 500;
 const TOUCH_TOLERANCE = 10;
+const ATTACHMENT_ACCEPT = '*/*';
+const guessMediaType = (mimeType) => {
+    if (!mimeType) return 'document';
+    if (mimeType.startsWith('image/')) return 'image';
+    if (mimeType.startsWith('video/')) return 'video';
+    if (mimeType.startsWith('audio/')) return 'audio';
+    return 'document';
+};
+
+const mapAttachments = (raw) => (raw || []).map(a => ({
+    id: a.id,
+    file_name: a.file_name,
+    content_type: a.content_type,
+    media_type: a.media_type,
+    file_size: a.file_size,
+    url: null,
+    loading: false,
+}));
 
 const getInitials = (name) => name?.trim().split(/\s+/).slice(0, 2).map(w => w[0]?.toUpperCase()).join('') || '??';
 
@@ -49,6 +67,7 @@ const msgToUi = (msg, uid) => {
         timestamp: new Date(msg.created_at),
         status: fromMe ? computeStatus(receipts) : undefined,
         deletedForEveryone: msg.deleted_for_everyone, receipts,
+        attachments: mapAttachments(msg.attachments),
     };
 };
 
@@ -70,6 +89,7 @@ export function useInboxPage() {
     const contactsLoading = ref(false);
     const showChatMenu = ref(false);
     const showParticipantsPanel = ref(false);
+    const lightboxImage = ref(null);
 
     const groupCreationMode = ref(false);
     const groupName = ref('');
@@ -77,6 +97,8 @@ export function useInboxPage() {
     const creatingGroup = ref(false);
     const uploadingGroupPhoto = ref(false);
     const groupPhotoInput = ref(null);
+    const selectedFiles = ref([]);
+    const attachFileInput = ref(null);
 
     const showAddMembersPanel = ref(false);
     const addMembersSearchQuery = ref('');
@@ -134,6 +156,24 @@ export function useInboxPage() {
             uploadingMyAvatar.value = false;
             URL.revokeObjectURL(localPreview);
         }
+    }
+
+    function openImageLightbox(attachment) {
+        lightboxImage.value = { url: attachment.url, fileName: attachment.file_name };
+    }
+
+    function closeImageLightbox() {
+        lightboxImage.value = null;
+    }
+
+    function downloadLightboxImage() {
+        if (!lightboxImage.value) return;
+        const link = document.createElement('a');
+        link.href = lightboxImage.value.url;
+        link.download = lightboxImage.value.fileName || 'image';
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
     }
 
     const filteredThreads = computed(() => {
@@ -257,12 +297,120 @@ export function useInboxPage() {
             creatingGroup.value = false;
         }
     }
+    function triggerFileAttach() {
+        attachFileInput.value?.click();
+    }
+
+    let fileIdCounter = 0;
+
+    function handleFilesSelected(event) {
+        const files = Array.from(event.target.files || []);
+        event.target.value = '';
+        files.forEach((file) => {
+            const mediaType = guessMediaType(file.type);
+            fileIdCounter += 1;
+            selectedFiles.value.push({
+                id: `file-${fileIdCounter}-${Date.now()}`,
+                file,
+                mediaType,
+                previewUrl: mediaType === 'image' ? URL.createObjectURL(file) : null,
+            });
+        });
+    }
+    function removeSelectedFile(id) {
+        const idx = selectedFiles.value.findIndex((f) => f.id === id);
+        if (idx === -1) return;
+        if (selectedFiles.value[idx].previewUrl) URL.revokeObjectURL(selectedFiles.value[idx].previewUrl);
+        selectedFiles.value.splice(idx, 1);
+    }
+
+    function clearSelectedFiles() {
+        selectedFiles.value.forEach((f) => { if (f.previewUrl) URL.revokeObjectURL(f.previewUrl); });
+        selectedFiles.value = [];
+    }
+    async function loadAttachmentUrl(attachment) {
+        if (attachment.url || attachment.loading) return attachment.url;
+        attachment.loading = true;
+        const result = await inboxStore.fetchAttachmentBlob(attachment.id);
+        attachment.loading = false;
+        if (result) attachment.url = result.url;
+        return attachment.url;
+    }
+
+    function autoloadImageAttachments(attachments) {
+        (attachments || []).filter((a) => a.media_type === 'image').forEach((a) => loadAttachmentUrl(a));
+    }
+
+    async function attachmentAction(attachment) {
+        const url = await loadAttachmentUrl(attachment);
+        if (!url) return;
+
+        if (attachment.media_type === 'image') {
+            openImageLightbox({ ...attachment, url });
+            return;
+        }
+        if (attachment.media_type === 'video') {
+            window.open(url, '_blank');
+            return;
+        }
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = attachment.file_name;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+    }
 
     async function sendMessage() {
         const text = messageText.value.trim();
-        if (!text || !activeThread.value) return;
+        const filesToSend = [...selectedFiles.value];
+        if ((!text && !filesToSend.length) || !activeThread.value) return;
+
         messageText.value = '';
+        selectedFiles.value = [];
         const thread = activeThread.value;
+
+        if (filesToSend.length) {
+            // ---- Har file ka apna alag message bubble — sab ek loop mein, ek ek karke bhejte hain ----
+            for (let i = 0; i < filesToSend.length; i++) {
+                const f = filesToSend[i];
+                const captionForThisFile = i === 0 ? text : '';   // caption sirf pehli file ke sath
+                const tempId = `pending-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+
+                const optimisticAttachment = {
+                    id: f.id,
+                    file_name: f.file.name,
+                    content_type: f.file.type,
+                    media_type: f.mediaType,
+                    file_size: f.file.size,
+                    url: f.previewUrl,
+                    loading: false,
+                };
+
+                thread.messages.push({
+                    id: tempId, fromMe: true, text: captionForThisFile, timestamp: new Date(),
+                    status: 'pending', attachments: [optimisticAttachment],
+                });
+                thread.lastMessage = captionForThisFile || f.file.name;
+                thread.lastMessageAt = new Date();
+                scrollToBottom();
+
+                try {
+                    const saved = await inboxStore.sendMessage(thread.id, captionForThisFile, [f.file]);
+                    const uiMsg = msgToUi(saved, currentUserId.value);
+                    const idx = thread.messages.findIndex((m) => m.id === tempId);
+                    if (idx !== -1) thread.messages.splice(idx, 1, uiMsg);
+                    autoloadImageAttachments(uiMsg.attachments);
+                } catch (err) {
+                    console.error('Failed to send attachment message:', f.file.name, err);
+                    const failed = thread.messages.find((m) => m.id === tempId);
+                    if (failed) failed.status = 'failed';
+                }
+            }
+            return;
+        }
+
+        // ---- Text-only message: purana pending-queue + retry flow, bilkul waisa hi ----
         const tempId = `pending-${Date.now()}-${Math.random().toString(36).slice(2)}`;
         const pendingMsg = { id: tempId, conversationId: thread.id, text, timestamp: new Date().toISOString() };
 
@@ -359,7 +507,6 @@ export function useInboxPage() {
             return;
         }
 
-        // NAYA — group members change hue (kisi ne leave kiya ya naya member add hua) — sab connected members ke liye live update
         if (data.type === 'members_updated') {
             if (!thread) return;
             thread.members = data.members || [];
@@ -399,17 +546,16 @@ export function useInboxPage() {
 
         if (!thread) { if (data.sender !== currentUserId.value) reAddConversation(data.conversation_id); return; }
         if (data.sender === currentUserId.value) return;
-
-        // NAYA — agar ye message id pehle se thread.messages mein maujood hai (duplicate SSE delivery,
-        // jaise reconnect ya naye conversation ki timing race ki wajah se), to dobara add na karo
         if (thread.messages.some(m => m.id === data.id)) return;
 
         const uiMsg = {
             id: data.id, fromMe: false,
             text: data.deleted_for_everyone ? 'This message was deleted' : (data.content || ''),
             timestamp: new Date(data.created_at), deletedForEveryone: data.deleted_for_everyone,
+            attachments: mapAttachments(data.attachments),
         };
         thread.messages.push(uiMsg);
+        autoloadImageAttachments(uiMsg.attachments);
         thread.lastMessage = uiMsg.text;
         thread.lastMessageAt = uiMsg.timestamp;
 
@@ -612,7 +758,15 @@ export function useInboxPage() {
     }
     const handleGlobalScroll = () => { if (contextMenu.visible) closeContextMenu(); };
     function handleEscKey(e) {
-        if (e.key === 'Escape') { closeContextMenu(); closeConfirmModal(); showChatMenu.value = false; closeParticipantsPanel(); }
+        if (e.key !== 'Escape') return;
+        if (contextMenu.visible) { closeContextMenu(); return; }
+        if (readByMenu.visible) { closeReadByMenu(); return; }
+        if (confirmModal.visible) { closeConfirmModal(); return; }
+        if (showAddMembersPanel.value) { closeAddMembersPanel(); return; }
+        if (showParticipantsPanel.value) { closeParticipantsPanel(); return; }
+        if (showChatMenu.value) { showChatMenu.value = false; return; }
+        if (showContactsPanel.value) { closeContactsPanel(); return; }
+        if (activeThreadId.value) { backToList(); return; }
     }
 
     function triggerGroupPhotoUpload() {
@@ -736,6 +890,9 @@ export function useInboxPage() {
         addMembersFilteredContacts, isCurrentUserGroupAdmin, currentUserMembership, activeGroupMembers,
         openAddMembersPanel, closeAddMembersPanel, toggleNewMemberSelection, isNewMemberSelected, submitAddMembers,
         requestLeaveGroup,    myAvatarInput, uploadingMyAvatar, myAvatar, triggerMyAvatarUpload, handleMyAvatarChange,
+        selectedFiles, attachFileInput, triggerFileAttach, handleFilesSelected,
+        removeSelectedFile, clearSelectedFiles, attachmentAction, loadAttachmentUrl,
+        lightboxImage, closeImageLightbox, downloadLightboxImage,
 
     };
 }
