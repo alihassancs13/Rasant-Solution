@@ -167,7 +167,7 @@
           <section class="lg:col-span-2 bg-white border border-border rounded-lg shadow-sm p-5">
             <h3 class="text-base font-bold text-headingMain mb-1">Quick modules</h3>
             <p class="text-xs text-textSupporting mb-4">Jump to the areas you use most</p>
-            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div class="grid grid-cols-1 sm:grid-cols-6 gap-3">
               <router-link
                   v-for="item in quickLinks"
                   :key="item.to"
