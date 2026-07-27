@@ -1,25 +1,73 @@
 from rest_framework import serializers
 from .models import User, Role, ContactMessage, EmailSettings
+from django.core.validators import EmailValidator, MinLengthValidator, MaxLengthValidator
+from django.core.exceptions import ValidationError
+import re
+
+
 class LoginSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=False)
-    username = serializers.CharField(required=False)
-    password = serializers.CharField(write_only=True)
+    email = serializers.EmailField(
+        required=False,
+        allow_blank=True,
+        max_length=50,
+        validators=[EmailValidator(message="Please enter a valid email address (e.g., abc@gmail.com)")]
+    )
+    username = serializers.CharField(
+        required=False,
+        allow_blank=True,
+        max_length=32,
+        min_length=1
+    )
+    password = serializers.CharField(
+        required=True,
+        write_only=True,
+        min_length=8,
+        max_length=50
+    )
+
+    def validate_email(self, value):
+        if value:
+            if len(value) > 50:
+                raise serializers.ValidationError("Email cannot exceed 50 characters")
+            try:
+                EmailValidator(message="Please enter a valid email address (e.g., abc@gmail.com)")(value)
+            except ValidationError as e:
+                raise serializers.ValidationError("Please enter a valid email address (e.g., abc@gmail.com)")
+            email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+            if not re.match(email_pattern, value):
+                raise serializers.ValidationError("Please enter a valid email address (e.g., abc@gmail.com)")
+
+        return value
+
+    def validate_username(self, value):
+        if value:
+            if len(value) > 32:
+                raise serializers.ValidationError("Username cannot exceed 32 characters")
+            if len(value) < 1:
+                raise serializers.ValidationError("Username must be at least 1 character")
+        return value
+
+    def validate_password(self, value):
+        if value:
+            if len(value) < 8:
+                raise serializers.ValidationError("Password must be at least 8 characters long")
+            if len(value) > 50:
+                raise serializers.ValidationError("Password cannot exceed 50 characters")
+
+        return value
 
     def validate(self, data):
         email = data.get('email')
         username = data.get('username')
         password = data.get('password')
-
-        if not email and not username:
-            raise serializers.ValidationError(
-                "Either email or username is required"
-            )
-
         if not password:
-            raise serializers.ValidationError(
-                "Password is required"
-            )
-
+            raise serializers.ValidationError({
+                "password": "Password is required"
+            })
+        if not email and not username:
+            raise serializers.ValidationError({
+                "non_field_errors": "Either email or username is required"
+            })
         return data
 
 

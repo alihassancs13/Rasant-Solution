@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import User, Module, ContactMessage, EmailSettings
+from .models import User, Module, ContactMessage, EmailSettings,InquiryStatus
 from .employee_access import build_sidebar_modules_for_role, ensure_user_is_employee
 from .serializer import (
     LoginSerializer,
@@ -16,9 +16,6 @@ from .serializer import (
     ChangePasswordSerializer,
     EmailSettingsSerializer,
 )
-from django.http import HttpResponse
-from .models import User, Module,ContactMessage ,InquiryStatus
-from .serializer import LoginSerializer, UserSerializer,ContactMessageSerializer
 from django.http import  HttpResponse
 from employeeDashboard.models import Employee
 from .email_service import send_test_email, send_inquiry_reply_email
@@ -32,20 +29,26 @@ def _is_admin(user):
 @permission_classes([AllowAny])
 def login_user(request):
     serializer = LoginSerializer(data=request.data)
-
     if not serializer.is_valid():
+        errors = {}
+        for field, error_list in serializer.errors.items():
+            if field == 'non_field_errors':
+                errors['non_field_errors'] = error_list
+            else:
+                if error_list and isinstance(error_list, list):
+                    errors[field] = error_list[0] if error_list else "Invalid value"
+                else:
+                    errors[field] = error_list
         return Response({
             "status": False,
             "message": "Validation Failed",
-            "errors": serializer.errors
+            "errors": errors
         }, status=status.HTTP_400_BAD_REQUEST)
-
     email = serializer.validated_data.get('email')
     username = serializer.validated_data.get('username')
     password = serializer.validated_data['password']
-    is_email_login = email is not None
-    is_username_login = username is not None
-
+    is_email_login = email is not None and email != ''
+    is_username_login = username is not None and username != ''
     try:
         if is_email_login:
             if not User.objects.filter(email=email).exists():
@@ -55,7 +58,6 @@ def login_user(request):
                     "error_type": "email_not_found"
                 }, status=status.HTTP_404_NOT_FOUND)
             user = User.objects.get(email=email)
-
         elif is_username_login:
             if not User.objects.filter(username=username).exists():
                 return Response({
@@ -75,7 +77,6 @@ def login_user(request):
             "status": False,
             "message": "User not found with provided credentials"
         }, status=status.HTTP_404_NOT_FOUND)
-
     # Check if user account is active
     if not user.is_active:
         return Response({
@@ -83,7 +84,6 @@ def login_user(request):
             "message": "Your account has been suspended. Please contact administrator.",
             "error_type": "account_suspended"
         }, status=status.HTTP_403_FORBIDDEN)
-
     # Check password
     if not user.check_password(password):
         return Response({
@@ -91,12 +91,9 @@ def login_user(request):
             "message": "Incorrect password. Please try again.",
             "error_type": "incorrect_password"
         }, status=status.HTTP_401_UNAUTHORIZED)
-
     # Generate JWT tokens
     refresh = RefreshToken.for_user(user)
-
     user_data = UserSerializer(user).data
-
     try:
         employee = Employee.objects.get(user=user)
         user_data['employee_id'] = employee.id
@@ -113,7 +110,6 @@ def login_user(request):
             employee_data['designation'] = employee.designation
 
         user_data['employee'] = employee_data
-
     except Employee.DoesNotExist:
         user_data['employee_id'] = None
         user_data['employee'] = None
@@ -121,9 +117,6 @@ def login_user(request):
         print(f"Error getting employee: {e}")
         user_data['employee_id'] = None
         user_data['employee'] = None
-
-
-
     try:
         if user_data.get('employee_id') and user.role and user.role.name.lower() == 'employee':
             ensure_user_is_employee(user)
@@ -135,7 +128,6 @@ def login_user(request):
         "account_modules": [],
         "project_modules": [],
     }
-
     return Response({
         "status": True,
         "message": "Login successful",
