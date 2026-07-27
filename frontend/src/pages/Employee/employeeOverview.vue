@@ -71,9 +71,9 @@
           </div>
         </section>
 
-        <div v-if="isLoading && !overview" class="py-20 text-center text-text-muted">
-          <font-awesome-icon :icon="['fas', 'spinner']" class="animate-spin text-3xl text-primary mb-3" />
-          <p class="text-sm">Loading your overview…</p>
+        <div v-if="isLoading && !overview" class="space-y-4">
+          <AppSkeleton variant="stats" :count="4" />
+          <AppSkeleton variant="cards" :count="4" :cols="2" />
         </div>
 
         <div v-else-if="error && !overview" class="bg-red-50 border border-red-200 rounded-md p-6 text-center">
@@ -229,6 +229,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import AdminSidebar from '@/components/adminSidebar.vue'
+import AppSkeleton from '@/components/AppSkeleton.vue'
 import DashboardHeader from '@/components/header.vue'
 import ToastContainer from '@/components/ToastContainer.vue'
 import { useEmployeeOverviewStore } from '@/stores/employeeOverviewStore.js'

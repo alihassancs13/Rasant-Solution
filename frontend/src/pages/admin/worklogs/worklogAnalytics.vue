@@ -219,9 +219,8 @@
               />
             </div>
 
-            <div v-if="store.loading" class="py-16 text-center text-text-muted">
-              <font-awesome-icon :icon="['fas', 'spinner']" class="animate-spin text-2xl text-primary mb-2" />
-              <p class="text-sm">Loading analytics…</p>
+            <div v-if="store.loading">
+              <AppSkeleton variant="table" :count="8" />
             </div>
 
             <div v-else-if="!filteredEmployees.length" class="py-16 text-center text-text-muted text-sm">
@@ -278,9 +277,8 @@
 
         <!-- EMPLOYEE DETAIL VIEW -->
         <template v-else>
-          <div v-if="store.detailLoading" class="py-20 text-center text-text-muted">
-            <font-awesome-icon :icon="['fas', 'spinner']" class="animate-spin text-3xl text-primary mb-3" />
-            <p class="text-sm">Loading employee worklogs…</p>
+          <div v-if="store.detailLoading">
+            <AppSkeleton variant="detail" />
           </div>
 
           <template v-else-if="detail">
@@ -364,6 +362,7 @@ import AdminSidebar from '@/components/adminSidebar.vue';
 import AppHeader from '@/components/header.vue';
 import ToastContainer from '@/components/ToastContainer.vue';
 import StatCard from '@/components/StatCard.vue';
+import AppSkeleton from '@/components/AppSkeleton.vue';
 import { useWorklogAnalyticsStore } from '@/stores/worklogAnalyticsStore.js';
 import { useJiraStore } from '@/stores/jiraStore.js';
 import { useToast } from '@/composables/useToast.js';

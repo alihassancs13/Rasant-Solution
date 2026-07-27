@@ -5,6 +5,7 @@ import pdfjsWorker from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 import AdminSidebar from '../../../components/adminSidebar.vue'
 import TopHeader from '../../../components/header.vue'
 import StatCard from '../../../components/statCard.vue'
+import AppSkeleton from '@/components/AppSkeleton.vue'
 import BaseModal from '../../../components/baseModal.vue'
 import BaseDetailModal from '../../../components/baseDetailModal.vue'
 import { useEmployeeCareer } from '../../../composables/useEmployeeCareer.js'
@@ -439,7 +440,9 @@ watch(() => selectedApplicant.value?.id, (id) => {
             </div>
           </div>
 
-          <div v-if="loadingAdmin" class="text-center py-10 text-text-muted text-sm border-t border-border-subtle">Loading jobs...</div>
+          <div v-if="loadingAdmin" class="py-2 border-t border-border-subtle">
+            <AppSkeleton variant="table" :count="6" />
+          </div>
 
           <div v-else-if="adminJobs.length === 0" class="text-center py-16 border-t border-border-subtle">
             <div class="w-12 h-12 rounded-full bg-surface-alt flex items-center justify-center mx-auto mb-3">
@@ -631,7 +634,9 @@ watch(() => selectedApplicant.value?.id, (id) => {
               </button>
             </div>
 
-            <div v-if="loadingAdmin" class="text-center py-10 text-text-muted text-sm">Loading jobs...</div>
+            <div v-if="loadingAdmin" class="py-2">
+              <AppSkeleton variant="cards" :count="6" :cols="3" />
+            </div>
             <div v-else-if="adminJobs.length === 0" class="text-center py-16">
               <p class="text-text-secondary font-medium">No job openings yet</p>
             </div>
@@ -698,14 +703,8 @@ watch(() => selectedApplicant.value?.id, (id) => {
                        class="w-full pl-9 pr-3 py-2 text-sm bg-white border border-border rounded-lg placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/20" />
               </div>
 
-              <div v-if="cvLoading" class="space-y-2">
-                <div v-for="i in 3" :key="i" class="p-3 rounded-lg bg-white border border-transparent animate-pulse flex gap-2.5">
-                  <div class="w-9 h-9 rounded-full bg-border shrink-0"></div>
-                  <div class="flex-1 space-y-1.5">
-                    <div class="h-2.5 bg-border rounded w-3/4"></div>
-                    <div class="h-2.5 bg-border rounded w-1/2"></div>
-                  </div>
-                </div>
+              <div v-if="cvLoading" class="py-1">
+                <AppSkeleton variant="list" :count="5" />
               </div>
 
               <div v-else-if="jobFilteredCVs.length === 0" class="text-center py-10 text-text-muted text-xs">

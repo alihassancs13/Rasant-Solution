@@ -688,3 +688,24 @@ html, body {
     opacity: 0;
     animation: chipFadeIn 0.5s ease-out forwards;
 }
+
+/* Loading skeletons — soft shimmer (replaces page spinners) */
+@keyframes skeleton-shimmer {
+    0% { background-position: 100% 0; }
+    100% { background-position: -100% 0; }
+}
+
+.skeleton-bone {
+    display: block;
+    flex-shrink: 0;
+    background: linear-gradient(
+        90deg,
+        #e8eef5 0%,
+        #e8eef5 35%,
+        #f5f8fc 50%,
+        #e8eef5 65%,
+        #e8eef5 100%
+    );
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.35s ease-in-out infinite;
+}

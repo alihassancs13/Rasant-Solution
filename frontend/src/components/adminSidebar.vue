@@ -76,9 +76,8 @@
         </div>
 
         <!-- Loading State (only when we have nothing to show yet) -->
-        <div v-if="loading && !companyModules.length" class="text-center py-10">
-          <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-primary border-t-transparent"></div>
-          <p class="text-sm text-text-muted mt-2" v-show="!showCollapsed">Loading menu...</p>
+        <div v-if="loading && !companyModules.length" class="py-4">
+          <AppSkeleton variant="sidebar" :count="7" :collapsed="showCollapsed" />
         </div>
 
         <!-- Error State -->
@@ -222,6 +221,7 @@
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue';
 import { useRouter } from 'vue-router';
 import { useAdminSidebar } from '../composables/useAdminsidebar.js';
+import AppSkeleton from '@/components/AppSkeleton.vue';
 
 const router = useRouter();
 

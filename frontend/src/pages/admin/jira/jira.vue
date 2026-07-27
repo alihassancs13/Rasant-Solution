@@ -306,9 +306,8 @@
       <!-- Issues List -->
       <div class="divide-y divide-gray-50 min-h-[200px] ">
 
-        <div v-if="isLoading" class="flex flex-col items-center justify-center py-12 gap-3">
-          <font-awesome-icon :icon="['fas', 'spinner']" class="w-6 h-6 text-blue-500 animate-spin" />
-          <p class="text-sm text-gray-400">Loading issues...</p>
+        <div v-if="isLoading" class="py-2">
+          <AppSkeleton variant="list" :count="8" />
         </div>
 
         <div v-else-if="!isLoading && paginatedTabIssues.length === 0" class="text-center py-12">
@@ -859,9 +858,8 @@
   >
 
     <!-- Loading -->
-    <div v-if="isModalLoading" class="flex flex-col items-center justify-center py-16 gap-3">
-      <font-awesome-icon :icon="['fas', 'spinner']" class="w-8 h-8 text-blue-500 animate-spin" />
-      <p class="text-sm text-gray-400">Loading issue details...</p>
+    <div v-if="isModalLoading" class="py-2">
+      <AppSkeleton variant="detail" />
     </div>
 
     <div v-else-if="selectedIssue" class="p-0">
@@ -1204,6 +1202,7 @@
 import { defineComponent } from 'vue';
 import AdminSidebar from '@/components/adminSidebar.vue'
 import TopHeader from '@/components/header.vue'
+import AppSkeleton from '@/components/AppSkeleton.vue'
 import { useJiraConnect } from '@/composables/useJira';
 import BaseModal from '@/components/baseModal.vue';
 import Multiselect from '@vueform/multiselect'

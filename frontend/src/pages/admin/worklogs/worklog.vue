@@ -68,9 +68,8 @@
         </div>
 
         <!-- Full-page loader ONLY on very first load (no data yet) -->
-        <div v-if="isCalendarLoading && worklogsByMonth.length === 0" class="p-20 text-center text-text-muted">
-          <font-awesome-icon :icon="['fas', 'spinner']" spin class="text-4xl text-primary mb-3" />
-          <p class="text-sm">Loading worklogs...</p>
+        <div v-if="isCalendarLoading && worklogsByMonth.length === 0">
+          <AppSkeleton variant="table" :count="8" />
         </div>
 
         <!-- Empty state (no data, not loading) -->
@@ -213,11 +212,8 @@
 
                 <tbody v-if="isCalendarLoading">
                   <tr>
-                    <td colspan="7" class="px-4 sm:px-5 py-10 text-center text-text-muted">
-                      <div class="flex flex-col items-center justify-center gap-2">
-                        <font-awesome-icon :icon="['fas', 'spinner']" spin class="text-2xl text-primary" />
-                        <span class="text-sm">Loading worklogs...</span>
-                      </div>
+                    <td colspan="7" class="px-4 sm:px-5 py-4">
+                      <AppSkeleton variant="table" :count="4" />
                     </td>
                   </tr>
                 </tbody>
@@ -290,9 +286,8 @@
 
               <!-- Mobile Card View - visible only on mobile -->
               <div class="sm:hidden space-y-3 p-3">
-                <div v-if="isCalendarLoading" class="text-center py-8 text-text-muted">
-                  <font-awesome-icon :icon="['fas', 'spinner']" spin class="text-2xl text-primary mb-2" />
-                  <p class="text-sm">Loading worklogs...</p>
+                <div v-if="isCalendarLoading" class="py-2">
+                  <AppSkeleton variant="list" :count="4" />
                 </div>
 
                 <div v-else-if="activeGroup.entries.length === 0" class="text-center py-8 text-text-muted">
@@ -758,17 +753,8 @@
           @close="closeViewModal"
       >
         <!-- Loading -->
-        <div
-            v-if="isLoadingWorklog"
-            class="flex flex-col items-center justify-center py-16 gap-3"
-        >
-          <font-awesome-icon
-              :icon="['fas', 'spinner']"
-              class="w-8 h-8 text-blue-500 animate-spin"
-          />
-          <p class="text-sm text-gray-400">
-            Loading worklog details...
-          </p>
+        <div v-if="isLoadingWorklog" class="py-2">
+          <AppSkeleton variant="form" :count="6" />
         </div>
 
         <div v-else-if="selectedViewWorklog" class="p-0">
@@ -897,6 +883,7 @@
 import AdminSidebar from '@/components/adminSidebar.vue'
 import StatCard from '@/components/statCard.vue'
 import TopHeader from '@/components/header.vue'
+import AppSkeleton from '@/components/AppSkeleton.vue'
 import CreateModal from '@/components/baseModal.vue'
 import BaseModal from '@/components/baseModal.vue'
 import BaseDetailModal from '@/components/baseModal.vue'

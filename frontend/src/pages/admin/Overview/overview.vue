@@ -51,9 +51,9 @@
           </div>
         </section>
 
-        <div v-if="store.loading && !stats" class="py-20 text-center text-text-muted">
-          <font-awesome-icon :icon="['fas', 'spinner']" class="animate-spin text-3xl text-primary mb-3" />
-          <p class="text-sm">Loading dashboard…</p>
+        <div v-if="store.loading && !stats" class="space-y-4">
+          <AppSkeleton variant="stats" :count="4" />
+          <AppSkeleton variant="table" :count="5" />
         </div>
 
         <div v-else-if="store.error && !stats" class="bg-red-50 border border-red-200 rounded-md p-6 text-center">
@@ -258,6 +258,7 @@ import Sidebar from '@/components/adminSidebar.vue';
 import AppHeader from '@/components/header.vue';
 import ToastContainer from '@/components/ToastContainer.vue';
 import StatCard from '@/components/StatCard.vue';
+import AppSkeleton from '@/components/AppSkeleton.vue';
 import { useOverviewStore } from '@/stores/worklogAnalyticsStore.js';
 import { useToast } from '@/composables/useToast.js';
 

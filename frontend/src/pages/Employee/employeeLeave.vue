@@ -192,7 +192,7 @@
             </select>
           </div>
 
-          <div v-if="store.isLoading" class="py-12 text-center text-text-muted text-sm">Loading…</div>
+          <AppSkeleton v-if="store.isLoading" variant="list" :count="6" />
           <div v-else-if="!store.myRequests.length" class="py-12 text-center text-text-muted text-sm">
             No leave requests yet.
             <button
@@ -246,6 +246,7 @@
 <script setup>
 import { computed, onMounted, reactive, ref } from 'vue'
 import AdminSidebar from '@/components/adminSidebar.vue'
+import AppSkeleton from '@/components/AppSkeleton.vue'
 import DashboardHeader from '@/components/header.vue'
 import ToastContainer from '@/components/ToastContainer.vue'
 import { useLeaveStore } from '@/stores/leaveStore.js'

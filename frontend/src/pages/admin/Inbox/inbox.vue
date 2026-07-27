@@ -1,6 +1,7 @@
 <script setup>
 import AppHeader from '../../../components/header.vue'
 import AdminSidebar from '@/components/adminSidebar.vue'
+import AppSkeleton from '@/components/AppSkeleton.vue'
 import { useInboxPage } from '@/composables/useInboxPage.js'
 
 const {
@@ -45,9 +46,8 @@ const {
         <div class="h-full overflow-hidden rounded-xl border border-border bg-card shadow-card-small">
 
           <!-- Loading state -->
-          <div v-if="isLoading" class="p-20 text-center text-text-muted">
-            <font-awesome-icon :icon="['fas', 'spinner']" spin class="text-4xl text-primary mb-3" />
-            <p class="text-sm">Loading your conversations...</p>
+          <div v-if="isLoading" class="p-4">
+            <AppSkeleton variant="list" :count="8" />
           </div>
 
           <div v-else class="flex h-full">
@@ -79,7 +79,9 @@ const {
                 </div>
 
                 <div class="flex-1 min-h-0 space-y-1 overflow-y-auto px-2 pb-3 scrollbar-whatsapp">
-                  <p v-if="contactsLoading" class="px-3 py-6 text-center text-sm text-text-muted">Loading contacts...</p>
+                  <div v-if="contactsLoading" class="px-1 py-2">
+                    <AppSkeleton variant="list" :count="6" />
+                  </div>
                   <template v-else>
                     <button v-if="!groupCreationMode" type="button" @click="openGroupCreation"
                             class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left hover:bg-surface-alt cursor-pointer">

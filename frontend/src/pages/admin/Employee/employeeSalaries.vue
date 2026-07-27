@@ -4,6 +4,7 @@ import AdminSidebar from '@/components/adminSidebar.vue'
 import TopHeader from '@/components/header.vue'
 import { useRouter, useRoute } from 'vue-router'
 import StatCard from '@/components/statCard.vue'
+import AppSkeleton from '@/components/AppSkeleton.vue'
 import ShineButton from '@/components/ShineButton.vue'
 import BaseModal from '@/components/baseModal.vue'
 import BaseDetailModal from '@/components/baseDetailModal.vue'
@@ -428,9 +429,9 @@ watch(() => route.query.highlightEmployee, (newVal) => {
               </tr>
               </thead>
               <tbody v-if="employeesLoading">
-              <tr v-for="i in 3" :key="i">
+              <tr>
                 <td colspan="7" class="px-4 sm:px-5 py-4">
-                  <div class="h-4 bg-border rounded w-full max-w-xs animate-pulse"></div>
+                  <AppSkeleton variant="table" :count="6" />
                 </td>
               </tr>
               </tbody>
@@ -537,8 +538,8 @@ watch(() => route.query.highlightEmployee, (newVal) => {
 
           <!-- Mobile: Card view -->
           <div class="md:hidden">
-            <div v-if="employeesLoading" class="space-y-3 p-4">
-              <div v-for="i in 3" :key="i" class="h-24 bg-border rounded-xl animate-pulse"></div>
+            <div v-if="employeesLoading" class="p-4">
+              <AppSkeleton variant="cards" :count="3" :cols="1" />
             </div>
             <div v-else-if="employees.length === 0" class="text-center py-16 text-text-muted">
               No employees found.
@@ -626,9 +627,8 @@ watch(() => route.query.highlightEmployee, (newVal) => {
             </button>
           </div>
 
-          <div v-if="policiesLoading" class="bg-white border border-border rounded-xl shadow-sm text-center py-16">
-            <font-awesome-icon icon="fa-solid fa-spinner" spin class="text-text-muted text-2xl" />
-            <p class="text-text-secondary font-medium mt-3">Loading policies...</p>
+          <div v-if="policiesLoading" class="py-2">
+            <AppSkeleton variant="cards" :count="3" :cols="3" />
           </div>
 
           <div v-else-if="policies.length === 0" class="bg-white border border-border rounded-xl shadow-sm text-center py-16">
@@ -735,8 +735,8 @@ watch(() => route.query.highlightEmployee, (newVal) => {
             </p>
           </div>
 
-          <div v-if="payrollSettingsLoading" class="text-center py-16">
-            <font-awesome-icon icon="fa-solid fa-spinner" spin class="text-text-muted text-2xl" />
+          <div v-if="payrollSettingsLoading" class="py-2 px-4 sm:px-5">
+            <AppSkeleton variant="form" :count="6" />
           </div>
 
           <div v-else class="px-4 sm:px-5 pb-5 grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-4">
@@ -871,8 +871,8 @@ watch(() => route.query.highlightEmployee, (newVal) => {
                 </div>
               </div>
 
-              <div v-if="holidaysLoading" class="text-center py-8">
-                <font-awesome-icon icon="fa-solid fa-spinner" spin class="text-text-muted text-xl" />
+              <div v-if="holidaysLoading" class="py-2">
+                <AppSkeleton variant="table" :count="4" />
               </div>
               <div v-else-if="!holidays.length" class="text-sm text-text-muted py-4 text-center border border-dashed border-border rounded-md">
                 No holidays set for {{ holidayYear }}.
@@ -1225,9 +1225,8 @@ watch(() => route.query.highlightEmployee, (newVal) => {
         @close="closeEmployeeDetailModal">
 
       <!-- Loading -->
-      <div v-if="isEmployeeDetailLoading" class="flex flex-col items-center justify-center py-16 gap-3">
-        <font-awesome-icon :icon="['fas', 'spinner']" class="w-8 h-8 text-blue-500 animate-spin" />
-        <p class="text-sm text-gray-400">Loading employee details...</p>
+      <div v-if="isEmployeeDetailLoading" class="py-2">
+        <AppSkeleton variant="detail" />
       </div>
 
       <div v-else-if="employeeDetail" class="p-0">

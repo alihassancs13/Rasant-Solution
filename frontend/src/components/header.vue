@@ -121,9 +121,9 @@
             <div class="max-h-96 overflow-y-auto">
               <div
                   v-if="notificationStore.isLoading && !notificationStore.items.length"
-                  class="px-6 py-10 text-center text-sm text-text-muted"
+                  class="px-4 py-4"
               >
-                Loading…
+                <AppSkeleton variant="list" :count="4" />
               </div>
 
               <div
@@ -280,6 +280,7 @@ import { useOverview } from '@/composables/useOverview.js'
 import { useAdminSidebar } from '@/composables/useAdminsidebar.js'
 import { useLoginStore } from '@/stores/loginStore.js'
 import { useNotificationStore } from '@/stores/notificationStore.js'
+import AppSkeleton from '@/components/AppSkeleton.vue'
 import { BASE_URL, API_ENDPOINTS } from '@/services/baseUrl.js'
 
 const notificationStore = useNotificationStore()

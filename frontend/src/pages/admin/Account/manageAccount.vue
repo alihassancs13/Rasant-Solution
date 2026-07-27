@@ -166,9 +166,8 @@
               </label>
             </div>
 
-            <div v-if="accountStore.isLoadingEmail" class="py-12 text-center text-text-muted text-sm">
-              <font-awesome-icon :icon="['fas', 'spinner']" class="animate-spin mr-2" />
-              Loading settings…
+            <div v-if="accountStore.isLoadingEmail" class="py-2">
+              <AppSkeleton variant="form" :count="6" />
             </div>
 
             <form v-else class="grid grid-cols-1 sm:grid-cols-2 gap-4" @submit.prevent="saveEmail">
@@ -252,6 +251,7 @@ import { computed, onMounted, onBeforeUnmount, reactive, ref, watch } from 'vue'
 import AdminSidebar from '@/components/adminSidebar.vue';
 import AppHeader from '@/components/header.vue';
 import ToastContainer from '@/components/ToastContainer.vue';
+import AppSkeleton from '@/components/AppSkeleton.vue';
 import { useAccountStore } from '@/stores/accountStore.js';
 import { useLoginStore } from '@/stores/loginStore.js';
 import { useToast } from '@/composables/useToast.js';

@@ -46,11 +46,8 @@
       <div class="flex-1 pt-1 px-4 pb-4 sm:px-6 lg:px-8 overflow-hidden">
         <div class="w-full h-full">
           <!-- Loading State -->
-          <div v-if="loading" class="flex justify-center items-center h-64">
-            <div class="text-center">
-              <i class="fas fa-spinner fa-spin text-4xl text-indigo-600 mb-4"></i>
-              <p class="text-gray-600">Loading credentials...</p>
-            </div>
+          <div v-if="loading">
+            <AppSkeleton variant="cards" :count="6" :cols="3" />
           </div>
 
           <!-- Error State -->
@@ -217,6 +214,7 @@
 <script>
 import { ref } from "vue";
 import AdminSidebar from "@/components/adminSidebar.vue";
+import AppSkeleton from "@/components/AppSkeleton.vue";
 import DashboardHeader from "@/components/header.vue";
 import ToastContainer from "@/components/ToastContainer.vue";
 import useEmployeeCredentials from "@/composables/useEmployeeCredentials.js";

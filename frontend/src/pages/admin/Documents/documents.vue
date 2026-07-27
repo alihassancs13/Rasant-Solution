@@ -17,9 +17,8 @@
       <div class="flex-1 pt-1 px-4 pb-4 sm:px-6 lg:px-8 overflow-hidden">
         <div class="w-full">
           <!-- Loading -->
-          <div v-if="loading" class="text-center py-10">
-            <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-600 border-t-transparent"></div>
-            <p class="text-sm text-gray-500 mt-2">Loading...</p>
+          <div v-if="loading" class="py-2">
+            <AppSkeleton variant="cards" :count="9" :cols="3" />
           </div>
 
           <!-- Error -->
@@ -278,9 +277,8 @@
 
                     <!-- Preview Content -->
                     <div class="flex-1 p-4" style="overflow: hidden;">
-                      <div v-if="previewLoading" class="flex items-center justify-center h-full">
-                        <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-600 border-t-transparent"></div>
-                        <span class="ml-2 text-sm text-gray-500">Loading preview...</span>
+                      <div v-if="previewLoading" class="py-4">
+                        <AppSkeleton variant="lines" :count="6" />
                       </div>
                       <div v-else-if="previewError" class="flex flex-col items-center justify-center h-full text-red-500">
                         <i class="fas fa-exclamation-circle text-3xl mb-2"></i>
@@ -519,8 +517,8 @@
 
         <!-- Employee Grid -->
         <div class="border border-gray-200 rounded-lg ">
-          <div v-if="employeeStore.isLoading" class="flex justify-center items-center py-12">
-            <i class="fas fa-spinner fa-spin text-2xl text-indigo-600"></i>
+          <div v-if="employeeStore.isLoading" class="p-3">
+            <AppSkeleton variant="list" :count="6" />
           </div>
 
           <div v-else-if="shareFilteredEmployees.length === 0" class="text-center py-12">
@@ -654,13 +652,15 @@ import useDocuments from '@/composables/useDocuments.js'
 import AdminSidebar from "@/components/adminSidebar.vue";
 import DashboardHeader from '@/components/header.vue';
 import BaseModal from '@/components/baseModal.vue';
+import AppSkeleton from '@/components/AppSkeleton.vue';
 
 export default {
   name: 'Documents',
   components: {
     AdminSidebar,
     DashboardHeader,
-    BaseModal
+    BaseModal,
+    AppSkeleton
   },
   setup() {
     return useDocuments()

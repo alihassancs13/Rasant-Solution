@@ -42,11 +42,8 @@
       <div class="flex-1 pt-1 px-4 pb-4 sm:px-6 lg:px-8 overflow-hidden">
         <div class="w-full h-full">
           <!-- Loading State -->
-          <div v-if="loading" class="flex justify-center items-center h-64">
-            <div class="text-center">
-              <i class="fas fa-spinner fa-spin text-4xl text-indigo-600 mb-4"></i>
-              <p class="text-gray-600">Loading credentials...</p>
-            </div>
+          <div v-if="loading" class="py-2">
+            <AppSkeleton variant="cards" :count="8" :cols="4" />
           </div>
 
           <!-- Error State -->
@@ -549,6 +546,7 @@ import { ref } from "vue";
 import AdminSidebar from "@/components/adminSidebar.vue";
 import DashboardHeader from "@/components/header.vue";
 import BaseModal from "@/components/baseModal.vue";
+import AppSkeleton from "@/components/AppSkeleton.vue";
 import useCredentialsVault from "@/composables/useCredentialsVault.js";
 import ToastContainer from "@/components/ToastContainer.vue";
 
@@ -558,7 +556,8 @@ export default {
     AdminSidebar,
     DashboardHeader,
     BaseModal,
-    ToastContainer
+    ToastContainer,
+    AppSkeleton
   },
   setup() {
     const isSidebarOpen = ref(false)

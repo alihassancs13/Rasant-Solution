@@ -18,9 +18,9 @@
       <main class="flex-1 min-h-0 overflow-hidden px-3 sm:px-4 pb-4 flex flex-col gap-4">
 
         <!-- Loading -->
-        <div v-if="loading" class="flex flex-col items-center justify-center py-20">
-          <div class="animate-spin rounded-full h-10 w-10 border-4 border-primary border-t-transparent"></div>
-          <p class="text-sm text-text-muted mt-3">Loading inquiries...</p>
+        <div v-if="loading" class="space-y-4">
+          <AppSkeleton variant="stats" :count="4" />
+          <AppSkeleton variant="list" :count="8" />
         </div>
 
         <!-- Error -->
@@ -369,6 +369,7 @@ import AppHeader from '@/components/header.vue'
 import ToastContainer from '@/components/ToastContainer.vue'
 import StatCard from '@/components/statCard.vue'
 import BaseModal from '@/components/baseModal.vue'
+import AppSkeleton from '@/components/AppSkeleton.vue'
 import { useInquiries } from '@/composables/useInquiries.js'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 

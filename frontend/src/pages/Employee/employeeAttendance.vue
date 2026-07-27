@@ -15,9 +15,9 @@
       </div>
 
       <main class="flex-1 overflow-y-auto overflow-x-hidden px-3 sm:px-4 pb-6 space-y-4">
-        <div v-if="isLoading && !loadedOnce" class="py-20 text-center text-text-muted">
-          <font-awesome-icon :icon="['fas', 'spinner']" class="animate-spin text-3xl text-primary mb-3" />
-          <p class="text-sm">Loading attendance…</p>
+        <div v-if="isLoading && !loadedOnce" class="space-y-4">
+          <AppSkeleton variant="stats" :count="4" />
+          <AppSkeleton variant="table" :count="5" />
         </div>
 
         <div v-else-if="error && !loadedOnce" class="bg-red-50 border border-red-200 rounded-md p-6 text-center">
@@ -134,7 +134,10 @@
             </div>
 
             <div class="overflow-x-auto">
-              <table v-if="history.length" class="w-full text-sm">
+              <div v-if="isLoading" class="p-4">
+                <AppSkeleton variant="table" :count="5" />
+              </div>
+              <table v-else-if="history.length" class="w-full text-sm">
                 <thead class="bg-surface text-left text-text-muted text-xs uppercase tracking-wide">
                   <tr>
                     <th class="px-4 py-3 font-semibold">Date</th>
@@ -183,7 +186,7 @@
                 </tbody>
               </table>
               <p v-else class="px-5 py-10 text-center text-sm text-text-muted">
-                {{ isLoading ? 'Loading records…' : 'No attendance records for this filter.' }}
+                No attendance records for this filter.
               </p>
             </div>
           </section>
@@ -197,6 +200,7 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import axios from 'axios'
 import AdminSidebar from '@/components/adminSidebar.vue'
+import AppSkeleton from '@/components/AppSkeleton.vue'
 import DashboardHeader from '@/components/header.vue'
 import StatCard from '@/components/StatCard.vue'
 import ToastContainer from '@/components/ToastContainer.vue'

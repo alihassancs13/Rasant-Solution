@@ -47,7 +47,9 @@
             </p>
           </div>
 
-          <div v-if="store.isLoading" class="py-16 text-center text-text-muted text-sm">Loading leave requests…</div>
+          <div v-if="store.isLoading">
+            <AppSkeleton variant="list" :count="6" />
+          </div>
           <div v-else-if="!store.adminRequests.length" class="py-16 text-center text-text-muted text-sm">
             No {{ statusFilter === 'all' ? '' : statusFilter + ' ' }}requests.
           </div>
@@ -145,6 +147,7 @@ import AdminSidebar from '@/components/adminSidebar.vue'
 import DashboardHeader from '@/components/header.vue'
 import ToastContainer from '@/components/ToastContainer.vue'
 import StatCard from '@/components/StatCard.vue'
+import AppSkeleton from '@/components/AppSkeleton.vue'
 import { useLeaveStore } from '@/stores/leaveStore.js'
 import { useToast } from '@/composables/useToast'
 

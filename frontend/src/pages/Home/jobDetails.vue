@@ -5,9 +5,8 @@
     <div class="max-w-6xl mx-auto px-4 sm:px-6 pt-28 pb-10">
 
       <!-- Loading state -->
-      <div v-if="loading" class="text-center py-12">
-        <font-awesome-icon :icon="['fas', 'spinner']" spin class="text-3xl text-primary-500" />
-        <p class="mt-4 text-textSupporting">Loading job details...</p>
+      <div v-if="loading" class="py-6 space-y-4">
+        <AppSkeleton variant="detail" />
       </div>
 
       <!-- Error state -->
@@ -284,6 +283,7 @@
 import { ref, onMounted, reactive } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import Navbar from '../../components/navbar.vue'
+import AppSkeleton from '@/components/AppSkeleton.vue'
 import ShineButton from '@/components/ShineButton.vue'
 import { useJobStore } from '@/stores/jobStore.js'
 import { useCvStore } from '@/stores/cvStore.js'

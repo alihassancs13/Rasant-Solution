@@ -112,9 +112,8 @@
             <button @click="loadEmployees" class="ml-auto text-xs underline font-bold cursor-pointer">Retry</button>
           </div>
 
-          <div v-if="isLoading" class="p-20 text-center text-text-muted">
-            <font-awesome-icon :icon="['fas', 'spinner']" spin class="text-4xl text-primary mb-3" />
-            <p class="text-sm">Fetching employee records details...</p>
+          <div v-if="isLoading" class="space-y-4">
+            <AppSkeleton variant="table" :count="8" />
           </div>
 
           <!-- Table (desktop) + Cards (mobile) -->
@@ -1053,6 +1052,7 @@ import { ref, onMounted, onBeforeUnmount } from 'vue';
 import DashboardHeader from '../../../components/header.vue';
 import StateCard from '../../../components/StatCard.vue';
 import AdminSidebar from '../../../components/adminSidebar.vue';
+import AppSkeleton from '@/components/AppSkeleton.vue';
 import CreateModal from '../../../components/baseModal.vue';
 import EmployeeRegistrationModelForm from '@/pages/admin/Employee/employeeRegistrationModel.vue';
 import EmployeeBaseModal from '@/components/employeeBaseModel.vue';

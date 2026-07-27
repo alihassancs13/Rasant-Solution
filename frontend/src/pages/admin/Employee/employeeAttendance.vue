@@ -3,6 +3,7 @@ import { onMounted, onUnmounted } from 'vue'
 import AdminSidebar from '../../../components/adminSidebar.vue'
 import DashboardHeader from '../../../components/header.vue'
 import StatCard from "@/components/StatCard.vue";
+import AppSkeleton from '@/components/AppSkeleton.vue'
 import {
   useAttendance,
   STATUS_META,
@@ -205,8 +206,8 @@ onUnmounted(() => document.removeEventListener('click', closeHistoryStatusDropdo
                 </td>
               </tr>
               <tr v-if="isLoadingList">
-                <td colspan="7" class="text-center text-[13px] text-text-muted py-12">
-                  Loading attendance…
+                <td colspan="7" class="px-4 py-4">
+                  <AppSkeleton variant="table" :count="6" />
                 </td>
               </tr>
               <tr v-else-if="!filteredEmployees.length">
@@ -367,7 +368,9 @@ onUnmounted(() => document.removeEventListener('click', closeHistoryStatusDropdo
             </div>
 
             <!-- History Table -->
-            <p v-if="isLoadingHistory" class="text-center text-[13px] text-text-muted py-12">Loading history…</p>
+            <div v-if="isLoadingHistory" class="px-4 py-4">
+              <AppSkeleton variant="table" :count="5" />
+            </div>
             <table v-else-if="historyRecords.length" class="w-full border-collapse">
               <thead>
               <tr>
