@@ -1,26 +1,23 @@
 // composables/useJobs.js
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive, computed, watch } from 'vue'
 import { useJobStore } from '@/stores/jobStore.js'
 import { useToast } from './useToast.js'
+import { useValidation } from './useValidation.js'
 
 export function useJobs() {
     const jobStore = useJobStore()
     const { showToast } = useToast()
+    const { getUsernameError, getAmountError } = useValidation()
 
     const getStatusId = (name) => jobStore.jobStatus.find(s => s.name?.toLowerCase() === name.toLowerCase())?.id ?? null
 
     const formData = reactive({
-        job_title: '',
-        job_type: null,
-        department: '',
-        location: '',
-        salary_range: null,
-        description: '',
-        requirements: '',
-        status: null,
-        id: null,
+        job_title: '', job_type: null, department: '', location: '',
+        salary_range: null, description: '', requirements: '', status: null, id: null,
     })
     const formErrors = reactive({})
+    const touched = reactive({}) // tracks which fields the user has actually interacted with
+    const isFormValid = ref(false)
     const isClosed = ref(false)
     const isSubmitting = ref(false)
     const submitSuccess = ref(false)
@@ -37,29 +34,41 @@ export function useJobs() {
         formData.status = checked ? getStatusId('Published') : getStatusId('Draft')
     }
 
-    const validateForm = () => {
+    const touchField = (key) => { touched[key] = true }
+    const touchAll = () => { Object.keys(formData).forEach((key) => { touched[key] = true }) }
+
+    // Single source of truth — live watch (borders + button) aur submit-time
+    // validateForm() dono isi se chalte hain, koi duplicate rule nahi.
+    const collectErrors = () => ({
+        job_title: getUsernameError(formData.job_title, undefined, 'Job title'),
+        job_type: formData.job_type ? null : 'Job type is required.',
+        department: getUsernameError(formData.department, undefined, 'Department'),
+        location: getUsernameError(formData.location, undefined, 'Location'),
+        salary_range: getAmountError(formData.salary_range, undefined, 'Salary range'),
+        description: formData.description.trim() ? null : 'Description is required.',
+        requirements: formData.requirements.trim() ? null : 'Requirements are required.',
+    })
+
+    watch(formData, () => {
+        const errors = collectErrors()
         Object.keys(formErrors).forEach((key) => delete formErrors[key])
+        Object.entries(errors).forEach(([key, msg]) => { if (msg) formErrors[key] = msg })
+        isFormValid.value = Object.values(errors).every((msg) => !msg)
+    }, { deep: true, immediate: true })
 
-        if (!formData.job_title.trim()) formErrors.job_title = 'Job title is required.'
-        if (!formData.job_type) formErrors.job_type = 'Job type is required.'
-        if (!formData.department.trim()) formErrors.department = 'Department is required.'
-        if (!formData.location.trim()) formErrors.location = 'Location is required.'
-        if (!formData.description.trim()) formErrors.description = 'Description is required.'
-        if (!formData.requirements.trim()) formErrors.requirements = 'Requirements are required.'
+    const validateForm = () => isFormValid.value
 
-        return Object.keys(formErrors).length === 0
-    }
+    // Border/error text visible only when BOTH true — invalid AND touched.
+    const fieldClass = (key, extra = '') =>
+        `w-full min-w-0 px-3.5 py-2.5 text-sm bg-surface border rounded-lg placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary ${extra} ${touched[key] && formErrors[key] ? 'border-danger' : 'border-border'}`
+    const fieldErrorVisible = (key) => touched[key] && formErrors[key]
 
     const resetForm = () => {
-        formData.id = null
-        formData.job_title = ''
-        formData.job_type = null
-        formData.department = ''
-        formData.location = ''
-        formData.salary_range = null
-        formData.description = ''
-        formData.requirements = ''
-        formData.status = getStatusId('Draft')
+        Object.assign(formData, {
+            id: null, job_title: '', job_type: null, department: '', location: '',
+            salary_range: null, description: '', requirements: '', status: getStatusId('Draft'),
+        })
+        Object.keys(touched).forEach((key) => delete touched[key])
         isClosed.value = false
         submitSuccess.value = false
         submitError.value = ''
@@ -68,28 +77,18 @@ export function useJobs() {
     const createJob = async () => {
         submitError.value = ''
         submitSuccess.value = false
-
-        if (!validateForm()) {
-            showToast('Please fix the highlighted fields.', 'error')
-            return null
-        }
-
         isSubmitting.value = true
         const result = await jobStore.createJob({ ...formData })
         isSubmitting.value = false
 
         if (result.success) {
             submitSuccess.value = true
-            showToast(
-                isClosed.value ? 'Job published on careers page.' : 'Job saved as draft.',
-                'success'
-            )
+            showToast(isClosed.value ? 'Job published on careers page.' : 'Job saved as draft.', 'success')
             return result.data
-        } else {
-            submitError.value = result.error
-            showToast(result.error, 'error')
-            return null
         }
+        submitError.value = result.error
+        showToast(result.error, 'error')
+        return null
     }
 
     const updateJob = async (id, jobData) => {
@@ -100,40 +99,23 @@ export function useJobs() {
         if (result.success) {
             showToast('Job opening updated.', 'success')
             return result.data
-        } else {
-            showToast(result.error, 'error')
-            return null
         }
+        showToast(result.error, 'error')
+        return null
     }
 
     const fetchAdminJobs = async () => {
         const result = await jobStore.fetchAdminJobs()
-        if (!result.success) {
-            showToast(result.error, 'error')
-        }
+        if (!result.success) showToast(result.error, 'error')
     }
 
-    const fetchPublicJobs = async () => {
-        await jobStore.fetchPublicJobs()
-    }
+    const fetchPublicJobs = async () => { await jobStore.fetchPublicJobs() }
 
     return {
-        formData,
-        formErrors,
-        isClosed,
-        isSubmitting,
-        submitSuccess,
-        submitError,
-        toggleStatus,
-        createJob,
-        resetForm,
-        updateJob,
-        adminJobs,
-        publicJobs,
-        loadingAdmin,
-        loadingPublic,
-        listError,
-        fetchAdminJobs,
-        fetchPublicJobs,
+        formData, formErrors, isClosed, isSubmitting, submitSuccess, submitError,
+        toggleStatus, createJob, resetForm, updateJob, validateForm, isFormValid,
+        touchField, touchAll, fieldClass, fieldErrorVisible,
+        adminJobs, publicJobs, loadingAdmin, loadingPublic, listError,
+        fetchAdminJobs, fetchPublicJobs,
     }
 }

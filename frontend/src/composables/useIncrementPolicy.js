@@ -1,13 +1,14 @@
-import { reactive, ref, computed } from 'vue'
+import { reactive, ref, computed, watch } from 'vue'
 import { usePolicyStore } from '@/stores/policyStore.js'
 import { useToast } from './useToast.js'
+import { useValidation } from './useValidation.js'
 
 export function useIncrementPolicy(employees) {
     const policyStore = usePolicyStore()
     const { showToast } = useToast()
     const policyPage = ref(1)
     const policiesPerPage = ref(4)
-
+    const { getUsernameError, getAmountError, LENGTH_LIMITS, blockNonDigitKeydown, blockNonDigitPaste } = useValidation()
     const formData = reactive({
         id: null,
         policy_name: '',
@@ -67,9 +68,11 @@ export function useIncrementPolicy(employees) {
     const validateForm = () => {
         Object.keys(formErrors).forEach((key) => delete formErrors[key])
 
-        if (!formData.policy_name.trim()) formErrors.policy_name = 'Policy name is required.'
+        const nameError = getUsernameError(formData.policy_name)
+        if (nameError) formErrors.policy_name = nameError
         if (!formData.increment_type)     formErrors.increment_type = 'Increment type is required.'
-        if (formData.amount === null || formData.amount === '') formErrors.amount = 'Amount is required.'
+        const amountError = getAmountError(formData.amount)
+        if (amountError) formErrors.amount = amountError
         if (!formData.cycle_timing)       formErrors.cycle_timing = 'Cycle/timing is required.'
         if (!formData.application_mode)   formErrors.application_mode = 'Application mode is required.'
 
@@ -457,6 +460,22 @@ export function useIncrementPolicy(employees) {
         bonusDraft.value = 0
     }
 
+    // Numeric guards for the Amount field — thin wrappers around the shared
+    // useValidation guards (previously ~25 lines duplicated here).
+    const blockNonNumericAmount = (e) =>
+        blockNonDigitKeydown(e, { allowDecimal: true, maxDigits: LENGTH_LIMITS.amount.maxDigits, currentValue: formData.amount })
+
+    const blockNonNumericPaste = (e) =>
+        blockNonDigitPaste(e, { allowDecimal: true, maxDigits: LENGTH_LIMITS.amount.maxDigits })
+
+    watch(() => formData.policy_name, (val) => {
+        formErrors.policy_name = getUsernameError(val) || ''
+    })
+
+    watch(() => formData.amount, (val) => {
+        formErrors.amount = getAmountError(val) || ''
+    })
+
     const saveMonthlyBonus = async () => {
         const emp = policyStore.employeeDetail
         if (!emp?.id) return { success: false }
@@ -498,6 +517,6 @@ export function useIncrementPolicy(employees) {
         isEmployeeDueToday, employeeDetail, isEmployeeDetailLoading,
         showEmployeeDetailModal, fetchEmployeeDetail,
         openEmployeeDetailModal, closeEmployeeDetailModal,
-        bonusDraft, isSavingBonus, saveMonthlyBonus,
+        bonusDraft, isSavingBonus, saveMonthlyBonus, blockNonNumericAmount, blockNonNumericPaste,
     }
 }

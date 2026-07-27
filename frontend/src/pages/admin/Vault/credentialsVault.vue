@@ -216,12 +216,12 @@
                   </button>
                   <div class="flex gap-1">
                     <button
-                        v-for="page in displayedPages"
-                        :key="page"
+                        v-for="(page, idx) in displayedPages"
+                        :key="`${page}-${idx}`"
                         @click="typeof page === 'number' ? goToPage(page) : null"
                         class="px-2 sm:px-3 py-2 rounded-lg transition-colors text-sm min-w-[32px]"
                         :class="page === '...' ? 'cursor-default text-gray-400' :
-                                currentPage === page ? 'dash-topbar-profile text-buttonTextColor' : 'hover:bg-gray-100 text-gray-700'"
+                        currentPage === page ? 'dash-topbar-profile text-buttonTextColor' : 'hover:bg-gray-100 text-gray-700'"
                         :disabled="page === '...'"
                     >
                       {{ page }}
@@ -252,12 +252,13 @@
         :submitText="isEditing ? 'Save changes' : 'Save credential'"
         :cancelText="'Cancel'"
         :loading="isSaving || loading"
+        :disableSubmit="!isFormValid"
         formId="credential-form"
         @close="closeModal"
         @cancel="closeModal"
         @save="saveCredential"
     >
-      <form id="credential-form" @submit.prevent="saveCredential">
+      <form id="credential-form" novalidate @submit.prevent="saveCredential">
         <div class="space-y-4">
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Credential label</label>
@@ -265,21 +266,30 @@
                 v-model="form.name"
                 type="text"
                 placeholder="e.g. Sentra AI — Admin Panel"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                :class="[
+                    'w-full px-4 py-2 border rounded-lg bg-white outline-none transition-all duration-200 placeholder:text-gray-400',
+                    fieldErrors.name
+                        ? 'border-error ring-2 ring-error/20 focus:border-error focus:ring-error/30'
+                        : 'border-borderDefault focus:border-primary-500 focus:ring-4 focus:ring-primary-500/12 focus:shadow-[0_0_0_4px_rgba(74,144,226,0.08),0_2px_8px_rgba(74,144,226,0.12)]'
+                ]"
                 required
             />
-            <p v-if="fieldErrors.name" class="text-xs mt-1 text-red-500">{{ fieldErrors.name }}</p>
+            <p v-if="fieldErrors.name" class="text-xs mt-1 text-error">{{ fieldErrors.name }}</p>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Login link (URL)</label>
             <input
                 v-model="form.link"
-                type="url"
+                type="text"
                 placeholder="https://admin.example.com"
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-                required
+                :class="[
+        'w-full px-4 py-2 border rounded-lg bg-white outline-none transition-all duration-200 placeholder:text-gray-400',
+        fieldErrors.link
+            ? 'border-error ring-2 ring-error/20 focus:border-error focus:ring-error/30'
+            : 'border-borderDefault focus:border-primary-500 focus:ring-4 focus:ring-primary-500/12 focus:shadow-[0_0_0_4px_rgba(74,144,226,0.08),0_2px_8px_rgba(74,144,226,0.12)]'
+    ]"
             />
-            <p v-if="fieldErrors.link" class="text-xs mt-1 text-red-500">{{ fieldErrors.link }}</p>
+            <p v-if="fieldErrors.link" class="text-xs mt-1 text-error">{{ fieldErrors.link }}</p>
           </div>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -288,10 +298,15 @@
                   v-model="form.username"
                   type="text"
                   placeholder="e.g. admin"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                  :class="[
+                      'w-full px-4 py-2 border rounded-lg bg-white outline-none transition-all duration-200 placeholder:text-gray-400',
+                      fieldErrors.username
+                          ? 'border-error ring-2 ring-error/20 focus:border-error focus:ring-error/30'
+                          : 'border-borderDefault focus:border-primary-500 focus:ring-4 focus:ring-primary-500/12 focus:shadow-[0_0_0_4px_rgba(74,144,226,0.08),0_2px_8px_rgba(74,144,226,0.12)]'
+                  ]"
                   required
               />
-              <p v-if="fieldErrors.username" class="text-xs mt-1 text-red-500">{{ fieldErrors.username }}</p>
+              <p v-if="fieldErrors.username" class="text-xs mt-1 text-error">{{ fieldErrors.username }}</p>
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
@@ -299,10 +314,17 @@
                   v-model="form.email"
                   type="email"
                   placeholder="e.g. admin@example.com"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                  :class="[
+                          'w-full px-4 py-2 border rounded-lg bg-white outline-none transition-all duration-200 placeholder:text-gray-400',
+                          fieldErrors.email
+                              ? 'border-error ring-2 ring-error/20 focus:border-error focus:ring-error/30'
+                              : 'border-borderDefault focus:border-primary-500 focus:ring-4 focus:ring-primary-500/12 focus:shadow-[0_0_0_4px_rgba(74,144,226,0.08),0_2px_8px_rgba(74,144,226,0.12)]'
+                      ]"
                   required
               />
-              <p v-if="fieldErrors.email" class="text-xs mt-1 text-red-500">{{ fieldErrors.email }}</p>
+              <p v-if="fieldErrors.email" class="mt-1 text-xs font-medium text-error animate-shake">
+                {{ fieldErrors.email }}
+              </p>
             </div>
           </div>
 
@@ -317,7 +339,12 @@
                   v-model="form.password"
                   type="text"
                   :placeholder="isEditing ? 'Leave blank to keep current' : 'Enter password'"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                  :class="[
+                      'w-full px-4 py-2 border rounded-lg bg-white outline-none transition-all duration-200 placeholder:text-gray-400',
+                      fieldErrors.password
+                          ? 'border-error ring-2 ring-error/20 focus:border-error focus:ring-error/30'
+                          : 'border-borderDefault focus:border-primary-500 focus:ring-4 focus:ring-primary-500/12 focus:shadow-[0_0_0_4px_rgba(74,144,226,0.08),0_2px_8px_rgba(74,144,226,0.12)]'
+                  ]"
                   :required="!isEditing"
               />
               <p v-if="fieldErrors.password" class="text-xs mt-1 text-red-500">{{ fieldErrors.password }}</p>
@@ -333,11 +360,17 @@
               <label class="block text-sm font-medium text-gray-700 mb-1">Confirm password</label>
               <input
                   v-model="form.confirmPassword"
-                  type="text"
+                  :type="showPassword ? 'text' : 'password'"
                   :placeholder="isEditing ? 'Confirm new password' : 'Re-enter password'"
-                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
+                  :class="[
+                      'w-full px-4 py-2 border rounded-lg bg-white outline-none transition-all duration-200 placeholder:text-gray-400',
+                      fieldErrors.confirmPassword
+                          ? 'border-error ring-2 ring-error/20 focus:border-error focus:ring-error/30'
+                          : 'border-borderDefault focus:border-primary-500 focus:ring-4 focus:ring-primary-500/12 focus:shadow-[0_0_0_4px_rgba(74,144,226,0.08),0_2px_8px_rgba(74,144,226,0.12)]'
+                  ]"
                   :required="!isEditing || !!form.password"
               />
+
               <p v-if="fieldErrors.confirmPassword" class="text-xs mt-1 text-red-500">{{ fieldErrors.confirmPassword }}</p>
               <p v-else-if="passwordMismatch" class="text-xs mt-1 text-red-500">
                 Passwords do not match
@@ -352,7 +385,12 @@
                 v-model="form.description"
                 rows="3"
                 placeholder="Add any additional notes, purpose, or details about this credential..."
-                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none resize-y"
+                :class="[
+                    'w-full px-4 py-2 border rounded-lg bg-white outline-none transition-all duration-200 placeholder:text-gray-400 resize-y',
+                    fieldErrors.description
+                        ? 'border-error ring-2 ring-error/20 focus:border-error focus:ring-error/30'
+                        : 'border-borderDefault focus:border-primary-500 focus:ring-4 focus:ring-primary-500/12 focus:shadow-[0_0_0_4px_rgba(74,144,226,0.08),0_2px_8px_rgba(74,144,226,0.12)]'
+                ]"
             ></textarea>
             <p v-if="fieldErrors.description" class="text-xs mt-1 text-red-500">{{ fieldErrors.description }}</p>
           </div>

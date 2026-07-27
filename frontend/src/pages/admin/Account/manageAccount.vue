@@ -66,21 +66,16 @@
             </div>
 
             <form class="grid grid-cols-1 sm:grid-cols-2 gap-4" @submit.prevent="saveProfile">
-              <div>
-                <label class="block text-xs font-semibold text-text-muted uppercase tracking-wide mb-1.5">Username</label>
-                <input v-model="profileForm.username" type="text" class="w-full px-3.5 py-2.5 rounded-xl border border-border bg-white text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-activeBorder transition" required />
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-text-muted uppercase tracking-wide mb-1.5">Email</label>
-                <input v-model="profileForm.email" type="email" class="w-full px-3.5 py-2.5 rounded-xl border border-border bg-white text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-activeBorder transition" />
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-text-muted uppercase tracking-wide mb-1.5">First name</label>
-                <input v-model="profileForm.first_name" type="text" class="w-full px-3.5 py-2.5 rounded-xl border border-border bg-white text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-activeBorder transition" />
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-text-muted uppercase tracking-wide mb-1.5">Last name</label>
-                <input v-model="profileForm.last_name" type="text" class="w-full px-3.5 py-2.5 rounded-xl border border-border bg-white text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-activeBorder transition" />
+              <div v-for="f in profileFields" :key="f.key">
+                <label class="block text-xs font-semibold text-text-muted uppercase tracking-wide mb-1.5">{{ f.label }}</label>
+                <input
+                    v-model="profileForm[f.key]"
+                    :type="f.type"
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-border bg-white text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-activeBorder transition"
+                    :class="{ 'border-red-500': errors[f.key] }"
+                    @input="validate(f.key)"
+                />
+                <p v-if="errors[f.key]" class="text-red-500 text-xs mt-1">{{ errors[f.key] }}</p>
               </div>
 
               <div v-if="profile?.employee" class="sm:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-3 rounded-xl bg-sectionLight border border-border p-4">
@@ -99,7 +94,7 @@
               </div>
 
               <div class="sm:col-span-2 flex justify-end pt-2">
-                <button type="submit" class="inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-buttonBackground text-white text-sm font-semibold hover:bg-buttonHover transition-colors disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer shadow-sm" :disabled="accountStore.isSavingProfile">
+                <button type="submit" class="inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-buttonBackground text-white text-sm font-semibold hover:bg-buttonHover transition-colors disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer shadow-sm" :disabled="accountStore.isSavingProfile || !isProfileFormValid">
                   <font-awesome-icon v-if="accountStore.isSavingProfile" :icon="['fas', 'spinner']" class="animate-spin mr-2" />
                   Save profile
                 </button>
@@ -115,35 +110,30 @@
             </div>
 
             <form class="max-w-lg space-y-4" @submit.prevent="savePassword">
-              <div>
-                <label class="block text-xs font-semibold text-text-muted uppercase tracking-wide mb-1.5">Current password</label>
+              <div v-for="f in passwordFields" :key="f.key">
+                <label class="block text-xs font-semibold text-text-muted uppercase tracking-wide mb-1.5">{{ f.label }}</label>
                 <div class="relative">
-                  <input v-model="passwordForm.current_password" :type="show.current ? 'text' : 'password'" class="w-full px-3.5 py-2.5 pr-10 rounded-xl border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-activeBorder transition" required />
-                  <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-primary cursor-pointer" @click="show.current = !show.current">
-                    <font-awesome-icon :icon="['fas', show.current ? 'eye-slash' : 'eye']" />
+                  <input
+                      v-model="passwordForm[f.key]"
+                      :type="show[f.showKey] ? 'text' : 'password'"
+                      class="w-full px-3.5 py-2.5 pr-10 rounded-xl border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-activeBorder transition"
+                      :class="{ 'border-red-500': errors[f.key] }"
+                      @input="validate(f.key)"
+                      required
+                  />
+                  <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-primary cursor-pointer" @click="show[f.showKey] = !show[f.showKey]">
+                    <font-awesome-icon :icon="['fas', show[f.showKey] ? 'eye-slash' : 'eye']" />
                   </button>
                 </div>
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-text-muted uppercase tracking-wide mb-1.5">New password</label>
-                <div class="relative">
-                  <input v-model="passwordForm.new_password" :type="show.next ? 'text' : 'password'" class="w-full px-3.5 py-2.5 pr-10 rounded-xl border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-activeBorder transition" required minlength="8" />
-                  <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-primary cursor-pointer" @click="show.next = !show.next">
-                    <font-awesome-icon :icon="['fas', show.next ? 'eye-slash' : 'eye']" />
-                  </button>
+                <p v-if="errors[f.key]" class="text-red-500 text-xs mt-1">{{ errors[f.key] }}</p>
+                <div v-if="f.key === 'new_password' && passwordStrengthLabel && !errors.new_password" class="text-xs mt-1" :class="passwordStrengthLabel.color">
+                  <font-awesome-icon :icon="['fas', 'circle-check']" class="mr-1" />
+                  {{ passwordStrengthLabel.text }}
                 </div>
               </div>
-              <div>
-                <label class="block text-xs font-semibold text-text-muted uppercase tracking-wide mb-1.5">Confirm new password</label>
-                <div class="relative">
-                  <input v-model="passwordForm.confirm_password" :type="show.confirm ? 'text' : 'password'" class="w-full px-3.5 py-2.5 pr-10 rounded-xl border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-activeBorder transition" required minlength="8" />
-                  <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-primary cursor-pointer" @click="show.confirm = !show.confirm">
-                    <font-awesome-icon :icon="['fas', show.confirm ? 'eye-slash' : 'eye']" />
-                  </button>
-                </div>
-              </div>
+
               <div class="flex justify-end pt-2">
-                <button type="submit" class="inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-buttonBackground text-white text-sm font-semibold hover:bg-buttonHover transition-colors disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer shadow-sm" :disabled="accountStore.isSavingPassword">
+                <button type="submit" class="inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-buttonBackground text-white text-sm font-semibold hover:bg-buttonHover transition-colors disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer shadow-sm" :disabled="accountStore.isSavingPassword || !isPasswordFormValid">
                   <font-awesome-icon v-if="accountStore.isSavingPassword" :icon="['fas', 'spinner']" class="animate-spin mr-2" />
                   Update password
                 </button>
@@ -178,40 +168,102 @@
 
               <div>
                 <label class="block text-xs font-semibold text-text-muted uppercase tracking-wide mb-1.5">SMTP host</label>
-                <input v-model="emailForm.smtp_host" type="text" class="w-full px-3.5 py-2.5 rounded-xl border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-activeBorder transition" placeholder="mail.rasantsol.com" required />
+                <input
+                    v-model="emailForm.smtp_host"
+                    type="text"
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-activeBorder transition"
+                    :class="{ 'border-red-500': emailErrors.smtp_host }"
+                    placeholder="mail.rasantsol.com"
+                    @input="validateEmailField('smtp_host')"
+                    required
+                />
+                <p v-if="emailErrors.smtp_host" class="text-red-500 text-xs mt-1">{{ emailErrors.smtp_host }}</p>
               </div>
               <div>
                 <label class="block text-xs font-semibold text-text-muted uppercase tracking-wide mb-1.5">SMTP port</label>
-                <input v-model.number="emailForm.smtp_port" type="number" class="w-full px-3.5 py-2.5 rounded-xl border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-activeBorder transition" min="1" required />
+                <input
+                    v-model.number="emailForm.smtp_port"
+                    type="number"
+                    inputmode="numeric"
+                    min="1"
+                    max="65535"
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-activeBorder transition"
+                    :class="{ 'border-red-500': emailErrors.smtp_port }"
+                    @keydown="blockNonNumeric"
+                    @input="validateEmailField('smtp_port')"
+                    required
+                />
+                <p v-if="emailErrors.smtp_port" class="text-red-500 text-xs mt-1">{{ emailErrors.smtp_port }}</p>
               </div>
               <div>
                 <label class="block text-xs font-semibold text-text-muted uppercase tracking-wide mb-1.5">Username</label>
-                <input v-model="emailForm.smtp_username" type="email" class="w-full px-3.5 py-2.5 rounded-xl border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-activeBorder transition" placeholder="danialali@rasantsol.com" required />
+                <input
+                    v-model="emailForm.smtp_username"
+                    type="email"
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-activeBorder transition"
+                    :class="{ 'border-red-500': emailErrors.smtp_username }"
+                    placeholder="danialali@rasantsol.com"
+                    @input="validateEmailField('smtp_username')"
+                    required
+                />
+                <p v-if="emailErrors.smtp_username" class="text-red-500 text-xs mt-1">{{ emailErrors.smtp_username }}</p>
               </div>
               <div>
-                <label class="block text-xs font-semibold text-text-muted uppercase tracking-wide mb-1.5">
-                  Password
+                <label class="flex flex-wrap items-baseline gap-1 text-xs font-semibold text-text-muted uppercase tracking-wide mb-1.5">
+                  <span>PASSWORD</span>
                   <span v-if="emailForm.has_password" class="normal-case font-medium text-tagTealText">(saved — leave blank to keep)</span>
                 </label>
                 <div class="relative">
-                  <input v-model="emailForm.smtp_password" :type="show.smtp ? 'text' : 'password'" class="w-full px-3.5 py-2.5 pr-10 rounded-xl border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-activeBorder transition" placeholder="Email account password" autocomplete="new-password" />
+                  <input
+                      v-model="emailForm.smtp_password"
+                      :type="show.smtp ? 'text' : 'password'"
+                      class="w-full px-3.5 py-2.5 pr-10 rounded-xl border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-activeBorder transition"
+                      :class="{ 'border-red-500': emailErrors.smtp_password }"
+                      placeholder="Email account password"
+                      autocomplete="new-password"
+                      @input="validateEmailField('smtp_password')"
+                  />
                   <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-primary cursor-pointer" @click="show.smtp = !show.smtp">
                     <font-awesome-icon :icon="['fas', show.smtp ? 'eye-slash' : 'eye']" />
                   </button>
                 </div>
+                <p v-if="emailErrors.smtp_password" class="text-red-500 text-xs mt-1">{{ emailErrors.smtp_password }}</p>
               </div>
               <div>
                 <label class="block text-xs font-semibold text-text-muted uppercase tracking-wide mb-1.5">From name</label>
-                <input v-model="emailForm.from_name" type="text" class="w-full px-3.5 py-2.5 rounded-xl border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-activeBorder transition" />
+                <input
+                    v-model="emailForm.from_name"
+                    type="text"
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-activeBorder transition"
+                    :class="{ 'border-red-500': emailErrors.from_name }"
+                    @input="validateEmailField('from_name')"
+                />
+                <p v-if="emailErrors.from_name" class="text-red-500 text-xs mt-1">{{ emailErrors.from_name }}</p>
               </div>
               <div>
                 <label class="block text-xs font-semibold text-text-muted uppercase tracking-wide mb-1.5">From email</label>
-                <input v-model="emailForm.from_email" type="email" class="w-full px-3.5 py-2.5 rounded-xl border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-activeBorder transition" required />
+                <input
+                    v-model="emailForm.from_email"
+                    type="email"
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-activeBorder transition"
+                    :class="{ 'border-red-500': emailErrors.from_email }"
+                    @input="validateEmailField('from_email')"
+                    required
+                />
+                <p v-if="emailErrors.from_email" class="text-red-500 text-xs mt-1">{{ emailErrors.from_email }}</p>
               </div>
               <div class="sm:col-span-2">
                 <label class="block text-xs font-semibold text-text-muted uppercase tracking-wide mb-1.5">Admin notification email</label>
-                <input v-model="emailForm.admin_notification_email" type="email" class="w-full px-3.5 py-2.5 rounded-xl border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-activeBorder transition" required />
-                <p class="text-xs text-text-muted mt-1">Receives increment-due digests and onboarding alerts.</p>
+                <input
+                    v-model="emailForm.admin_notification_email"
+                    type="email"
+                    class="w-full px-3.5 py-2.5 rounded-xl border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-activeBorder transition"
+                    :class="{ 'border-red-500': emailErrors.admin_notification_email }"
+                    @input="validateEmailField('admin_notification_email')"
+                    required
+                />
+                <p v-if="emailErrors.admin_notification_email" class="text-red-500 text-xs mt-1">{{ emailErrors.admin_notification_email }}</p>
+                <p v-else class="text-xs text-text-muted mt-1">Receives increment-due digests and onboarding alerts.</p>
               </div>
 
               <div class="sm:col-span-2 flex flex-wrap items-center gap-4">
@@ -233,7 +285,7 @@
                     Send test
                   </button>
                 </div>
-                <button type="submit" class="inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-buttonBackground text-white text-sm font-semibold hover:bg-buttonHover transition-colors disabled:opacity-60 cursor-pointer shadow-sm" :disabled="accountStore.isSavingEmail">
+                <button type="submit" class="inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-buttonBackground text-white text-sm font-semibold hover:bg-buttonHover transition-colors disabled:opacity-60 cursor-pointer shadow-sm" :disabled="accountStore.isSavingEmail || !isEmailFormValid">
                   <font-awesome-icon v-if="accountStore.isSavingEmail" :icon="['fas', 'spinner']" class="animate-spin mr-2" />
                   Save email settings
                 </button>
@@ -256,34 +308,23 @@ import { useAccountStore } from '@/stores/accountStore.js';
 import { useLoginStore } from '@/stores/loginStore.js';
 import { useToast } from '@/composables/useToast.js';
 import { BASE_URL, API_ENDPOINTS } from '@/services/baseUrl.js';
+import { useValidation } from '@/composables/useValidation.js';
 
 const accountStore = useAccountStore();
 const loginStore = useLoginStore();
 const { showToast } = useToast();
+const { getUsernameError, getEmailError, getPasswordStrengthError, getPasswordStrengthLabel } = useValidation();
 
 const activeTab = ref('profile');
 const avatarBust = ref(Date.now());
 const testToEmail = ref('');
 
-const show = reactive({
-  current: false,
-  next: false,
-  confirm: false,
-  smtp: false,
-});
+const show = reactive({ current: false, next: false, confirm: false, smtp: false });
 
-const profileForm = reactive({
-  username: '',
-  email: '',
-  first_name: '',
-  last_name: '',
-});
+const profileForm = reactive({ username: '', email: '', first_name: '', last_name: '' });
+const passwordForm = reactive({ current_password: '', new_password: '', confirm_password: '' });
 
-const passwordForm = reactive({
-  current_password: '',
-  new_password: '',
-  confirm_password: '',
-});
+const MAX_SMTP_PORT = 65535;
 
 const emailForm = reactive({
   smtp_host: 'mail.rasantsol.com',
@@ -299,6 +340,122 @@ const emailForm = reactive({
   is_active: true,
 });
 
+// Field metadata drives both the template loops and the validation map
+const profileFields = [
+  { key: 'username', label: 'Username', type: 'text' },
+  { key: 'email', label: 'Email', type: 'email' },
+  { key: 'first_name', label: 'First name', type: 'text' },
+  { key: 'last_name', label: 'Last name', type: 'text' },
+];
+
+const passwordFields = [
+  { key: 'current_password', label: 'Current password', showKey: 'current' },
+  { key: 'new_password', label: 'New password', showKey: 'next' },
+  { key: 'confirm_password', label: 'Confirm new password', showKey: 'confirm' },
+];
+
+// Single errors object replaces separate refs for profile/password
+const errors = reactive({
+  username: '', email: '', first_name: '', last_name: '',
+  current_password: '', new_password: '', confirm_password: '',
+});
+
+// Optional profile fields: empty is valid, otherwise run the matching checker
+const optionalCheckers = {
+  username: getUsernameError,
+  email: getEmailError,
+  first_name: getUsernameError,
+  last_name: getUsernameError,
+};
+
+// Required password fields: custom rule per field
+const requiredCheckers = {
+  current_password: (v) => (!v ? 'Current password is required.' : ''),
+  new_password: (v) => (!v ? 'New password is required.' : getPasswordStrengthError(v) || ''),
+  confirm_password: (v) => {
+    if (!v) return 'Please confirm your new password.';
+    return v !== passwordForm.new_password ? 'Passwords do not match.' : '';
+  },
+};
+
+function validate(key) {
+  if (key in optionalCheckers) {
+    const value = profileForm[key]?.trim();
+    errors[key] = value ? (optionalCheckers[key](value) || '') : '';
+  } else {
+    errors[key] = requiredCheckers[key](passwordForm[key]);
+  }
+  // Re-check confirm password whenever new password changes
+  if (key === 'new_password' && passwordForm.confirm_password) {
+    errors.confirm_password = requiredCheckers.confirm_password(passwordForm.confirm_password);
+  }
+}
+
+const passwordStrengthLabel = computed(() => {
+  if (!passwordForm.new_password || errors.new_password) return null;
+  return getPasswordStrengthLabel(passwordForm.new_password);
+});
+
+const isProfileFormValid = computed(() =>
+    profileFields.every((f) => !errors[f.key])
+);
+
+const isPasswordFormValid = computed(() =>
+    passwordFields.every((f) => !errors[f.key] && passwordForm[f.key])
+);
+
+// --- Email / SMTP settings validation ---
+const emailErrors = reactive({
+  smtp_host: '', smtp_port: '', smtp_username: '', smtp_password: '',
+  from_name: '', from_email: '', admin_notification_email: '',
+});
+
+// Which checker applies to which email-settings field (from_name is optional, rest required)
+const emailFieldCheckers = {
+  smtp_host: getUsernameError,
+  smtp_username: getEmailError,
+  from_name: getUsernameError,
+  from_email: getEmailError,
+  admin_notification_email: getEmailError,
+};
+
+function validateEmailField(key) {
+  if (key === 'smtp_port') {
+    const value = emailForm.smtp_port;
+    if (!value) emailErrors.smtp_port = 'Port is required.';
+    else if (value < 1 || value > MAX_SMTP_PORT) emailErrors.smtp_port = `Port must be between 1 and ${MAX_SMTP_PORT}.`;
+    else emailErrors.smtp_port = '';
+    return;
+  }
+
+  if (key === 'smtp_password') {
+    const value = emailForm.smtp_password;
+    emailErrors.smtp_password = value ? (getPasswordStrengthError(value) || '') : '';
+    return;
+  }
+  const value = emailForm[key]?.trim();
+  if (!value) {
+    emailErrors[key] = key === 'from_name' ? '' : 'This field is required.';
+    return;
+  }
+  emailErrors[key] = emailFieldCheckers[key](value) || '';
+}
+
+function blockNonNumeric(e) {
+  const allowed = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Home', 'End'];
+  if (allowed.includes(e.key) || e.ctrlKey || e.metaKey) return;
+  if (!/^[0-9]$/.test(e.key)) {
+    e.preventDefault();
+    return;
+  }
+  const projected = Number(String(emailForm.smtp_port ?? '') + e.key);
+  if (projected > MAX_SMTP_PORT) e.preventDefault();
+}
+
+const isEmailFormValid = computed(() =>
+    Object.keys(emailErrors).every((k) => !emailErrors[k])
+);
+
 const profile = computed(() => accountStore.profile);
 const isAdmin = computed(() => {
   const role = (profile.value?.role_name || loginStore.getUserRole || '').toLowerCase();
@@ -310,28 +467,23 @@ const visibleTabs = computed(() => {
     { id: 'profile', label: 'Profile', icon: ['fas', 'user'] },
     { id: 'password', label: 'Password', icon: ['fas', 'lock'] },
   ];
-  if (isAdmin.value) {
-    tabs.push({ id: 'email', label: 'Email settings', icon: ['fas', 'envelope'] });
-  }
+  if (isAdmin.value) tabs.push({ id: 'email', label: 'Email settings', icon: ['fas', 'envelope'] });
   return tabs;
 });
 
 const displayName = computed(() => {
   const p = profile.value;
   if (!p) return loginStore.getUserName || 'User';
-  const full = `${p.first_name || ''} ${p.last_name || ''}`.trim();
-  return full || p.username || p.email || 'User';
+  return `${p.first_name || ''} ${p.last_name || ''}`.trim() || p.username || p.email || 'User';
 });
 
 const roleLabel = computed(() => profile.value?.role_name || loginStore.getUserRole || 'User');
 
-const initials = computed(() => {
-  const name = displayName.value || 'U';
-  return name.split(/\s+/).slice(0, 2).map((p) => p[0]?.toUpperCase() || '').join('') || 'U';
-});
+const initials = computed(() =>
+    (displayName.value || 'U').split(/\s+/).slice(0, 2).map((p) => p[0]?.toUpperCase() || '').join('') || 'U'
+);
 
 const avatarObjectUrl = ref(null);
-
 const avatarUrl = computed(() => avatarObjectUrl.value);
 
 async function loadAvatarBlob() {
@@ -348,17 +500,16 @@ async function loadAvatarBlob() {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
     if (!res.ok) return;
-    const blob = await res.blob();
-    avatarObjectUrl.value = URL.createObjectURL(blob);
+    avatarObjectUrl.value = URL.createObjectURL(await res.blob());
   } catch {
     // keep initials fallback
   }
 }
 
 watch(
-  () => [profile.value?.id, profile.value?.has_avatar, avatarBust.value],
-  () => { loadAvatarBlob(); },
-  { immediate: true }
+    () => [profile.value?.id, profile.value?.has_avatar, avatarBust.value],
+    loadAvatarBlob,
+    { immediate: true }
 );
 
 function fillProfileForm(data) {
@@ -367,6 +518,7 @@ function fillProfileForm(data) {
   profileForm.email = data.email || '';
   profileForm.first_name = data.first_name || '';
   profileForm.last_name = data.last_name || '';
+  profileFields.forEach((f) => validate(f.key));
 }
 
 function fillEmailForm(data) {
@@ -385,6 +537,7 @@ function fillEmailForm(data) {
     is_active: data.is_active !== false,
   });
   testToEmail.value = data.admin_notification_email || data.from_email || profileForm.email || '';
+  Object.keys(emailErrors).forEach((k) => (emailErrors[k] = ''));
 }
 
 function onSslToggle() {
@@ -402,25 +555,43 @@ function onTlsToggle() {
 }
 
 async function saveProfile() {
+  profileFields.forEach((f) => validate(f.key));
+  if (!isProfileFormValid.value) {
+    showToast('Please fix all validation errors before saving.', 'error');
+    return;
+  }
   const result = await accountStore.updateProfile({ ...profileForm });
   showToast(result.success ? result.message : result.error, result.success ? 'success' : 'error');
 }
 
 async function savePassword() {
+  passwordFields.forEach((f) => validate(f.key));
+  if (!isPasswordFormValid.value) {
+    showToast('Please fix all password validation errors.', 'error');
+    return;
+  }
   if (passwordForm.new_password !== passwordForm.confirm_password) {
     showToast('New passwords do not match.', 'error');
     return;
   }
+
   const result = await accountStore.changePassword({ ...passwordForm });
   showToast(result.success ? result.message : result.error, result.success ? 'success' : 'error');
   if (result.success) {
     passwordForm.current_password = '';
     passwordForm.new_password = '';
     passwordForm.confirm_password = '';
+    passwordFields.forEach((f) => (errors[f.key] = ''));
   }
 }
 
 async function saveEmail() {
+  Object.keys(emailErrors).forEach((k) => validateEmailField(k));
+  if (!isEmailFormValid.value) {
+    showToast('Please fix all validation errors before saving.', 'error');
+    return;
+  }
+
   const payload = { ...emailForm };
   delete payload.has_password;
   if (!payload.smtp_password) delete payload.smtp_password;
@@ -445,10 +616,7 @@ async function onAvatarChange(event) {
   showToast(result.success ? 'Avatar updated.' : result.error, result.success ? 'success' : 'error');
   if (result.success) {
     avatarBust.value = Date.now();
-    // Keep header avatar in sync with login user
-    if (loginStore.user) {
-      loginStore.setUser({ ...loginStore.user, has_avatar: true });
-    }
+    if (loginStore.user) loginStore.setUser({ ...loginStore.user, has_avatar: true });
   }
   event.target.value = '';
 }

@@ -3,12 +3,14 @@ import { useCredentialsVaultStore } from '@/stores/credentialsVaultStore.js'
 import { storeToRefs } from 'pinia'
 import { useToast } from '@/composables/useToast.js'
 import { useEmployeeStore } from '@/stores/employeeStore.js'
+import { useValidation } from '@/composables/useValidation.js'
 
 export default function useCredentialsVault() {
     const store = useCredentialsVaultStore()
     const employeeStore = useEmployeeStore()
     const { credentials, loading, error, uniqueProjects, staleCredentials, totalCount } = storeToRefs(store)
     const { showToast } = useToast()
+    const { getEmailError, getCredentialLabelError, getUsernameError, getLinkError, getPasswordStrengthError } = useValidation()
 
     const currentFilter = ref('all')
     const searchQuery = ref('')
@@ -44,6 +46,28 @@ export default function useCredentialsVault() {
         if (!selectedCredential.value?.shared_with) return false
         return selectedCredential.value.shared_with.includes(employeeId)
     }
+    function buildPageList(total, current) {
+        if (total <= 5) {
+            return Array.from({ length: total }, (_, i) => i + 1)
+        }
+
+        let leftStart = current <= 2 ? 1 : current - 1
+        leftStart = Math.min(leftStart, total - 1)
+        const leftEnd = Math.min(leftStart + 1, total)
+        const left = leftStart === leftEnd ? [leftStart] : [leftStart, leftEnd]
+
+        const rightStart = total - 1
+        const rightEnd = total
+        let right = rightStart === rightEnd ? [rightEnd] : [rightStart, rightEnd]
+        right = right.filter(p => !left.includes(p))
+
+        if (right.length === 0) {
+            return [1, '...', ...left]
+        }
+
+        return [...left, '...', ...right]
+    }
+
     const filteredCredentials = computed(() => {
         if (!credentials.value) return []
 
@@ -134,19 +158,30 @@ export default function useCredentialsVault() {
     const validateForm = () => {
         const errors = {}
 
-        if (!form.value.name?.trim()) errors.name = 'Credential label is required'
-        if (!form.value.link?.trim()) errors.link = 'Login link is required'
-        if (!form.value.username?.trim()) errors.username = 'Username is required'
-        if (!form.value.email?.trim()) errors.email = 'Email is required'
+        const nameError = getCredentialLabelError(form.value.name)
+        if (nameError) errors.name = nameError
+
+        const linkError = getLinkError(form.value.link)
+        if (linkError) errors.link = linkError
+
+        const usernameError = getUsernameError(form.value.username)
+        if (usernameError) errors.username = usernameError
+
+        if (!form.value.email?.trim()) {
+            errors.email = 'Email is required'
+        } else {
+            const emailError = getEmailError(form.value.email)
+            if (emailError) errors.email = emailError
+        }
 
         // Password required on create; on edit leave blank to keep existing
         if (!isEditing.value && !form.value.password) {
             errors.password = 'Password is required'
         }
         if (form.value.password || form.value.confirmPassword) {
-            if (!form.value.password) {
-                errors.password = 'Password is required'
-            }
+            const pwdError = getPasswordStrengthError(form.value.password)
+            if (pwdError) errors.password = pwdError
+
             if (!form.value.confirmPassword) {
                 errors.confirmPassword = 'Confirm password is required'
             } else if (form.value.password !== form.value.confirmPassword) {
@@ -171,6 +206,29 @@ export default function useCredentialsVault() {
         fieldErrors.value = errors
         return Object.keys(errors).length === 0
     }
+
+    // All required fields filled + password rules satisfied, used to disable the Save button
+    const isFormValid = computed(() => {
+        const requiredFilled =
+            !!form.value.name?.trim() &&
+            !!form.value.link?.trim() &&
+            !!form.value.username?.trim() &&
+            !!form.value.email?.trim()
+
+        const passwordOk = isEditing.value
+            ? (!form.value.password && !form.value.confirmPassword) ||
+            (!!form.value.password && form.value.password === form.value.confirmPassword)
+            : !!form.value.password && form.value.password === form.value.confirmPassword
+
+        const noErrors = !fieldErrors.value.name &&
+            !fieldErrors.value.link &&
+            !fieldErrors.value.username &&
+            !fieldErrors.value.email &&
+            !fieldErrors.value.password &&
+            !fieldErrors.value.confirmPassword
+
+        return requiredFilled && passwordOk && noErrors
+    })
 
     const getInitials = (name) => {
         if (!name) return '?'
@@ -467,7 +525,10 @@ export default function useCredentialsVault() {
 
     const saveCredential = async () => {
         if (isSaving.value) return
-        if (!validateForm()) return
+        if (!validateForm()) {
+            showToast('Please fix the highlighted fields', 'error', 4000)
+            return
+        }
 
         isSaving.value = true
         try {
@@ -527,70 +588,60 @@ export default function useCredentialsVault() {
     const goToPage = (page) => {
         currentPage.value = page
     }
-    const shareDisplayedPages = computed(() => {
-        const total = shareTotalPages.value
-        const current = shareCurrentPage.value
-        const pages = []
-        const maxVisible = 5
+    const displayedPages = computed(() => buildPageList(totalPages.value, currentPage.value))
 
-        if (total <= maxVisible) {
-            for (let i = 1; i <= total; i++) {
-                pages.push(i)
-            }
-        } else {
-            if (current <= 3) {
-                for (let i = 1; i <= 3; i++) pages.push(i)
-                pages.push('...')
-                for (let i = total - 1; i <= total; i++) pages.push(i)
-            } else if (current >= total - 2) {
-                for (let i = 1; i <= 2; i++) pages.push(i)
-                pages.push('...')
-                for (let i = total - 2; i <= total; i++) pages.push(i)
-            } else {
-                pages.push(1)
-                pages.push('...')
-                for (let i = current - 1; i <= current + 1; i++) pages.push(i)
-                pages.push('...')
-                pages.push(total)
-            }
-        }
-        return pages
-    })
-    const displayedPages = computed(() => {
-        const total = totalPages.value
-        const current = currentPage.value
-        const pages = []
-        const maxVisible = 5
+    const shareDisplayedPages = computed(() => buildPageList(shareTotalPages.value, shareCurrentPage.value))
 
-        if (total <= maxVisible) {
-            for (let i = 1; i <= total; i++) {
-                pages.push(i)
-            }
-        } else {
-            if (current <= 3) {
-                for (let i = 1; i <= 3; i++) pages.push(i)
-                pages.push('...')
-                for (let i = total - 1; i <= total; i++) pages.push(i)
-            } else if (current >= total - 2) {
-                for (let i = 1; i <= 2; i++) pages.push(i)
-                pages.push('...')
-                for (let i = total - 2; i <= total; i++) pages.push(i)
-            } else {
-                pages.push(1)
-                pages.push('...')
-                for (let i = current - 1; i <= current + 1; i++) pages.push(i)
-                pages.push('...')
-                pages.push(total)
-            }
-        }
-        return pages
+    // Live validation: credential label
+    watch(() => form.value.name, (val) => {
+        fieldErrors.value.name = getCredentialLabelError(val) || ''
     })
+
+    // Live validation: username
+    watch(() => form.value.username, (val) => {
+        fieldErrors.value.username = getUsernameError(val) || ''
+    })
+
+    // Live validation: login link
+    watch(() => form.value.link, (val) => {
+        fieldErrors.value.link = getLinkError(val) || ''
+    })
+
+    // Live validation: email
+    watch(() => form.value.email, (val) => {
+        if (!val) {
+            fieldErrors.value.email = ''
+            return
+        }
+        fieldErrors.value.email = getEmailError(val) || ''
+    })
+
+    // Live validation: password + confirm password
+    watch([() => form.value.password, () => form.value.confirmPassword], ([pwd, confirmPwd]) => {
+        if (!pwd) {
+            fieldErrors.value.password = ''
+            fieldErrors.value.confirmPassword = ''
+            return
+        }
+
+        fieldErrors.value.password = getPasswordStrengthError(pwd) || ''
+
+        fieldErrors.value.confirmPassword = confirmPwd && pwd !== confirmPwd
+            ? 'Passwords do not match'
+            : ''
+    })
+
     watch([searchQuery], () => {
         currentPage.value = 1
     })
 
     watch([shareSearchQuery], () => {
         shareCurrentPage.value = 1
+    })
+    watch(totalPages, (newTotal) => {
+        if (currentPage.value > newTotal) {
+            currentPage.value = newTotal
+        }
     })
 
     onMounted(async () => {
@@ -625,6 +676,7 @@ export default function useCredentialsVault() {
         passwordStrength,
         passwordMismatch,
         fieldErrors,
+        isFormValid,
         selectedCredential,
         shareSearchQuery,
         shareCurrentPage,

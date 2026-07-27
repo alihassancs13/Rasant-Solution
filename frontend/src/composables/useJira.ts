@@ -1,6 +1,6 @@
 import {computed, onMounted, reactive, ref, watch,nextTick} from 'vue';
 import { useJiraStore } from '@/stores/jiraStore';
-
+import { useValidation } from '@/composables/useValidation'
 
 export interface JiraForm {
     email: string
@@ -81,6 +81,7 @@ export interface ToastMessage {
 
 export function useJiraConnect() {
     const jiraStore = useJiraStore()
+    const { getEmailError } = useValidation()
 
     const form = ref<JiraForm>({
         email: '',
@@ -322,8 +323,10 @@ export function useJiraConnect() {
 
         if (!form.value.email)
             errors.value.email = 'Email is required.'
-        else if (!/\S+@\S+\.\S+/.test(form.value.email))
-            errors.value.email = 'Enter a valid email address.'
+        else {
+            const emailError = getEmailError(form.value.email)
+            if (emailError) errors.value.email = emailError
+        }
 
         if (!form.value.apiToken)
             errors.value.apiToken = 'API token is required.'
@@ -577,6 +580,14 @@ export function useJiraConnect() {
             isDeleting.value = false
         }
     }
+
+    watch(() => form.value.email, (val) => {
+        if (!val) {
+            errors.value.email = ''
+            return
+        }
+        errors.value.email = getEmailError(val) || ''
+    })
 
     watch(() => jiraStore.jiraExpired, (val) => {
         if (val) {

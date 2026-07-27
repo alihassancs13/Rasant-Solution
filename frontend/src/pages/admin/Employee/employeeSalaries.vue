@@ -15,22 +15,36 @@ import { usePolicyStore } from '@/stores/policyStore'
 import { usePayrollSettingsStore } from '../../../stores/payrollStore.js'
 import { getCurrentPosition, reverseGeocodeLabel } from '@/composables/useGeolocation.js'
 import ToastContainer from '@/components/ToastContainer.vue'
+import { useValidation } from '@/composables/useValidation.js'
+import { useToast } from '@/composables/useToast.js'
 
 const policyStore = usePolicyStore()
 const employeeStore = useEmployeeStore()
 const payrollSettingsStore = usePayrollSettingsStore()
+const { showToast } = useToast()
 
 // ⚠️ IMPORTANT: Define employees FIRST before using it in composables
 const employees = computed(() => employeeStore.employees)
 const employeesLoading = computed(() => employeeStore.isLoading)
-import { useToast } from '@/composables/useToast.js'
 
 const showSaveSettingsModal = ref(false)
-const employeesCovered = ref(3)
-const dueNow = ref(1)
 const highlightedEmployeeId = ref(null)
 const router = useRouter()
 const route = useRoute()
+const payrollErrors = ref({
+  grace_minutes: '',
+  allowed_leaves_per_month: '',
+  allowed_absents_per_month: '',
+  overtime_rate_per_hour: '',
+  late_count_threshold: '',
+  office_radius_meters: '',
+})
+
+const {
+  getGraceMinutesError, getAllowedPaidLimitError, getUnpaidAbsentsError,
+  getOvertimeRateError, getFreeLatesError, getOfficeRadiusError,
+  blockNonDigitKeydown, blockNonDigitPaste,
+} = useValidation()
 
 function handleHighlightEmployee(employeeId) {
   activeTab.value = 'employee-roster'
@@ -76,7 +90,7 @@ const {
   selectedApplyIds, toggleApplySelection, toggleSelectAllApply, employeeDetail, isEmployeeDetailLoading,
   showEmployeeDetailModal, fetchEmployeeDetail,openEmployeeDetailModal, closeEmployeeDetailModal,
   openApplyModal, closeApplyModal, confirmApplyIncrement,isEmployeeDueToday,isEmployeeOverdue,
-  bonusDraft, isSavingBonus, saveMonthlyBonus,
+  bonusDraft, isSavingBonus, saveMonthlyBonus,blockNonNumericPaste,blockNonNumericAmount,getAmountError
 } = useIncrementPolicy(employees)
 
 // ── Assign policy modal (separate composable) ──
@@ -85,6 +99,73 @@ const {
   otherAssignedPolicies, toggleEmployeeSelection,
   assignPolicy, closeAssignModal, saveAssignments,
 } = useAssignPolicy(employees, assignments)
+
+function validatePayrollField(key) {
+  const val = payrollSettings.value?.[key]
+  switch (key) {
+    case 'grace_minutes':
+      payrollErrors.value.grace_minutes = getGraceMinutesError(val) || ''
+      break
+    case 'allowed_leaves_per_month':
+      payrollErrors.value.allowed_leaves_per_month = getAllowedPaidLimitError(val) || ''
+      break
+    case 'allowed_absents_per_month':
+      payrollErrors.value.allowed_absents_per_month = getUnpaidAbsentsError(val) || ''
+      break
+    case 'overtime_rate_per_hour':
+      payrollErrors.value.overtime_rate_per_hour = getOvertimeRateError(val) || ''
+      break
+    case 'late_count_threshold':
+      payrollErrors.value.late_count_threshold = getFreeLatesError(
+          val, payrollSettings.value?.allowed_absents_per_month || 31
+      ) || ''
+      break
+    case 'office_radius_meters':
+      payrollErrors.value.office_radius_meters = getOfficeRadiusError(val) || ''
+      break
+  }
+}
+
+// Single source of truth for which fields get validated before a save — was
+// duplicated 3x (openSaveSettingsModal + two identical confirmSavePayrollSettings).
+const PAYROLL_VALIDATION_FIELDS = [
+  'grace_minutes', 'allowed_leaves_per_month', 'allowed_absents_per_month',
+  'overtime_rate_per_hour', 'late_count_threshold', 'office_radius_meters',
+]
+const validateAllPayrollFields = () => PAYROLL_VALIDATION_FIELDS.forEach(validatePayrollField)
+
+const isPayrollFormValid = computed(() =>
+    Object.values(payrollErrors.value).every((e) => !e)
+)
+
+function openSaveSettingsModal() {
+  validateAllPayrollFields()
+  if (!isPayrollFormValid.value) {
+    showToast('Please fix the highlighted payroll fields.', 'error')
+    return
+  }
+  showSaveSettingsModal.value = true
+}
+
+function closeSaveSettingsModal() {
+  showSaveSettingsModal.value = false
+}
+
+async function confirmSavePayrollSettings() {
+  validateAllPayrollFields()
+  showSaveSettingsModal.value = false
+
+  if (!isPayrollFormValid.value) {
+    showToast('Please fix the highlighted payroll fields.', 'error')
+    return
+  }
+
+  const result = await payrollSettingsStore.saveSettings(payrollSettingsStore.settings)
+  showToast(
+      result.success ? 'Payroll settings saved successfully.' : (result.error || 'Failed to save payroll settings.'),
+      result.success ? 'success' : 'error'
+  )
+}
 
 // ── Pill Tab Navigation ──
 const tabs = [
@@ -108,10 +189,6 @@ const holidayYear = ref(new Date().getFullYear())
 const fetchPayrollSettings = () => payrollSettingsStore.fetchSettings()
 const fetchHolidays = () => payrollSettingsStore.fetchHolidays(holidayYear.value)
 
-const savePayrollSettings = () => payrollSettingsStore.saveSettings(payrollSettingsStore.settings)
-
-const { showToast } = useToast()
-
 async function addHoliday() {
   if (!holidayForm.value.date) {
     showToast('Pick a holiday date.', 'error')
@@ -132,11 +209,10 @@ async function addHoliday() {
 
 async function removeHoliday(id) {
   const result = await payrollSettingsStore.deleteHoliday(id)
-  if (result.success) {
-    showToast(result.message || 'Holiday removed.', 'success')
-  } else {
-    showToast(result.error || 'Could not remove holiday', 'error')
-  }
+  showToast(
+      result.success ? (result.message || 'Holiday removed.') : (result.error || 'Could not remove holiday'),
+      result.success ? 'success' : 'error'
+  )
 }
 
 async function captureOfficeLocation() {
@@ -144,15 +220,15 @@ async function captureOfficeLocation() {
     const coords = await getCurrentPosition()
     const address = await reverseGeocodeLabel(coords.latitude, coords.longitude)
     const result = await payrollSettingsStore.setOfficeFromDevice({ ...coords, address })
-    if (result.success) {
-      showToast('Office location saved from your current position.', 'success')
-    } else {
-      showToast(result.error || 'Could not save office location', 'error')
-    }
+    showToast(
+        result.success ? 'Office location saved from your current position.' : (result.error || 'Could not save office location'),
+        result.success ? 'success' : 'error'
+    )
   } catch (err) {
     showToast(err.message || 'Location permission required', 'error')
   }
 }
+
 const formatDate = (dateStr) => {
   if (!dateStr) return '—'
   return new Date(dateStr).toLocaleDateString('en-US', {
@@ -169,49 +245,28 @@ const avatarPalette = [
 ]
 const avatarStyle = (index) => avatarPalette[index % avatarPalette.length]
 
-function openSaveSettingsModal() {
-  showSaveSettingsModal.value = true
-}
-
-function closeSaveSettingsModal() {
-  showSaveSettingsModal.value = false
-}
-
-async function confirmSavePayrollSettings() {
-  const result = await payrollSettingsStore.saveSettings(payrollSettingsStore.settings)
-  showSaveSettingsModal.value = false
-
-  if (result.success) {
-    showToast('Payroll settings saved successfully.', 'success')
-  } else {
-    showToast(result.error || 'Failed to save payroll settings.', 'error')
-  }
-}
+watch(() => formData.increment_type, (val) => { if (val) formErrors.increment_type = '' })
+watch(() => formData.cycle_timing, (val) => { if (val) formErrors.cycle_timing = '' })
+watch(() => formData.application_mode, (val) => { if (val) formErrors.application_mode = '' })
 
 const initials = (name) =>
     name.split(' ').map(w => w[0]).slice(0, 2).join('').toUpperCase()
 
-// ── Force increment: refresh everything after applying ──
+// ── Force/Apply increment: refresh everything after applying ──
+const refreshAfterIncrement = () => Promise.all([
+  employeeStore.fetchEmployees(),
+  fetchPolicies(),
+  fetchAssignments(),
+])
+
 const handleConfirmForceIncrement = async () => {
   const result = await confirmForceIncrement()
-  if (result.success) {
-    await Promise.all([
-      employeeStore.fetchEmployees(),
-      fetchPolicies(),
-      fetchAssignments(),
-    ])
-  }
+  if (result.success) await refreshAfterIncrement()
 }
 
 const handleConfirmApplyIncrement = async () => {
   const result = await confirmApplyIncrement()
-  if (result.success) {
-    await Promise.all([
-      employeeStore.fetchEmployees(),
-      fetchPolicies(),
-      fetchAssignments(),
-    ])
-  }
+  if (result.success) await refreshAfterIncrement()
 }
 
 // ── Pagination ──
@@ -227,12 +282,8 @@ const paginatedEmployees = computed(() => {
   return employees.value.slice(start, start + employeesPerPage.value)
 })
 
-const prevEmployeePage = () => {
-  if (employeePage.value > 1) employeePage.value--
-}
-const nextEmployeePage = () => {
-  if (employeePage.value < totalEmployeePages.value) employeePage.value++
-}
+const prevEmployeePage = () => { if (employeePage.value > 1) employeePage.value-- }
+const nextEmployeePage = () => { if (employeePage.value < totalEmployeePages.value) employeePage.value++ }
 
 const employeePaginationRange = computed(() => {
   const total = totalEmployeePages.value
@@ -250,11 +301,8 @@ const employeePaginationRange = computed(() => {
 
   for (const i of range) {
     if (l !== undefined) {
-      if (i - l === 2) {
-        rangeWithDots.push(l + 1)
-      } else if (i - l !== 1) {
-        rangeWithDots.push('...')
-      }
+      if (i - l === 2) rangeWithDots.push(l + 1)
+      else if (i - l !== 1) rangeWithDots.push('...')
     }
     rangeWithDots.push(i)
     l = i
@@ -276,16 +324,11 @@ const paginatedPolicies = computed(() => {
   return policies.value.slice(start, start + policiesPerPage.value)
 })
 
-const prevPolicyPage = () => {
-  if (policyPage.value > 1) policyPage.value--
-}
-const nextPolicyPage = () => {
-  if (policyPage.value < totalPolicyPages.value) policyPage.value++
-}
+const prevPolicyPage = () => { if (policyPage.value > 1) policyPage.value-- }
+const nextPolicyPage = () => { if (policyPage.value < totalPolicyPages.value) policyPage.value++ }
 
 // ── Lifecycle ──
 onMounted(async () => {
-
   fetchPolicies()
   fetchLookups()
   fetchAssignments()
@@ -295,17 +338,12 @@ onMounted(async () => {
   }
   fetchPayrollSettings()
   fetchHolidays()
-
 })
 
-watch(holidayYear, () => {
-  fetchHolidays()
-})
+watch(holidayYear, () => { fetchHolidays() })
 
 watch(() => route.query.highlightEmployee, (newVal) => {
-  if (newVal) {
-    handleHighlightEmployee(Number(newVal))
-  }
+  if (newVal) handleHighlightEmployee(Number(newVal))
 })
 </script>
 
@@ -743,36 +781,49 @@ watch(() => route.query.highlightEmployee, (newVal) => {
 
             <div class="dash-field">
               <label>Grace Minutes</label>
-              <input v-model.number="payrollSettings.grace_minutes" type="number" min="0"
-                     class="w-full mt-1 px-3.5 py-2.5 rounded-md border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
-              <p class="text-xs text-text-muted mt-1">Late arrival window with no deduction (minutes).</p>
+              <input v-model.number="payrollSettings.grace_minutes" type="number" min="0" max="480"
+                     @keydown="blockNonDigitKeydown($event)"
+                     @paste="blockNonDigitPaste($event)"
+                     @input="validatePayrollField('grace_minutes')"
+                     class="w-full mt-1 px-3.5 py-2.5 rounded-md border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                     :class="payrollErrors.grace_minutes ? 'border-danger' : 'border-border'" />
+              <p v-if="payrollErrors.grace_minutes" class="text-xs text-danger mt-1">{{ payrollErrors.grace_minutes }}</p>
+              <p v-else class="text-xs text-text-muted mt-1">Late arrival window with no deduction (minutes).</p>
             </div>
 
             <div class="dash-field">
               <label>Allowed Paid Leaves / Month</label>
-              <input v-model.number="payrollSettings.allowed_leaves_per_month" type="number" min="0"
-                     class="w-full mt-1 px-3.5 py-2.5 rounded-md border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
-              <p class="text-xs text-text-muted mt-1">Leaves beyond this limit become unpaid.</p>
+              <input v-model.number="payrollSettings.allowed_leaves_per_month" type="number" min="0" max="31"
+                     @keydown="blockNonDigitKeydown($event)"
+                     @paste="blockNonDigitPaste($event)"
+                     @input="validatePayrollField('allowed_leaves_per_month')"
+                     class="w-full mt-1 px-3.5 py-2.5 rounded-md border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                     :class="payrollErrors.allowed_leaves_per_month ? 'border-danger' : 'border-border'" />
+              <p v-if="payrollErrors.allowed_leaves_per_month" class="text-xs text-danger mt-1">{{ payrollErrors.allowed_leaves_per_month }}</p>
+              <p v-else class="text-xs text-text-muted mt-1">Leaves beyond this limit become unpaid.</p>
             </div>
 
             <div class="dash-field">
               <label>Allowed Unpaid-Free Absents / Month</label>
-              <input v-model.number="payrollSettings.allowed_absents_per_month" type="number" min="0"
-                     class="w-full mt-1 px-3.5 py-2.5 rounded-md border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
-              <p class="text-xs text-text-muted mt-1">Absents beyond this limit become unpaid.</p>
+              <input v-model.number="payrollSettings.allowed_absents_per_month" type="number" min="0" max="31"
+                     @keydown="blockNonDigitKeydown($event)"
+                     @paste="blockNonDigitPaste($event)"
+                     @input="validatePayrollField('allowed_absents_per_month')"
+                     class="w-full mt-1 px-3.5 py-2.5 rounded-md border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                     :class="payrollErrors.allowed_absents_per_month ? 'border-danger' : 'border-border'" />
+              <p v-if="payrollErrors.allowed_absents_per_month" class="text-xs text-danger mt-1">{{ payrollErrors.allowed_absents_per_month }}</p>
+              <p v-else class="text-xs text-text-muted mt-1">Absents beyond this limit become unpaid.</p>
             </div>
 
             <div class="dash-field">
               <label>Overtime Rate / Hour</label>
-              <input v-model.number="payrollSettings.overtime_rate_per_hour" type="number" step="0.01" min="0"
-                     class="w-full mt-1 px-3.5 py-2.5 rounded-md border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
-            </div>
-
-            <div class="dash-field">
-              <label>Free Lates Before Penalty</label>
-              <input v-model.number="payrollSettings.late_count_threshold" type="number" min="0"
-                     class="w-full mt-1 px-3.5 py-2.5 rounded-md border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
-              <p class="text-xs text-text-muted mt-1">First N lates in a month are free. Every late after that cuts half a day's salary.</p>
+              <input v-model.number="payrollSettings.overtime_rate_per_hour" type="number" step="0.01" min="0" max="1000"
+                     @keydown="blockNonDigitKeydown($event, { allowDecimal: true })"
+                     @paste="blockNonDigitPaste($event, { allowDecimal: true })"
+                     @input="validatePayrollField('overtime_rate_per_hour')"
+                     class="w-full mt-1 px-3.5 py-2.5 rounded-md border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                     :class="payrollErrors.overtime_rate_per_hour ? 'border-danger' : 'border-border'" />
+              <p v-if="payrollErrors.overtime_rate_per_hour" class="text-xs text-danger mt-1">{{ payrollErrors.overtime_rate_per_hour }}</p>
             </div>
 
             <div class="dash-field">
@@ -785,9 +836,14 @@ watch(() => route.query.highlightEmployee, (newVal) => {
 
             <div class="dash-field">
               <label>Office Radius (meters)</label>
-              <input v-model.number="payrollSettings.office_radius_meters" type="number" min="20"
-                     class="w-full mt-1 px-3.5 py-2.5 rounded-md border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
-              <p class="text-xs text-text-muted mt-1">Check-ins inside this radius are marked In office.</p>
+              <input v-model.number="payrollSettings.office_radius_meters" type="number" min="10" max="5000"
+                     @keydown="blockNonDigitKeydown($event)"
+                     @paste="blockNonDigitPaste($event)"
+                     @input="validatePayrollField('office_radius_meters')"
+                     class="w-full mt-1 px-3.5 py-2.5 rounded-md border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                     :class="payrollErrors.office_radius_meters ? 'border-danger' : 'border-border'" />
+              <p v-if="payrollErrors.office_radius_meters" class="text-xs text-danger mt-1">{{ payrollErrors.office_radius_meters }}</p>
+              <p v-else class="text-xs text-text-muted mt-1">Check-ins inside this radius are marked In office.</p>
             </div>
 
             <div class="sm:col-span-2 rounded-md border border-border bg-surface/50 p-4">
@@ -807,11 +863,11 @@ watch(() => route.query.highlightEmployee, (newVal) => {
                   <p v-if="payrollSettings.office_address" class="text-xs text-text-muted mt-1">{{ payrollSettings.office_address }}</p>
                 </div>
                 <ShineButton
-                  variant="blue"
-                  shape="xl"
-                  size="sm"
-                  :loading="isSettingOffice"
-                  @click="captureOfficeLocation"
+                    variant="blue"
+                    shape="xl"
+                    size="sm"
+                    :loading="isSettingOffice"
+                    @click="captureOfficeLocation"
                 >
                   <font-awesome-icon :icon="['fas', 'location-crosshairs']" class="w-3 h-3" />
                   Use my current location
@@ -838,11 +894,11 @@ watch(() => route.query.highlightEmployee, (newVal) => {
                 <div class="flex items-center gap-2">
                   <label class="text-xs text-text-muted">Year</label>
                   <input
-                    v-model.number="holidayYear"
-                    type="number"
-                    min="2020"
-                    max="2100"
-                    class="w-24 px-2.5 py-1.5 rounded-md border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                      v-model.number="holidayYear"
+                      type="number"
+                      min="2020"
+                      max="2100"
+                      class="w-24 px-2.5 py-1.5 rounded-md border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
                   />
                 </div>
               </div>
@@ -880,29 +936,29 @@ watch(() => route.query.highlightEmployee, (newVal) => {
               <div v-else class="overflow-x-auto rounded-md border border-border">
                 <table class="min-w-full text-sm">
                   <thead class="bg-surface text-left text-text-muted">
-                    <tr>
-                      <th class="px-3 py-2 font-semibold">Date</th>
-                      <th class="px-3 py-2 font-semibold">Name</th>
-                      <th class="px-3 py-2 font-semibold">Note</th>
-                      <th class="px-3 py-2 font-semibold w-24"></th>
-                    </tr>
+                  <tr>
+                    <th class="px-3 py-2 font-semibold">Date</th>
+                    <th class="px-3 py-2 font-semibold">Name</th>
+                    <th class="px-3 py-2 font-semibold">Note</th>
+                    <th class="px-3 py-2 font-semibold w-24"></th>
+                  </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="h in holidays" :key="h.id" class="border-t border-border">
-                      <td class="px-3 py-2.5 text-text-primary whitespace-nowrap">{{ h.date }}</td>
-                      <td class="px-3 py-2.5 text-text-primary">{{ h.name }}</td>
-                      <td class="px-3 py-2.5 text-text-muted">{{ h.note || '—' }}</td>
-                      <td class="px-3 py-2.5 text-right">
-                        <button
+                  <tr v-for="h in holidays" :key="h.id" class="border-t border-border">
+                    <td class="px-3 py-2.5 text-text-primary whitespace-nowrap">{{ h.date }}</td>
+                    <td class="px-3 py-2.5 text-text-primary">{{ h.name }}</td>
+                    <td class="px-3 py-2.5 text-text-muted">{{ h.note || '—' }}</td>
+                    <td class="px-3 py-2.5 text-right">
+                      <button
                           type="button"
                           class="text-red-600 hover:text-red-700 text-xs font-semibold cursor-pointer disabled:opacity-50"
                           :disabled="holidaySaving"
                           @click="removeHoliday(h.id)"
-                        >
-                          Remove
-                        </button>
-                      </td>
-                    </tr>
+                      >
+                        Remove
+                      </button>
+                    </td>
+                  </tr>
                   </tbody>
                 </table>
               </div>
@@ -957,15 +1013,20 @@ watch(() => route.query.highlightEmployee, (newVal) => {
         <div class="dash-field">
           <label>Amount</label>
           <input
-              v-model.number="formData.amount"
-              type="number"
-              step="0.01"
-              min="0"
-              placeholder="10 or 5000"
+              v-model="formData.amount"
+              type="text"
+              inputmode="decimal"
+              @keydown="blockNonNumericAmount"
+              @paste="blockNonNumericPaste"
+              @input="formErrors.amount = getAmountError(formData.amount) || ''"
+              placeholder="e.g. 5000"
               class="w-full mt-1 px-3.5 py-2.5 rounded-md border text-sm text-text-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
               :class="formErrors.amount ? 'border-danger' : 'border-border'"
           />
-          <p v-if="formErrors.amount" class="text-xs text-danger mt-1">{{ formErrors.amount }}</p>
+
+          <p v-if="formErrors.amount" class="text-xs text-danger mt-1">
+            {{ formErrors.amount }}
+          </p>
         </div>
 
         <div class="dash-field">
@@ -1377,17 +1438,17 @@ watch(() => route.query.highlightEmployee, (newVal) => {
                 </span>
                 <div class="flex items-center gap-2">
                   <input
-                    v-model.number="bonusDraft"
-                    type="number"
-                    min="0"
-                    step="0.01"
-                    class="w-28 px-2 py-1 rounded-md border border-border text-xs text-right focus:outline-none focus:ring-2 focus:ring-primary/30"
+                      v-model.number="bonusDraft"
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      class="w-28 px-2 py-1 rounded-md border border-border text-xs text-right focus:outline-none focus:ring-2 focus:ring-primary/30"
                   />
                   <button
-                    type="button"
-                    class="px-2.5 py-1 rounded-md bg-primary text-white text-[11px] font-semibold disabled:opacity-50 cursor-pointer"
-                    :disabled="isSavingBonus"
-                    @click="saveMonthlyBonus"
+                      type="button"
+                      class="px-2.5 py-1 rounded-md bg-primary text-white text-[11px] font-semibold disabled:opacity-50 cursor-pointer"
+                      :disabled="isSavingBonus"
+                      @click="saveMonthlyBonus"
                   >
                     {{ isSavingBonus ? 'Saving…' : 'Save' }}
                   </button>
@@ -1395,8 +1456,8 @@ watch(() => route.query.highlightEmployee, (newVal) => {
               </div>
 
               <p
-                v-if="employeeDetail.payroll_deductions_applied === false"
-                class="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-2 py-1.5"
+                  v-if="employeeDetail.payroll_deductions_applied === false"
+                  class="text-[11px] text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-2 py-1.5"
               >
                 Leave / absent / late payroll settings do not apply for {{ employeeDetail.status }} employees.
               </p>

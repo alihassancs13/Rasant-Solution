@@ -3,28 +3,26 @@ import { storeToRefs } from 'pinia'
 import * as XLSX from 'xlsx'
 import { useAttendanceStore } from '../stores/attendanceStore.js'
 import { useToast } from '@/composables/useToast'
-function buildPageNumbers(current, total, delta = 2) {
-    if (total <= 1) return [1]
-    const range = []
-    for (let i = 1; i <= total; i++) {
-        if (i === 1 || i === total || (i >= current - delta && i <= current + delta)) {
-            range.push(i)
-        }
+function buildPageNumbers(current, total) {
+    if (total <= 5) {
+        return Array.from({ length: total }, (_, i) => i + 1)
     }
-    const withDots = []
-    let last = null
-    for (const page of range) {
-        if (last !== null) {
-            if (page - last === 2) {
-                withDots.push(last + 1)
-            } else if (page - last !== 1) {
-                withDots.push('...')
-            }
-        }
-        withDots.push(page)
-        last = page
+
+    let leftStart = current <= 2 ? 1 : current - 1
+    leftStart = Math.min(leftStart, total - 1)
+    const leftEnd = Math.min(leftStart + 1, total)
+    const left = leftStart === leftEnd ? [leftStart] : [leftStart, leftEnd]
+
+    const rightStart = total - 1
+    const rightEnd = total
+    let right = rightStart === rightEnd ? [rightEnd] : [rightStart, rightEnd]
+    right = right.filter((p) => !left.includes(p))
+
+    if (right.length === 0) {
+        return [1, '...', ...left]
     }
-    return withDots
+
+    return [...left, '...', ...right]
 }
 
 // Reusable pagination state for a reactive source array.

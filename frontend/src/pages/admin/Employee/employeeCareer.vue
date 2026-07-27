@@ -13,16 +13,19 @@ import { useJobs } from '../../../composables/useJobs.js'
 import { useJobStore } from '../../../stores/jobStore.js'
 import { useCvStore } from '../../../stores/cvStore.js'
 import { useToast } from '../../../composables/useToast.js'
+import { useValidation } from '../../../composables/useValidation.js'
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorker
 
 const { showToast } = useToast()
 const jobStore = useJobStore()
 const cvStore = useCvStore()
+const { blockNonDigitKeydown, blockNonDigitPaste, LENGTH_LIMITS } = useValidation()
 
 const {
   formData, formErrors, isClosed, isSubmitting,
-  toggleStatus, createJob, resetForm,
+  toggleStatus, createJob, resetForm, validateForm,
+  fieldClass, fieldErrorVisible, touchField, touchAll,
   adminJobs, loadingAdmin, fetchAdminJobs, updateJob,
 } = useJobs()
 
@@ -170,16 +173,18 @@ const handleEditJob = (job) => {
   showJobModal.value = true
 }
 
-// Toasts (created/published/draft/updated) are fired inside useJobs.js
-// (createJob / updateJob) — nothing to do here except refresh + close.
 const handleCreateJob = async () => {
+  if (!validateForm()) {
+    touchAll() // submit try kiya to sab invalid fields turant highlight ho jayein
+    showToast('Please fix the highlighted fields.', 'error')
+    return
+  }
   const saved = formData.id ? await updateJob(formData.id, { ...formData }) : await createJob()
   if (saved) {
     await fetchAdminJobs()
     closeJobModal()
   }
 }
-
 // ── View Job Modal ──
 const showViewModal = ref(false)
 const viewingJob = ref(null)
@@ -359,8 +364,6 @@ const downloadPreviewedCV = () => {
   URL.revokeObjectURL(url)
 }
 
-// Load preview only when the actual applicant changes (by id), not on every
-// array/reference change from a refetch — this is what caused the duplicate preview.
 watch(() => selectedApplicant.value?.id, (id) => {
   id ? viewCV(selectedApplicant.value) : closeCvPreview()
 }, { immediate: true })
@@ -825,60 +828,71 @@ watch(() => selectedApplicant.value?.id, (id) => {
         <BaseModal :is-open="showJobModal" mode="form" size="xl" :title="modalTitle"
                    subtitle="Select job type and details — publish immediately or save as draft."
                    :submit-text="isSubmitting ? 'Saving...' : 'Save job post'" :loading="isSubmitting"
+                   :submit-disabled="!validateForm()"
                    @close="closeJobModal" @cancel="closeJobModal" @save="handleCreateJob">
           <form @submit.prevent="handleCreateJob">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-5 w-full">
               <div class="w-full min-w-0">
                 <label class="block text-[11px] font-semibold text-text-muted tracking-wide uppercase mb-1.5">Job Title</label>
-                <input v-model="formData.job_title" type="text" placeholder="e.g. Senior React Developer"
-                       class="w-full min-w-0 px-3.5 py-2.5 text-sm bg-surface border border-border rounded-lg placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
-                <p v-if="formErrors.job_title" class="text-xs text-danger mt-1">{{ formErrors.job_title }}</p>
+                <input v-model="formData.job_title" type="text" placeholder="e.g. Senior Frontend Developer"
+                       :class="fieldClass('job_title')" @blur="touchField('job_title')" />
+                <p v-if="fieldErrorVisible('job_title')" class="text-xs text-danger mt-1">{{ formErrors.job_title }}</p>
               </div>
 
               <div class="w-full min-w-0">
                 <label class="block text-[11px] font-semibold text-text-muted tracking-wide uppercase mb-1.5">Job Type</label>
                 <div class="relative">
-                  <select v-model="formData.job_type" class="w-full min-w-0 appearance-none px-3.5 py-2.5 pr-10 text-sm bg-white border border-border rounded-lg text-text-primary cursor-pointer transition-colors hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary">
+                  <select v-model="formData.job_type" @change="touchField('job_type')"
+                          :class="['w-full min-w-0 appearance-none px-3.5 py-2.5 pr-10 text-sm bg-white border rounded-lg text-text-primary cursor-pointer transition-colors hover:border-primary/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary', fieldErrorVisible('job_type') ? 'border-danger' : 'border-border']">
                     <option :value="null" disabled class="text-text-muted">Select type</option>
                     <option v-for="type in jobTypes" :key="type.id" :value="type.id" class="text-text-primary py-2">{{ type.name }}</option>
                   </select>
                   <font-awesome-icon :icon="['fas', 'chevron-down']" class="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-text-muted w-3 h-3" />
                 </div>
-                <p v-if="formErrors.job_type" class="text-xs text-danger mt-1">{{ formErrors.job_type }}</p>
+                <p v-if="fieldErrorVisible('job_type')" class="text-xs text-danger mt-1">{{ formErrors.job_type }}</p>
               </div>
 
               <div class="w-full min-w-0">
                 <label class="block text-[11px] font-semibold text-text-muted tracking-wide uppercase mb-1.5">Department</label>
-                <input v-model="formData.department" type="text" placeholder="Engineering"
-                       class="w-full min-w-0 px-3.5 py-2.5 text-sm bg-surface border border-border rounded-lg placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
-                <p v-if="formErrors.department" class="text-xs text-danger mt-1">{{ formErrors.department }}</p>
+                <input v-model="formData.department" type="text" placeholder="e.g. Engineering"
+                       :class="fieldClass('department')" @blur="touchField('department')" />
+                <p v-if="fieldErrorVisible('department')" class="text-xs text-danger mt-1">{{ formErrors.department }}</p>
               </div>
 
               <div class="w-full min-w-0">
                 <label class="block text-[11px] font-semibold text-text-muted tracking-wide uppercase mb-1.5">Location</label>
-                <input v-model="formData.location" type="text" placeholder="Islamabad / Remote"
-                       class="w-full min-w-0 px-3.5 py-2.5 text-sm bg-surface border border-border rounded-lg placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
-                <p v-if="formErrors.location" class="text-xs text-danger mt-1">{{ formErrors.location }}</p>
+                <input v-model="formData.location" type="text" placeholder="e.g. Lahore, Pakistan"
+                       :class="fieldClass('location')" @blur="touchField('location')" />
+                <p v-if="fieldErrorVisible('location')" class="text-xs text-danger mt-1">{{ formErrors.location }}</p>
               </div>
 
               <div class="w-full min-w-0">
                 <label class="block text-[11px] font-semibold text-text-muted tracking-wide uppercase mb-1.5">Salary Range</label>
-                <input v-model="formData.salary_range" type="number" placeholder="e.g. 220000"
-                       class="w-full min-w-0 px-3.5 py-2.5 text-sm bg-surface border border-border rounded-lg placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary" />
+                <input
+                    v-model="formData.salary_range"
+                    type="text"
+                    inputmode="numeric"
+                    placeholder="e.g. 80000"
+                    :class="fieldClass('salary_range')"
+                    @blur="touchField('salary_range')"
+                    @keydown="blockNonDigitKeydown($event, { allowDecimal: true, maxDigits: LENGTH_LIMITS.amount.maxDigits })"
+                    @paste="blockNonDigitPaste($event, { allowDecimal: true, maxDigits: LENGTH_LIMITS.amount.maxDigits })"
+                />
+                <p v-if="fieldErrorVisible('salary_range')" class="text-xs text-danger mt-1">{{ formErrors.salary_range }}</p>
               </div>
 
               <div class="md:col-span-2 w-full min-w-0">
                 <label class="block text-[11px] font-semibold text-text-muted tracking-wide uppercase mb-1.5">Description</label>
                 <textarea v-model="formData.description" rows="4" placeholder="Role overview, responsibilities..."
-                          class="w-full min-w-0 px-3.5 py-2.5 text-sm bg-surface border border-border rounded-lg placeholder:text-text-muted resize-y focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"></textarea>
-                <p v-if="formErrors.description" class="text-xs text-danger mt-1">{{ formErrors.description }}</p>
+                          :class="fieldClass('description', 'resize-y')" @blur="touchField('description')"></textarea>
+                <p v-if="fieldErrorVisible('description')" class="text-xs text-danger mt-1">{{ formErrors.description }}</p>
               </div>
 
               <div class="md:col-span-2 w-full min-w-0">
                 <label class="block text-[11px] font-semibold text-text-muted tracking-wide uppercase mb-1.5">Requirements</label>
                 <textarea v-model="formData.requirements" rows="4" placeholder="Skills, experience, education..."
-                          class="w-full min-w-0 px-3.5 py-2.5 text-sm bg-surface border border-border rounded-lg placeholder:text-text-muted resize-y focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"></textarea>
-                <p v-if="formErrors.requirements" class="text-xs text-danger mt-1">{{ formErrors.requirements }}</p>
+                          :class="fieldClass('requirements', 'resize-y')" @blur="touchField('requirements')"></textarea>
+                <p v-if="fieldErrorVisible('requirements')" class="text-xs text-danger mt-1">{{ formErrors.requirements }}</p>
               </div>
             </div>
 
