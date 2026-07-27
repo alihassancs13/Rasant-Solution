@@ -2,7 +2,6 @@
   <header class="flex items-center justify-between gap-3 bg-white border border-border rounded-xl px-3 sm:px-4 py-2.5">
     <!-- Left: Back/Hamburger + Avatar + Greeting + Title -->
     <div class="flex items-center gap-2.5 sm:gap-3 min-w-0">
-      <!-- Back button (shown instead of hamburger when navigating within a drilled-down view) -->
       <button
           v-if="showBack"
           @click="$emit('back')"
@@ -11,7 +10,6 @@
       >
         <font-awesome-icon :icon="['fas', 'chevron-left']" class="text-sm" />
       </button>
-
       <!-- Mobile sidebar toggle -->
       <button
           v-else
@@ -21,13 +19,11 @@
       >
         <font-awesome-icon :icon="['fas', 'bars']" class="text-sm" />
       </button>
-
       <!-- Avatar with dash-topbar-profile class - Text centered -->
       <div class="dash-topbar-profile flex items-center justify-center">
         <font-awesome-icon v-if="iconOverride" :icon="iconOverride" class="text-sm" />
         <template v-else>{{ initials }}</template>
       </div>
-
       <div class="min-w-0">
         <p class="hidden xs:block text-[10px] sm:text-[11px] font-semibold text-text-muted tracking-wide uppercase truncate">
           {{ greeting }}, {{ displayName }}
@@ -44,16 +40,108 @@
         <p class="hidden sm:block text-xs text-text-muted truncate">{{ subtitle }}</p>
       </div>
     </div>
-
     <!-- Right: Search + Date + Notification + Avatar (with dropdown) -->
     <div class="flex items-center gap-2 sm:gap-3 shrink-0">
-      <div class="relative hidden lg:block">
-        <font-awesome-icon :icon="['fas', 'magnifying-glass']" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
-        <input
-            type="text"
-            placeholder="Search pages, tickets, messages..."
-            class="pl-9 pr-4 py-2 w-56 xl:w-72 text-sm bg-surface border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 text-text-primary placeholder-text-muted"
+      <!-- Global Search -->
+      <div ref="searchContainerRef" class="relative hidden lg:block">
+        <font-awesome-icon
+            :icon="['fas', 'magnifying-glass']"
+            class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted"
+            :class="{ 'text-primary': searchQuery.length > 0 }"
         />
+        <input
+            ref="searchInputRef"
+            type="text"
+            v-model="searchQuery"
+            @input="handleSearchInput"
+            @focus="handleSearchFocus"
+            @blur="handleSearchBlur"
+            @keydown.esc="clearSearch"
+            @keydown.down="handleKeyDown"
+            @keydown.up="handleKeyUp"
+            @keydown.enter="handleKeyEnter"
+            placeholder="Search employees, messages..."
+            class="pl-9 pr-4 py-2 w-56 xl:w-72 text-sm bg-surface border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 text-text-primary placeholder-text-muted transition-all duration-200"
+            :class="{ 'border-primary ring-2 ring-primary/20': searchQuery.length > 0 }"
+        />
+
+        <!-- Clear button -->
+        <button
+            v-if="searchQuery.length > 0"
+            @click="clearSearch"
+            class="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary transition-colors"
+        >
+          <font-awesome-icon :icon="['fas', 'xmark']" class="w-3.5 h-3.5" />
+        </button>
+
+        <!-- Search Results Dropdown -->
+        <div
+            v-if="showResults && searchQuery.length >= 2"
+            class="absolute left-0 top-full mt-2 w-[420px] max-h-[500px] bg-white border border-border rounded-xl shadow-2xl z-[100] overflow-hidden"
+            style="transform-origin: top left;"
+        >
+          <!-- Loading state -->
+          <div v-if="isSearching" class="flex items-center justify-center gap-3 py-8">
+            <div class="w-5 h-5 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+            <span class="text-sm text-text-muted">Searching...</span>
+          </div>
+
+          <!-- Results -->
+          <div v-else class="max-h-[500px] overflow-y-auto">
+            <!-- Results header -->
+            <div v-if="searchResults.length > 0" class="px-4 py-3 bg-surface border-b border-border">
+              <p class="text-xs font-semibold text-text-muted uppercase tracking-wider">
+                Found {{ searchResults.length }} result{{ searchResults.length > 1 ? 's' : '' }}
+              </p>
+            </div>
+
+            <!-- Result items grouped by module -->
+            <div v-if="searchResults.length > 0">
+              <div v-for="(group, moduleName) in groupedResults" :key="moduleName" class="border-b border-border last:border-0">
+                <div class="px-4 py-2 bg-white/50">
+                  <span class="text-[10px] font-bold text-text-muted uppercase tracking-wider">{{ moduleName }}</span>
+                </div>
+
+                <button
+                    v-for="(result, index) in group"
+                    :key="result.id"
+                    @click="navigateToResult(result)"
+                    @mouseenter="selectedIndex = getGlobalIndex(moduleName, index)"
+                    class="group w-full flex items-center gap-3 px-4 py-3 hover:bg-primary-subtle/20 transition-colors cursor-pointer text-left border-t border-border/50 first:border-t-0"
+                    :class="{ 'bg-primary-subtle/20': selectedIndex === getGlobalIndex(moduleName, index) }"
+                >
+                  <!-- Icon -->
+                  <div class="w-10 h-10 rounded-lg bg-primary-subtle/20 flex items-center justify-center shrink-0 group-hover:bg-primary-subtle/40 transition-colors">
+                    <font-awesome-icon :icon="result.icon" class="w-4 h-4 text-primary" />
+                  </div>
+
+                  <!-- Content -->
+                  <div class="min-w-0 flex-1">
+                    <p class="text-sm font-semibold text-text-primary truncate group-hover:text-primary transition-colors">
+                      {{ result.title }}
+                    </p>
+                    <p class="text-xs text-text-muted truncate">{{ result.subtitle }}</p>
+                  </div>
+
+                  <!-- Module badge -->
+                  <span class="text-[10px] font-medium text-text-muted bg-surface px-2 py-1 rounded-full shrink-0">
+            {{ result.module }}
+          </span>
+                </button>
+              </div>
+            </div>
+
+            <!-- No results message -->
+            <div v-if="searchResults.length === 0 && !isSearching && searchQuery.length >= 2" class="px-4 py-8 text-center">
+              <font-awesome-icon :icon="['fas', 'search']" class="w-8 h-8 text-text-muted/50 mb-2" />
+              <p class="text-sm font-semibold text-text-primary">No results found</p>
+              <p class="text-xs text-text-muted mt-1">We couldn't find anything for "<span class="font-medium text-text-primary">{{ searchQuery }}</span>"</p>
+              <p class="text-xs text-text-muted/70 mt-2">Try adjusting your search terms</p>
+            </div>
+
+
+          </div>
+        </div>
       </div>
 
       <div class="hidden md:flex items-center gap-1.5 text-sm font-medium text-text-secondary bg-surface border border-border px-3 py-2 rounded-lg whitespace-nowrap">
@@ -116,7 +204,6 @@
                 </span>
               </div>
             </div>
-
             <!-- List -->
             <div class="max-h-96 overflow-y-auto">
               <div
@@ -138,7 +225,6 @@
                   <p class="text-xs text-text-muted mt-0.5">No notifications yet.</p>
                 </div>
               </div>
-
               <button
                   v-for="item in notificationStore.items"
                   :key="item.id"
@@ -164,7 +250,6 @@
                 </div>
               </button>
             </div>
-
             <div
                 v-if="notificationStore.items.length"
                 class="px-5 py-3 bg-surface border-t border-border flex items-center justify-between gap-2"
@@ -188,7 +273,6 @@
           </div>
         </transition>
       </div>
-
       <!-- Avatar + dropdown menu -->
       <div ref="userMenuRef" class="relative">
         <button
@@ -206,7 +290,6 @@
           />
           <span v-else>{{ profileInitials }}</span>
         </button>
-
         <transition
             enter-active-class="transition ease-out duration-150"
             enter-from-class="opacity-0 -translate-y-1"
@@ -238,7 +321,6 @@
       </div>
     </div>
   </header>
-
   <!-- Logout Confirm Modal -->
   <div
       v-if="showLogoutModal"
@@ -272,46 +354,125 @@
     </div>
   </div>
 </template>
-
 <script setup>
-import { computed, ref, onMounted, onUnmounted, watch } from 'vue'
+import { computed, ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useOverview } from '@/composables/useOverview.js'
 import { useAdminSidebar } from '@/composables/useAdminsidebar.js'
 import { useLoginStore } from '@/stores/loginStore.js'
 import { useNotificationStore } from '@/stores/notificationStore.js'
+import { useGlobalSearch } from '@/composables/useGlobalSearch.js'
 import AppSkeleton from '@/components/AppSkeleton.vue'
 import { BASE_URL, API_ENDPOINTS } from '@/services/baseUrl.js'
-
 const notificationStore = useNotificationStore()
 const loginStore = useLoginStore()
 const showNotifMenu = ref(false)
 const notifRef = ref(null)
-
+function handleSearchBlur() {
+  setTimeout(() => {
+    if (searchContainerRef.value && !searchContainerRef.value.contains(document.activeElement)) {
+      showResults.value = false;
+    }
+  }, 200);
+}
+function handleSearchFocus() {
+  if (searchQuery.value.length >= 2) {
+    showResults.value = true;
+    performSearch(searchQuery.value);
+  }
+}
+function handleKeyDown() {
+  if (flattenedResults.value.length === 0) return;
+  selectedIndex.value = Math.min(selectedIndex.value + 1, flattenedResults.value.length - 1);
+  scrollToSelected();
+}
+function handleKeyUp() {
+  if (flattenedResults.value.length === 0) return;
+  selectedIndex.value = Math.max(selectedIndex.value - 1, -1);
+  scrollToSelected();
+}
+function handleKeyEnter() {
+  if (selectedIndex.value >= 0 && selectedIndex.value < flattenedResults.value.length) {
+    navigateToResult(flattenedResults.value[selectedIndex.value]);
+  }
+}
+function scrollToSelected() {
+  nextTick(() => {
+    const selectedElement = document.querySelector('[data-selected="true"]');
+    if (selectedElement) {
+      selectedElement.scrollIntoView({ block: 'nearest' });
+    }
+  });
+}
+// ── Global Search ──────────────────────────────
+const {
+  searchQuery,
+  searchResults,
+  showResults,
+  isSearching,
+  performSearch,
+  navigateToResult,
+  clearSearch
+} = useGlobalSearch()
+const searchContainerRef = ref(null)
+const searchInputRef = ref(null)
+const selectedIndex = ref(-1)
+let searchDebounceTimeout = null
+const groupedResults = computed(() => {
+  const groups = {}
+  searchResults.value.forEach(result => {
+    if (!groups[result.module]) {
+      groups[result.module] = []
+    }
+    groups[result.module].push(result)
+  })
+  return groups
+})
+const getGlobalIndex = (moduleName, index) => {
+  let globalIdx = 0
+  const moduleNames = Object.keys(groupedResults.value)
+  for (const mod of moduleNames) {
+    if (mod === moduleName) {
+      return globalIdx + index
+    }
+    globalIdx += groupedResults.value[mod].length
+  }
+  return -1
+}
+const flattenedResults = computed(() => {
+  const flat = []
+  Object.values(groupedResults.value).forEach(group => {
+    flat.push(...group)
+  })
+  return flat
+})
+function handleSearchInput() {
+  clearTimeout(searchDebounceTimeout)
+  searchDebounceTimeout = setTimeout(() => {
+    performSearch(searchQuery.value)
+    selectedIndex.value = -1
+  }, 300)
+}
 // ── Get sidebar functions ──
-const { isSidebarOpen, toggleSidebar } = useAdminSidebar()
-
+const {  toggleSidebar } = useAdminSidebar()
 // ── Notification dropdown ──────────────────────
 function toggleNotifMenu() {
   showNotifMenu.value = !showNotifMenu.value
   if (showNotifMenu.value) {
     openNotifications()
   } else {
-    // Closing after viewing → clear what was seen
     clearSeenNotifications()
   }
 }
 
 async function openNotifications() {
   await notificationStore.fetchNotifications({ force: true })
-  // Opening the panel counts as "seen" → clear unread badge immediately
   if (notificationStore.unreadCount > 0) {
     await notificationStore.markRead([], true)
   }
 }
 
 async function clearSeenNotifications() {
-  // After the user has viewed the panel, remove those notifications
   if (!notificationStore.items.length) return
   await notificationStore.clearNotifications({ clearAll: true })
 }
@@ -331,13 +492,10 @@ const TYPE_STYLES = {
   leave: { icon: ['fas', 'umbrella-beach'], bg: 'bg-indigo-100', text: 'text-indigo-700' },
   system: { icon: ['fas', 'bell'], bg: 'bg-slate-100', text: 'text-slate-700' },
 }
-
 function typeStyle(type) {
   return TYPE_STYLES[type] || TYPE_STYLES.system
 }
-
 const unseenCount = computed(() => notificationStore.unreadCount || 0)
-
 function formatNotifTime(iso) {
   if (!iso) return ''
   const d = new Date(iso)
@@ -349,11 +507,9 @@ function formatNotifTime(iso) {
     minute: '2-digit',
   })
 }
-
 async function markAllRead() {
   await notificationStore.markRead([], true)
 }
-
 const props = defineProps({
   userName: { type: String, default: '' },
   role: { type: String, default: '' },
@@ -365,14 +521,10 @@ const props = defineProps({
   showBack: { type: Boolean, default: false },
   iconOverride: { type: Array, default: null },
 })
-
 const emit = defineEmits(['back', 'highlight-employee'])
-
 const router = useRouter()
-
 async function handleNotifItemClick(item) {
   showNotifMenu.value = false
-  // Clicking an item means the panel was seen — clear all, then navigate
   await notificationStore.clearNotifications({ clearAll: true })
   if (item?.type === 'increment' && item?.payload?.employee_id) {
     router.push({
@@ -385,14 +537,12 @@ async function handleNotifItemClick(item) {
     router.push(item.link)
   }
 }
-
 const {
   showLogoutModal,
   openLogoutModal,
   closeLogoutModal,
   handleLogout
 } = useOverview()
-
 const roleConfig = {
   admin: {
     label: 'ADMINISTRATOR',
@@ -413,12 +563,10 @@ const roleConfig = {
     badgeClasses: 'bg-warning-subtle text-warning'
   }
 }
-
 const pageTitle = computed(() => props.titleOverride || roleConfig[props.role]?.title || '')
 const subtitle = computed(() => props.subtitleOverride || roleConfig[props.role]?.subtitle || '')
 const roleLabel = computed(() => roleConfig[props.role]?.label || '')
 const roleBadgeClasses = computed(() => roleConfig[props.role]?.badgeClasses || 'bg-surface-alt text-text-secondary')
-
 function getInitials(name) {
   if (!name || typeof name !== 'string') return '??'
   const parts = name.trim().split(/\s+/).filter(Boolean)
@@ -426,9 +574,7 @@ function getInitials(name) {
   if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase()
   return (parts[0][0] + parts[1][0]).toUpperCase()
 }
-
 const loggedInUser = computed(() => loginStore.user || null)
-
 const profileDisplayName = computed(() => {
   const u = loggedInUser.value
   if (u) {
@@ -439,14 +585,11 @@ const profileDisplayName = computed(() => {
   }
   return props.accountName?.trim() || props.userName?.trim() || 'User'
 })
-
 const displayName = computed(() => props.userName?.trim() || profileDisplayName.value || 'User')
 const initials = computed(() => getInitials(props.userName || profileDisplayName.value))
 const profileInitials = computed(() => getInitials(profileDisplayName.value))
-
 const profileAvatarUrl = ref(null)
 let profileAvatarObjectUrl = null
-
 function clearProfileAvatar() {
   if (profileAvatarObjectUrl) {
     URL.revokeObjectURL(profileAvatarObjectUrl)
@@ -476,11 +619,11 @@ async function loadProfileAvatar() {
 }
 
 watch(
-  () => [loggedInUser.value?.id, loggedInUser.value?.has_avatar],
-  () => {
-    loadProfileAvatar()
-  },
-  { immediate: true }
+    () => [loggedInUser.value?.id, loggedInUser.value?.has_avatar],
+    () => {
+      loadProfileAvatar()
+    },
+    { immediate: true }
 )
 
 const now = ref(new Date())
@@ -495,6 +638,7 @@ onUnmounted(() => {
   clearInterval(timer)
   clearProfileAvatar()
   notificationStore.stopPolling()
+  clearTimeout(searchDebounceTimeout)
 })
 
 const greeting = computed(() => {
@@ -512,8 +656,6 @@ const currentDate = computed(() => {
     year: 'numeric'
   })
 })
-
-// ── Avatar dropdown (Settings / Logout) ──────────────────────
 const showUserMenu = ref(false)
 const userMenuRef = ref(null)
 
@@ -535,19 +677,21 @@ function handleLogoutClick() {
   openLogoutModal()
 }
 
-// Close the dropdown when clicking anywhere outside it
 function handleClickOutside(event) {
   if (userMenuRef.value && !userMenuRef.value.contains(event.target)) {
-    showUserMenu.value = false
+    showUserMenu.value = false;
   }
   if (notifRef.value && !notifRef.value.contains(event.target)) {
     if (showNotifMenu.value) {
-      showNotifMenu.value = false
-      clearSeenNotifications()
+      showNotifMenu.value = false;
+      clearSeenNotifications();
     }
   }
+  if (searchContainerRef.value && !searchContainerRef.value.contains(event.target)) {
+    showResults.value = false;
+    selectedIndex.value = -1;
+  }
 }
-
 onMounted(() => {
   document.addEventListener('click', handleClickOutside)
 })
@@ -564,5 +708,21 @@ onUnmounted(() => {
   color: #fff;
   border-color: transparent;
   box-shadow: 0 4px 12px rgba(42, 95, 158, 0.2);
+}
+.max-h-\[500px\]::-webkit-scrollbar {
+  width: 4px;
+}
+
+.max-h-\[500px\]::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.max-h-\[500px\]::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+
+.max-h-\[500px\]::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
 }
 </style>
