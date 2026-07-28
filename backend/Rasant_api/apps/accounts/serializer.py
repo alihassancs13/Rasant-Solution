@@ -103,20 +103,23 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class ProfileUpdateSerializer(serializers.Serializer):
-    username = serializers.CharField(required=False, max_length=150)
-    email = serializers.EmailField(required=False, allow_blank=True)
-    first_name = serializers.CharField(required=False, allow_blank=True, max_length=150)
-    last_name = serializers.CharField(required=False, allow_blank=True, max_length=150)
+    username = serializers.CharField(required=False, max_length=32)
+    email = serializers.EmailField(required=False, allow_blank=True, max_length=50)
+    first_name = serializers.CharField(required=False, allow_blank=True, max_length=32)
+    last_name = serializers.CharField(required=False, allow_blank=True, max_length=32)
 
     def validate_email(self, value):
         if not value:
             return value
+        # Email format validation is already handled by EmailField
         user = self.context['request'].user
         if User.objects.filter(email__iexact=value).exclude(pk=user.pk).exists():
             raise serializers.ValidationError('This email is already in use.')
         return value
 
     def validate_username(self, value):
+        if not value:
+            return value
         user = self.context['request'].user
         if User.objects.filter(username=value).exclude(pk=user.pk).exists():
             raise serializers.ValidationError('This username is already taken.')
@@ -125,14 +128,34 @@ class ProfileUpdateSerializer(serializers.Serializer):
 
 class ChangePasswordSerializer(serializers.Serializer):
     current_password = serializers.CharField(write_only=True)
-    new_password = serializers.CharField(write_only=True, min_length=8)
+    new_password = serializers.CharField(write_only=True, min_length=8, max_length=32)
     confirm_password = serializers.CharField(write_only=True)
 
     def validate(self, data):
         if data['new_password'] != data['confirm_password']:
             raise serializers.ValidationError({'confirm_password': 'Passwords do not match.'})
-        return data
 
+        # Password complexity validation
+        new_password = data.get('new_password')
+        if new_password:
+            import re
+            if len(new_password) < 8:
+                raise serializers.ValidationError({'new_password': 'Password must be at least 8 characters long.'})
+            if len(new_password) > 32:
+                raise serializers.ValidationError({'new_password': 'Password must not exceed 32 characters.'})
+            if not re.search(r'[A-Z]', new_password):
+                raise serializers.ValidationError(
+                    {'new_password': 'Password must contain at least one uppercase letter.'})
+            if not re.search(r'[a-z]', new_password):
+                raise serializers.ValidationError(
+                    {'new_password': 'Password must contain at least one lowercase letter.'})
+            if not re.search(r'[0-9]', new_password):
+                raise serializers.ValidationError({'new_password': 'Password must contain at least one number.'})
+            if not re.search(r'[!@#$%^&*()_+\-=\[\]{};:\'",.<>?/\\|`~]', new_password):
+                raise serializers.ValidationError(
+                    {'new_password': 'Password must contain at least one special character.'})
+
+        return data
 
 class RoleSerializer(serializers.ModelSerializer):
     """Serializer for roles"""
@@ -149,7 +172,6 @@ class ContactMessageSerializer(serializers.ModelSerializer):
         model = ContactMessage
         fields = ['id', 'full_name', 'email', 'phone', 'message', 'status', 'status_label', 'created_at']
         read_only_fields = ['id', 'created_at']
-
 
 
 class EmailSettingsSerializer(serializers.ModelSerializer):

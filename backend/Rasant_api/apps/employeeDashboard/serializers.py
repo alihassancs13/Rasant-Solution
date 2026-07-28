@@ -65,11 +65,8 @@ class FlexibleEmploymentStatusField(serializers.Field):
 
 
 class EmployeeSerializer(serializers.ModelSerializer):
-    """
-    Create/accept employee payload. Binary file columns are excluded —
-    files are attached in the view from request.FILES.
-    """
     status = FlexibleEmploymentStatusField(required=False, allow_null=True)
+    source = serializers.CharField(write_only=True, required=False, default='admin_quick')
 
     class Meta:
         model = Employee
@@ -111,6 +108,16 @@ class EmployeeSerializer(serializers.ModelSerializer):
         }
 
     def validate_email(self, value):
+        import re
+        if not value:
+            raise serializers.ValidationError("Email is required.")
+        # Email format validation
+        email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(email_regex, value):
+            raise serializers.ValidationError("Please enter a valid email address.")
+        if len(value) > 50:
+            raise serializers.ValidationError("Email must not exceed 50 characters.")
+
         from django.contrib.auth import get_user_model
         UserModel = get_user_model()
         if Employee.objects.filter(email__iexact=value).exists():
@@ -118,32 +125,195 @@ class EmployeeSerializer(serializers.ModelSerializer):
         if UserModel.objects.filter(email__iexact=value).exists():
             raise serializers.ValidationError("A user account with this email already exists.")
         return value
-    def validate_cnic(self, value):
-        if value in (None, ''):
-            return None
-        if Employee.objects.filter(cnic=value).exists():
-            raise serializers.ValidationError("Employee with this CNIC already exists.")
+
+    def validate_name(self, value):
+        if not value:
+            raise serializers.ValidationError("Name is required.")
+        if len(value) > 32:
+            raise serializers.ValidationError("Name must not exceed 32 characters.")
         return value
 
     def validate_phone_number(self, value):
         value = (value or '').strip()
         if not value:
             raise serializers.ValidationError("Phone number is required.")
+        import re
+        if not re.match(r'^\d+$', value):
+            raise serializers.ValidationError("Phone number must contain only numbers.")
+        if len(value) > 15:
+            raise serializers.ValidationError("Phone number must not exceed 15 digits.")
+        return value
+
+    def validate_salary(self, value):
+        if value is None:
+            raise serializers.ValidationError("Salary is required.")
+        import re
+        str_value = str(value)
+
+        if '.' in str_value:
+            str_value = str_value.rstrip('0').rstrip('.')
+        if not re.match(r'^\d+$', str_value):
+            raise serializers.ValidationError("Salary must contain only numbers.")
+
+        if len(str_value) > 10:
+            raise serializers.ValidationError("Salary must not exceed 10 digits.")
+        return int(str_value)
+
+    def validate_designation(self, value):
+        if not value:
+            raise serializers.ValidationError("Designation is required.")
+        if len(value) > 32:
+            raise serializers.ValidationError("Designation must not exceed 32 characters.")
+        return value
+
+    def validate_department(self, value):
+        if not value:
+            raise serializers.ValidationError("Department is required.")
+        if len(value) > 32:
+            raise serializers.ValidationError("Department must not exceed 32 characters.")
+        return value
+
+    def validate_cnic(self, value):
+        if value in (None, ''):
+            return None
+        import re
+        if not re.match(r'^\d+$', str(value)):
+            raise serializers.ValidationError("CNIC must contain only numbers.")
+        if len(str(value)) != 13:
+            raise serializers.ValidationError("CNIC must be exactly 13 digits.")
+        if Employee.objects.filter(cnic=value).exists():
+            raise serializers.ValidationError("Employee with this CNIC already exists.")
+        return value
+
+    def validate_gender(self, value):
+        if value in (None, ''):
+            return None
+
+        value_lower = value.lower()
+        if value_lower not in ['male', 'female', 'other']:
+            raise serializers.ValidationError("Gender must be male, female, or other.")
+
+        return value_lower
+
+    def validate_present_address(self, value):
+        if value and len(value) > 400:
+            raise serializers.ValidationError("Present address must not exceed 400 characters.")
+        return value
+
+    def validate_permanent_address(self, value):
+        if value and len(value) > 400:
+            raise serializers.ValidationError("Permanent address must not exceed 400 characters.")
+        return value
+
+    def validate_emergency_name(self, value):
+        if value and len(value) > 32:
+            raise serializers.ValidationError("Emergency contact name must not exceed 32 characters.")
+        return value
+
+    def validate_emergency_relation(self, value):
+        if value and len(value) > 32:
+            raise serializers.ValidationError("Emergency relation must not exceed 32 characters.")
+        return value
+
+    def validate_emergency_phone(self, value):
+        if value:
+            import re
+            if not re.match(r'^\d+$', str(value)):
+                raise serializers.ValidationError("Emergency phone number must contain only numbers.")
+            if len(str(value)) > 15:
+                raise serializers.ValidationError("Emergency phone number must not exceed 15 digits.")
+        return value
+
+    def validate_emergency_cnic(self, value):
+        if value in (None, ''):
+            return None
+        import re
+        if not re.match(r'^\d+$', str(value)):
+            raise serializers.ValidationError("Emergency CNIC must contain only numbers.")
+        if len(str(value)) != 13:
+            raise serializers.ValidationError("Emergency CNIC must be exactly 13 digits.")
+        return value
+
+    def validate_emergency_address(self, value):
+        if value and len(value) > 400:
+            raise serializers.ValidationError("Emergency address must not exceed 400 characters.")
+        return value
+
+    def validate_bank_name(self, value):
+        if value and len(value) > 32:
+            raise serializers.ValidationError("Bank name must not exceed 32 characters.")
+        return value
+
+    def validate_branch_name(self, value):
+        if value and len(value) > 32:
+            raise serializers.ValidationError("Branch name must not exceed 32 characters.")
+        return value
+
+    def validate_account_number(self, value):
+        if value and len(value) > 24:
+            raise serializers.ValidationError("Account/IBAN number must not exceed 24 characters.")
         return value
 
     def validate(self, attrs):
-        # Normalize blank optional unique/nullable fields to None
         for key in ('cnic', 'emergency_cnic', 'gender'):
             if key in attrs and attrs[key] == '':
                 attrs[key] = None
-        if not attrs.get('department'):
-            attrs['department'] = 'Unassigned'
-        if not attrs.get('designation'):
-            attrs['designation'] = 'Unassigned'
-        if not attrs.get('status'):
-            attrs['status'] = default_employment_status()
-        if not attrs.get('joined_date'):
-            attrs['joined_date'] = date.today()
+
+        source = attrs.get('source', 'admin_quick')
+        self.context['source'] = source
+        if source == 'user_onboarding':
+            # CNIC is required for user onboarding
+            if not attrs.get('cnic'):
+                raise serializers.ValidationError({'cnic': 'CNIC is required.'})
+
+            # Gender is required for user onboarding
+            if not attrs.get('gender'):
+                raise serializers.ValidationError({'gender': 'Gender is required.'})
+
+            # Present address is required
+            if not attrs.get('present_address'):
+                raise serializers.ValidationError({'present_address': 'Present address is required.'})
+            if attrs.get('present_address') and len(attrs.get('present_address')) > 400:
+                raise serializers.ValidationError(
+                    {'present_address': 'Present address must not exceed 400 characters.'})
+
+            # Permanent address is required
+            if not attrs.get('permanent_address'):
+                raise serializers.ValidationError({'permanent_address': 'Permanent address is required.'})
+            if attrs.get('permanent_address') and len(attrs.get('permanent_address')) > 400:
+                raise serializers.ValidationError(
+                    {'permanent_address': 'Permanent address must not exceed 400 characters.'})
+
+            # Emergency contact is required
+            if not attrs.get('emergency_name'):
+                raise serializers.ValidationError({'emergency_name': 'Emergency contact name is required.'})
+            if not attrs.get('emergency_relation'):
+                raise serializers.ValidationError({'emergency_relation': 'Emergency relation is required.'})
+            if not attrs.get('emergency_phone'):
+                raise serializers.ValidationError({'emergency_phone': 'Emergency phone number is required.'})
+            if not attrs.get('emergency_address'):
+                raise serializers.ValidationError({'emergency_address': 'Emergency address is required.'})
+
+            # Bank details are required
+            if not attrs.get('bank_name'):
+                raise serializers.ValidationError({'bank_name': 'Bank name is required.'})
+            if not attrs.get('branch_name'):
+                raise serializers.ValidationError({'branch_name': 'Branch name is required.'})
+            if not attrs.get('account_number'):
+                raise serializers.ValidationError({'account_number': 'Account/IBAN number is required.'})
+
+        # Set defaults for admin contexts
+        if source in ['admin_quick', 'admin_onboarding']:
+            if not attrs.get('department'):
+                attrs['department'] = 'Unassigned'
+            if not attrs.get('designation'):
+                attrs['designation'] = 'Unassigned'
+            if not attrs.get('status'):
+                attrs['status'] = default_employment_status()
+            if not attrs.get('joined_date'):
+                attrs['joined_date'] = date.today()
+        attrs.pop('source', None)
+
         return attrs
 
 
@@ -392,7 +562,50 @@ class JobOpeningSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
 
+    def validate_job_title(self, value):
+        if not value:
+            raise serializers.ValidationError("Job title is required.")
+        if len(value) > 32:
+            raise serializers.ValidationError("Job title must not exceed 32 characters.")
+        return value
 
+    def validate_job_type(self, value):
+        if not value:
+            raise serializers.ValidationError("Job type is required.")
+        return value
+
+    def validate_department(self, value):
+        if not value:
+            raise serializers.ValidationError("Department is required.")
+        if len(value) > 32:
+            raise serializers.ValidationError("Department must not exceed 32 characters.")
+        return value
+
+    def validate_location(self, value):
+        if not value:
+            raise serializers.ValidationError("Location is required.")
+        if len(value) > 50:
+            raise serializers.ValidationError("Location must not exceed 50 characters.")
+        return value
+
+    def validate_salary_range(self, value):
+        if value:  # Only validate if value is provided
+            import re
+            if not re.match(r'^\d+$', str(value)):
+                raise serializers.ValidationError("Salary must contain only numbers.")
+            if len(str(value)) > 10:
+                raise serializers.ValidationError("Salary must not exceed 10 digits.")
+        return value
+
+    def validate_description(self, value):
+        if not value:
+            raise serializers.ValidationError("Description is required.")
+        return value
+
+    def validate_requirements(self, value):
+        if not value:
+            raise serializers.ValidationError("Requirements are required.")
+        return value
 class IncrementTypeSerializer(serializers.ModelSerializer):
     class Meta:
         model = IncrementType
@@ -437,6 +650,38 @@ class IncrementPolicySerializer(serializers.ModelSerializer):
             'description': {'required': False, 'allow_null': True, 'allow_blank': True},
         }
 
+    def validate_policy_name(self, value):
+        if not value:
+            raise serializers.ValidationError("Policy name is required.")
+        if len(value) > 32:
+            raise serializers.ValidationError("Policy name must not exceed 32 characters.")
+        return value
+
+    def validate_increment_type(self, value):
+        if not value:
+            raise serializers.ValidationError("Increment type is required.")
+        return value
+
+    def validate_amount(self, value):
+        if value is None:
+            raise serializers.ValidationError("Amount is required.")
+        import re
+        if not re.match(r'^\d+$', str(value)):
+            raise serializers.ValidationError("Amount must contain only digits.")
+        if len(str(value)) > 10:
+            raise serializers.ValidationError("Amount must not exceed 10 digits.")
+        return value
+
+    def validate_cycle_timing(self, value):
+        if not value:
+            raise serializers.ValidationError("Cycle timing is required.")
+        return value
+
+    def validate_application_mode(self, value):
+        if not value:
+            raise serializers.ValidationError("Application mode is required.")
+        return value
+
     def create(self, validated_data):
         request = self.context.get('request')
         user = getattr(request, 'user', None)
@@ -457,7 +702,6 @@ class IncrementPolicySerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
         return instance
-
 class EmployeePolicyAssignmentSerializer(serializers.ModelSerializer):
     employee_name = serializers.CharField(source='employee.full_name', read_only=True)  # field name confirm karna hai
     policy_name = serializers.CharField(source='policy.policy_name', read_only=True)
@@ -733,6 +977,53 @@ class PayrollSettingsSerializer(serializers.ModelSerializer):
             'id', 'updated_by', 'updated_by_name', 'updated_at',
             'office_set_at', 'office_configured',
         ]
+
+    def validate_grace_minutes(self, value):
+        if value is not None:
+            import re
+            if not re.match(r'^\d+$', str(value)):
+                raise serializers.ValidationError("Grace minutes must contain only numbers.")
+            if int(value) > 480:
+                raise serializers.ValidationError("Grace minutes must not exceed 480.")
+        return value
+
+    def validate_allowed_leaves_per_month(self, value):
+        if value is not None:
+            import re
+            if not re.match(r'^\d+$', str(value)):
+                raise serializers.ValidationError("Allowed leaves per month must contain only numbers.")
+            if int(value) > 31:
+                raise serializers.ValidationError("Allowed leaves per month must not exceed 31.")
+        return value
+
+    def validate_allowed_absents_per_month(self, value):
+        if value is not None:
+            import re
+            if not re.match(r'^\d+$', str(value)):
+                raise serializers.ValidationError("Allowed absents per month must contain only numbers.")
+            if int(value) > 31:
+                raise serializers.ValidationError("Allowed absents per month must not exceed 31.")
+        return value
+
+    def validate_overtime_rate_per_hour(self, value):
+        if value is not None:
+            import re
+            str_value = str(value)
+            # Allow decimal numbers with optional decimal part
+            if not re.match(r'^\d+(\.\d+)?$', str_value):
+                raise serializers.ValidationError("Overtime rate per hour must contain only numbers.")
+            if float(value) > 1000:
+                raise serializers.ValidationError("Overtime rate per hour must not exceed 1000.")
+        return value
+
+    def validate_office_radius_meters(self, value):
+        if value is not None:
+            import re
+            if not re.match(r'^\d+$', str(value)):
+                raise serializers.ValidationError("Office radius meters must contain only numbers.")
+            if int(value) > 5000:
+                raise serializers.ValidationError("Office radius meters must not exceed 5000.")
+        return value
 
     def update(self, instance, validated_data):
         request = self.context.get('request')

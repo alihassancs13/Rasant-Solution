@@ -8,6 +8,7 @@ export function useEmployeeRegistration() {
     // --- state ---
     const currentStep = ref(1);
     const totalSteps = 4;
+
     const isSubmitted = ref(false);
     const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
     const { showToast } = useToast();
@@ -106,29 +107,26 @@ export function useEmployeeRegistration() {
     };
 
     // --- submission using store ---
-    const submitForm = async (onSuccess) => {
-        if (isSubmitted.value) return; // Prevent double submission
+    const submitForm = async (onSuccess, source = 'user_onboarding') => {
+        if (isSubmitted.value) return;
 
-        // Validate all steps before submitting
         const formElement = document.getElementById('employeeForm');
         if (!formElement.checkValidity()) {
             formElement.reportValidity();
-            // Find which step has errors and navigate to it
-            const invalidFields = formElement.querySelectorAll(':invalid');
-            if (invalidFields.length > 0) {
-                // Try to find which step contains the invalid field
-                // You can implement step mapping here
-            }
             return;
         }
         isSubmitted.value = true;
         const payload = new FormData();
+
+        // ADD THIS - source field
+        payload.append('source', source);
+
         const cleanCnic = (value) => (value || '').replace(/\D/g, '');
 
         const cleanedCnic = cleanCnic(formData.value.cnic);
         const cleanedEmergencyCnic = cleanCnic(formData.value.emergency_cnic);
 
-        // Prepare cleaned data with all fields and defaults
+        // Prepare cleaned data
         const cleanedData = {
             name: (formData.value.name || '').trim(),
             present_address: (formData.value.present_address || '').trim(),
@@ -137,7 +135,6 @@ export function useEmployeeRegistration() {
             gender: formData.value.gender || 'Male',
             email: (formData.value.email || '').trim(),
             department: (formData.value.department || '').trim() || 'Unassigned',
-
             designation: (formData.value.designation || '').trim() || 'Employee',
             salary: parseFloat(formData.value.salary) || 0,
             joined_date: formData.value.joined_date || new Date().toISOString().split('T')[0],
@@ -158,6 +155,7 @@ export function useEmployeeRegistration() {
 
         if (!cleanedData.name || !cleanedData.email || !cleanedData.phone_number) {
             showToast('Name, email, and phone number are required.', 'error');
+            isSubmitted.value = false;
             return { success: false };
         }
 
@@ -177,70 +175,35 @@ export function useEmployeeRegistration() {
             const result = await store.addEmployee(payload);
 
             if (result.success) {
-                showToast(
-                    `Employee ${result.data?.name || ''} added successfully! `,
-                    'success',
-                    5000
-                );
-                console.log('Employee added:', result.data);
+                const emailNote = result.data?.email_sent === false
+                    ? ' (create-password email could not be sent — check Email settings)'
+                    : ' Create-password link emailed to the employee.';
+                showToast(`Employee added successfully.${emailNote}`, 'success', 5000);
                 isSubmitted.value = false;
                 resetForm();
                 if (onSuccess) onSuccess(result.data);
-                return result;
+                return { success: true, data: result.data };
             } else {
-                let errorMsg = 'Submission failed:\n';
-                if (result.error) {
-                    errorMsg += result.error;
-                } else if (result.errors) {
-                    if (typeof result.errors === 'object') {
-                        for (const [field, msgs] of Object.entries(result.errors)) {
-                            if (Array.isArray(msgs)) {
-                                errorMsg += `\n${field}: ${msgs.join(', ')}`;
-                            } else {
-                                errorMsg += `\n${field}: ${msgs}`;
-                            }
-                        }
-                    } else {
-                        errorMsg += result.errors;
-                    }
-                } else {
-                    errorMsg += 'Unknown error occurred';
+                let errorMsg = 'Submission failed';
+                if (result.errors && typeof result.errors === 'object') {
+                    const parts = Object.entries(result.errors).map(([field, msgs]) => {
+                        const text = Array.isArray(msgs) ? msgs.join(', ') : String(msgs);
+                        return `${field}: ${text}`;
+                    });
+                    if (parts.length) errorMsg = parts.join(' | ');
+                } else if (result.error) {
+                    errorMsg = result.error;
                 }
-
-                showToast(errorMsg, 'error', 7000);
-                console.error('Submission error:', result.error);
-                return result;
+                showToast(errorMsg, 'error', 6000);
+                isSubmitted.value = false;
+                return { success: false, error: errorMsg };
             }
         } catch (error) {
             console.error('Unexpected error:', error);
             showToast('An unexpected error occurred. Please try again.', 'error', 5000);
-            return { success: false, error: error.message };
-        } finally {
             isSubmitted.value = false;
+            return { success: false, error: error.message };
         }
-        if (result.success) {
-            const emailNote = result.data?.email_sent === false
-                ? ' (create-password email could not be sent — check Email settings)'
-                : ' Create-password link emailed to the employee.';
-            showToast(`Employee added successfully.${emailNote}`, 'success', 5000);
-            isSubmitted.value = true;
-            if (onSuccess) onSuccess(result.data);
-            return { success: true, data: result.data };
-        }
-
-        let errorMsg = 'Submission failed';
-        if (result.errors && typeof result.errors === 'object') {
-            const parts = Object.entries(result.errors).map(([field, msgs]) => {
-                const text = Array.isArray(msgs) ? msgs.join(', ') : String(msgs);
-                return `${field}: ${text}`;
-            });
-            if (parts.length) errorMsg = parts.join(' | ');
-        } else if (result.error) {
-            errorMsg = result.error;
-        }
-        showToast(errorMsg, 'error', 6000);
-        isSubmitted.value = false;
-        return { success: false, error: errorMsg };
     };
     const resetForm = () => {
         formData.value = {

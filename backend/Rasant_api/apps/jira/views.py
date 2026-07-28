@@ -1,24 +1,15 @@
 import requests
 from datetime import datetime,timezone,timedelta
-import base64
 from django.http import JsonResponse, HttpResponse,StreamingHttpResponse
-from django.views.decorators.csrf import csrf_exempt
 from django.apps import apps
-import json
-import subprocess
-import tempfile
-import json as json_module
 from .services import (
     get_jira_headers,
     get_jira_creds,
     get_jira_worklog,
-    fetch_worklogs,
     create_jira_worklog,
     update_jira_worklog,
     fetch_recent_jira_projects,
     delete_jira_worklog,
-    _get_current_account_id,
-    _fetch_all_worklogs_for_issue,
     fetch_issue_types,
     fetch_statuses,
     get_issue_detail_service,
@@ -34,7 +25,6 @@ from .worklog_storage import (
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework import status
 
 # LOGIN TO JIRA
 @api_view(['POST'])
@@ -232,7 +222,7 @@ def get_issue_detail(request, issue_key):
     return JsonResponse(result, status=status_code)
 
 # CREATE JIRA ISSUE
-def create_jira_issue_service(data, user,attachments, source, created_by_id=None):
+def create_jira_issue_service(data, user, attachments, source, created_by_id=None):
     domain, headers = get_jira_creds(user)
     if not domain:
         return {'error': 'Jira not connected'}, 400
@@ -258,6 +248,25 @@ def create_jira_issue_service(data, user,attachments, source, created_by_id=None
     fix_versions = data.get('fix_versions', [])
     labels = data.get('labels', [])
     linked_issues = data.get('linked_issues', [])
+
+    # Required field validations
+    missing_fields = []
+
+    if not project_key:
+        missing_fields.append('project_key')
+    if not summary:
+        missing_fields.append('summary')
+    if not issue_type:
+        missing_fields.append('issue_type')
+    if not reporter_id:
+        missing_fields.append('reporter_id')
+
+    if missing_fields:
+        return {
+            'error': 'Missing required fields',
+            'required_fields': missing_fields,
+            'message': f"The following fields are required: {', '.join(missing_fields)}"
+        }, 400
 
     payload = {
         'fields': {
@@ -308,7 +317,6 @@ def create_jira_issue_service(data, user,attachments, source, created_by_id=None
     ISSUE_TYPES_WITHOUT_PARENT = {'epic'}
     if parent_key and issue_type.lower() not in ISSUE_TYPES_WITHOUT_PARENT:
         payload['fields']['parent'] = {'key': parent_key}
-
 
     r = requests.post(
         f'{domain}/rest/api/3/issue',

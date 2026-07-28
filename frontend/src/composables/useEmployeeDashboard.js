@@ -327,6 +327,10 @@ export function useEmployeeDashboard() {
         isCreating.value = true;
         try {
             const formDataPayload = new FormData();
+
+            // ADD THIS LINE:
+            formDataPayload.append('source', 'admin_quick');
+
             formDataPayload.append('name', createFormData.name.trim());
             formDataPayload.append('email', createFormData.email.trim());
             formDataPayload.append('phone_number', createFormData.phone_number.trim());

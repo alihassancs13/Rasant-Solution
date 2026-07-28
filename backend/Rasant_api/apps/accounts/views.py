@@ -354,7 +354,6 @@ def email_settings_view(request):
         'data': EmailSettingsSerializer(updated).data,
     })
 
-
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def test_email_settings(request):

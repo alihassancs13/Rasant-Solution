@@ -673,6 +673,10 @@ export default {
       validationError.value = '';
 
       if (currentStep.value === totalSteps) {
+        // CHANGE THIS LINE - pass the source
+        // Determine source based on context
+        const source = isDirectAccess.value ? 'user_onboarding' : 'admin_onboarding';
+
         submitForm((data) => {
           isSubmitted.value = true;
           // Refresh dashboard list when submitted from the modal
@@ -682,7 +686,7 @@ export default {
               emit('close');
             }, 2500);
           }
-        });
+        }, source); // Pass source here
       } else {
         nextStep();
         scrollToTop();

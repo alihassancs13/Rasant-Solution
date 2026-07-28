@@ -93,6 +93,8 @@ def add_employee(request):
         if hasattr(value, "read"):
             continue
         data[key] = value
+    source = request.data.get('source', 'admin_quick')
+    data['source'] = source
 
     for blank_key in ("cnic", "emergency_cnic", "gender"):
         if blank_key in data and data.get(blank_key) in ("", None):
@@ -105,7 +107,7 @@ def add_employee(request):
         if isinstance(raw_active, str):
             data["is_active"] = raw_active.strip().lower() in ("1", "true", "yes", "on")
 
-    serializer = EmployeeSerializer(data=data)
+    serializer = EmployeeSerializer(data=data,context={'source': source})
     if not serializer.is_valid():
         return Response(
             {"error": "Validation failed.", "errors": serializer.errors},
@@ -238,6 +240,7 @@ def add_employee(request):
 
 
 @api_view(["GET"])
+@permission_classes([IsAuthenticated])
 def list_employees(request):
     employees = (
         Employee.objects.select_related("status")
