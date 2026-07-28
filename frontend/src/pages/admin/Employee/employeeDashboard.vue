@@ -368,12 +368,14 @@
         title="Create employee"
         subtitle="Enter basic details — onboarding continues in this dashboard."
         submit-text="Create & send invitation"
+        :disable-submit="!isCreateFormValid || isCreating"
         :loading="isCreating"
         :wide="false"
         @close="closeCreateModal"
         @save="handleCreateEmployee"
     >
       <form @submit.prevent="handleCreateEmployee" class="grid grid-cols-1 md:grid-cols-2 gap-5 text-left text-gray-700">
+        <!-- Full Name -->
         <div class="flex flex-col gap-1.5">
           <label class="text-xs font-bold uppercase tracking-wider text-gray-400">
             Full Name <span class="text-red-500">*</span>
@@ -382,11 +384,19 @@
               type="text"
               v-model="createFormData.name"
               placeholder="e.g. Sarah Ali"
-              required
-              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition-all duration-200"
+              maxlength="32"
+              :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200', (createTouched.name && createErrors.name) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
+              @keydown="nameHandlers.keydown"
+              @paste="nameHandlers.paste"
+              @input="nameHandlers.input"
+              @blur="markCreateTouched('name')"
           />
+          <span v-if="createTouched.name && createErrors.name" class="text-xs text-rose-500 mt-1 block">
+            <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ createErrors.name }}
+          </span>
         </div>
 
+        <!-- Email -->
         <div class="flex flex-col gap-1.5">
           <label class="text-xs font-bold uppercase tracking-wider text-gray-400">
             Email Address <span class="text-red-500">*</span>
@@ -395,59 +405,85 @@
               type="email"
               v-model="createFormData.email"
               placeholder="employee@email.com"
-              required
-              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition-all duration-200"
+              :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200', (createTouched.email && createErrors.email) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
+              @input="markCreateTouched('email')"
+              @blur="markCreateTouched('email')"
           />
+          <span v-if="createTouched.email && createErrors.email" class="text-xs text-rose-500 mt-1 block">
+            <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ createErrors.email }}
+          </span>
         </div>
 
+        <!-- Phone Number -->
         <div class="flex flex-col gap-1.5">
           <label class="text-xs font-bold uppercase tracking-wider text-gray-400">
             Phone Number <span class="text-red-500">*</span>
           </label>
           <input
-              type="tel"
+              type="text"
+              inputmode="numeric"
               v-model="createFormData.phone_number"
-              placeholder="e.g. 03XX-XXXXXXX"
-              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition-all duration-200"
+              placeholder="e.g. 03XXXXXXXXX"
+              maxlength="15"
+              :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200', (createTouched.phone_number && createErrors.phone_number) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
+              @keydown="phoneHandlers.keydown"
+              @paste="phoneHandlers.paste"
+              @input="phoneHandlers.input"
+              @blur="markCreateTouched('phone_number')"
           />
+          <span v-if="createTouched.phone_number && createErrors.phone_number" class="text-xs text-rose-500 mt-1 block">
+            <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ createErrors.phone_number }}
+          </span>
         </div>
 
+        <!-- Designation -->
         <div class="flex flex-col gap-1.5">
           <div class="flex items-center justify-between">
-            <label class="text-xs font-bold uppercase tracking-wider text-gray-400">
-              Designation <span class="text-red-500">*</span>
-            </label>
-            <span class="text-[10px] font-semibold uppercase tracking-wider text-amber-600 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">
-              ADMIN ONLY
-            </span>
+            <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Designation</label>
+            <span class="text-[10px] font-semibold uppercase tracking-wider text-amber-600 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">ADMIN ONLY</span>
           </div>
           <input
               type="text"
               v-model="createFormData.position"
               placeholder="e.g. Software Engineer"
-              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition-all duration-200"
+              maxlength="32"
+              :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200', (createTouched.position && createErrors.position) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
+              @keydown="designationHandlers.keydown"
+              @paste="designationHandlers.paste"
+              @input="designationHandlers.input"
+              @blur="markCreateTouched('position')"
           />
+          <span v-if="createTouched.position && createErrors.position" class="text-xs text-rose-500 mt-1 block">
+            <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ createErrors.position }}
+          </span>
         </div>
 
+        <!-- Monthly Salary -->
         <div class="flex flex-col gap-1.5">
           <div class="flex items-center justify-between">
             <label class="text-xs font-bold uppercase tracking-wider text-gray-400">
               Monthly Salary (PKR) <span class="text-red-500">*</span>
             </label>
-            <span class="text-[10px] font-semibold uppercase tracking-wider text-amber-600 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">
-              ADMIN ONLY
-            </span>
+            <span class="text-[10px] font-semibold uppercase tracking-wider text-amber-600 bg-amber-50 px-2.5 py-0.5 rounded-full border border-amber-200">ADMIN ONLY</span>
           </div>
           <input
-              type="number"
+              type="text"
+              inputmode="decimal"
               v-model="createFormData.salary"
               placeholder="e.g. 85000"
-              min="0"
-              step="1000"
-              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition-all duration-200"
+              maxlength="10"
+              :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200', (createTouched.salary && createErrors.salary) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
+              @keydown="salaryHandlers.keydown"
+              @paste="salaryHandlers.paste"
+              @input="salaryHandlers.input"
+              @blur="markCreateTouched('salary')"
           />
+          <span v-if="createTouched.salary && createErrors.salary" class="text-xs text-rose-500 mt-1 block">
+            <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ createErrors.salary }}
+          </span>
         </div>
 
+        <!-- Department -->
         <div class="flex flex-col gap-1.5">
           <label class="text-xs font-bold uppercase tracking-wider text-gray-400">
             Department <span class="text-red-500">*</span>
@@ -456,43 +492,64 @@
               type="text"
               v-model="createFormData.department"
               placeholder="e.g. Engineering"
-              required
-              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition-all duration-200"
+              maxlength="32"
+              :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200', (createTouched.department && createErrors.department) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
+              @keydown="departmentHandlers.keydown"
+              @paste="departmentHandlers.paste"
+              @input="departmentHandlers.input"
+              @blur="markCreateTouched('department')"
           />
+          <span v-if="createTouched.department && createErrors.department" class="text-xs text-rose-500 mt-1 block">
+            <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ createErrors.department }}
+          </span>
         </div>
 
+        <!-- Insurance Amount -->
         <div class="flex flex-col gap-1.5">
-          <label class="text-xs font-bold uppercase tracking-wider text-gray-400">
-            Insurance Amount
-          </label>
+          <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Insurance Amount</label>
           <input
               type="text"
+              inputmode="decimal"
               v-model="createFormData.insurance_amount"
-              placeholder="e.g. Rs.23000"
-              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition-all duration-200"
+              placeholder="e.g. 23000"
+              maxlength="10"
+              :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200', (createTouched.insurance_amount && createErrors.insurance_amount) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
+              @keydown="insuranceHandlers.keydown"
+              @paste="insuranceHandlers.paste"
+              @input="insuranceHandlers.input"
+              @blur="markCreateTouched('insurance_amount')"
           />
+          <span v-if="createTouched.insurance_amount && createErrors.insurance_amount" class="text-xs text-rose-500 mt-1 block">
+            <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ createErrors.insurance_amount }}
+          </span>
         </div>
 
+        <!-- Tax -->
         <div class="flex flex-col gap-1.5">
-        <label class="text-xs font-bold uppercase tracking-wider text-gray-400">
-         Tax (%)
-        </label>
-       <div class="relative">
-         <input
-           type="number"
-           v-model="createFormData.tax"
-           placeholder="e.g. 5"
-           min="0"
-           max="100"
-           step="0.01"
-           class="w-full px-4 py-2.5 pr-8 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition-all duration-200"
-           />
-         <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
+          <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Tax (%)</label>
+          <div class="relative">
+            <input
+                type="text"
+                inputmode="decimal"
+                v-model="createFormData.tax"
+                placeholder="e.g. 5"
+                maxlength="5"
+                :class="['w-full px-4 py-2.5 pr-8 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200', (createTouched.tax && createErrors.tax) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
+                @keydown="taxHandlers.keydown"
+                @paste="taxHandlers.paste"
+                @input="taxHandlers.input"
+                @blur="markCreateTouched('tax')"
+            />
+            <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
+          </div>
+          <span v-if="createTouched.tax && createErrors.tax" class="text-xs text-rose-500 mt-1 block">
+            <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ createErrors.tax }}
+          </span>
         </div>
-      </div>
       </form>
     </CreateModal>
 
+    <!-- Edit Modal -->
     <!-- Edit Modal -->
     <EmployeeBaseModal
         :is-open="isEditModalOpen"
@@ -503,6 +560,7 @@
         :hide-footer="true"
         :loading="isUpdating"
         :show-more="showMoreEdit"
+        :disable-submit="!isEditFormValid || isUpdating"
         @close="closeEditModal"
         @cancel="closeEditModal"
         @toggle-more="toggleMoreEdit"
@@ -511,7 +569,7 @@
       <!-- Main container with proper height management -->
       <div class="flex flex-col" style="height: 100%;">
 
-        <!-- Scrollable Content - Only this scrolls -->
+        <!-- Scrollable Content -->
         <div class="flex-1 overflow-y-auto px-6 py-6 custom-scroll">
           <form
               id="edit-employee-form"
@@ -522,40 +580,106 @@
               <!-- Basic Details Grid - 2 columns -->
               <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                 <div class="flex flex-col gap-1.5">
-                  <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Full Name</label>
+                  <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Full Name <span class="text-red-500">*</span></label>
                   <input
                       type="text"
                       v-model="editFormData.name"
-                      class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
+                      maxlength="32"
+                      :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.name && editErrors.name) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
+                      @keydown="editNameHandlers.keydown"
+                      @paste="editNameHandlers.paste"
+                      @input="editNameHandlers.input"
+                      @blur="markEditTouched('name')"
                   />
+                  <span v-if="editTouched.name && editErrors.name" class="text-xs text-rose-500 mt-1 block">
+                <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ editErrors.name }}
+              </span>
                 </div>
 
                 <div class="flex flex-col gap-1.5">
-                  <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Email</label>
+                  <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Email <span class="text-red-500">*</span></label>
                   <input
                       type="email"
                       v-model="editFormData.email"
-                      class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
+                      :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.email && editErrors.email) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
+                      @input="markEditTouched('email')"
+                      @blur="markEditTouched('email')"
                   />
+                  <span v-if="editTouched.email && editErrors.email" class="text-xs text-rose-500 mt-1 block">
+                <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ editErrors.email }}
+              </span>
                 </div>
 
                 <div class="flex flex-col gap-1.5">
-                  <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Phone</label>
+                  <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Phone <span class="text-red-500">*</span></label>
                   <input
                       type="text"
+                      inputmode="numeric"
                       v-model="editFormData.phone_number"
-                      class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
+                      maxlength="15"
+                      :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.phone_number && editErrors.phone_number) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
+                      @keydown="editPhoneHandlers.keydown"
+                      @paste="editPhoneHandlers.paste"
+                      @input="editPhoneHandlers.input"
+                      @blur="markEditTouched('phone_number')"
                   />
+                  <span v-if="editTouched.phone_number && editErrors.phone_number" class="text-xs text-rose-500 mt-1 block">
+                <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ editErrors.phone_number }}
+              </span>
                 </div>
 
                 <div class="flex flex-col gap-1.5">
-                  <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Department</label>
+                  <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Department <span class="text-red-500">*</span></label>
                   <input
                       type="text"
                       v-model="editFormData.department"
-                      class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
+                      maxlength="32"
+                      :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.department && editErrors.department) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
+                      @keydown="editDepartmentHandlers.keydown"
+                      @paste="editDepartmentHandlers.paste"
+                      @input="editDepartmentHandlers.input"
+                      @blur="markEditTouched('department')"
                   />
+                  <span v-if="editTouched.department && editErrors.department" class="text-xs text-rose-500 mt-1 block">
+                <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ editErrors.department }}
+              </span>
                 </div>
+
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Designation <span class="text-red-500">*</span></label>
+                  <input
+                      type="text"
+                      v-model="editFormData.designation"
+                      maxlength="32"
+                      :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.designation && editErrors.designation) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
+                      @keydown="editDesignationHandlers.keydown"
+                      @paste="editDesignationHandlers.paste"
+                      @input="editDesignationHandlers.input"
+                      @blur="markEditTouched('designation')"
+                  />
+                  <span v-if="editTouched.designation && editErrors.designation" class="text-xs text-rose-500 mt-1 block">
+                <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ editErrors.designation }}
+              </span>
+                </div>
+
+                <div class="flex flex-col gap-1.5">
+                  <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Monthly Salary (PKR) <span class="text-red-500">*</span></label>
+                  <input
+                      type="text"
+                      inputmode="decimal"
+                      v-model="editFormData.salary"
+                      maxlength="10"
+                      :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.salary && editErrors.salary) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
+                      @keydown="editSalaryHandlers.keydown"
+                      @paste="editSalaryHandlers.paste"
+                      @input="editSalaryHandlers.input"
+                      @blur="markEditTouched('salary')"
+                  />
+                  <span v-if="editTouched.salary && editErrors.salary" class="text-xs text-rose-500 mt-1 block">
+                <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ editErrors.salary }}
+              </span>
+                </div>
+
                 <div class="flex flex-col gap-1.5">
                   <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Work from home</label>
                   <select
@@ -571,59 +695,46 @@
                 </div>
 
                 <div class="flex flex-col gap-1.5">
-                  <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Designation</label>
+                  <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Insurance Amount (PKR)</label>
                   <input
                       type="text"
-                      v-model="editFormData.designation"
-                      class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
+                      inputmode="decimal"
+                      v-model="editFormData.insurance_amount"
+                      placeholder="e.g. 5000"
+                      maxlength="10"
+                      :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.insurance_amount && editErrors.insurance_amount) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
+                      @keydown="editInsuranceHandlers.keydown"
+                      @paste="editInsuranceHandlers.paste"
+                      @input="editInsuranceHandlers.input"
+                      @blur="markEditTouched('insurance_amount')"
                   />
+                  <span v-if="editTouched.insurance_amount && editErrors.insurance_amount" class="text-xs text-rose-500 mt-1 block">
+                <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ editErrors.insurance_amount }}
+              </span>
                 </div>
 
                 <div class="flex flex-col gap-1.5">
-                  <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Monthly Salary (PKR)</label>
-                  <input
-                      type="number"
-                      v-model="editFormData.salary"
-                      class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
-                  />
+                  <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Tax (%)</label>
+                  <div class="relative">
+                    <input
+                        type="text"
+                        inputmode="decimal"
+                        v-model="editFormData.tax"
+                        placeholder="e.g. 10"
+                        maxlength="5"
+                        :class="['w-full px-4 py-2.5 pr-10 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.tax && editErrors.tax) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
+                        @keydown="editTaxHandlers.keydown"
+                        @paste="editTaxHandlers.paste"
+                        @input="editTaxHandlers.input"
+                        @blur="markEditTouched('tax')"
+                    />
+                    <span class="absolute inset-y-0 right-4 flex items-center text-gray-500 font-medium">%</span>
+                  </div>
+                  <span v-if="editTouched.tax && editErrors.tax" class="text-xs text-rose-500 mt-1 block">
+                <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ editErrors.tax }}
+              </span>
                 </div>
-
-                <!-- Insurance Amount -->
-              <div class="flex flex-col gap-1.5">
-              <label class="text-xs font-bold uppercase tracking-wider text-gray-400">
-              Insurance Amount (PKR)
-             </label>
-               <input
-                   type="number"
-                   v-model="editFormData.insurance_amount"
-                   placeholder="e.g. 5000"
-                   min="0"
-                   step="100"
-                   class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
-                />
-               </div>
-
-              <!-- Tax Percentage -->
-            <div class="flex flex-col gap-1.5">
-             <label class="text-xs font-bold uppercase tracking-wider text-gray-400">
-                Tax (%)
-              </label>
-            <div class="relative">
-             <input
-                type="number"
-                v-model="editFormData.tax"
-                placeholder="e.g. 10"
-                min="0"
-                max="100"
-                step="0.01"
-                class="w-full px-4 py-2.5 pr-10 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
-               />
-             <span class="absolute inset-y-0 right-4 flex items-center text-gray-500 font-medium">
-              %
-             </span>
-            </div>
-           </div>
-          </div>
+              </div>
 
               <!-- ACCOUNT SECURITY Section -->
               <div class="space-y-4 pt-2">
@@ -637,11 +748,11 @@
                       <span v-if="editFormData.password && passwordStrength && passwordStrength !== 'Strong' && !showStrongMessage"
                             class="text-xs font-semibold px-2 py-0.5 rounded-full border"
                             :class="{
-                                'bg-red-100 border-red-300 text-red-600': passwordStrength === 'Weak',
-                                'bg-yellow-100 border-yellow-300 text-yellow-600': passwordStrength === 'Medium'
-                              }">
-                          {{ passwordStrength }}
-                        </span>
+                            'bg-red-100 border-red-300 text-red-600': passwordStrength === 'Weak',
+                            'bg-yellow-100 border-yellow-300 text-yellow-600': passwordStrength === 'Medium'
+                          }">
+                    {{ passwordStrength }}
+                  </span>
                     </div>
                     <div class="relative">
                       <input
@@ -650,10 +761,10 @@
                           placeholder="Enter new password"
                           class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition pr-12"
                           :class="{
-                            'border-red-500 focus:ring-red-500': passwordStrength === 'Weak' && editFormData.password && !showStrongMessage,
-                            'border-yellow-500 focus:ring-yellow-500': passwordStrength === 'Medium' && editFormData.password && !showStrongMessage,
-                            'border-green-500 focus:ring-green-500': passwordStrength === 'Strong' && editFormData.password && showStrongMessage
-                          }"
+                        'border-red-500 focus:ring-red-500': passwordStrength === 'Weak' && editFormData.password && !showStrongMessage,
+                        'border-yellow-500 focus:ring-yellow-500': passwordStrength === 'Medium' && editFormData.password && !showStrongMessage,
+                        'border-green-500 focus:ring-green-500': passwordStrength === 'Strong' && editFormData.password && showStrongMessage
+                      }"
                       />
                       <button
                           type="button"
@@ -685,8 +796,8 @@
                       </button>
                     </div>
                     <span v-if="passwordError" class="text-xs text-red-500 font-medium mt-1">
-                      <i class="fas fa-exclamation-circle mr-1"></i> {{ passwordError }}
-                    </span>
+                  <i class="fas fa-exclamation-circle mr-1"></i> {{ passwordError }}
+                </span>
                   </div>
 
                   <div class="flex flex-col gap-1.5 md:col-span-2">
@@ -703,12 +814,17 @@
                   </div>
 
                   <div class="flex flex-col gap-1.5 md:col-span-2">
-                    <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Join Date</label>
+                    <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Join Date <span class="text-red-500">*</span></label>
                     <input
                         type="date"
                         v-model="editFormData.joined_date"
-                        class="w-95 px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
+                        :class="['w-95 px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.joined_date && editErrors.joined_date) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
+                        @change="markEditTouched('joined_date')"
+                        @blur="markEditTouched('joined_date')"
                     />
+                    <span v-if="editTouched.joined_date && editErrors.joined_date" class="text-xs text-rose-500 mt-1 block">
+                  <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ editErrors.joined_date }}
+                </span>
                   </div>
                 </div>
               </div>
@@ -722,15 +838,23 @@
                     <input
                         type="text"
                         v-model="editFormData.cnic"
-                        placeholder="—"
-                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
+                        placeholder="00000-0000000-0"
+                        maxlength="15"
+                        :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.cnic && editErrors.cnic) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
+                        @input="markEditTouched('cnic')"
+                        @blur="markEditTouched('cnic')"
                     />
+                    <span v-if="editTouched.cnic && editErrors.cnic" class="text-xs text-rose-500 mt-1 block">
+                  <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ editErrors.cnic }}
+                </span>
                   </div>
                   <div class="flex flex-col gap-1.5">
                     <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Gender</label>
                     <select
                         v-model="editFormData.gender"
                         class="w-full px-4 py-2.5 bg-white rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
+                        @change="markEditTouched('gender')"
+                        @blur="markEditTouched('gender')"
                     >
                       <option value="">Select Gender</option>
                       <option value="Male">Male</option>
@@ -744,8 +868,14 @@
                         type="text"
                         v-model="editFormData.present_address"
                         placeholder="—"
-                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
+                        maxlength="250"
+                        :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.present_address && editErrors.present_address) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
+                        @input="markEditTouched('present_address')"
+                        @blur="markEditTouched('present_address')"
                     />
+                    <span v-if="editTouched.present_address && editErrors.present_address" class="text-xs text-rose-500 mt-1 block">
+                  <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ editErrors.present_address }}
+                </span>
                   </div>
                   <div class="flex flex-col gap-1.5 md:col-span-2">
                     <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Permanent Address</label>
@@ -753,8 +883,14 @@
                         type="text"
                         v-model="editFormData.permanent_address"
                         placeholder="—"
-                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
+                        maxlength="250"
+                        :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.permanent_address && editErrors.permanent_address) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
+                        @input="markEditTouched('permanent_address')"
+                        @blur="markEditTouched('permanent_address')"
                     />
+                    <span v-if="editTouched.permanent_address && editErrors.permanent_address" class="text-xs text-rose-500 mt-1 block">
+                  <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ editErrors.permanent_address }}
+                </span>
                   </div>
                 </div>
 
@@ -766,8 +902,14 @@
                         type="text"
                         v-model="editFormData.emergency_name"
                         placeholder="—"
-                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
+                        maxlength="32"
+                        :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.emergency_name && editErrors.emergency_name) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
+                        @input="markEditTouched('emergency_name')"
+                        @blur="markEditTouched('emergency_name')"
                     />
+                    <span v-if="editTouched.emergency_name && editErrors.emergency_name" class="text-xs text-rose-500 mt-1 block">
+                  <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ editErrors.emergency_name }}
+                </span>
                   </div>
                   <div class="flex flex-col gap-1.5">
                     <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Relation</label>
@@ -775,26 +917,47 @@
                         type="text"
                         v-model="editFormData.emergency_relation"
                         placeholder="—"
-                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
+                        maxlength="32"
+                        :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.emergency_relation && editErrors.emergency_relation) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
+                        @input="markEditTouched('emergency_relation')"
+                        @blur="markEditTouched('emergency_relation')"
                     />
+                    <span v-if="editTouched.emergency_relation && editErrors.emergency_relation" class="text-xs text-rose-500 mt-1 block">
+                  <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ editErrors.emergency_relation }}
+                </span>
                   </div>
                   <div class="flex flex-col gap-1.5">
                     <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Emergency CNIC</label>
                     <input
                         type="text"
                         v-model="editFormData.emergency_cnic"
-                        placeholder="—"
-                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
+                        placeholder="00000-0000000-0"
+                        maxlength="15"
+                        :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.emergency_cnic && editErrors.emergency_cnic) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
+                        @input="markEditTouched('emergency_cnic')"
+                        @blur="markEditTouched('emergency_cnic')"
                     />
+                    <span v-if="editTouched.emergency_cnic && editErrors.emergency_cnic" class="text-xs text-rose-500 mt-1 block">
+                  <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ editErrors.emergency_cnic }}
+                </span>
                   </div>
                   <div class="flex flex-col gap-1.5">
                     <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Emergency Phone</label>
                     <input
                         type="text"
+                        inputmode="numeric"
                         v-model="editFormData.emergency_phone"
-                        placeholder="—"
-                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
+                        placeholder="03XXXXXXXXX"
+                        maxlength="15"
+                        :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.emergency_phone && editErrors.emergency_phone) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
+                        @keydown="(e) => blockNonDigitKeydown(e, { allowDecimal: false, maxDigits: 15, currentValue: editFormData.emergency_phone })"
+                        @paste="(e) => blockNonDigitPaste(e, { allowDecimal: false, maxDigits: 15 })"
+                        @input="(event) => { const digitsOnly = event.target.value.replace(/\D/g, '').slice(0, 15); event.target.value = digitsOnly; editFormData.emergency_phone = digitsOnly; markEditTouched('emergency_phone'); }"
+                        @blur="markEditTouched('emergency_phone')"
                     />
+                    <span v-if="editTouched.emergency_phone && editErrors.emergency_phone" class="text-xs text-rose-500 mt-1 block">
+                  <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ editErrors.emergency_phone }}
+                </span>
                   </div>
                   <div class="flex flex-col gap-1.5 md:col-span-2">
                     <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Emergency Address</label>
@@ -802,8 +965,14 @@
                         type="text"
                         v-model="editFormData.emergency_address"
                         placeholder="—"
-                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
+                        maxlength="250"
+                        :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.emergency_address && editErrors.emergency_address) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
+                        @input="markEditTouched('emergency_address')"
+                        @blur="markEditTouched('emergency_address')"
                     />
+                    <span v-if="editTouched.emergency_address && editErrors.emergency_address" class="text-xs text-rose-500 mt-1 block">
+                  <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ editErrors.emergency_address }}
+                </span>
                   </div>
                 </div>
 
@@ -815,8 +984,14 @@
                         type="text"
                         v-model="editFormData.bank_name"
                         placeholder="—"
-                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
+                        maxlength="32"
+                        :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.bank_name && editErrors.bank_name) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
+                        @input="markEditTouched('bank_name')"
+                        @blur="markEditTouched('bank_name')"
                     />
+                    <span v-if="editTouched.bank_name && editErrors.bank_name" class="text-xs text-rose-500 mt-1 block">
+                  <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ editErrors.bank_name }}
+                </span>
                   </div>
                   <div class="flex flex-col gap-1.5">
                     <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Branch Name</label>
@@ -824,17 +999,29 @@
                         type="text"
                         v-model="editFormData.branch_name"
                         placeholder="—"
-                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
+                        maxlength="32"
+                        :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.branch_name && editErrors.branch_name) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
+                        @input="markEditTouched('branch_name')"
+                        @blur="markEditTouched('branch_name')"
                     />
+                    <span v-if="editTouched.branch_name && editErrors.branch_name" class="text-xs text-rose-500 mt-1 block">
+                  <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ editErrors.branch_name }}
+                </span>
                   </div>
                   <div class="flex flex-col gap-1.5 md:col-span-2">
                     <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Account Number</label>
                     <input
                         type="text"
                         v-model="editFormData.account_number"
-                        placeholder="—"
-                        class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition"
+                        placeholder="PK00XXXX0000000000000000"
+                        maxlength="24"
+                        :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.account_number && editErrors.account_number) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
+                        @input="markEditTouched('account_number')"
+                        @blur="markEditTouched('account_number')"
                     />
+                    <span v-if="editTouched.account_number && editErrors.account_number" class="text-xs text-rose-500 mt-1 block">
+                  <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ editErrors.account_number }}
+                </span>
                   </div>
                 </div>
               </div>
@@ -842,10 +1029,9 @@
           </form>
         </div>
 
-        <!-- Footer - Fixed at bottom -->
+        <!-- Footer -->
         <div class="flex-shrink-0 w-full bg-white border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-end gap-2 sm:gap-3" style="padding: 1rem 2rem; border-radius: 0 0 2rem 2rem; background: white;">
           <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 w-full sm:w-auto">
-            <!-- Cancel Button -->
             <button
                 type="button"
                 @click="closeEditModal"
@@ -854,23 +1040,21 @@
               Cancel
             </button>
 
-            <!-- More details / Show less button -->
             <button
                 type="button"
                 @click="toggleMoreEdit"
-                class="px-5 py-2.5 rounded-xl text-sm font-bold text-buttonTextColor shadow-sm transition flex items-center justify-center gap-2 btn-primary-gradient  w-full sm:w-auto"
+                class="px-5 py-2.5 rounded-xl text-sm font-bold text-buttonTextColor shadow-sm transition flex items-center justify-center gap-2 btn-primary-gradient w-full sm:w-auto"
             >
               <i v-if="showMoreEdit" class="fas fa-chevron-up text-xs"></i>
               <i v-else class="fas fa-chevron-down text-xs"></i>
               {{ showMoreEdit ? 'Show less' : 'More details' }}
             </button>
 
-            <!-- Save changes button -->
             <button
                 type="submit"
                 form="edit-employee-form"
-                class="px-5 py-2.5 rounded-xl text-sm font-bold text-buttonTextColor shadow-sm transition btn-primary-gradient  w-full sm:w-auto"
-                :disabled="isUpdating"
+                class="px-5 py-2.5 rounded-xl text-sm font-bold text-buttonTextColor shadow-sm transition btn-primary-gradient w-full sm:w-auto"
+                :disabled="!isEditFormValid || isUpdating"
             >
               {{ isUpdating ? 'Saving...' : 'Save changes' }}
             </button>
@@ -1081,6 +1265,7 @@ const {
   viewEmployee,
   isEditModalOpen,
   isUpdating,
+  selectedEmployee,          // ADD
   isCreateModalOpen,
   isCreating,
   showMoreEdit,
@@ -1119,7 +1304,30 @@ const {
   toggleMoreEdit,
   copyOnboardingLink,
   initialize,
-  cleanup
+  cleanup,
+  createTouched,
+  createErrors,
+  markCreateTouched,
+  isCreateFormValid,         // ADD
+  nameHandlers,
+  designationHandlers,
+  departmentHandlers,
+  salaryHandlers,
+  insuranceHandlers,
+  taxHandlers,
+  phoneHandlers,
+  editTouched,                // ADD
+  editErrors,                 // ADD
+  markEditTouched,            // ADD
+  isEditFormValid,            // ADD
+  editNameHandlers,           // ADD
+  editDesignationHandlers,    // ADD
+  editDepartmentHandlers,     // ADD
+  editSalaryHandlers,         // ADD
+  editInsuranceHandlers,      // ADD
+  editTaxHandlers,            // ADD
+  editPhoneHandlers,          // ADD
+  emergencyPhoneHandlers,     // ADD — see below
 } = useEmployeeDashboard();
 
 // Lifecycle

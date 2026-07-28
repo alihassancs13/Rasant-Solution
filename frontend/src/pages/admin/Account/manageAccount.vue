@@ -175,7 +175,6 @@
                     :class="{ 'border-red-500': emailErrors.smtp_host }"
                     placeholder="mail.rasantsol.com"
                     @input="validateEmailField('smtp_host')"
-                    required
                 />
                 <p v-if="emailErrors.smtp_host" class="text-red-500 text-xs mt-1">{{ emailErrors.smtp_host }}</p>
               </div>
@@ -189,9 +188,7 @@
                     max="65535"
                     class="w-full px-3.5 py-2.5 rounded-xl border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-activeBorder transition"
                     :class="{ 'border-red-500': emailErrors.smtp_port }"
-                    @keydown="blockNonNumeric"
                     @input="validateEmailField('smtp_port')"
-                    required
                 />
                 <p v-if="emailErrors.smtp_port" class="text-red-500 text-xs mt-1">{{ emailErrors.smtp_port }}</p>
               </div>
@@ -199,12 +196,11 @@
                 <label class="block text-xs font-semibold text-text-muted uppercase tracking-wide mb-1.5">Username</label>
                 <input
                     v-model="emailForm.smtp_username"
-                    type="email"
+                    type="text"
                     class="w-full px-3.5 py-2.5 rounded-xl border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-activeBorder transition"
                     :class="{ 'border-red-500': emailErrors.smtp_username }"
                     placeholder="danialali@rasantsol.com"
                     @input="validateEmailField('smtp_username')"
-                    required
                 />
                 <p v-if="emailErrors.smtp_username" class="text-red-500 text-xs mt-1">{{ emailErrors.smtp_username }}</p>
               </div>
@@ -248,7 +244,6 @@
                     class="w-full px-3.5 py-2.5 rounded-xl border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-activeBorder transition"
                     :class="{ 'border-red-500': emailErrors.from_email }"
                     @input="validateEmailField('from_email')"
-                    required
                 />
                 <p v-if="emailErrors.from_email" class="text-red-500 text-xs mt-1">{{ emailErrors.from_email }}</p>
               </div>
@@ -260,7 +255,6 @@
                     class="w-full px-3.5 py-2.5 rounded-xl border border-border bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-activeBorder transition"
                     :class="{ 'border-red-500': emailErrors.admin_notification_email }"
                     @input="validateEmailField('admin_notification_email')"
-                    required
                 />
                 <p v-if="emailErrors.admin_notification_email" class="text-red-500 text-xs mt-1">{{ emailErrors.admin_notification_email }}</p>
                 <p v-else class="text-xs text-text-muted mt-1">Receives increment-due digests and onboarding alerts.</p>
@@ -324,8 +318,6 @@ const show = reactive({ current: false, next: false, confirm: false, smtp: false
 const profileForm = reactive({ username: '', email: '', first_name: '', last_name: '' });
 const passwordForm = reactive({ current_password: '', new_password: '', confirm_password: '' });
 
-const MAX_SMTP_PORT = 65535;
-
 const emailForm = reactive({
   smtp_host: 'mail.rasantsol.com',
   smtp_port: 465,
@@ -358,6 +350,99 @@ const passwordFields = [
 const errors = reactive({
   username: '', email: '', first_name: '', last_name: '',
   current_password: '', new_password: '', confirm_password: '',
+});
+
+// ==================== EMAIL VALIDATION ====================
+const emailErrors = reactive({
+  smtp_host: '',
+  smtp_port: '',
+  smtp_username: '',
+  smtp_password: '',
+  from_name: '',
+  from_email: '',
+  admin_notification_email: '',
+});
+
+// Max length limits for email fields (based on DB constraints)
+const FIELD_MAX_LENGTHS = {
+  smtp_host: 255,
+  smtp_username: 255,
+  smtp_password: 255,
+  from_name: 255,
+  from_email: 255,
+  admin_notification_email: 255,
+};
+
+// Field labels for error messages
+const FIELD_LABELS = {
+  smtp_host: 'SMTP host',
+  smtp_port: 'SMTP port',
+  smtp_username: 'Username',
+  smtp_password: 'Password',
+  from_name: 'From name',
+  from_email: 'From email',
+  admin_notification_email: 'Admin notification email',
+};
+
+// Validation function for email fields
+function validateEmailField(key) {
+  const value = emailForm[key];
+
+  // For port field
+  if (key === 'smtp_port') {
+    if (!value && value !== 0) {
+      emailErrors.smtp_port = 'SMTP port is required.';
+    } else if (value < 1 || value > 65535) {
+      emailErrors.smtp_port = 'SMTP port must be between 1 and 65535.';
+    } else {
+      emailErrors.smtp_port = '';
+    }
+    return;
+  }
+
+  // For email fields - validate as email
+  if (key === 'admin_notification_email' || key === 'from_email') {
+    const email = (value || '').trim();
+
+    // Required validation
+    if (!email) {
+      const label = FIELD_LABELS[key];
+      emailErrors[key] = `${label} is required.`;
+      return;
+    }
+
+    // Email validation using getEmailError from useValidation
+    const emailError = getEmailError(email);
+    if (emailError) {
+      emailErrors[key] = emailError;
+    } else {
+      emailErrors[key] = '';
+    }
+    return;
+  }
+
+  // For other fields - check max length
+  const maxLength = FIELD_MAX_LENGTHS[key];
+  const fieldLabel = FIELD_LABELS[key];
+
+  // Required validation for important fields
+  if (key === 'smtp_host' || key === 'smtp_username' || key === 'from_name') {
+    if (!value || !value.trim()) {
+      emailErrors[key] = `${fieldLabel} is required.`;
+      return;
+    }
+  }
+
+  if (value && value.length > maxLength) {
+    emailErrors[key] = `${fieldLabel} must not exceed ${maxLength} characters. (Current: ${value.length})`;
+  } else {
+    emailErrors[key] = '';
+  }
+}
+
+// Check if email form is valid
+const isEmailFormValid = computed(() => {
+  return Object.keys(emailErrors).every((k) => !emailErrors[k]);
 });
 
 // Optional profile fields: empty is valid, otherwise run the matching checker
@@ -402,58 +487,6 @@ const isProfileFormValid = computed(() =>
 
 const isPasswordFormValid = computed(() =>
     passwordFields.every((f) => !errors[f.key] && passwordForm[f.key])
-);
-
-// --- Email / SMTP settings validation ---
-const emailErrors = reactive({
-  smtp_host: '', smtp_port: '', smtp_username: '', smtp_password: '',
-  from_name: '', from_email: '', admin_notification_email: '',
-});
-
-// Which checker applies to which email-settings field (from_name is optional, rest required)
-const emailFieldCheckers = {
-  smtp_host: getUsernameError,
-  smtp_username: getEmailError,
-  from_name: getUsernameError,
-  from_email: getEmailError,
-  admin_notification_email: getEmailError,
-};
-
-function validateEmailField(key) {
-  if (key === 'smtp_port') {
-    const value = emailForm.smtp_port;
-    if (!value) emailErrors.smtp_port = 'Port is required.';
-    else if (value < 1 || value > MAX_SMTP_PORT) emailErrors.smtp_port = `Port must be between 1 and ${MAX_SMTP_PORT}.`;
-    else emailErrors.smtp_port = '';
-    return;
-  }
-
-  if (key === 'smtp_password') {
-    const value = emailForm.smtp_password;
-    emailErrors.smtp_password = value ? (getPasswordStrengthError(value) || '') : '';
-    return;
-  }
-  const value = emailForm[key]?.trim();
-  if (!value) {
-    emailErrors[key] = key === 'from_name' ? '' : 'This field is required.';
-    return;
-  }
-  emailErrors[key] = emailFieldCheckers[key](value) || '';
-}
-
-function blockNonNumeric(e) {
-  const allowed = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Home', 'End'];
-  if (allowed.includes(e.key) || e.ctrlKey || e.metaKey) return;
-  if (!/^[0-9]$/.test(e.key)) {
-    e.preventDefault();
-    return;
-  }
-  const projected = Number(String(emailForm.smtp_port ?? '') + e.key);
-  if (projected > MAX_SMTP_PORT) e.preventDefault();
-}
-
-const isEmailFormValid = computed(() =>
-    Object.keys(emailErrors).every((k) => !emailErrors[k])
 );
 
 const profile = computed(() => accountStore.profile);
@@ -537,6 +570,7 @@ function fillEmailForm(data) {
     is_active: data.is_active !== false,
   });
   testToEmail.value = data.admin_notification_email || data.from_email || profileForm.email || '';
+  // Clear email errors when loading data
   Object.keys(emailErrors).forEach((k) => (emailErrors[k] = ''));
 }
 
@@ -557,7 +591,7 @@ function onTlsToggle() {
 async function saveProfile() {
   profileFields.forEach((f) => validate(f.key));
   if (!isProfileFormValid.value) {
-    showToast('Please fix all validation errors before saving.', 'error');
+    showToast('Please fill the highlight fields', 'error');
     return;
   }
   const result = await accountStore.updateProfile({ ...profileForm });
@@ -586,9 +620,14 @@ async function savePassword() {
 }
 
 async function saveEmail() {
+  // Validate all email fields before saving
   Object.keys(emailErrors).forEach((k) => validateEmailField(k));
+
   if (!isEmailFormValid.value) {
-    showToast('Please fix all validation errors before saving.', 'error');
+    const errorFields = Object.keys(emailErrors)
+        .filter((k) => emailErrors[k])
+        .map((k) => FIELD_LABELS[k] || k);
+    showToast(`Please fix validation errors in: ${errorFields.join(', ')}`, 'error');
     return;
   }
 
@@ -596,8 +635,31 @@ async function saveEmail() {
   delete payload.has_password;
   if (!payload.smtp_password) delete payload.smtp_password;
   const result = await accountStore.saveEmailSettings(payload);
-  showToast(result.success ? result.message : result.error, result.success ? 'success' : 'error');
-  if (result.success) fillEmailForm(accountStore.emailSettings);
+
+  if (result.success) {
+    showToast(result.message || 'Email settings saved successfully!', 'success');
+    fillEmailForm(accountStore.emailSettings);
+  } else {
+    // Handle backend validation errors
+    let errorMessage = result.error || 'Failed to save email settings.';
+
+    // If backend returns field-specific errors
+    if (result.errors && typeof result.errors === 'object') {
+      const fieldErrors = [];
+      Object.entries(result.errors).forEach(([field, messages]) => {
+        const fieldLabel = FIELD_LABELS[field] || field;
+        const msg = Array.isArray(messages) ? messages.join(', ') : messages;
+        fieldErrors.push(`${fieldLabel}: ${msg}`);
+        // Highlight the field with error
+        if (emailErrors[field] !== undefined) {
+          emailErrors[field] = Array.isArray(messages) ? messages[0] : messages;
+        }
+      });
+      errorMessage = `Validation errors: ${fieldErrors.join('; ')}`;
+    }
+
+    showToast(errorMessage, 'error', 7000);
+  }
 }
 
 async function sendTest() {

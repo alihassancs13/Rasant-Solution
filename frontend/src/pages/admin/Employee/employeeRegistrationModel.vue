@@ -1,31 +1,31 @@
 <template>
-  <!-- Page background wrapper - only present/visible in direct-access mode, no-op in modal mode -->
+  <!-- Page background wrapper -->
   <div :class="isDirectAccess ? 'min-h-screen w-full bg-slate-100 flex flex-col items-center md:py-8 md:px-4' : ''">
 
-    <!-- Navbar - only shown when opened directly in a new tab -->
+    <!-- Navbar -->
     <Navbar v-if="isDirectAccess" class="w-full mb-10" />
 
-    <!-- Outer container: changes based on direct access mode -->
+    <!-- Outer container -->
     <div :class="[
-    'bg-white w-full relative mx-auto flex flex-col',
-    isDirectAccess ? 'md:max-w-5xl md:my-8 md:rounded-2xl md:shadow-xl md:border md:border-slate-200' : 'max-w-4xl max-h-[95vh] rounded-xl shadow-xl border border-slate-200 overflow-hidden'
-  ]">
+      'bg-white w-full relative mx-auto flex flex-col',
+      isDirectAccess ? 'md:max-w-5xl md:my-8 md:rounded-2xl md:shadow-xl md:border md:border-slate-200' : 'max-w-4xl max-h-[95vh] rounded-xl shadow-xl border border-slate-200 overflow-hidden'
+    ]">
 
-      <!-- Pinned Close Button - Only show in modal mode -->
+      <!-- Pinned Close Button -->
       <button v-if="!isDirectAccess" type="button" class="absolute top-5 right-6 cursor-pointer text-slate-400 hover:text-slate-600 transition z-50" @click="close">
         <i class="fa-solid fa-xmark text-xl"></i>
       </button>
 
-      <!-- HEADER SECTION - scrolls with the page in direct-access mode -->
+      <!-- HEADER SECTION -->
       <div :class="[
-      'border-b border-slate-100 bg-white',
-      isDirectAccess ? 'px-6 md:px-8 py-6' : 'p-5 px-6 pr-16 shrink-0'
-    ]">
+        'border-b border-slate-100 bg-white',
+        isDirectAccess ? 'px-6 md:px-8 py-6' : 'p-5 px-6 pr-16 shrink-0'
+      ]">
         <div class="mb-3">
           <h1 :class="[
-          'font-bold text-slate-800',
-          isDirectAccess ? 'text-2xl' : 'text-xl'
-        ]">Employee Onboarding Form</h1>
+            'font-bold text-slate-800',
+            isDirectAccess ? 'text-2xl' : 'text-xl'
+          ]">Employee Onboarding Form</h1>
           <p class="text-xs text-slate-400 mt-0.5">Complete the multi-step registration to register a new employee.</p>
         </div>
 
@@ -39,11 +39,10 @@
         </div>
       </div>
 
-      <!-- CONTENT BODY - scrolls with the whole page in direct-access mode -->
+      <!-- CONTENT BODY -->
       <div :class="[
-      isDirectAccess ? 'bg-slate-50/30' : 'flex-1 overflow-y-auto space-y-4'
-    ]">
-        <!-- Page-mode padding wrapper (no-op in modal mode) -->
+        isDirectAccess ? 'bg-slate-50/30' : 'flex-1 overflow-y-auto space-y-4'
+      ]">
         <div :class="isDirectAccess ? 'px-2 md:px-4 py-6 space-y-4' : ''">
 
           <!-- STEP WIZARD INDICATORS -->
@@ -51,20 +50,19 @@
             <div class="flex justify-between max-w-2xl mx-auto relative">
               <div v-for="step in steps" :key="step.id" class="flex flex-col items-center flex-1">
                 <div :class="[
-                'w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300',
-                currentStep > step.id ? 'bg-emerald-600 text-white' : (currentStep === step.id ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-400')
-              ]">
+                  'w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm transition-all duration-300',
+                  currentStep > step.id ? 'bg-emerald-600 text-white' : (currentStep === step.id ? 'bg-blue-600 text-white' : 'bg-slate-100 text-slate-400')
+                ]">
                   <i v-if="currentStep > step.id" class="fa-solid fa-check"></i>
                   <span v-else>{{ step.id }}</span>
                 </div>
                 <span :class="[
-                'text-xs mt-2 transition-all duration-300',
-                currentStep > step.id ? 'font-bold text-emerald-600' : (currentStep === step.id ? 'font-bold text-blue-600' : 'font-semibold text-slate-400')
-              ]">{{ step.name }}</span>
+                  'text-xs mt-2 transition-all duration-300',
+                  currentStep > step.id ? 'font-bold text-emerald-600' : (currentStep === step.id ? 'font-bold text-blue-600' : 'font-semibold text-slate-400')
+                ]">{{ step.name }}</span>
               </div>
             </div>
 
-            <!-- Preview Note -->
             <div class="text-center mt-3">
               <p class="text-xs text-slate-400"><i class="fa-regular fa-eye mr-1"></i> Preview only — changes are not saved</p>
             </div>
@@ -77,7 +75,7 @@
             <p>2. Relevant documents for the verification may please be attached with the application.</p>
           </div>
 
-          <!-- FORM FIELDS - Show only when not submitted -->
+          <!-- FORM FIELDS -->
           <div v-if="!isSubmitted">
             <form @submit.prevent id="employeeForm" enctype="multipart/form-data" class="px-6 pb-6">
 
@@ -98,38 +96,51 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Name <span class="text-rose-500">*</span></label>
-                    <input type="text" v-model="formData.name" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" placeholder="Full Name">
+                    <input
+                        type="text"
+                        v-model="formData.name"
+                        :required="isDirectAccess"
+                        :class="[
+                        'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
+                        (touched.name && errors.name) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
+                      ]"
+                        placeholder="Full Name"
+                        @input="markTouched('name')"
+                        @blur="markTouched('name')"
+                    >
+                    <span v-if="touched.name && errors.name" class="text-xs text-rose-500 mt-1 block">
+                      <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ errors.name }}
+                    </span>
                   </div>
                   <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">CNIC <span class="text-rose-500">*</span></label>
                     <input
                         type="text"
                         v-model="formData.cnic"
-                        required
+                        :required="isDirectAccess"
                         :class="[
-                          'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
-                          (cnicError || validationError) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
-                        ]"
+                        'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
+                        (cnicError || validationError) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
+                      ]"
                         placeholder="00000-0000000-0"
                         @input="formatCnic"
                         @focus="validationError = ''"
                         maxlength="15"
                     >
                     <span v-if="cnicError" class="text-xs text-rose-500 mt-1 block">
-                        <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ cnicError }}
-                      </span>
+                      <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ cnicError }}
+                    </span>
                     <span v-else-if="validationError" class="text-xs text-rose-500 mt-1 block">
-                        <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ validationError }}
-                      </span>
+                      <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ validationError }}
+                    </span>
                     <span v-else class="text-[10px] text-slate-400 mt-1 block">National identity card number (13 digits)</span>
                   </div>
                 </div>
 
-                <!-- CNIC Scan (full width) -->
+                <!-- CNIC Scan -->
                 <div>
                   <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">CNIC Scan copy <span class="text-rose-500" v-if="!fileNames.cnic_scan">*</span></label>
 
-                  <!-- Show file info if uploaded -->
                   <div v-if="fileNames.cnic_scan" class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between">
                     <div class="flex items-center gap-3">
                       <i class="fa-solid fa-file-pdf text-emerald-600 text-2xl"></i>
@@ -143,24 +154,61 @@
                     </button>
                   </div>
 
-                  <!-- Show upload area if no file -->
-                  <div v-else class="border-2 border-dashed border-slate-200 rounded-2xl p-6 text-center hover:bg-slate-50 transition relative group cursor-pointer">
-                    <input type="file" @change="handleFileUpload($event, 'cnic_scan')" data-field="cnic_scan" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                  <div v-else :class="[
+                    'border-2 border-dashed rounded-2xl p-6 text-center hover:bg-slate-50 transition relative group cursor-pointer',
+                    fileErrors.cnic_scan ? 'border-rose-400 bg-rose-50/40' : 'border-slate-200'
+                  ]">
+                    <input type="file" @change="handleFileUpload($event, 'cnic_scan')" data-field="cnic_scan" :required="isDirectAccess" accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                     <div class="text-blue-500 text-3xl mb-2 group-hover:scale-110 transition-transform"><i class="fa-solid fa-cloud-arrow-up"></i></div>
                     <p class="text-sm font-medium text-slate-600">Drag & drop or <span class="text-blue-500 underline font-semibold">click to upload</span></p>
                     <p class="text-xs text-slate-400 mt-1">.pdf, .png, .jpg, .jpeg (Max 10MB)</p>
                   </div>
+                  <span v-if="fileErrors.cnic_scan" class="text-xs text-rose-500 mt-1 block">
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ fileErrors.cnic_scan }}
+                  </span>
                 </div>
 
                 <!-- Row 2: Email + Phone -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Email <span class="text-rose-500">*</span></label>
-                    <input type="email" v-model="formData.email" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" placeholder="employee@company.com">
+                    <input
+                        type="email"
+                        v-model="formData.email"
+                        :required="isDirectAccess"
+                        :class="[
+                        'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
+                        (touched.email && errors.email) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
+                      ]"
+                        placeholder="employee@company.com"
+                        @input="markTouched('email')"
+                        @blur="markTouched('email')"
+                    >
+                    <span v-if="touched.email && errors.email" class="text-xs text-rose-500 mt-1 block">
+                      <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ errors.email }}
+                    </span>
                   </div>
                   <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Phone Number <span class="text-rose-500">*</span></label>
-                    <input type="text" v-model="formData.phone_number" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" placeholder="+92 300 0000000">
+                    <input
+                        type="text"
+                        inputmode="numeric"
+                        v-model="formData.phone_number"
+                        :required="isDirectAccess"
+                        maxlength="15"
+                        :class="[
+                        'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
+                        (touched.phone_number && errors.phone_number) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
+                      ]"
+                        placeholder="03XXXXXXXXX"
+                        @keydown="handlePhoneKeydown"
+                        @paste="handlePhonePaste"
+                        @input="handlePhoneInput"
+                        @blur="markTouched('phone_number')"
+                    >
+                    <span v-if="touched.phone_number && errors.phone_number" class="text-xs text-rose-500 mt-1 block">
+                      <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ errors.phone_number }}
+                    </span>
                   </div>
                 </div>
 
@@ -169,29 +217,91 @@
                   <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Gender <span class="text-rose-500">*</span></label>
                     <div class="flex gap-4">
-                      <label class="inline-flex items-center text-sm font-medium text-slate-700 bg-white border border-slate-200 px-4 py-2 rounded-xl cursor-pointer hover:bg-slate-50">
-                        <input type="radio" v-model="formData.gender" value="Male" required class="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500 mr-2"> Male
+                      <label :class="genderPillClass">
+                        <input
+                            type="radio"
+                            v-model="formData.gender"
+                            value="Male"
+                            :required="isDirectAccess"
+                            class="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500 mr-2"
+                            @change="markTouched('gender')"
+                        > Male
                       </label>
-                      <label class="inline-flex items-center text-sm font-medium text-slate-700 bg-white border border-slate-200 px-4 py-2 rounded-xl cursor-pointer hover:bg-slate-50">
-                        <input type="radio" v-model="formData.gender" value="Female" class="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500 mr-2"> Female
+                      <label :class="genderPillClass">
+                        <input
+                            type="radio"
+                            v-model="formData.gender"
+                            value="Female"
+                            class="w-4 h-4 text-blue-600 border-slate-300 focus:ring-blue-500 mr-2"
+                            @change="markTouched('gender')"
+                        > Female
                       </label>
                     </div>
+                    <span v-if="touched.gender && errors.gender" class="text-xs text-rose-500 mt-1 block">
+                      <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ errors.gender }}
+                    </span>
                   </div>
                   <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Department <span class="text-rose-500">*</span></label>
-                    <input type="text" v-model="formData.department" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" placeholder="e.g. Engineering">
+                    <input
+                        type="text"
+                        v-model="formData.department"
+                        :required="isDirectAccess"
+                        :class="[
+                        'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
+                        (touched.department && errors.department) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
+                      ]"
+                        placeholder="e.g. Engineering"
+                        @input="markTouched('department')"
+                        @blur="markTouched('department')"
+                    >
+                    <span v-if="touched.department && errors.department" class="text-xs text-rose-500 mt-1 block">
+                      <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ errors.department }}
+                    </span>
                   </div>
                 </div>
 
                 <!-- Row 4: Designation + Salary -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div v-if="!isDirectAccess">
+                  <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Designation <span class="text-rose-500">*</span></label>
-                    <input type="text" v-model="formData.designation" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" placeholder="e.g. Software Engineer">
+                    <input
+                        type="text"
+                        v-model="formData.designation"
+                        :required="isDirectAccess"
+                        :class="[
+                        'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
+                        (touched.designation && errors.designation) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
+                      ]"
+                        placeholder="e.g. Software Engineer"
+                        @input="markTouched('designation')"
+                        @blur="markTouched('designation')"
+                    >
+                    <span v-if="touched.designation && errors.designation" class="text-xs text-rose-500 mt-1 block">
+                      <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ errors.designation }}
+                    </span>
                   </div>
-                  <div v-if="!isDirectAccess">
+                  <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Salary <span class="text-rose-500">*</span></label>
-                    <input type="number" step="0.01" v-model="formData.salary" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" placeholder="0.00">
+                    <input
+                        type="text"
+                        inputmode="decimal"
+                        v-model="formData.salary"
+                        :required="isDirectAccess"
+                        maxlength="10"
+                        :class="[
+                        'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
+                        (touched.salary && errors.salary) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
+                      ]"
+                        placeholder="0.00"
+                        @keydown="handleSalaryKeydown"
+                        @paste="handleSalaryPaste"
+                        @input="handleSalaryInput"
+                        @blur="markTouched('salary')"
+                    >
+                    <span v-if="touched.salary && errors.salary" class="text-xs text-rose-500 mt-1 block">
+                      <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ errors.salary }}
+                    </span>
                   </div>
                 </div>
 
@@ -199,19 +309,46 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Joined Date <span class="text-rose-500">*</span></label>
-                    <input type="date" v-model="formData.joined_date" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm">
+                    <input
+                        type="date"
+                        v-model="formData.joined_date"
+                        :required="isDirectAccess"
+                        :class="[
+                        'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
+                        (touched.joined_date && errors.joined_date) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
+                      ]"
+                        @change="markTouched('joined_date')"
+                        @blur="markTouched('joined_date')"
+                    >
+                    <span v-if="touched.joined_date && errors.joined_date" class="text-xs text-rose-500 mt-1 block">
+                      <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ errors.joined_date }}
+                    </span>
                   </div>
                   <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Status</label>
-                    <select v-model="formData.status" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm bg-white">
-                    <option
-                      v-for="st in employmentStatuses"
-                      :key="st.id || st.code || st.name"
-                      :value="st.name"
-                    >{{ st.name }}</option>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Status <span class="text-rose-500">*</span></label>
+                    <select
+                        v-model="formData.status"
+                        :required="isDirectAccess"
+                        :class="[
+                        'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm bg-white',
+                        (touched.status && errors.status) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
+                      ]"
+                        @change="markTouched('status')"
+                        @blur="markTouched('status')"
+                    >
+                      <option value="">Select Status</option>
+                      <option
+                          v-for="st in employmentStatuses"
+                          :key="st.id || st.code || st.name"
+                          :value="st.name"
+                      >{{ st.name }}</option>
                     </select>
+                    <span v-if="touched.status && errors.status" class="text-xs text-rose-500 mt-1 block">
+                      <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ errors.status }}
+                    </span>
                   </div>
                 </div>
+
                 <div class="mt-4">
                   <label class="inline-flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
                     <input type="checkbox" v-model="formData.work_from_home" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500" />
@@ -219,16 +356,35 @@
                   </label>
                   <p class="text-xs text-slate-500 mt-1">If enabled, attendance outside the office radius is marked as Work from home.</p>
                 </div>
+
                 <!-- Present Address -->
                 <div>
                   <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Present Address <span class="text-rose-500">*</span></label>
-                  <textarea v-model="formData.present_address" required rows="3" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" placeholder="Your current residential address"></textarea>
+                  <textarea
+                      v-model="formData.present_address"
+                      :required="isDirectAccess"
+                      rows="3"
+                      maxlength="250"
+                      :class="[
+                      'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
+                      (touched.present_address && errors.present_address) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
+                    ]"
+                      placeholder="Your current residential address"
+                      @input="markTouched('present_address')"
+                      @blur="markTouched('present_address')"
+                  ></textarea>
+                  <div class="flex items-center justify-between mt-1">
+                    <span v-if="touched.present_address && errors.present_address" class="text-xs text-rose-500">
+                      <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ errors.present_address }}
+                    </span>
+                    <span class="text-[10px] text-slate-400 ml-auto">{{ (formData.present_address || '').length }}/250</span>
+                  </div>
                 </div>
 
                 <!-- Permanent Address -->
                 <div>
                   <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Permanent Address</label>
-                  <textarea v-model="formData.permanent_address" rows="3" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" placeholder="Your permanent home address"></textarea>
+                  <textarea v-model="formData.permanent_address" rows="3" maxlength="250" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" placeholder="Your permanent home address"></textarea>
                 </div>
               </div>
 
@@ -248,11 +404,39 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Name <span class="text-rose-500">*</span></label>
-                    <input type="text" v-model="formData.emergency_name" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" placeholder="Full Name">
+                    <input
+                        type="text"
+                        v-model="formData.emergency_name"
+                        :required="isDirectAccess"
+                        :class="[
+                        'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
+                        (touched.emergency_name && errors.emergency_name) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
+                      ]"
+                        placeholder="Full Name"
+                        @input="markTouched('emergency_name')"
+                        @blur="markTouched('emergency_name')"
+                    >
+                    <span v-if="touched.emergency_name && errors.emergency_name" class="text-xs text-rose-500 mt-1 block">
+                      <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ errors.emergency_name }}
+                    </span>
                   </div>
                   <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Relation <span class="text-rose-500">*</span></label>
-                    <input type="text" v-model="formData.emergency_relation" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" placeholder="Spouse, Parent, Sibling">
+                    <input
+                        type="text"
+                        v-model="formData.emergency_relation"
+                        :required="isDirectAccess"
+                        :class="[
+                        'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
+                        (touched.emergency_relation && errors.emergency_relation) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
+                      ]"
+                        placeholder="Spouse, Parent, Sibling"
+                        @input="markTouched('emergency_relation')"
+                        @blur="markTouched('emergency_relation')"
+                    >
+                    <span v-if="touched.emergency_relation && errors.emergency_relation" class="text-xs text-rose-500 mt-1 block">
+                      <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ errors.emergency_relation }}
+                    </span>
                   </div>
                 </div>
 
@@ -261,26 +445,24 @@
                   <input
                       type="text"
                       v-model="formData.emergency_cnic"
-                      required
+                      :required="isDirectAccess"
                       :class="[
-        'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
-        emergencyCnicError ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
-      ]"
+                      'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
+                      emergencyCnicError ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
+                    ]"
                       placeholder="00000-0000000-0"
                       @input="formatEmergencyCnic"
-                      @focus="emergencyCnicValidationError = ''"
                       maxlength="15"
                   >
                   <span v-if="emergencyCnicError" class="text-xs text-rose-500 mt-1 block">
-    <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ emergencyCnicError }}
-  </span>
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ emergencyCnicError }}
+                  </span>
                   <span v-else class="text-[10px] text-slate-400 mt-1 block">National identity card number (13 digits)</span>
                 </div>
 
                 <div>
                   <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">CNIC scan copy <span class="text-rose-500" v-if="!fileNames.emergency_cnic_scan">*</span></label>
 
-                  <!-- Show file info if uploaded -->
                   <div v-if="fileNames.emergency_cnic_scan" class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between">
                     <div class="flex items-center gap-3">
                       <i class="fa-solid fa-file-pdf text-emerald-600 text-2xl"></i>
@@ -294,23 +476,64 @@
                     </button>
                   </div>
 
-                  <!-- Show upload area if no file -->
-                  <div v-else class="border-2 border-dashed border-slate-200 rounded-2xl p-6 text-center hover:bg-slate-50 transition relative group cursor-pointer">
-                    <input type="file" @change="handleFileUpload($event, 'emergency_cnic_scan')" data-field="emergency_cnic_scan" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                  <div v-else :class="[
+                    'border-2 border-dashed rounded-2xl p-6 text-center hover:bg-slate-50 transition relative group cursor-pointer',
+                    fileErrors.emergency_cnic_scan ? 'border-rose-400 bg-rose-50/40' : 'border-slate-200'
+                  ]">
+                    <input type="file" @change="handleFileUpload($event, 'emergency_cnic_scan')" data-field="emergency_cnic_scan" :required="isDirectAccess" accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                     <div class="text-blue-500 text-3xl mb-2 group-hover:scale-110 transition-transform"><i class="fa-solid fa-cloud-arrow-up"></i></div>
                     <p class="text-sm font-medium text-slate-600">Drag & drop or <span class="text-blue-500 underline font-semibold">click to upload</span></p>
                     <p class="text-xs text-slate-400 mt-1">.pdf, .png, .jpg, .jpeg (Max 10MB)</p>
                   </div>
+                  <span v-if="fileErrors.emergency_cnic_scan" class="text-xs text-rose-500 mt-1 block">
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ fileErrors.emergency_cnic_scan }}
+                  </span>
                 </div>
 
                 <div>
                   <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Phone no <span class="text-rose-500">*</span></label>
-                  <input type="text" v-model="formData.emergency_phone" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" placeholder="+92 300 0000000">
+                  <input
+                      type="text"
+                      inputmode="numeric"
+                      v-model="formData.emergency_phone"
+                      :required="isDirectAccess"
+                      maxlength="15"
+                      :class="[
+                      'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
+                      (touched.emergency_phone && errors.emergency_phone) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
+                    ]"
+                      placeholder="03XXXXXXXXX"
+                      @keydown="handleEmergencyPhoneKeydown"
+                      @paste="handleEmergencyPhonePaste"
+                      @input="handleEmergencyPhoneInput"
+                      @blur="markTouched('emergency_phone')"
+                  >
+                  <span v-if="touched.emergency_phone && errors.emergency_phone" class="text-xs text-rose-500 mt-1 block">
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ errors.emergency_phone }}
+                  </span>
                 </div>
 
                 <div>
                   <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Address <span class="text-rose-500">*</span></label>
-                  <textarea v-model="formData.emergency_address" required rows="3" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" placeholder="Residential address of contact person"></textarea>
+                  <textarea
+                      v-model="formData.emergency_address"
+                      :required="isDirectAccess"
+                      rows="3"
+                      maxlength="250"
+                      :class="[
+                      'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
+                      (touched.emergency_address && errors.emergency_address) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
+                    ]"
+                      placeholder="Residential address of contact person"
+                      @input="markTouched('emergency_address')"
+                      @blur="markTouched('emergency_address')"
+                  ></textarea>
+                  <div class="flex items-center justify-between mt-1">
+                    <span v-if="touched.emergency_address && errors.emergency_address" class="text-xs text-rose-500">
+                      <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ errors.emergency_address }}
+                    </span>
+                    <span class="text-[10px] text-slate-400 ml-auto">{{ (formData.emergency_address || '').length }}/250</span>
+                  </div>
                 </div>
               </div>
 
@@ -344,12 +567,18 @@
                     </button>
                   </div>
 
-                  <div v-else class="border-2 border-dashed border-slate-200 rounded-2xl p-6 text-center hover:bg-slate-50 transition relative group cursor-pointer">
-                    <input type="file" @change="handleFileUpload($event, 'matric_certificate')" data-field="matric_certificate" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                  <div v-else :class="[
+                    'border-2 border-dashed rounded-2xl p-6 text-center hover:bg-slate-50 transition relative group cursor-pointer',
+                    fileErrors.matric_certificate ? 'border-rose-400 bg-rose-50/40' : 'border-slate-200'
+                  ]">
+                    <input type="file" @change="handleFileUpload($event, 'matric_certificate')" data-field="matric_certificate" :required="isDirectAccess" accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                     <div class="text-blue-500 text-3xl mb-2 group-hover:scale-110 transition-transform"><i class="fa-solid fa-cloud-arrow-up"></i></div>
                     <p class="text-sm font-medium text-slate-600">Drag & drop or <span class="text-blue-500 underline font-semibold">click to upload</span></p>
                     <p class="text-xs text-slate-400 mt-1">.pdf, .png, .jpg, .jpeg (Max 10MB)</p>
                   </div>
+                  <span v-if="fileErrors.matric_certificate" class="text-xs text-rose-500 mt-1 block">
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ fileErrors.matric_certificate }}
+                  </span>
                 </div>
 
                 <!-- FSC -->
@@ -369,12 +598,18 @@
                     </button>
                   </div>
 
-                  <div v-else class="border-2 border-dashed border-slate-200 rounded-2xl p-6 text-center hover:bg-slate-50 transition relative group cursor-pointer">
-                    <input type="file" @change="handleFileUpload($event, 'fsc_certificate')" data-field="fsc_certificate" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                  <div v-else :class="[
+                    'border-2 border-dashed rounded-2xl p-6 text-center hover:bg-slate-50 transition relative group cursor-pointer',
+                    fileErrors.fsc_certificate ? 'border-rose-400 bg-rose-50/40' : 'border-slate-200'
+                  ]">
+                    <input type="file" @change="handleFileUpload($event, 'fsc_certificate')" data-field="fsc_certificate" :required="isDirectAccess" accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                     <div class="text-blue-500 text-3xl mb-2 group-hover:scale-110 transition-transform"><i class="fa-solid fa-cloud-arrow-up"></i></div>
                     <p class="text-sm font-medium text-slate-600">Drag & drop or <span class="text-blue-500 underline font-semibold">click to upload</span></p>
                     <p class="text-xs text-slate-400 mt-1">.pdf, .png, .jpg, .jpeg (Max 10MB)</p>
                   </div>
+                  <span v-if="fileErrors.fsc_certificate" class="text-xs text-rose-500 mt-1 block">
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ fileErrors.fsc_certificate }}
+                  </span>
                 </div>
 
                 <!-- University -->
@@ -394,12 +629,18 @@
                     </button>
                   </div>
 
-                  <div v-else class="border-2 border-dashed border-blue-200 bg-blue-50/10 rounded-2xl p-6 text-center hover:bg-slate-50 transition relative group cursor-pointer">
-                    <input type="file" @change="handleFileUpload($event, 'university_degree')" data-field="university_degree" required class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                  <div v-else :class="[
+                    'border-2 border-dashed rounded-2xl p-6 text-center hover:bg-slate-50 transition relative group cursor-pointer',
+                    fileErrors.university_degree ? 'border-rose-400 bg-rose-50/40' : 'border-blue-200 bg-blue-50/10'
+                  ]">
+                    <input type="file" @change="handleFileUpload($event, 'university_degree')" data-field="university_degree" :required="isDirectAccess" accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                     <div class="text-blue-500 text-3xl mb-2 group-hover:scale-110 transition-transform"><i class="fa-solid fa-cloud-arrow-up"></i></div>
                     <p class="text-sm font-medium text-slate-600">Drag & drop or <span class="text-blue-500 underline font-semibold">click to upload</span></p>
                     <p class="text-xs text-slate-400 mt-1">.pdf, .png, .jpg, .jpeg (Max 10MB)</p>
                   </div>
+                  <span v-if="fileErrors.university_degree" class="text-xs text-rose-500 mt-1 block">
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ fileErrors.university_degree }}
+                  </span>
                 </div>
 
                 <!-- Other Courses -->
@@ -419,12 +660,18 @@
                     </button>
                   </div>
 
-                  <div v-else class="border-2 border-dashed border-slate-200 rounded-2xl p-6 text-center hover:bg-slate-50 transition relative group cursor-pointer">
-                    <input type="file" @change="handleFileUpload($event, 'other_course')" data-field="other_course" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                  <div v-else :class="[
+                    'border-2 border-dashed rounded-2xl p-6 text-center hover:bg-slate-50 transition relative group cursor-pointer',
+                    fileErrors.other_course ? 'border-rose-400 bg-rose-50/40' : 'border-slate-200'
+                  ]">
+                    <input type="file" @change="handleFileUpload($event, 'other_course')" data-field="other_course" accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
                     <div class="text-blue-500 text-3xl mb-2 group-hover:scale-110 transition-transform"><i class="fa-solid fa-cloud-arrow-up"></i></div>
                     <p class="text-sm font-medium text-slate-600">Drag & drop or <span class="text-blue-500 underline font-semibold">click to upload</span></p>
                     <p class="text-xs text-slate-400 mt-1">.pdf, .png, .jpg, .jpeg (Max 10MB)</p>
                   </div>
+                  <span v-if="fileErrors.other_course" class="text-xs text-rose-500 mt-1 block">
+                    <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ fileErrors.other_course }}
+                  </span>
                 </div>
               </div>
 
@@ -444,23 +691,68 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Bank Name <span class="text-rose-500">*</span></label>
-                    <input type="text" v-model="formData.bank_name" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" placeholder="e.g. Meezan Bank">
+                    <input
+                        type="text"
+                        v-model="formData.bank_name"
+                        :required="isDirectAccess"
+                        :class="[
+                        'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
+                        (touched.bank_name && errors.bank_name) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
+                      ]"
+                        placeholder="e.g. Meezan Bank"
+                        @input="markTouched('bank_name')"
+                        @blur="markTouched('bank_name')"
+                    >
+                    <span v-if="touched.bank_name && errors.bank_name" class="text-xs text-rose-500 mt-1 block">
+                      <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ errors.bank_name }}
+                    </span>
                   </div>
                   <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Branch Name</label>
-                    <input type="text" v-model="formData.branch_name" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" placeholder="Branch location name">
+                    <input
+                        type="text"
+                        v-model="formData.branch_name"
+                        :class="[
+                        'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
+                        (touched.branch_name && errors.branch_name) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
+                      ]"
+                        placeholder="Branch location name"
+                        @input="markTouched('branch_name')"
+                        @blur="markTouched('branch_name')"
+                    >
+                    <span v-if="touched.branch_name && errors.branch_name" class="text-xs text-rose-500 mt-1 block">
+                      <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ errors.branch_name }}
+                    </span>
                   </div>
                 </div>
 
                 <div>
                   <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Account no / IBAN Number <span class="text-rose-500">*</span></label>
-                  <input type="text" v-model="formData.account_number" required class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" placeholder="PK00XXXX0000000000000000">
+                  <input
+                      type="text"
+                      v-model="formData.account_number"
+                      :required="isDirectAccess"
+                      maxlength="24"
+                      :class="[
+                      'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
+                      (touched.account_number && errors.account_number) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
+                    ]"
+                      placeholder="PK00XXXX0000000000000000"
+                      @input="markTouched('account_number')"
+                      @blur="markTouched('account_number')"
+                  >
+                  <div class="flex items-center justify-between mt-1">
+                    <span v-if="touched.account_number && errors.account_number" class="text-xs text-rose-500">
+                      <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ errors.account_number }}
+                    </span>
+                    <span class="text-[10px] text-slate-400 ml-auto">{{ (formData.account_number || '').length }}/24</span>
+                  </div>
                 </div>
               </div>
             </form>
           </div>
 
-          <!-- SUCCESS MESSAGE - Show after submission -->
+          <!-- SUCCESS MESSAGE -->
           <div v-else class="px-6 py-12">
             <div class="text-center max-w-md mx-auto">
               <div class="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -491,20 +783,18 @@
           </div>
 
         </div>
-        <!-- /page-mode padding wrapper -->
       </div>
 
-      <!-- FOOTER SECTION - flows with the page in direct-access mode, hidden when submitted -->
+      <!-- FOOTER SECTION -->
       <div v-if="!isSubmitted" :class="[
-      'border-t border-slate-100 flex justify-between items-center',
-      isDirectAccess ? 'px-6 md:px-8 py-4 bg-white' : 'p-6 bg-slate-50/80 shrink-0'
-    ]">
+        'border-t border-slate-100 flex justify-between items-center',
+        isDirectAccess ? 'px-6 md:px-8 py-4 bg-white' : 'p-6 bg-slate-50/80 shrink-0'
+      ]">
         <button type="button" @click="prevStep" :class="['px-5 py-2.5 rounded-xl border cursor-pointer border-slate-200 text-slate-600 font-semibold text-sm hover:bg-slate-100 transition flex items-center bg-white', currentStep === 1 ? 'invisible' : '']">
           <i class="fa-solid fa-arrow-left mr-2 mt-0.5"></i> Back
         </button>
 
         <div class="flex gap-3">
-          <!-- Show Close button only in modal mode -->
           <button v-if="!isDirectAccess" type="button" @click="close" class="px-5 py-2.5 cursor-pointer rounded-xl border border-slate-200 text-slate-600 font-semibold text-sm hover:bg-slate-100 transition bg-white">
             Close
           </button>
@@ -523,7 +813,7 @@
 
 <script>
 import { useEmployeeRegistration } from '@/composables/useEmployeeRegistration.js';
-import { onMounted, ref, computed, nextTick } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import Navbar from '@/components/Navbar.vue';
 import { useEmployeeStore } from '@/stores/employeeStore.js';
@@ -533,13 +823,10 @@ export default {
   emits: ['close'],
   setup(props, { emit }) {
     const router = useRouter();
-    const isSubmitted = ref(false);
     const isDirectAccess = ref(false);
-    const validationError = ref('');
     const employeeStore = useEmployeeStore();
     const employmentStatuses = computed(() => employeeStore.employmentStatuses || []);
 
-    // Get token from URL
     const getTokenFromURL = () => {
       const path = window.location.pathname;
       const segments = path.split('/');
@@ -549,7 +836,6 @@ export default {
 
     const token = getTokenFromURL();
 
-    // Check if opened directly (not in modal)
     const checkDirectAccess = () => {
       const path = window.location.pathname;
       if (path.includes('/onboarding')) {
@@ -557,7 +843,13 @@ export default {
       }
     };
 
-    const registration = useEmployeeRegistration();
+    // All step 1-4 field/file validation lives in the composable (single source
+    // of truth — see composables/useValidation.js + composables/useEmployeeRegistration.js).
+    // NOTE: native HTML "required" is now bound to `isDirectAccess` throughout the
+    // template above — required only applies on the public onboarding link, not
+    // inside the admin modal. All JS-level (length/format/file-type) validation
+    // below is unchanged and still runs for BOTH modes.
+    const registration = useEmployeeRegistration(isDirectAccess);
 
     const {
       currentStep,
@@ -565,81 +857,52 @@ export default {
       steps,
       formData,
       fileNames,
+      isSubmitted,
       currentProgressPercentage,
+      touched,
+      errors,
+      fileErrors,
+      validationError,
+      emergencyCnicError,
+      markTouched,
+      isValidCnic,
       handleFileUpload,
+      removeFile,
+      formatCnic: registrationFormatCnic,
+      formatEmergencyCnic,
+      handlePhoneKeydown,
+      handlePhonePaste,
+      handlePhoneInput,
+      handleEmergencyPhoneKeydown,
+      handleEmergencyPhonePaste,
+      handleEmergencyPhoneInput,
+      handleSalaryKeydown,
+      handleSalaryPaste,
+      handleSalaryInput,
       nextStep,
       prevStep,
       submitForm,
     } = registration;
 
-    // CNIC validation functions
-    const isCnicValid = (cnic) => {
-      if (!cnic) return false;
-      const cleanCnic = cnic.replace(/[-\s]/g, '');
-      return /^\d{13}$/.test(cleanCnic);
-    };
+    const genderPillClass = computed(() => [
+      'inline-flex items-center text-sm font-medium text-slate-700 bg-white px-4 py-2 rounded-xl cursor-pointer hover:bg-slate-50 border',
+      (touched.value.gender && errors.value.gender) ? 'border-rose-500 bg-rose-50' : 'border-slate-200',
+    ])
 
-    // Computed for CNIC error
     const cnicError = computed(() => {
       if (currentStep.value !== 1) return '';
       if (!formData.value.cnic) return '';
-      if (!isCnicValid(formData.value.cnic)) {
+      if (!isValidCnic(formData.value.cnic)) {
         return 'CNIC must be exactly 13 digits (e.g., 12345-1234567-8)';
       }
       return '';
     });
 
-    // Format CNIC with dashes
+    // Wrap the composable's formatCnic so the step-1 "Please enter CNIC number"
+    // banner clears as soon as the user starts typing again.
     const formatCnic = (event) => {
-      let value = event.target.value.replace(/[^0-9]/g, '');
-
-      // Limit to 13 digits
-      if (value.length > 13) {
-        value = value.slice(0, 13);
-      }
-
-      // Auto-format with dashes: 00000-0000000-0
-      let formatted = '';
-      if (value.length > 0) {
-        formatted = value.slice(0, 5);
-        if (value.length > 5) {
-          formatted += '-' + value.slice(5, 12);
-        }
-        if (value.length > 12) {
-          formatted += '-' + value.slice(12, 13);
-        }
-      }
-
-      event.target.value = formatted;
-      formData.value.cnic = formatted;
+      registrationFormatCnic(event);
       validationError.value = '';
-    };
-
-    // Add removeFile function
-    const removeFile = (fieldName) => {
-      fileNames.value[fieldName] = null;
-      formData.value[fieldName] = null;
-      const inputs = document.querySelectorAll(`input[data-field="${fieldName}"]`);
-      inputs.forEach(input => {
-        input.value = '';
-      });
-    };
-
-    // Add scroll to top function
-    // Waits for Vue's DOM update (nextTick) to flush before scrolling, so the
-    // browser doesn't re-adjust/anchor scroll position after the new step's
-    // content lays out — this is what makes Continue/Back reliably land at the top.
-    const scrollToTop = () => {
-      nextTick(() => {
-        if (isDirectAccess.value) {
-          window.scrollTo({ top: 0, behavior: 'auto' });
-          return;
-        }
-        const container = document.querySelector('.flex-1.overflow-y-auto');
-        if (container) {
-          container.scrollTop = 0;
-        }
-      });
     };
 
     onMounted(() => {
@@ -648,38 +911,16 @@ export default {
 
       if (token) {
         console.log('Token from URL:', token);
-        // loadEmployeeData(token);
       }
     });
 
     const customNextStep = () => {
-      // Validate CNIC if on step 1
-      if (currentStep.value === 1) {
-        if (!formData.value.cnic) {
-          validationError.value = 'Please enter CNIC number';
-          const cnicInput = document.querySelector('input[v-model="formData.cnic"]');
-          if (cnicInput) cnicInput.focus();
-          return;
-        }
-        if (!isCnicValid(formData.value.cnic)) {
-          validationError.value = 'CNIC must be exactly 13 digits. Please check and try again.';
-          const cnicInput = document.querySelector('input[v-model="formData.cnic"]');
-          if (cnicInput) cnicInput.focus();
-          return;
-        }
-      }
-
-      // Clear validation error if everything is valid
-      validationError.value = '';
-
       if (currentStep.value === totalSteps) {
         // CHANGE THIS LINE - pass the source
         // Determine source based on context
         const source = isDirectAccess.value ? 'user_onboarding' : 'admin_onboarding';
 
         submitForm((data) => {
-          isSubmitted.value = true;
-          // Refresh dashboard list when submitted from the modal
           if (!isDirectAccess.value) {
             window.dispatchEvent(new CustomEvent('employee-created', { detail: data }));
             setTimeout(() => {
@@ -689,16 +930,6 @@ export default {
         }, source); // Pass source here
       } else {
         nextStep();
-        scrollToTop();
-      }
-    };
-
-    // Override or extend the prevStep function
-    const customPrevStep = () => {
-      if (currentStep.value > 1) {
-        prevStep();
-        scrollToTop();
-        validationError.value = '';
       }
     };
 
@@ -718,7 +949,7 @@ export default {
       fileNames,
       currentProgressPercentage,
       handleFileUpload,
-      prevStep: customPrevStep,
+      prevStep,
       customNextStep,
       close,
       isDirectAccess,
@@ -727,8 +958,24 @@ export default {
       removeFile,
       cnicError,
       formatCnic,
+      formatEmergencyCnic,
+      emergencyCnicError,
       validationError,
       employmentStatuses,
+      touched,
+      errors,
+      fileErrors,
+      markTouched,
+      genderPillClass,
+      handlePhoneKeydown,
+      handlePhonePaste,
+      handlePhoneInput,
+      handleEmergencyPhoneKeydown,
+      handleEmergencyPhonePaste,
+      handleEmergencyPhoneInput,
+      handleSalaryKeydown,
+      handleSalaryPaste,
+      handleSalaryInput,
     };
   }
 };

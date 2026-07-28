@@ -5,7 +5,9 @@ const LENGTH_LIMITS = {
     password: { min: 8, max: 32 },
     credentialLabel: { max: 50 },
     username: { max: 32 },
-    amount: { maxDigits: 10 },
+    amount: { maxDigits: 7 },
+    phone: { maxDigits: 15 },
+    address: { max: 250 },
     payroll: {
         graceMinutesMax: 480,
         paidLeavesMax: 31,
@@ -17,13 +19,18 @@ const LENGTH_LIMITS = {
     },
 };
 
+const ALLOWED_SCAN_EXTENSIONS = ['pdf', 'png', 'jpg', 'jpeg'];
+const ALLOWED_SCAN_MIME_TYPES = ['application/pdf', 'image/png', 'image/jpeg'];
+
+// NEW — letters + spaces only (used for Name, Designation, Department, etc.)
+const ALPHA_ONLY_REGEX = /^[A-Za-z\s]+$/;
+
 export function useValidation() {
     const isValidLength = (value, max) => (value?.trim() || '').length <= max;
 
     const getLengthError = (value, fieldName, max) =>
         (value?.trim() || '').length > max ? `${fieldName} must not exceed ${max} characters.` : null;
 
-    // required + max-length wrapper, shared by username / credential-label style fields
     const requiredLengthError = (value, fieldName, max) => {
         const trimmed = (value || '').trim();
         if (!trimmed) return `${fieldName} is required.`;
@@ -33,7 +40,7 @@ export function useValidation() {
 
     const getEmailError = (value, max = LENGTH_LIMITS.emailOrUsername.max) => {
         const email = (value || '').trim();
-        if (!email) return null; // don't show error before user starts typing
+        if (!email) return null;
         if (email.length > max) return `Email must not exceed ${max} characters.`;
         if (email.includes(' ')) return 'Email must not contain spaces.';
 
@@ -65,7 +72,7 @@ export function useValidation() {
         if (domainSegments[domainSegments.length - 1].length < 2) {
             return 'Email domain extension must be at least 2 characters.';
         }
-        return null; // valid
+        return null;
     };
 
     const isValidEmail = (email) => !getEmailError(email) && !!(email || '').trim();
@@ -73,8 +80,13 @@ export function useValidation() {
     const getCredentialLabelError = (value, max = LENGTH_LIMITS.credentialLabel.max) =>
         requiredLengthError(value, 'Credential label', max);
 
-    const getUsernameError = (value, max = LENGTH_LIMITS.username.max, fieldName = 'Username') =>
-        requiredLengthError(value, fieldName, max);
+    // UPDATED — now also rejects numbers/special characters (letters + spaces only)
+    const getUsernameError = (value, max = LENGTH_LIMITS.username.max, fieldName = 'Username') => {
+        const requiredErr = requiredLengthError(value, fieldName, max);
+        if (requiredErr) return requiredErr;
+        if (!ALPHA_ONLY_REGEX.test(value.trim())) return `${fieldName} must contain only alphabets, no numbers or special characters.`;
+        return null;
+    };
 
     const getLinkError = (value) => {
         const trimmed = (value || '').trim();
@@ -109,7 +121,6 @@ export function useValidation() {
         return { text: 'Strong password', color: 'text-emerald-600' };
     };
 
-    // Generic: digits only (with optional decimal), required, min/max range
     const getNumericRangeError = (value, { min = 0, max = Infinity, fieldName = 'Value', required = true } = {}) => {
         const trimmed = String(value ?? '').trim();
         if (!trimmed) return required ? `${fieldName} is required.` : null;
@@ -129,8 +140,31 @@ export function useValidation() {
         return null;
     };
 
-    // Factory: builds a `(value, overrideMax?) => error|null` validator for a payroll range field.
-    // Collapses what used to be 6 near-identical wrapper functions into 1 factory + 6 one-liners.
+    const getPhoneError = (value, maxDigits = LENGTH_LIMITS.phone.maxDigits, fieldName = 'Phone number') => {
+        const trimmed = String(value ?? '').trim();
+        if (!trimmed) return `${fieldName} is required.`;
+        if (!/^\d+$/.test(trimmed)) return `${fieldName} must contain numbers only.`;
+        if (trimmed.length > maxDigits) return `${fieldName} must not exceed ${maxDigits} digits.`;
+        return null;
+    };
+
+    const getAddressLengthError = (value, max = LENGTH_LIMITS.address.max, fieldName = 'Address') =>
+        requiredLengthError(value, fieldName, max);
+
+    const getFileTypeError = (
+        file,
+        { allowedExtensions = ALLOWED_SCAN_EXTENSIONS, allowedMimeTypes = ALLOWED_SCAN_MIME_TYPES, fieldName = 'File' } = {}
+    ) => {
+        if (!file) return null;
+        const ext = (file.name?.split('.').pop() || '').toLowerCase();
+        const extOk = allowedExtensions.includes(ext);
+        const mimeOk = !file.type || allowedMimeTypes.includes(file.type);
+        if (!extOk || !mimeOk) {
+            return `${fieldName} must be one of: ${allowedExtensions.map((e) => '.' + e).join(', ')}`;
+        }
+        return null;
+    };
+
     const rangeError = (fieldName, min, max) => (value, overrideMax) =>
         getNumericRangeError(value, { min, max: overrideMax ?? max, fieldName });
 
@@ -146,8 +180,7 @@ export function useValidation() {
     const getFreeLatesError = rangeError('Free lates before penalty', 0, freeLatesMax);
     const getOfficeRadiusError = rangeError('Office radius', officeRadiusMin, officeRadiusMax);
 
-    // Shared numeric-input guards — used by every digit-only field across the app
-    // (previously duplicated separately inside the .vue file and useIncrementPolicy.js)
+    // Shared numeric-input guards (digits only, optional single decimal point)
     const NAV_KEYS = ['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab', 'Home', 'End'];
 
     const blockNonDigitKeydown = (e, { allowDecimal = false, maxDigits = Infinity, currentValue } = {}) => {
@@ -168,6 +201,17 @@ export function useValidation() {
         if (!pattern.test(pasted) || pasted.replace('.', '').length > maxDigits) e.preventDefault();
     };
 
+    // NEW — shared alphabet-only guards (letters + spaces), used for Name/Designation/Department etc.
+    const blockNonAlphaKeydown = (e) => {
+        if (NAV_KEYS.includes(e.key) || e.ctrlKey || e.metaKey) return;
+        if (!/^[A-Za-z\s]$/.test(e.key)) e.preventDefault();
+    };
+
+    const blockNonAlphaPaste = (e) => {
+        const pasted = (e.clipboardData || window.clipboardData).getData('text');
+        if (!ALPHA_ONLY_REGEX.test(pasted) && pasted !== '') e.preventDefault();
+    };
+
     return {
         LENGTH_LIMITS,
         isValidLength,
@@ -181,6 +225,9 @@ export function useValidation() {
         getPasswordStrengthLabel,
         getNumericRangeError,
         getAmountError,
+        getPhoneError,
+        getAddressLengthError,
+        getFileTypeError,
         getGraceMinutesError,
         getAllowedPaidLimitError,
         getUnpaidAbsentsError,
@@ -189,5 +236,7 @@ export function useValidation() {
         getOfficeRadiusError,
         blockNonDigitKeydown,
         blockNonDigitPaste,
+        blockNonAlphaKeydown,   // NEW
+        blockNonAlphaPaste,     // NEW
     };
 }

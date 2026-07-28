@@ -440,19 +440,19 @@
             <label class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-1.5 block">Entry type</label>
             <div class="inline-flex items-center gap-1 bg-white border border-border rounded-lg p-1">
               <button
-                type="button"
-                class="px-3 py-1.5 rounded-md text-xs font-semibold cursor-pointer"
-                :class="worklogForm.source === 'jira' ? 'tab-active-gradient text-white' : 'text-gray-500 hover:bg-blue-50'"
-                :disabled="needsJiraLogin"
-                @click="worklogForm.source = 'jira'"
+                  type="button"
+                  class="px-3 py-1.5 rounded-md text-xs font-semibold cursor-pointer"
+                  :class="worklogForm.source === 'jira' ? 'tab-active-gradient text-white' : 'text-gray-500 hover:bg-blue-50'"
+                  :disabled="needsJiraLogin"
+                  @click="worklogForm.source = 'jira'"
               >
                 Jira
               </button>
               <button
-                type="button"
-                class="px-3 py-1.5 rounded-md text-xs font-semibold cursor-pointer"
-                :class="worklogForm.source === 'manual' ? 'tab-active-gradient text-white' : 'text-gray-500 hover:bg-blue-50'"
-                @click="worklogForm.source = 'manual'"
+                  type="button"
+                  class="px-3 py-1.5 rounded-md text-xs font-semibold cursor-pointer"
+                  :class="worklogForm.source === 'manual' ? 'tab-active-gradient text-white' : 'text-gray-500 hover:bg-blue-50'"
+                  @click="worklogForm.source = 'manual'"
               >
                 Manual
               </button>
@@ -461,14 +461,19 @@
 
           <div v-if="worklogForm.source === 'manual'" class="flex flex-col gap-1.5">
             <label class="text-xs font-bold uppercase tracking-wider text-gray-400">
-              Task / title
+              Task / title <span class="text-red-500">*</span>
             </label>
             <input
-              type="text"
-              v-model="worklogForm.summary"
-              placeholder="e.g. Client meeting, docs, support"
-              class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4]"
+                type="text"
+                v-model="worklogForm.summary"
+                placeholder="e.g. Client meeting, docs, support"
+                @focus="clearFieldError('summary')"
+                @blur="touched.summary = true; validateField('summary', worklogForm.summary)"
+                @input="validateField('summary', worklogForm.summary)"
+                class="w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition-all duration-200"
+                :class="touched.summary && fieldErrors.summary ? 'border-red-500' : 'border-gray-200'"
             />
+            <p v-if="touched.summary && fieldErrors.summary" class="text-red-500 text-xs mt-1">{{ fieldErrors.summary }}</p>
             <input type="hidden" v-model="worklogForm.issue_key" />
           </div>
 
@@ -485,11 +490,14 @@
                   autocomplete="off"
                   required
                   :readonly="isIssueSelected"
-                  class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition-all duration-200"
-                  :class="{ 'bg-surface cursor-default': isIssueSelected }"
+                  @blur="!isIssueSelected && (touched.issue_key = true)"
+                  class="w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition-all duration-200"
+                  :class="[
+              isIssueSelected ? 'bg-surface cursor-default' : '',
+              touched.issue_key && fieldErrors.issue_key ? 'border-red-500' : 'border-gray-200'
+            ]"
                   @focus="openIssueDropdown"
-                  @blur="closeIssueDropdown"
-                  @input="worklogForm.issue_key = ''"
+                  @input="worklogForm.issue_key = ''; validateField('issue_key', '')"
               />
 
               <button
@@ -501,6 +509,7 @@
                 <font-awesome-icon :icon="['fas', 'xmark']" />
               </button>
             </div>
+            <p v-if="touched.issue_key && fieldErrors.issue_key" class="text-red-500 text-xs mt-1">{{ fieldErrors.issue_key }}</p>
 
             <ul
                 v-if="isIssueDropdownOpen && !isIssueSelected && filteredIssues.length > 0"
@@ -513,8 +522,8 @@
               >
                 <span class="font-bold text-text-primary">{{ issue.issue_key }}</span>
                 <span v-if="issue.summary" class="text-text-muted ml-2 text-xs">
-                  {{ issue.summary }}
-                </span>
+            {{ issue.summary }}
+          </span>
               </li>
             </ul>
 
@@ -533,8 +542,13 @@
                   type="date"
                   v-model="worklogForm.start_date"
                   required
-                  class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition-all duration-200"
+                  @focus="clearFieldError('start_date')"
+                  @blur="touched.start_date = true; validateField('start_date', worklogForm.start_date)"
+                  @change="validateField('start_date', worklogForm.start_date)"
+                  class="w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition-all duration-200"
+                  :class="touched.start_date && fieldErrors.start_date ? 'border-red-500' : 'border-gray-200'"
               />
+              <p v-if="touched.start_date && fieldErrors.start_date" class="text-red-500 text-xs mt-1">{{ fieldErrors.start_date }}</p>
             </div>
             <div class="flex flex-col gap-1.5">
               <label class="text-xs font-bold uppercase tracking-wider text-gray-400">Start Time <span class="text-red-500">*</span></label>
@@ -542,8 +556,13 @@
                   type="time"
                   v-model="worklogForm.start_time"
                   required
-                  class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition-all duration-200"
+                  @focus="clearFieldError('start_time')"
+                  @blur="touched.start_time = true; validateField('start_time', worklogForm.start_time)"
+                  @change="validateField('start_time', worklogForm.start_time)"
+                  class="w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition-all duration-200"
+                  :class="touched.start_time && fieldErrors.start_time ? 'border-red-500' : 'border-gray-200'"
               />
+              <p v-if="touched.start_time && fieldErrors.start_time" class="text-red-500 text-xs mt-1">{{ fieldErrors.start_time }}</p>
             </div>
           </div>
 
@@ -563,8 +582,13 @@
                   type="time"
                   v-model="worklogForm.end_time"
                   required
-                  class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition-all duration-200"
+                  @focus="clearFieldError('end_time')"
+                  @blur="touched.end_time = true; validateField('end_time', worklogForm.end_time)"
+                  @change="validateField('end_time', worklogForm.end_time)"
+                  class="w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition-all duration-200"
+                  :class="touched.end_time && fieldErrors.end_time ? 'border-red-500' : 'border-gray-200'"
               />
+              <p v-if="touched.end_time && fieldErrors.end_time" class="text-red-500 text-xs mt-1">{{ fieldErrors.end_time }}</p>
             </div>
           </div>
 
@@ -959,12 +983,12 @@ const {
   formatDateOnly,
   selectedMonthFilter,
 
-  // --- month picker ---
     isMonthPickerOpen,
     monthNames,
     pickerYear,
     displayedMonthLabel,
     isSelectedMonth,
     selectMonth,
+    fieldErrors, touched, validateField, clearFieldError
 } = useWorklog()
 </script>

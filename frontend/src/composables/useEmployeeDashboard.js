@@ -2,10 +2,25 @@
 import { computed, reactive, ref, watch, onMounted, onBeforeUnmount } from 'vue';
 import { useEmployeeStore } from '@/stores/employeeStore.js';
 import { useToast } from '@/composables/useToast.js';
+import { useValidation } from '@/composables/useValidation.js';
 
 export function useEmployeeDashboard() {
     const employeeStore = useEmployeeStore();
     const { showToast } = useToast();
+    const {
+        getUsernameError,
+        getEmailError,
+        getPhoneError,
+        getAmountError,
+        getNumericRangeError,
+        getAddressLengthError,
+        getAccountNumberError,
+        blockNonDigitKeydown,
+        blockNonDigitPaste,
+        blockNonAlphaKeydown,
+        blockNonAlphaPaste,
+    } = useValidation();
+
     const tempStatusId = ref(null);
     const allEmployees = computed(() => employeeStore.employees);
     const isLoading = computed(() => employeeStore.isLoading);
@@ -40,6 +55,8 @@ export function useEmployeeDashboard() {
     const isChangingStatus = ref(false);
     const statusChangeError = ref('');
     const employmentStatuses = computed(() => employeeStore.employmentStatuses || []);
+
+    // ==================== CREATE FORM ====================
     const createFormData = reactive({
         name: '',
         email: '',
@@ -51,6 +68,151 @@ export function useEmployeeDashboard() {
         tax: ''
     });
 
+    const createTouched = reactive({
+        name: false,
+        email: false,
+        phone_number: false,
+        position: false,
+        salary: false,
+        department: false,
+        insurance_amount: false,
+        tax: false,
+    });
+    const createErrors = reactive({
+        name: null,
+        email: null,
+        phone_number: null,
+        position: null,
+        salary: null,
+        department: null,
+        insurance_amount: null,
+        tax: null,
+    });
+
+    const CREATE_REQUIRED_FIELDS = ['name', 'email', 'phone_number', 'salary', 'department', 'position', 'insurance_amount', 'tax'];
+    
+    const isCreateFormValid = computed(() => {
+        for (const field of CREATE_REQUIRED_FIELDS) {
+            if (!createFormData[field] || !String(createFormData[field]).trim()) {
+                return false;
+            }
+        }
+        for (const field of Object.keys(createErrors)) {
+            if (createErrors[field]) {
+                return false;
+            }
+        }
+        return true;
+    });
+
+    const validateCreateField = (field) => {
+        const value = createFormData[field];
+        const isOptionalAndEmpty = !CREATE_REQUIRED_FIELDS.includes(field) && !String(value ?? '').trim();
+        if (isOptionalAndEmpty) {
+            createErrors[field] = null;
+            return null;
+        }
+
+        let error = null;
+        switch (field) {
+            case 'name':
+                error = getUsernameError(value, 32, 'Full Name');
+                break;
+            case 'email':
+                error = (!value || !value.trim()) ? 'Email is required.' : getEmailError(value);
+                break;
+            case 'phone_number':
+                error = getPhoneError(value);
+                break;
+            case 'position':
+                error = getUsernameError(value, 32, 'Designation');
+                break;
+            case 'salary':
+                error = getAmountError(value, 8, 'Monthly Salary');
+                break;
+            case 'department':
+                error = getUsernameError(value, 32, 'Department');
+                break;
+            case 'insurance_amount':
+                error = getAmountError(value, 8, 'Insurance Amount');
+                break;
+            case 'tax':
+                error = getNumericRangeError(value, { min: 0, max: 100, fieldName: 'Tax' });
+                break;
+            default:
+                break;
+        }
+        createErrors[field] = error;
+        return error;
+    };
+
+    const markCreateTouched = (field) => {
+        createTouched[field] = true;
+        validateCreateField(field);
+    };
+
+    // Create form handlers
+    const makeAlphaHandlers = (field) => ({
+        keydown: blockNonAlphaKeydown,
+        paste: blockNonAlphaPaste,
+        input: (event) => {
+            const cleaned = event.target.value.replace(/[^A-Za-z\s]/g, '');
+            event.target.value = cleaned;
+            createFormData[field] = cleaned;
+            markCreateTouched(field);
+        },
+    });
+    const nameHandlers = makeAlphaHandlers('name');
+    const designationHandlers = makeAlphaHandlers('position');
+    const departmentHandlers = makeAlphaHandlers('department');
+
+    const makeAmountHandlers = (field, maxDigits = 8, allowDecimal = true) => ({
+        keydown: (e) => blockNonDigitKeydown(e, { allowDecimal, maxDigits, currentValue: createFormData[field] }),
+        paste: (e) => blockNonDigitPaste(e, { allowDecimal, maxDigits }),
+        input: (event) => {
+            let value = allowDecimal
+                ? event.target.value.replace(/[^0-9.]/g, '')
+                : event.target.value.replace(/[^0-9]/g, '');
+            if (allowDecimal) {
+                const parts = value.split('.');
+                if (parts.length > 2) value = parts[0] + '.' + parts.slice(1).join('');
+                if (parts[0] && parts[0].length > maxDigits) {
+                    value = parts[0].slice(0, maxDigits) + (parts[1] !== undefined ? '.' + parts[1] : '');
+                }
+            } else if (value.length > maxDigits) {
+                value = value.slice(0, maxDigits);
+            }
+            event.target.value = value;
+            createFormData[field] = value;
+            markCreateTouched(field);
+        },
+    });
+    const salaryHandlers = makeAmountHandlers('salary', 8, false);       // decimal off
+    const insuranceHandlers = makeAmountHandlers('insurance_amount', 8, false); // decimal off
+    const taxHandlers = makeAmountHandlers('tax', 3, true);              // decimal rehne do
+
+    const phoneHandlers = {
+        keydown: (e) => blockNonDigitKeydown(e, { allowDecimal: false, maxDigits: 15, currentValue: createFormData.phone_number }),
+        paste: (e) => blockNonDigitPaste(e, { allowDecimal: false, maxDigits: 15 }),
+        input: (event) => {
+            const digitsOnly = event.target.value.replace(/\D/g, '').slice(0, 15);
+            event.target.value = digitsOnly;
+            createFormData.phone_number = digitsOnly;
+            markCreateTouched('phone_number');
+        },
+    };
+
+    // Create form watches
+    watch(() => createFormData.name, () => { createTouched.name = true; validateCreateField('name'); });
+    watch(() => createFormData.email, () => { createTouched.email = true; validateCreateField('email'); });
+    watch(() => createFormData.phone_number, () => { createTouched.phone_number = true; validateCreateField('phone_number'); });
+    watch(() => createFormData.position, () => { createTouched.position = true; validateCreateField('position'); });
+    watch(() => createFormData.salary, () => { createTouched.salary = true; validateCreateField('salary'); });
+    watch(() => createFormData.department, () => { createTouched.department = true; validateCreateField('department'); });
+    watch(() => createFormData.insurance_amount, () => { createTouched.insurance_amount = true; validateCreateField('insurance_amount'); });
+    watch(() => createFormData.tax, () => { createTouched.tax = true; validateCreateField('tax'); });
+
+    // ==================== EDIT FORM ====================
     const editFormData = reactive({
         name: '',
         email: '',
@@ -81,6 +243,260 @@ export function useEmployeeDashboard() {
         insurance_amount: '',
     });
 
+    // Edit form validation state
+    const editTouched = reactive({
+        name: false,
+        email: false,
+        phone_number: false,
+        department: false,
+        designation: false,
+        salary: false,
+        joined_date: false,
+        cnic: false,
+        gender: false,
+        present_address: false,
+        permanent_address: false,
+        emergency_name: false,
+        emergency_relation: false,
+        emergency_cnic: false,
+        emergency_phone: false,
+        emergency_address: false,
+        bank_name: false,
+        branch_name: false,
+        account_number: false,
+        tax: false,
+        insurance_amount: false,
+    });
+
+    const editErrors = reactive({
+        name: null,
+        email: null,
+        phone_number: null,
+        department: null,
+        designation: null,
+        salary: null,
+        joined_date: null,
+        cnic: null,
+        gender: null,
+        present_address: null,
+        permanent_address: null,
+        emergency_name: null,
+        emergency_relation: null,
+        emergency_cnic: null,
+        emergency_phone: null,
+        emergency_address: null,
+        bank_name: null,
+        branch_name: null,
+        account_number: null,
+        tax: null,
+        insurance_amount: null,
+    });
+
+    // Edit form required fields
+    const EDIT_REQUIRED_FIELDS = ['name', 'email', 'phone_number', 'department', 'designation', 'salary', 'joined_date'];
+
+    // COMPUTED: Check if edit form is valid
+    const isEditFormValid = computed(() => {
+        // Check if any required field is empty
+        for (const field of EDIT_REQUIRED_FIELDS) {
+            if (!editFormData[field] || !String(editFormData[field]).trim()) {
+                return false;
+            }
+        }
+        // Check if any field has an error
+        for (const field of Object.keys(editErrors)) {
+            if (editErrors[field]) {
+                return false;
+            }
+        }
+        return true;
+    });
+
+    const validateEditField = (field) => {
+        const value = editFormData[field];
+        const isOptionalAndEmpty = !EDIT_REQUIRED_FIELDS.includes(field) && !String(value ?? '').trim();
+        if (isOptionalAndEmpty) {
+            editErrors[field] = null;
+            return null;
+        }
+
+        let error = null;
+        switch (field) {
+            case 'name':
+                error = getUsernameError(value, 32, 'Full Name');
+                break;
+            case 'email':
+                error = (!value || !value.trim()) ? 'Email is required.' : getEmailError(value);
+                break;
+            case 'phone_number':
+                error = getPhoneError(value);
+                break;
+            case 'department':
+                error = getUsernameError(value, 32, 'Department');
+                break;
+            case 'designation':
+                error = getUsernameError(value, 32, 'Designation');
+                break;
+            case 'salary':
+                error = getAmountError(value, 8, 'Monthly Salary');
+                break;
+            case 'joined_date':
+                error = !value ? 'Joined date is required.' : null;
+                break;
+            case 'cnic':
+                error = value ? (getCnicError(value) || null) : null;
+                break;
+            case 'gender':
+                error = null; // Gender can be empty, no validation needed
+                break;
+            case 'present_address':
+                error = value ? getAddressLengthError(value, 250, 'Present address') : null;
+                break;
+            case 'permanent_address':
+                error = value ? getAddressLengthError(value, 250, 'Permanent address') : null;
+                break;
+            case 'emergency_name':
+                error = value ? getUsernameError(value, 32, 'Emergency contact name') : null;
+                break;
+            case 'emergency_relation':
+                error = value ? getUsernameError(value, 32, 'Relation') : null;
+                break;
+            case 'emergency_cnic':
+                error = value ? (getCnicError(value) || null) : null;
+                break;
+            case 'emergency_phone':
+                error = value ? getPhoneError(value, 15, 'Emergency phone number') : null;
+                break;
+            case 'emergency_address':
+                error = value ? getAddressLengthError(value, 250, 'Emergency contact address') : null;
+                break;
+            case 'bank_name':
+                error = value ? getUsernameError(value, 32, 'Bank name') : null;
+                break;
+            case 'branch_name':
+                error = value ? getUsernameError(value, 32, 'Branch name') : null;
+                break;
+            case 'account_number':
+                error = value ? getAccountNumberError(value, 24, 'Account no / IBAN number') : null;
+                break;
+            case 'tax':
+                error = value ? getNumericRangeError(value, { min: 0, max: 100, fieldName: 'Tax' }) : null;
+                break;
+            case 'insurance_amount':
+                error = value ? getAmountError(value, 8, 'Insurance Amount') : null;
+                break;
+            default:
+                break;
+        }
+        editErrors[field] = error;
+        return error;
+    };
+
+    const markEditTouched = (field) => {
+        editTouched[field] = true;
+        validateEditField(field);
+    };
+
+    // CNIC validation helper
+    const isValidCnic = (cnic) => !!cnic && /^\d{13}$/.test(cnic.replace(/[-\s]/g, ''));
+
+    const getCnicError = (cnic) => {
+        if (!cnic) return null;
+        return /^\d{13}$/.test(cnic.replace(/[-\s]/g, '')) ? null : 'CNIC must be exactly 13 digits (e.g., 12345-1234567-8)';
+    };
+
+    // Edit form input handlers
+    const editAlphaHandlers = (field) => ({
+        keydown: blockNonAlphaKeydown,
+        paste: blockNonAlphaPaste,
+        input: (event) => {
+            const cleaned = event.target.value.replace(/[^A-Za-z\s]/g, '');
+            event.target.value = cleaned;
+            editFormData[field] = cleaned;
+            markEditTouched(field);
+        },
+    });
+
+    const editNameHandlers = editAlphaHandlers('name');
+    const editDesignationHandlers = editAlphaHandlers('designation');
+    const editDepartmentHandlers = editAlphaHandlers('department');
+
+    const editAmountHandlers = (field, maxDigits = 8, allowDecimal = true) => ({
+        keydown: (e) => blockNonDigitKeydown(e, { allowDecimal, maxDigits, currentValue: editFormData[field] }),
+        paste: (e) => blockNonDigitPaste(e, { allowDecimal, maxDigits }),
+        input: (event) => {
+            let value = allowDecimal
+                ? event.target.value.replace(/[^0-9.]/g, '')
+                : event.target.value.replace(/[^0-9]/g, '');
+            if (allowDecimal) {
+                const parts = value.split('.');
+                if (parts.length > 2) value = parts[0] + '.' + parts.slice(1).join('');
+                if (parts[0] && parts[0].length > maxDigits) {
+                    value = parts[0].slice(0, maxDigits) + (parts[1] !== undefined ? '.' + parts[1] : '');
+                }
+            } else if (value.length > maxDigits) {
+                value = value.slice(0, maxDigits);
+            }
+            event.target.value = value;
+            editFormData[field] = value;
+            markEditTouched(field);
+        },
+    });
+
+    const editSalaryHandlers = editAmountHandlers('salary', 8, false);
+    const editInsuranceHandlers = editAmountHandlers('insurance_amount', 8, false);
+    const editTaxHandlers = editAmountHandlers('tax', 3, true);
+
+
+    const editPhoneHandlers = {
+        keydown: (e) => blockNonDigitKeydown(e, { allowDecimal: false, maxDigits: 15, currentValue: editFormData.phone_number }),
+        paste: (e) => blockNonDigitPaste(e, { allowDecimal: false, maxDigits: 15 }),
+        input: (event) => {
+            const digitsOnly = event.target.value.replace(/\D/g, '').slice(0, 15);
+            event.target.value = digitsOnly;
+            editFormData.phone_number = digitsOnly;
+            markEditTouched('phone_number');
+        },
+    };
+    const emergencyPhoneHandlers = {
+        keydown: (e) => blockNonDigitKeydown(e, { allowDecimal: false, maxDigits: 15, currentValue: editFormData.emergency_phone }),
+        paste: (e) => blockNonDigitPaste(e, { allowDecimal: false, maxDigits: 15 }),
+        input: (event) => {
+            const digitsOnly = event.target.value.replace(/\D/g, '').slice(0, 15);
+            event.target.value = digitsOnly;
+            editFormData.emergency_phone = digitsOnly;
+            markEditTouched('emergency_phone');
+        },
+    };
+
+    // Edit form watches for live validation
+    watch(() => editFormData.name, () => { editTouched.name = true; validateEditField('name'); });
+    watch(() => editFormData.email, () => { editTouched.email = true; validateEditField('email'); });
+    watch(() => editFormData.phone_number, () => { editTouched.phone_number = true; validateEditField('phone_number'); });
+    watch(() => editFormData.department, () => { editTouched.department = true; validateEditField('department'); });
+    watch(() => editFormData.designation, () => { editTouched.designation = true; validateEditField('designation'); });
+    watch(() => editFormData.salary, () => { editTouched.salary = true; validateEditField('salary'); });
+    watch(() => editFormData.joined_date, () => { editTouched.joined_date = true; validateEditField('joined_date'); });
+    watch(() => editFormData.cnic, () => { editTouched.cnic = true; validateEditField('cnic'); });
+    watch(() => editFormData.gender, () => { editTouched.gender = true; validateEditField('gender'); });
+    watch(() => editFormData.present_address, () => { editTouched.present_address = true; validateEditField('present_address'); });
+    watch(() => editFormData.permanent_address, () => { editTouched.permanent_address = true; validateEditField('permanent_address'); });
+    watch(() => editFormData.emergency_name, () => { editTouched.emergency_name = true; validateEditField('emergency_name'); });
+    watch(() => editFormData.emergency_relation, () => { editTouched.emergency_relation = true; validateEditField('emergency_relation'); });
+    watch(() => editFormData.emergency_cnic, () => { editTouched.emergency_cnic = true; validateEditField('emergency_cnic'); });
+    watch(() => editFormData.emergency_phone, () => { editTouched.emergency_phone = true; validateEditField('emergency_phone'); });
+    watch(() => editFormData.emergency_address, () => { editTouched.emergency_address = true; validateEditField('emergency_address'); });
+    watch(() => editFormData.bank_name, () => { editTouched.bank_name = true; validateEditField('bank_name'); });
+    watch(() => editFormData.branch_name, () => { editTouched.branch_name = true; validateEditField('branch_name'); });
+    watch(() => editFormData.account_number, () => { editTouched.account_number = true; validateEditField('account_number'); });
+    watch(() => editFormData.tax, () => { editTouched.tax = true; validateEditField('tax'); });
+    watch(() => editFormData.insurance_amount, () => { editTouched.insurance_amount = true; validateEditField('insurance_amount'); });
+
+    // ==================== REST OF THE CODE ====================
+    // (Pagination, stats, loadEmployees, updateEmployee, etc. remain the same)
+
+    // ... existing pagination code ...
+
     // Computed for pagination
     const pageNumbers = computed(() => {
         const total = totalPages.value;
@@ -108,7 +524,6 @@ export function useEmployeeDashboard() {
         return pages;
     });
 
-    // Client‑side filtering (case‑insensitive)
     const filteredEmployees = computed(() => {
         if (!searchQuery.value.trim()) {
             return allEmployees.value;
@@ -121,7 +536,6 @@ export function useEmployeeDashboard() {
         );
     });
 
-    // Sorting the filtered list
     const sortedEmployees = computed(() => {
         const list = filteredEmployees.value;
         if (!sortBy.value) return list;
@@ -138,7 +552,6 @@ export function useEmployeeDashboard() {
         });
     });
 
-    // Pagination on the sorted list
     const totalFiltered = computed(() => sortedEmployees.value.length);
     const totalPages = computed(() => Math.ceil(totalFiltered.value / pageSize.value));
 
@@ -148,7 +561,6 @@ export function useEmployeeDashboard() {
         return sortedEmployees.value.slice(start, end);
     });
 
-    // Stats summary (overall, not filtered)
     const statsSummary = reactive({
         total: 0,
         inOffice: 0,
@@ -165,6 +577,7 @@ export function useEmployeeDashboard() {
         }).length;
         statsSummary.awayToday = allEmployees.value.filter(e => e.today_status?.toLowerCase() === 'away').length;
     };
+
     const loadEmployees = async () => {
         const params = {
             search: searchQuery.value,
@@ -177,6 +590,7 @@ export function useEmployeeDashboard() {
             if (searchQuery.value) currentPage.value = 1;
         }
     };
+
     const updateEmployee = async (employeeId, payload) => {
         const result = await employeeStore.updateEmployeeDetails(employeeId, payload);
         if (result.success) {
@@ -193,7 +607,6 @@ export function useEmployeeDashboard() {
         return result;
     };
 
-    // Toggle sorting
     const toggleSort = (field) => {
         if (sortBy.value === field) {
             sortDirection.value = sortDirection.value === 'asc' ? 'desc' : 'asc';
@@ -203,69 +616,35 @@ export function useEmployeeDashboard() {
         }
     };
 
-    // Password validation functions
     const validatePasswordStrength = (password) => {
         const errors = [];
-
-        if (password.length < 8) {
-            errors.push('Password must be at least 8 characters long');
-        }
-
-        if (!/[a-z]/.test(password)) {
-            errors.push('Password must contain at least one lowercase letter');
-        }
-
-        if (!/[A-Z]/.test(password)) {
-            errors.push('Password must contain at least one uppercase letter');
-        }
-
-        if (!/[0-9]/.test(password)) {
-            errors.push('Password must contain at least one number');
-        }
-
-        if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
-            errors.push('Password must contain at least one special character (!@#$%^&* etc.)');
-        }
-
+        if (password.length < 8) errors.push('Password must be at least 8 characters long');
+        if (!/[a-z]/.test(password)) errors.push('Password must contain at least one lowercase letter');
+        if (!/[A-Z]/.test(password)) errors.push('Password must contain at least one uppercase letter');
+        if (!/[0-9]/.test(password)) errors.push('Password must contain at least one number');
+        if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) errors.push('Password must contain at least one special character (!@#$%^&* etc.)');
         return errors;
     };
 
-    const getPasswordRules = (password) => {
-        const rules = [
-            { text: 'At least 8 characters', passed: password.length >= 8 },
-            { text: 'Contains lowercase letter', passed: /[a-z]/.test(password) },
-            { text: 'Contains uppercase letter', passed: /[A-Z]/.test(password) },
-            { text: 'Contains a number', passed: /[0-9]/.test(password) },
-            { text: 'Contains special character (!@#$%^&*)', passed: /[!@#$%^&*(),.?":{}|<>]/.test(password) }
-        ];
-        return rules;
-    };
+    const getPasswordRules = (password) => ([
+        { text: 'At least 8 characters', passed: password.length >= 8 },
+        { text: 'Contains lowercase letter', passed: /[a-z]/.test(password) },
+        { text: 'Contains uppercase letter', passed: /[A-Z]/.test(password) },
+        { text: 'Contains a number', passed: /[0-9]/.test(password) },
+        { text: 'Contains special character (!@#$%^&*)', passed: /[!@#$%^&*(),.?":{}|<>]/.test(password) }
+    ]);
 
     const getStatusColor = (statusId) => {
         const status = employmentStatuses.value.find(s => s.id === statusId);
         if (!status) return '#1e293b';
-
-        const colors = {
-            'Intern': '#7c3aed',
-            'Probation': '#d97706',
-            'Contract': '#4f46e5',
-            'Permanent': '#059669',
-            'Resign': '#dc2626'
-        };
+        const colors = { 'Intern': '#7c3aed', 'Probation': '#d97706', 'Contract': '#4f46e5', 'Permanent': '#059669', 'Resign': '#dc2626' };
         return colors[status.name] || '#1e293b';
     };
 
     const getStatusBgColor = (statusId) => {
         const status = employmentStatuses.value.find(s => s.id === statusId);
         if (!status) return '#f1f5f9';
-
-        const bgColors = {
-            'Intern': '#ede9fe',
-            'Probation': '#fef3c7',
-            'Contract': '#e0e7ff',
-            'Permanent': '#d1fae5',
-            'Resign': '#fee2e2'
-        };
+        const bgColors = { 'Intern': '#ede9fe', 'Probation': '#fef3c7', 'Contract': '#e0e7ff', 'Permanent': '#d1fae5', 'Resign': '#fee2e2' };
         return bgColors[status.name] || '#f1f5f9';
     };
 
@@ -280,29 +659,22 @@ export function useEmployeeDashboard() {
             return employee.status.id;
         }
         if (typeof employee.status === 'string') {
-            const statusObj = employmentStatuses.value.find(s =>
-                s.name.toLowerCase() === employee.status.toLowerCase()
-            );
+            const statusObj = employmentStatuses.value.find(s => s.name.toLowerCase() === employee.status.toLowerCase());
             return statusObj ? statusObj.id : null;
         }
-        if (employee.status_id) {
-            return employee.status_id;
-        }
+        if (employee.status_id) return employee.status_id;
         return null;
     };
 
-    // Modal handlers
+    // ==================== MODAL HANDLERS ====================
+
     const openCreateModal = () => {
         Object.assign(createFormData, {
-            name: '',
-            email: '',
-            phone_number: '',
-            position: '',
-            salary: '',
-            department: '',
-            insurance_amount: '',
-            tax: ''
+            name: '', email: '', phone_number: '', position: '',
+            salary: '', department: '', insurance_amount: '', tax: ''
         });
+        Object.keys(createTouched).forEach((k) => { createTouched[k] = false; });
+        Object.keys(createErrors).forEach((k) => { createErrors[k] = null; });
         isCreateModalOpen.value = true;
     };
 
@@ -311,16 +683,28 @@ export function useEmployeeDashboard() {
     };
 
     const handleCreateEmployee = async () => {
-        if (!createFormData.name.trim() || !createFormData.email.trim()) {
-            showToast('Name and Email are required.', 'error');
-            return;
+        Object.keys(createTouched).forEach((field) => {
+            createTouched[field] = true;
+            validateCreateField(field);
+        });
+
+        let isValid = true;
+        for (const field of Object.keys(createErrors)) {
+            if (createErrors[field]) {
+                isValid = false;
+                break;
+            }
         }
-        if (!createFormData.phone_number.trim()) {
-            showToast('Phone number is required.', 'error');
-            return;
+
+        for (const field of CREATE_REQUIRED_FIELDS) {
+            if (!createFormData[field] || !String(createFormData[field]).trim()) {
+                isValid = false;
+                break;
+            }
         }
-        if (!createFormData.department.trim()) {
-            showToast('Department is required.', 'error');
+
+        if (!isValid) {
+            showToast('Please fill all highlighted fields correctly.', 'error');
             return;
         }
 
@@ -334,17 +718,11 @@ export function useEmployeeDashboard() {
             formDataPayload.append('name', createFormData.name.trim());
             formDataPayload.append('email', createFormData.email.trim());
             formDataPayload.append('phone_number', createFormData.phone_number.trim());
-            formDataPayload.append(
-                'designation',
-                (createFormData.position || '').trim() || 'Employee'
-            );
+            formDataPayload.append('designation', (createFormData.position || '').trim() || 'Employee');
             formDataPayload.append('department', createFormData.department.trim());
             formDataPayload.append('status', 'Intern');
             formDataPayload.append('is_active', 'true');
-            formDataPayload.append(
-                'joined_date',
-                new Date().toISOString().split('T')[0]
-            );
+            formDataPayload.append('joined_date', new Date().toISOString().split('T')[0]);
             if (createFormData.salary) {
                 formDataPayload.append('salary', parseFloat(createFormData.salary));
             }
@@ -369,7 +747,14 @@ export function useEmployeeDashboard() {
                     console.error('Employee created but list refresh failed:', refreshErr);
                 }
             } else {
-                showToast(result.error || 'Failed to create employee', 'error', 6000);
+                let errorMsg = result.error || 'Failed to create employee';
+                if (result.errors) {
+                    const errorDetails = Object.entries(result.errors)
+                        .map(([field, msgs]) => `${field}: ${Array.isArray(msgs) ? msgs.join(', ') : msgs}`)
+                        .join(' | ');
+                    errorMsg += `: ${errorDetails}`;
+                }
+                showToast(errorMsg, 'error', 6000);
             }
         } catch (error) {
             console.error('Failed to create employee:', error);
@@ -388,6 +773,10 @@ export function useEmployeeDashboard() {
         showStrongMessage.value = false;
         if (strongMessageTimeout) clearTimeout(strongMessageTimeout);
 
+        // Reset validation state
+        Object.keys(editTouched).forEach((k) => { editTouched[k] = false; });
+        Object.keys(editErrors).forEach((k) => { editErrors[k] = null; });
+
         Object.assign(editFormData, {
             name: employee.name || employee.full_name || '',
             email: employee.email || '',
@@ -397,7 +786,7 @@ export function useEmployeeDashboard() {
             status: employee.status || employee.employment_status || 'Permanent',
             is_active: employee.is_active === true || employee.is_active === 'true' || employee.account_status === 'Active',
             work_from_home: employee.work_from_home === true || employee.work_from_home === 'true',
-            salary: employee.salary || '',
+            salary: employee.salary ? String(Math.trunc(Number(employee.salary))) : '',              // CHANGED
             joined_date: employee.joined_date || '',
             employee_number: employee.employee_number || '',
             cnic: employee.cnic || '',
@@ -415,8 +804,14 @@ export function useEmployeeDashboard() {
             password: '',
             confirmPassword: '',
             tax: employee.tax || '',
-            insurance_amount: employee.insurance_amount || '',
+            insurance_amount: employee.insurance_amount ? String(Math.trunc(Number(employee.insurance_amount))) : '',  // CHANGED
         });
+
+        EDIT_REQUIRED_FIELDS.forEach(field => {
+            editTouched[field] = true;
+            validateEditField(field);
+        });
+
         isEditModalOpen.value = true;
     };
 
@@ -429,6 +824,33 @@ export function useEmployeeDashboard() {
     };
 
     const handleUpdateEmployee = async () => {
+        // Mark all fields as touched to show errors
+        Object.keys(editTouched).forEach((field) => {
+            editTouched[field] = true;
+            validateEditField(field);
+        });
+
+        // Check if form is valid
+        let isValid = true;
+        for (const field of Object.keys(editErrors)) {
+            if (editErrors[field]) {
+                isValid = false;
+                break;
+            }
+        }
+
+        for (const field of EDIT_REQUIRED_FIELDS) {
+            if (!editFormData[field] || !String(editFormData[field]).trim()) {
+                isValid = false;
+                break;
+            }
+        }
+
+        if (!isValid) {
+            showToast('Please fill all highlighted fields correctly.', 'error');
+            return;
+        }
+
         if (!selectedEmployee.value) return;
 
         const password = editFormData.password;
@@ -453,7 +875,6 @@ export function useEmployeeDashboard() {
         }
 
         passwordError.value = '';
-
         isUpdating.value = true;
         try {
             const payload = {};
@@ -474,11 +895,9 @@ export function useEmployeeDashboard() {
 
             nullableTextFields.forEach((key) => {
                 const value = editFormData[key];
-                if (value === undefined || value === null || value === '') {
-                    payload[key] = null;
-                } else {
-                    payload[key] = typeof value === 'string' ? value.trim() : value;
-                }
+                payload[key] = (value === undefined || value === null || value === '')
+                    ? null
+                    : (typeof value === 'string' ? value.trim() : value);
             });
 
             if (editFormData.joined_date) {
@@ -544,8 +963,6 @@ export function useEmployeeDashboard() {
     };
 
     const handleStatusChange = (employee, newStatusId) => {
-        console.log('Status change triggered:', { employee, newStatusId });
-
         const statusObj = employmentStatuses.value.find(s => s.id === newStatusId);
         if (!statusObj) {
             console.error('Status not found:', newStatusId);
@@ -553,23 +970,16 @@ export function useEmployeeDashboard() {
         }
 
         const currentStatusId = getEmployeeStatusId(employee);
-        console.log('Current status ID:', currentStatusId, 'New status ID:', newStatusId);
+        if (currentStatusId === newStatusId) return;
 
-        if (currentStatusId === newStatusId) {
-            console.log('Status not changed');
-            return;
-        }
         tempStatusId.value = newStatusId;
-
         statusChangeEmployee.value = employee;
         selectedNewStatus.value = statusObj;
         statusFeedback.value = '';
         statusChangeError.value = '';
-
-        console.log('Opening confirmation modal for:', employee.name, 'to', statusObj.name);
-
         showStatusConfirmModal.value = true;
     };
+
     const confirmStatusChange = async () => {
         if (!statusChangeEmployee.value || !selectedNewStatus.value) return;
 
@@ -582,10 +992,7 @@ export function useEmployeeDashboard() {
         statusChangeError.value = '';
 
         try {
-            const payload = {
-                status: selectedNewStatus.value.id
-            };
-
+            const payload = { status: selectedNewStatus.value.id };
             if (statusFeedback.value.trim()) {
                 payload.feedback = statusFeedback.value.trim();
             }
@@ -607,8 +1014,7 @@ export function useEmployeeDashboard() {
                 statusChangeError.value = result.error || 'Failed to update status';
                 showToast(statusChangeError.value, 'error');
                 if (statusChangeEmployee.value) {
-                    const originalStatusId = getEmployeeStatusId(statusChangeEmployee.value);
-                    tempStatusId.value = originalStatusId;
+                    tempStatusId.value = getEmployeeStatusId(statusChangeEmployee.value);
                 }
             }
         } catch (error) {
@@ -616,8 +1022,7 @@ export function useEmployeeDashboard() {
             statusChangeError.value = error.message || 'An error occurred';
             showToast(statusChangeError.value, 'error');
             if (statusChangeEmployee.value) {
-                const originalStatusId = getEmployeeStatusId(statusChangeEmployee.value);
-                tempStatusId.value = originalStatusId;
+                tempStatusId.value = getEmployeeStatusId(statusChangeEmployee.value);
             }
         } finally {
             isChangingStatus.value = false;
@@ -647,6 +1052,7 @@ export function useEmployeeDashboard() {
             prompt('Copy this link:', link);
         }
     };
+
     watch(showModal, (isOpen) => {
         const container = document.getElementById('dashboardScrollContainer');
         if (isOpen) {
@@ -657,6 +1063,7 @@ export function useEmployeeDashboard() {
             if (container) container.classList.remove('!overflow-y-hidden');
         }
     });
+
     watch(() => editFormData.password, (newPassword) => {
         if (!newPassword) {
             passwordStrength.value = '';
@@ -673,12 +1080,9 @@ export function useEmployeeDashboard() {
             passwordStrength.value = 'Strong';
             passwordStrengthColor.value = 'text-green-600';
             passwordStrengthClass.value = 'bg-green-100 border-green-300';
-
             showStrongMessage.value = true;
             if (strongMessageTimeout) clearTimeout(strongMessageTimeout);
-            strongMessageTimeout = setTimeout(() => {
-                showStrongMessage.value = false;
-            }, 2000);
+            strongMessageTimeout = setTimeout(() => { showStrongMessage.value = false; }, 2000);
         } else if (errors.length <= 2) {
             passwordStrength.value = 'Medium';
             passwordStrengthColor.value = 'text-yellow-600';
@@ -693,6 +1097,7 @@ export function useEmployeeDashboard() {
             if (strongMessageTimeout) clearTimeout(strongMessageTimeout);
         }
     });
+
     watch(() => editFormData.confirmPassword, () => {
         if (passwordError.value && passwordError.value.includes('match')) {
             if (editFormData.password === editFormData.confirmPassword) {
@@ -781,5 +1186,33 @@ export function useEmployeeDashboard() {
         initialize,
         cleanup,
         tempStatusId,
+        // Create Employee modal validation
+        createTouched,
+        createErrors,
+        markCreateTouched,
+        validateCreateField,
+        isCreateFormValid,
+        nameHandlers,
+        designationHandlers,
+        departmentHandlers,
+        salaryHandlers,
+        insuranceHandlers,
+        taxHandlers,
+        phoneHandlers,
+        // Edit Employee modal validation
+        editTouched,
+        editErrors,
+        markEditTouched,
+        validateEditField,
+        isEditFormValid,
+        editNameHandlers,
+        editDesignationHandlers,
+        editDepartmentHandlers,
+        editSalaryHandlers,
+        editInsuranceHandlers,
+        editTaxHandlers,
+        editPhoneHandlers,
+        isValidCnic,
+        getCnicError,
     };
 }
