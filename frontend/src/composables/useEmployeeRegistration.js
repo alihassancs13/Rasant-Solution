@@ -266,11 +266,11 @@ export function useEmployeeRegistration(isDirectAccess) {
         validateField('emergency_cnic');
     };
 
-    const makeDigitHandlers = (field, maxDigits = 15) => ({
-        keydown: (e) => blockNonDigitKeydown(e, { allowDecimal: false, maxDigits, currentValue: formData.value[field] }),
-        paste: (e) => blockNonDigitPaste(e, { allowDecimal: false, maxDigits }),
+    const makeDigitHandlers = (field) => ({
+        keydown: (e) => blockNonDigitKeydown(e, { allowDecimal: false, currentValue: formData.value[field] }),
+        paste: (e) => blockNonDigitPaste(e, {}),
         input: (event) => {
-            const digitsOnly = event.target.value.replace(/\D/g, '').slice(0, maxDigits);
+            const digitsOnly = event.target.value.replace(/\D/g, '');
             event.target.value = digitsOnly;
             formData.value[field] = digitsOnly;
             touched.value[field] = true;
@@ -278,11 +278,12 @@ export function useEmployeeRegistration(isDirectAccess) {
         },
     });
 
+
     const phoneHandlers = makeDigitHandlers('phone_number');
     const emergencyPhoneHandlers = makeDigitHandlers('emergency_phone');
 
-    const handleSalaryKeydown = (e) => blockNonDigitKeydown(e, { allowDecimal: true, maxDigits: 10, currentValue: formData.value.salary });
-    const handleSalaryPaste = (e) => blockNonDigitPaste(e, { allowDecimal: true, maxDigits: 10 });
+    const handleSalaryKeydown = (e) => blockNonDigitKeydown(e, { allowDecimal: true, currentValue: formData.value.salary });
+    const handleSalaryPaste = (e) => blockNonDigitPaste(e, { allowDecimal: true });
     const handleSalaryInput = (event) => {
         let value = event.target.value.replace(/[^0-9.]/g, '');
         const parts = value.split('.');
@@ -427,11 +428,27 @@ export function useEmployeeRegistration(isDirectAccess) {
 
             let errorMsg = 'Submission failed';
             if (result.errors && typeof result.errors === 'object') {
-                const parts = Object.entries(result.errors).map(([field, msgs]) => {
-                    const text = Array.isArray(msgs) ? msgs.join(', ') : String(msgs);
-                    return `${field}: ${text}`;
+                // Map backend field errors onto the actual form fields so they highlight red
+                Object.entries(result.errors).forEach(([field, msgs]) => {
+                    const message = Array.isArray(msgs) ? msgs[0] : String(msgs);
+                    if (Object.prototype.hasOwnProperty.call(errors.value, field)) {
+                        errors.value[field] = message.charAt(0).toUpperCase() + message.slice(1);
+                        touched.value[field] = true;
+                    }
                 });
-                if (parts.length) errorMsg = parts.join(' | ');
+
+                // If the failing field is on an earlier step, jump back so the user sees it
+                const failingFields = Object.keys(result.errors);
+                for (let step = 1; step <= totalSteps; step++) {
+                    if (getFieldsForStep(step).some(f => failingFields.includes(f))) {
+                        currentStep.value = step;
+                        break;
+                    }
+                }
+
+                const firstField = failingFields[0];
+                const firstMsg = Array.isArray(result.errors[firstField]) ? result.errors[firstField][0] : result.errors[firstField];
+                errorMsg = firstMsg.charAt(0).toUpperCase() + firstMsg.slice(1);
             } else if (result.error) {
                 errorMsg = result.error;
             }

@@ -195,7 +195,6 @@
                         inputmode="numeric"
                         v-model="formData.phone_number"
                         :required="isDirectAccess"
-                        maxlength="15"
                         :class="[
                         'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
                         (touched.phone_number && errors.phone_number) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
@@ -288,7 +287,6 @@
                         inputmode="decimal"
                         v-model="formData.salary"
                         :required="isDirectAccess"
-                        maxlength="10"
                         :class="[
                         'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
                         (touched.salary && errors.salary) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
@@ -364,7 +362,7 @@
                       v-model="formData.present_address"
                       :required="isDirectAccess"
                       rows="3"
-                      maxlength="250"
+                      
                       :class="[
                       'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
                       (touched.present_address && errors.present_address) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
@@ -384,7 +382,7 @@
                 <!-- Permanent Address -->
                 <div>
                   <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Permanent Address</label>
-                  <textarea v-model="formData.permanent_address" rows="3" maxlength="250" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" placeholder="Your permanent home address"></textarea>
+                  <textarea v-model="formData.permanent_address" rows="3"  class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm" placeholder="Your permanent home address"></textarea>
                 </div>
               </div>
 
@@ -497,7 +495,6 @@
                       inputmode="numeric"
                       v-model="formData.emergency_phone"
                       :required="isDirectAccess"
-                      maxlength="15"
                       :class="[
                       'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
                       (touched.emergency_phone && errors.emergency_phone) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
@@ -519,7 +516,7 @@
                       v-model="formData.emergency_address"
                       :required="isDirectAccess"
                       rows="3"
-                      maxlength="250"
+                      
                       :class="[
                       'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
                       (touched.emergency_address && errors.emergency_address) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
@@ -732,7 +729,6 @@
                       type="text"
                       v-model="formData.account_number"
                       :required="isDirectAccess"
-                      maxlength="24"
                       :class="[
                       'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
                       (touched.account_number && errors.account_number) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'

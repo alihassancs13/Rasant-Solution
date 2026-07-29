@@ -11,6 +11,7 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 from django.contrib.auth import get_user_model
 from .models import Conversation, ConversationMember, Message, MessageReceipt, MessageDeleteFor, MessageAttachment
 from .serializers import ConversationSerializer,ConversationCreateSerializer, MessageSerializer, MessageAttachmentSerializer
+from .chat_utils import get_last_message_for_user
 from django.core.cache import cache
 from django.http import StreamingHttpResponse, HttpResponseForbidden, HttpResponse
 from django.views.decorators.http import require_GET
@@ -129,6 +130,8 @@ def list_conversations(request):
     return Response(
         ConversationSerializer(conversations, many=True, context={'request': request}).data
     )
+
+
 def _deleted_for_me_ids(conv, user):
     return frozenset(
         MessageDeleteFor.objects.filter(
@@ -136,20 +139,6 @@ def _deleted_for_me_ids(conv, user):
         ).values_list('message_id', flat=True)
     )
 
-
-def _get_last_message_for_user(conv, user):
-    last = Message.objects.filter(conversation=conv).exclude(
-        deleted_for__user=user
-    ).order_by('-created_at').first()
-    if not last:
-        return None
-    return {
-        'id': last.id,
-        'content': last.content,
-        'sender_id': last.sender_id,
-        'created_at': last.created_at.isoformat(),
-        'deleted_for_everyone': last.deleted_for_everyone,
-    }
 
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
@@ -390,7 +379,11 @@ def delete_message_for_me(request, message_id):
 
     MessageDeleteFor.objects.get_or_create(message=msg, user=request.user)
 
-    return Response({'status': True, 'message': 'Message deleted for you'}, status=status.HTTP_200_OK)
+    return Response({
+        'status': True,
+        'message': 'Message deleted for you',
+        'last_message': get_last_message_for_user(msg.conversation, request.user),
+    }, status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
@@ -464,12 +457,6 @@ def _avatar_hash(avatar_bytes):
     return hashlib.md5(bytes(avatar_bytes)).hexdigest()
 
 
-def _avatar_hash(avatar_bytes):
-    if not avatar_bytes:
-        return None
-    return hashlib.md5(bytes(avatar_bytes)).hexdigest()
-
-
 def _members_hash(conv):
     rows = ConversationMember.objects.filter(conversation=conv).order_by('user_id').values_list(
         'user_id', 'role', 'left_at'
@@ -508,6 +495,8 @@ def inbox_sse_stream(request):
         user=user, is_delivered=False
     ).update(is_delivered=True, delivered_at=timezone.now())
 
+    AVATAR_CHECK_EVERY_N = 5  # avatar/member hash checks har 5 seconds mein 1 dafa
+
     def event_stream():
         last_message_ids = {}
         sent_receipt_updates = set()
@@ -518,6 +507,7 @@ def inbox_sse_stream(request):
         last_member_avatar_hashes = {}
         last_deleted_for_me_ids = {}
         heartbeat = 0
+        iteration_count = 0
 
         member_conv_ids = list(
             ConversationMember.objects.filter(
@@ -554,6 +544,9 @@ def inbox_sse_stream(request):
 
                 _mark_user_online(user.id)
 
+                iteration_count += 1
+                check_slow_path = (iteration_count % AVATAR_CHECK_EVERY_N == 0)
+
                 current_conv_ids = set(
                     ConversationMember.objects.filter(
                         user=user, left_at__isnull=True
@@ -588,62 +581,11 @@ def inbox_sse_stream(request):
                     conv = membership.conversation
                     last_id = last_message_ids.get(conv.id, 0)
 
-                    try:
-                        current_members_hash = _members_hash(conv)
-                        previous_members_hash = last_members_hash.get(conv.id)
-                        if current_members_hash != previous_members_hash:
-                            last_members_hash[conv.id] = current_members_hash
-                            members_payload = ConversationSerializer(conv, context={'request': request}).data.get('members', [])
-                            data = {
-                                'type': 'members_updated',
-                                'conversation_id': conv.id,
-                                'members': members_payload,
-                            }
-                            yield f"data: {json.dumps(data)}\n\n"
-                    except Exception:
-                        logger.exception('members_updated event failed for conversation %s (user %s)', conv.id, user.id)
-
-                    current_hash = _avatar_hash(conv.avatar)
-                    previous_hash = last_avatar_hashes.get(conv.id)
-                    if current_hash != previous_hash:
-                        last_avatar_hashes[conv.id] = current_hash
-                        data = {
-                            'type': 'group_avatar_updated',
-                            'conversation_id': conv.id,
-                            'has_avatar': bool(conv.avatar),
-                        }
-                        yield f"data: {json.dumps(data)}\n\n"
-
-                    try:
-                        current_member_avatars = _current_member_avatars(conv)
-                        prev_member_avatars = last_member_avatar_hashes.get(conv.id, {})
-                        for uid, h in current_member_avatars.items():
-                            if prev_member_avatars.get(uid) != h:
-                                data = {
-                                    'type': 'member_avatar_updated',
-                                    'conversation_id': conv.id,
-                                    'user_id': uid,
-                                    'has_avatar': bool(h),
-                                }
-                                yield f"data: {json.dumps(data)}\n\n"
-                        last_member_avatar_hashes[conv.id] = current_member_avatars
-                    except Exception:
-                        logger.exception('member_avatar_updated event failed for conversation %s (user %s)', conv.id, user.id)
-
-                    try:
-                        current_deleted_ids = _deleted_for_me_ids(conv, user)
-                        previous_deleted_ids = last_deleted_for_me_ids.get(conv.id, frozenset())
-                        if current_deleted_ids != previous_deleted_ids:
-                            last_deleted_for_me_ids[conv.id] = current_deleted_ids
-                            data = {
-                                'type': 'last_message_updated',
-                                'conversation_id': conv.id,
-                                'last_message': _get_last_message_for_user(conv, user),
-                            }
-                            yield f"data: {json.dumps(data)}\n\n"
-                    except Exception:
-                        logger.exception('last_message_updated event failed for conversation %s (user %s)', conv.id, user.id)
-
+                    # ---------------- FAST PATH ----------------
+                    # Naye messages, deletions, aur delivery/read ticks —
+                    # ye sabse zaroori/real-time cheezein hain, isliye
+                    # inhe avatar/member hashing se PEHLE process karo
+                    # taake ticks bina kisi extra overhead ke turant nikal jayein.
                     new_msgs = Message.objects.filter(
                         conversation=conv,
                         id__gt=last_id
@@ -735,6 +677,69 @@ def inbox_sse_stream(request):
                             'is_delivered': receipt.is_delivered,
                         }
                         yield f"data: {json.dumps(data)}\n\n"
+
+                    # ---------------- SLOW PATH ----------------
+                    # Avatar / member-list / deleted-for-me checks — ye
+                    # kam frequently badalte hain, is liye har second
+                    # nahi, sirf har AVATAR_CHECK_EVERY_N seconds mein
+                    # ek dafa chalao. Isse ticks ke fast-path par koi
+                    # extra DB/blob-hashing overhead nahi padta.
+                    if check_slow_path:
+                        try:
+                            current_members_hash = _members_hash(conv)
+                            previous_members_hash = last_members_hash.get(conv.id)
+                            if current_members_hash != previous_members_hash:
+                                last_members_hash[conv.id] = current_members_hash
+                                members_payload = ConversationSerializer(conv, context={'request': request}).data.get('members', [])
+                                data = {
+                                    'type': 'members_updated',
+                                    'conversation_id': conv.id,
+                                    'members': members_payload,
+                                }
+                                yield f"data: {json.dumps(data)}\n\n"
+                        except Exception:
+                            logger.exception('members_updated event failed for conversation %s (user %s)', conv.id, user.id)
+
+                        current_hash = _avatar_hash(conv.avatar)
+                        previous_hash = last_avatar_hashes.get(conv.id)
+                        if current_hash != previous_hash:
+                            last_avatar_hashes[conv.id] = current_hash
+                            data = {
+                                'type': 'group_avatar_updated',
+                                'conversation_id': conv.id,
+                                'has_avatar': bool(conv.avatar),
+                            }
+                            yield f"data: {json.dumps(data)}\n\n"
+
+                        try:
+                            current_member_avatars = _current_member_avatars(conv)
+                            prev_member_avatars = last_member_avatar_hashes.get(conv.id, {})
+                            for uid, h in current_member_avatars.items():
+                                if prev_member_avatars.get(uid) != h:
+                                    data = {
+                                        'type': 'member_avatar_updated',
+                                        'conversation_id': conv.id,
+                                        'user_id': uid,
+                                        'has_avatar': bool(h),
+                                    }
+                                    yield f"data: {json.dumps(data)}\n\n"
+                            last_member_avatar_hashes[conv.id] = current_member_avatars
+                        except Exception:
+                            logger.exception('member_avatar_updated event failed for conversation %s (user %s)', conv.id, user.id)
+
+                        try:
+                            current_deleted_ids = _deleted_for_me_ids(conv, user)
+                            previous_deleted_ids = last_deleted_for_me_ids.get(conv.id, frozenset())
+                            if current_deleted_ids != previous_deleted_ids:
+                                last_deleted_for_me_ids[conv.id] = current_deleted_ids
+                                data = {
+                                    'type': 'last_message_updated',
+                                    'conversation_id': conv.id,
+                                    'last_message': get_last_message_for_user(conv, user),
+                                }
+                                yield f"data: {json.dumps(data)}\n\n"
+                        except Exception:
+                            logger.exception('last_message_updated event failed for conversation %s (user %s)', conv.id, user.id)
 
                 heartbeat += 1
                 if heartbeat >= 15:

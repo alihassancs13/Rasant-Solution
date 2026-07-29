@@ -9,6 +9,7 @@ from .models import (
     MessageDeleteFor,
     MessageAttachment,
 )
+from .chat_utils import get_last_message_for_user
 
 User = get_user_model()
 
@@ -159,18 +160,9 @@ class ConversationSerializer(serializers.ModelSerializer):
 
     def get_last_message(self, obj):
         request = self.context.get('request')
-        last = obj.messages.exclude(
-            deleted_for__user=request.user
-        ).order_by('-created_at').first() if request else obj.messages.order_by('-created_at').first()
-        if not last:
+        if not request or not request.user.is_authenticated:
             return None
-        return {
-            'id': last.id,
-            'content': last.content,
-            'sender_id': last.sender_id,
-            'created_at': last.created_at,
-            'deleted_for_everyone': last.deleted_for_everyone,
-        }
+        return get_last_message_for_user(obj, request.user)
 
     def get_unread_count(self, obj):
         request = self.context.get('request')

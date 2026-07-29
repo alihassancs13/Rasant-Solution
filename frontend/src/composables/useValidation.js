@@ -212,6 +212,14 @@ export function useValidation() {
     const blockNonAlphaKeydown = (e) => {
         if (NAV_KEYS.includes(e.key) || e.ctrlKey || e.metaKey) return;
         if (!/^[A-Za-z\s]$/.test(e.key)) e.preventDefault();
+
+    };
+    const getAccountNumberError = (value, max = 24, fieldName = 'Account no / IBAN number') => {
+        const trimmed = (value || '').trim();
+        if (!trimmed) return `${fieldName} is required.`;
+        if (trimmed.length > max) return `${fieldName} must not exceed ${max} characters.`;
+        if (!/^[A-Za-z0-9-]+$/.test(trimmed)) return `${fieldName} must contain only letters, numbers, and hyphens.`;
+        return null;
     };
 
     const blockNonAlphaPaste = (e) => {
@@ -238,6 +246,7 @@ export function useValidation() {
         getGraceMinutesError,
         getAllowedPaidLimitError,
         getUnpaidAbsentsError,
+        getAccountNumberError,
         getOvertimeRateError,
         getFreeLatesError,
         getOfficeRadiusError,

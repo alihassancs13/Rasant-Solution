@@ -153,6 +153,16 @@ export const useInboxStore = defineStore('inbox', {
             }
         },
 
+        // NAYA — jab kisi thread ka last message locally badalta hai (delete for me,
+        // delete for everyone, clear chat, ya naya message aana) to cached
+        // `conversations` list (jo dobara "list conversations" call na hone tak
+        // stale reh jaati thi) ko bhi turant sync kar do. `lastMessage` null ho to
+        // matlab "No messages yet".
+        updateConversationLastMessage(conversationId, lastMessage) {
+            const conv = this.conversations.find((c) => c.id === conversationId);
+            if (conv) conv.last_message = lastMessage;
+        },
+
         async deleteMessageForMe(messageId) {
             const response = await apiClient.post(API_ENDPOINTS.INBOX_DELETE_FOR_ME(messageId));
             return response.data;

@@ -41,6 +41,23 @@ const mapReceipts = (raw) => (raw || []).map(r => ({
     is_delivered: r.is_delivered,
 }));
 
+
+const messagePreviewText = (msg) => {
+    if (msg.deletedForEveryone) return 'This message was deleted';
+    if (msg.text) return msg.text;
+    if (msg.attachments?.length) return msg.attachments[0].file_name;
+    return '';
+};
+
+const apiLastMessagePreview = (lastMsg) => {
+    if (!lastMsg) return '';
+    if (lastMsg.deleted_for_everyone) return 'This message was deleted';
+    if (lastMsg.content) return lastMsg.content;
+    if (lastMsg.attachments?.length) return lastMsg.attachments[0].file_name;
+    return '';
+};
+
+
 const convToThread = (conv, uid) => {
     const other = conv.members?.find(m => m.user.id !== uid);
     const last = conv.last_message;
@@ -53,7 +70,7 @@ const convToThread = (conv, uid) => {
         hasAvatar: conv.type === 'group' ? (conv.has_avatar || false) : (other?.user?.has_avatar || false),
         online: false, unread: conv.unread_count || 0,
         lastMessageAt: last?.created_at ? new Date(last.created_at) : new Date(conv.created_at),
-        lastMessage: last ? (last.deleted_for_everyone ? 'This message was deleted' : last.content) : '',
+        lastMessage: last ? apiLastMessagePreview(last) : '',
         messages: [], messagesLoaded: false, members: conv.members || [],
     };
 };
@@ -69,6 +86,26 @@ const msgToUi = (msg, uid) => {
         deletedForEveryone: msg.deleted_for_everyone, receipts,
         attachments: mapAttachments(msg.attachments),
     };
+};
+
+// ---------- Date helpers (thread-list preview aur in-chat date separators dono
+// isi ek pattern ko follow karte hain — WhatsApp jaisa: Today / Yesterday /
+// weekday agar pichhle 7 din mein ho / warna dd/mm/yyyy) ----------
+const dayDiff = (date) => {
+    const d = new Date(date), now = new Date();
+    return Math.round(
+        (new Date(now.getFullYear(), now.getMonth(), now.getDate()) -
+            new Date(d.getFullYear(), d.getMonth(), d.getDate())) / 86400000
+    );
+};
+
+const formatDayLabel = (date) => {
+    const d = new Date(date);
+    const diffDays = dayDiff(date);
+    if (diffDays <= 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return d.toLocaleDateString([], { weekday: 'long' });
+    return d.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' });
 };
 
 export function useInboxPage() {
@@ -206,15 +243,30 @@ export function useInboxPage() {
         return contacts.value.filter(c => !activeIds.has(c.id) && (!q || c.name.toLowerCase().includes(q)));
     });
 
-    const formatMessageTime = (date) => {
-        const d = new Date(date), now = new Date();
-        const diffDays = Math.round((new Date(now.getFullYear(), now.getMonth(), now.getDate()) - new Date(d.getFullYear(), d.getMonth(), d.getDate())) / 86400000);
-        if (diffDays <= 0) return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
-        if (diffDays === 1) return 'Yesterday';
-        if (diffDays < 7) return d.toLocaleDateString([], { weekday: 'long' });
-        return d.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' });
-    };
+    const formatMessageTime = (date) => formatDayLabel(date);
     const formatBubbleTime = (date) => new Date(date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true });
+
+    // NAYA — chat window ke andar messages ke beech WhatsApp jaisa date divider
+    // ("Today" / "Yesterday" / weekday / dd-mm-yyyy). Thread-list preview
+    // (formatMessageTime) jo pattern use karta hai, isi ko yahan bhi follow
+    // kiya gaya hai (formatDayLabel shared helper).
+    const formatDateSeparator = (date) => formatDayLabel(date);
+
+    const groupedMessages = computed(() => {
+        const msgs = activeThread.value?.messages || [];
+        const result = [];
+        let lastDateKey = null;
+        for (const msg of msgs) {
+            const dateKey = new Date(msg.timestamp).toDateString();
+            if (dateKey !== lastDateKey) {
+                result.push({ _type: 'date-separator', _key: `sep-${dateKey}`, label: formatDateSeparator(msg.timestamp) });
+                lastDateKey = dateKey;
+            }
+            result.push({ _type: 'message', ...msg });
+        }
+        return result;
+    });
+
     const scrollToBottom = () => nextTick(() => { if (messagesContainer.value) messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight; });
 
     async function loadConversations() {
@@ -362,6 +414,27 @@ export function useInboxPage() {
         link.remove();
     }
 
+    // NAYA — jab bhi thread ke messages badalte hain (delete/clear/naya message),
+    // is function ko call karo taake dono jagah — local thread.lastMessage AND
+    // inboxStore.conversations cache — hamesha sync rahein. Isi wajah se
+    // refresh ke baad ya conversation list ke dobara load hone par purana
+    // (deleted) message wapas nahi dikhega.
+    function refreshThreadPreview(thread) {
+        if (!thread.messages.length) {
+            thread.lastMessage = '';
+            inboxStore.updateConversationLastMessage(thread.id, null);
+            return;
+        }
+        const last = thread.messages.at(-1);
+        thread.lastMessage = messagePreviewText(last);
+        thread.lastMessageAt = last.timestamp;
+        inboxStore.updateConversationLastMessage(thread.id, {
+            content: last.text,
+            deleted_for_everyone: last.deletedForEveryone,
+            created_at: last.timestamp instanceof Date ? last.timestamp.toISOString() : last.timestamp,
+        });
+    }
+
     async function sendMessage() {
         const text = messageText.value.trim();
         const filesToSend = [...selectedFiles.value];
@@ -408,6 +481,7 @@ export function useInboxPage() {
                     const idx = thread.messages.findIndex((m) => m.id === tempId);
                     if (idx !== -1) thread.messages.splice(idx, 1, uiMsg);
                     autoloadImageAttachments(uiMsg.attachments);
+                    refreshThreadPreview(thread);
                 } catch (err) {
                     console.error('Failed to send attachment message:', f.file.name, err);
                     const failed = thread.messages.find((m) => m.id === tempId);
@@ -443,6 +517,7 @@ export function useInboxPage() {
             if (idx !== -1) thread.messages.splice(idx, 1, uiMsg);
             pendingQueue.value = pendingQueue.value.filter(m => m.id !== pendingMsg.id);
             savePendingQueue();
+            refreshThreadPreview(thread);
         } catch (err) {
             console.warn('Message still pending:', err?.message);
         }finally {
@@ -528,6 +603,14 @@ export function useInboxPage() {
             })();
             return;
         }
+        if (data.type === 'last_message_updated') {
+            if (!thread) return;
+            const lm = data.last_message;
+            thread.lastMessage = lm ? apiLastMessagePreview(lm) : '';
+            thread.lastMessageAt = lm?.created_at ? new Date(lm.created_at) : thread.lastMessageAt;
+            inboxStore.updateConversationLastMessage(data.conversation_id, lm || null);
+            return;
+        }
 
         if (data.type === 'read_receipt' || data.type === 'delivery_receipt') {
             if (!thread) return;
@@ -547,7 +630,7 @@ export function useInboxPage() {
             if (!thread) return;
             const msg = thread.messages.find(m => m.id === data.id);
             if (msg) { msg.deletedForEveryone = true; msg.text = 'This message was deleted'; delete msg.status; }
-            if (thread.messages.at(-1)?.id === data.id) thread.lastMessage = 'This message was deleted';
+            if (thread.messages.at(-1)?.id === data.id) refreshThreadPreview(thread);
             return;
         }
 
@@ -563,8 +646,7 @@ export function useInboxPage() {
         };
         thread.messages.push(uiMsg);
         autoloadImageAttachments(uiMsg.attachments);
-        thread.lastMessage = uiMsg.text;
-        thread.lastMessageAt = uiMsg.timestamp;
+        refreshThreadPreview(thread);
 
         if (thread.id !== activeThreadId.value) {
             thread.unread++;
@@ -605,13 +687,6 @@ export function useInboxPage() {
         closeContactsPanel();
     }
 
-    function refreshThreadPreview(thread) {
-        if (!thread.messages.length) { thread.lastMessage = ''; return; }
-        const last = thread.messages.at(-1);
-        thread.lastMessage = last.deletedForEveryone ? 'This message was deleted' : last.text;
-        thread.lastMessageAt = last.timestamp;
-    }
-
     function positionMenu(x, y, w = 200, h = 96) {
         const pad = 8;
         if (x + w + pad > window.innerWidth) x = window.innerWidth - w - pad;
@@ -620,7 +695,6 @@ export function useInboxPage() {
     }
 
     function openContextMenu(event, msg, threadId) {
-        if (!msg.fromMe) return;
         event.preventDefault();
         contextMenu.message = msg;
         contextMenu.threadId = threadId;
@@ -630,7 +704,6 @@ export function useInboxPage() {
     const closeContextMenu = () => { contextMenu.visible = false; contextMenu.message = null; contextMenu.threadId = null; };
 
     function handleTouchStart(event, msg, threadId) {
-        if (!msg.fromMe) return;
         const t = event.touches[0];
         touchStartX = t.clientX; touchStartY = t.clientY; longPressFired = false;
         longPressTimer = setTimeout(() => {
@@ -710,7 +783,7 @@ export function useInboxPage() {
                 try {
                     await inboxStore.clearChat(thread.id, false);
                     thread.messages = [];
-                    thread.lastMessage = '';
+                    refreshThreadPreview(thread);
                 } catch (err) { console.error(err); }
             },
         });
@@ -840,6 +913,7 @@ export function useInboxPage() {
         }
     }
 
+
     function requestLeaveGroup() {
         if (activeThread.value?.type !== 'group') return;
         const thread = activeThread.value;
@@ -883,6 +957,7 @@ export function useInboxPage() {
         isLoading, threads, contacts, activeThreadId, searchQuery, messageText, mobileChatOpen, messagesContainer,
         showContactsPanel, contactSearchQuery, contactsLoading, showChatMenu, contextMenu, confirmModal,
         filteredThreads, filteredContacts, activeThread, formatMessageTime, formatBubbleTime,
+        formatDateSeparator, groupedMessages,
         selectThread, backToList, sendMessage, openContactsPanel, closeContactsPanel, startChatWithContact,
         openContextMenu, closeContextMenu, handleTouchStart, handleTouchMove, handleTouchEnd,
         requestDeleteForMe, requestDeleteForEveryone, toggleChatMenu, requestClearChat, requestDeleteChat,

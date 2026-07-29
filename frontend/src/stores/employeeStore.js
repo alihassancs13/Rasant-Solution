@@ -116,23 +116,33 @@ export const useEmployeeStore = defineStore('employee', {
 
                 if (!response.ok) {
                     let errorMsg = `HTTP Error: ${response.status}`;
-                    if (responseData && responseData.error) {
+                    let fieldErrors = null;
+
+                    if (responseData && responseData.errors && typeof responseData.errors === 'object') {
+                        fieldErrors = responseData.errors;
+                        const firstKey = Object.keys(fieldErrors)[0];
+                        const firstVal = fieldErrors[firstKey];
+                        errorMsg = Array.isArray(firstVal) ? firstVal[0] : String(firstVal);
+                    } else if (responseData && responseData.error) {
                         errorMsg = responseData.error;
                     } else if (responseData && responseData.message) {
                         errorMsg = responseData.message;
                     } else if (responseData && typeof responseData === 'object') {
-                        // Handle Django field errors
-                        const errors = Object.entries(responseData)
-                            .map(([field, msgs]) => {
-                                if (Array.isArray(msgs)) {
-                                    return `${field}: ${msgs.join(', ')}`;
-                                }
-                                return `${field}: ${msgs}`;
-                            })
-                            .join('; ');
-                        if (errors) errorMsg = errors;
+                        // Handle Django field errors (flat object of field: messages)
+                        fieldErrors = responseData;
+                        const firstKey = Object.keys(responseData)[0];
+                        const firstVal = responseData[firstKey];
+                        if (firstKey !== undefined) {
+                            errorMsg = Array.isArray(firstVal) ? firstVal[0] : String(firstVal);
+                        }
                     }
-                    throw new Error(errorMsg);
+
+                    return {
+                        success: false,
+                        error: errorMsg,
+                        errors: fieldErrors,
+                        data: null
+                    };
                 }
                 // Success - update local state
                 if (responseData && responseData.success !== false) {
@@ -155,6 +165,7 @@ export const useEmployeeStore = defineStore('employee', {
                 return {
                     success: false,
                     error: this.error,
+                    errors: null,
                     data: null
                 };
             } finally {
@@ -201,34 +212,38 @@ export const useEmployeeStore = defineStore('employee', {
 
                 if (!response.ok) {
                     let errorMsg = 'Failed to add employee';
+                    let fieldErrors = null;
 
                     if (responseData && typeof responseData === 'object') {
-                        if (responseData.error) {
+                        if (responseData.errors && typeof responseData.errors === 'object') {
+                            // Backend already sends a nested "errors" object — use it directly
+                            fieldErrors = responseData.errors;
+                            const firstKey = Object.keys(fieldErrors)[0];
+                            const firstVal = fieldErrors[firstKey];
+                            errorMsg = Array.isArray(firstVal) ? firstVal[0] : String(firstVal);
+                        } else if (responseData.error) {
                             errorMsg = responseData.error;
-                        }
-                        else if (responseData.message) {
+                        } else if (responseData.message) {
                             errorMsg = responseData.message;
-                        }
-                        else {
-                            const errorMessages = [];
-                            for (const [field, errors] of Object.entries(responseData)) {
-                                if (Array.isArray(errors)) {
-                                    errorMessages.push(`${field}: ${errors.join(', ')}`);
-                                } else if (typeof errors === 'string') {
-                                    errorMessages.push(`${field}: ${errors}`);
-                                } else if (typeof errors === 'object') {
-                                    errorMessages.push(`${field}: ${JSON.stringify(errors)}`);
-                                }
-                            }
-                            if (errorMessages.length > 0) {
-                                errorMsg = errorMessages.join('; ');
+                        } else {
+                            // Flat field:messages object (e.g. { email: [...] })
+                            fieldErrors = responseData;
+                            const firstKey = Object.keys(responseData)[0];
+                            if (firstKey !== undefined) {
+                                const firstVal = responseData[firstKey];
+                                errorMsg = Array.isArray(firstVal) ? firstVal[0] : String(firstVal);
                             }
                         }
                     } else if (typeof responseData === 'string') {
                         errorMsg = responseData;
                     }
 
-                    throw new Error(errorMsg);
+                    return {
+                        success: false,
+                        error: errorMsg,
+                        errors: fieldErrors,
+                        data: null
+                    };
                 }
 
                 // Success case
@@ -253,6 +268,7 @@ export const useEmployeeStore = defineStore('employee', {
                 return {
                     success: false,
                     error: this.error,
+                    errors: null,
                     data: null
                 };
             } finally {
@@ -317,22 +333,32 @@ export const useEmployeeStore = defineStore('employee', {
 
                 if (!response.ok) {
                     let errorMsg = `HTTP Error: ${response.status}`;
-                    if (responseData && responseData.error) {
+                    let fieldErrors = null;
+
+                    if (responseData && responseData.errors && typeof responseData.errors === 'object') {
+                        fieldErrors = responseData.errors;
+                        const firstKey = Object.keys(fieldErrors)[0];
+                        const firstVal = fieldErrors[firstKey];
+                        errorMsg = Array.isArray(firstVal) ? firstVal[0] : String(firstVal);
+                    } else if (responseData && responseData.error) {
                         errorMsg = responseData.error;
                     } else if (responseData && responseData.message) {
                         errorMsg = responseData.message;
                     } else if (responseData && typeof responseData === 'object') {
-                        const errors = Object.entries(responseData)
-                            .map(([field, msgs]) => {
-                                if (Array.isArray(msgs)) {
-                                    return `${field}: ${msgs.join(', ')}`;
-                                }
-                                return `${field}: ${msgs}`;
-                            })
-                            .join('; ');
-                        if (errors) errorMsg = errors;
+                        fieldErrors = responseData;
+                        const firstKey = Object.keys(responseData)[0];
+                        if (firstKey !== undefined) {
+                            const firstVal = responseData[firstKey];
+                            errorMsg = Array.isArray(firstVal) ? firstVal[0] : String(firstVal);
+                        }
                     }
-                    throw new Error(errorMsg);
+
+                    return {
+                        success: false,
+                        error: errorMsg,
+                        errors: fieldErrors,
+                        data: null
+                    };
                 }
 
                 // Update local employee data
@@ -355,6 +381,7 @@ export const useEmployeeStore = defineStore('employee', {
                 return {
                     success: false,
                     error: this.error,
+                    errors: null,
                     data: null
                 };
             } finally {

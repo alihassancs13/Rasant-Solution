@@ -9,7 +9,7 @@ const {
   showContactsPanel, contactSearchQuery, contactsLoading,
   showChatMenu, contextMenu, confirmModal,
   filteredThreads, filteredContacts, activeThread,
-  formatMessageTime, formatBubbleTime,
+  formatMessageTime, formatBubbleTime, groupedMessages,
   selectThread, backToList, sendMessage,
   openContactsPanel, closeContactsPanel, startChatWithContact,
   openContextMenu, handleTouchStart, handleTouchMove, handleTouchEnd,
@@ -200,69 +200,80 @@ const {
                 </div>
 
                 <div ref="messagesContainer" class="flex-1 space-y-3 overflow-y-auto bg-messages-gradient px-4 py-4 scrollbar-whatsapp">
-                  <div v-for="msg in activeThread.messages" :key="msg.id" class="flex" :class="msg.fromMe ? 'justify-end' : 'justify-start'">
-                    <div class="max-w-[75%] select-none rounded-xl px-3.5 py-2 text-sm leading-relaxed"
-                         :class="[msg.fromMe ? 'rounded-br-[4px] bg-chat-bubble-me-gradient text-white shadow-bubble-me' : 'rounded-bl-[4px] border border-border bg-card text-text-primary shadow-[var(--shadow-sm)]', msg.fromMe ? 'cursor-pointer' : 'cursor-default']"
-                         style="touch-action: manipulation;"
-                         @contextmenu="openContextMenu($event, msg, activeThread.id)"
-                         @touchstart="handleTouchStart($event, msg, activeThread.id)"
-                         @touchmove="handleTouchMove($event)" @touchend="handleTouchEnd($event)">
-                      <p v-if="msg.deletedForEveryone" class="italic opacity-70">
-                        <i class="fa-solid fa-ban mr-1 text-[11px]"></i> This message was deleted
-                      </p>
-                      <p v-else-if="msg.text" class="whitespace-pre-wrap break-words">{{ msg.text }}</p>
-                      <div v-if="msg.attachments?.length && !msg.deletedForEveryone" class="mt-1.5 space-y-1.5">
-                        <div v-for="att in msg.attachments" :key="att.id">
-                          <!-- Image -->
-                          <div v-if="att.media_type === 'image'" class="overflow-hidden rounded-lg cursor-pointer" @click="attachmentAction(att)">
-                            <img v-if="att.url" :src="att.url" class="max-h-64 w-full object-cover" />
-                            <div v-else class="flex h-32 w-48 items-center justify-center bg-black/10">
-                              <font-awesome-icon :icon="['fas', 'spinner']" spin class="text-[18px]" :class="msg.fromMe ? 'text-white/80' : 'text-text-muted'" />
-                            </div>
-                          </div>
+                  <template v-for="item in groupedMessages" :key="item._type === 'date-separator' ? item._key : item.id">
 
-                          <!-- Video -->
-                          <div v-else-if="att.media_type === 'video'" class="overflow-hidden rounded-lg">
-                            <video v-if="att.url" :src="att.url" controls class="max-h-64 w-full rounded-lg"></video>
-                            <button v-else type="button" @click="loadAttachmentUrl(att)"
-                                    class="flex h-32 w-48 items-center justify-center rounded-lg bg-black/10 cursor-pointer">
-                              <font-awesome-icon :icon="['fas', att.loading ? 'spinner' : 'circle-play']" :spin="att.loading" class="text-[20px]" :class="msg.fromMe ? 'text-white/80' : 'text-text-muted'" />
+                    <!-- Date divider chip (WhatsApp-style: Today / Yesterday / weekday / dd-mm-yyyy) -->
+                    <div v-if="item._type === 'date-separator'" class="flex justify-center py-1">
+                      <span class="rounded-full bg-black/10 px-3 py-1 text-[11px] font-medium text-text-secondary shadow-sm">
+                        {{ item.label }}
+                      </span>
+                    </div>
+
+                    <!-- Message bubble -->
+                    <div v-else class="flex" :class="item.fromMe ? 'justify-end' : 'justify-start'">
+                      <div class="max-w-[75%] select-none rounded-xl px-3.5 py-2 text-sm leading-relaxed"
+                           :class="[item.fromMe ? 'rounded-br-[4px] bg-chat-bubble-me-gradient text-white shadow-bubble-me' : 'rounded-bl-[4px] border border-border bg-card text-text-primary shadow-[var(--shadow-sm)]', item.fromMe ? 'cursor-pointer' : 'cursor-default']"
+                           style="touch-action: manipulation;"
+                           @contextmenu="openContextMenu($event, item, activeThread.id)"
+                           @touchstart="handleTouchStart($event, item, activeThread.id)"
+                           @touchmove="handleTouchMove($event)" @touchend="handleTouchEnd($event)">
+                        <p v-if="item.deletedForEveryone" class="italic opacity-70">
+                          <i class="fa-solid fa-ban mr-1 text-[11px]"></i> This message was deleted
+                        </p>
+                        <p v-else-if="item.text" class="whitespace-pre-wrap break-words">{{ item.text }}</p>
+                        <div v-if="item.attachments?.length && !item.deletedForEveryone" class="mt-1.5 space-y-1.5">
+                          <div v-for="att in item.attachments" :key="att.id">
+                            <!-- Image -->
+                            <div v-if="att.media_type === 'image'" class="overflow-hidden rounded-lg cursor-pointer" @click="attachmentAction(att)">
+                              <img v-if="att.url" :src="att.url" class="max-h-64 w-full object-cover" />
+                              <div v-else class="flex h-32 w-48 items-center justify-center bg-black/10">
+                                <font-awesome-icon :icon="['fas', 'spinner']" spin class="text-[18px]" :class="item.fromMe ? 'text-white/80' : 'text-text-muted'" />
+                              </div>
+                            </div>
+
+                            <!-- Video -->
+                            <div v-else-if="att.media_type === 'video'" class="overflow-hidden rounded-lg">
+                              <video v-if="att.url" :src="att.url" controls class="max-h-64 w-full rounded-lg"></video>
+                              <button v-else type="button" @click="loadAttachmentUrl(att)"
+                                      class="flex h-32 w-48 items-center justify-center rounded-lg bg-black/10 cursor-pointer">
+                                <font-awesome-icon :icon="['fas', att.loading ? 'spinner' : 'circle-play']" :spin="att.loading" class="text-[20px]" :class="item.fromMe ? 'text-white/80' : 'text-text-muted'" />
+                              </button>
+                            </div>
+
+                            <!-- Audio -->
+                            <div v-else-if="att.media_type === 'audio'" class="w-85">
+                              <audio v-if="att.url" :src="att.url" controls class="w-full"></audio>
+                              <button v-else type="button" @click="loadAttachmentUrl(att)"
+                                      class="flex w-full items-center gap-2 rounded-lg px-3 py-2 cursor-pointer"
+                                      :class="item.fromMe ? 'bg-white/15 text-white' : 'bg-surface-alt text-text-primary'">
+                                <font-awesome-icon :icon="['fas', att.loading ? 'spinner' : 'circle-play']" :spin="att.loading" class="text-[16px]" />
+                                <span class="truncate text-xs">{{ att.file_name }}</span>
+                              </button>
+                            </div>
+
+                            <!-- Document (catch-all: zip, exe, sql, pdf, etc.) -->
+                            <button v-else type="button" @click="attachmentAction(att)"
+                                    class="flex w-56 items-center gap-2.5 rounded-lg px-3 py-2.5 cursor-pointer"
+                                    :class="item.fromMe ? 'bg-white/15 text-white hover:bg-white/20' : 'bg-surface-alt text-text-primary hover:bg-surface'">
+                              <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg" :class="item.fromMe ? 'bg-white/20' : 'bg-primary/10 text-primary'">
+                                <font-awesome-icon :icon="['fas', att.loading ? 'spinner' : 'file']" :spin="att.loading" class="text-[16px]" />
+                              </div>
+                              <div class="min-w-0 flex-1 text-left">
+                                <p class="truncate text-xs font-medium">{{ att.file_name }}</p>
+                                <p class="text-[10px] opacity-70">{{ (att.file_size / 1024).toFixed(0) }} KB</p>
+                              </div>
+                              <font-awesome-icon :icon="['fas', 'download']" class="text-[12px] shrink-0 opacity-70" />
                             </button>
                           </div>
-
-                          <!-- Audio -->
-                          <div v-else-if="att.media_type === 'audio'" class="w-85">
-                            <audio v-if="att.url" :src="att.url" controls class="w-full"></audio>
-                            <button v-else type="button" @click="loadAttachmentUrl(att)"
-                                    class="flex w-full items-center gap-2 rounded-lg px-3 py-2 cursor-pointer"
-                                    :class="msg.fromMe ? 'bg-white/15 text-white' : 'bg-surface-alt text-text-primary'">
-                              <font-awesome-icon :icon="['fas', att.loading ? 'spinner' : 'circle-play']" :spin="att.loading" class="text-[16px]" />
-                              <span class="truncate text-xs">{{ att.file_name }}</span>
-                            </button>
-                          </div>
-
-                          <!-- Document (catch-all: zip, exe, sql, pdf, etc.) -->
-                          <button v-else type="button" @click="attachmentAction(att)"
-                                  class="flex w-56 items-center gap-2.5 rounded-lg px-3 py-2.5 cursor-pointer"
-                                  :class="msg.fromMe ? 'bg-white/15 text-white hover:bg-white/20' : 'bg-surface-alt text-text-primary hover:bg-surface'">
-                            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg" :class="msg.fromMe ? 'bg-white/20' : 'bg-primary/10 text-primary'">
-                              <font-awesome-icon :icon="['fas', att.loading ? 'spinner' : 'file']" :spin="att.loading" class="text-[16px]" />
-                            </div>
-                            <div class="min-w-0 flex-1 text-left">
-                              <p class="truncate text-xs font-medium">{{ att.file_name }}</p>
-                              <p class="text-[10px] opacity-70">{{ (att.file_size / 1024).toFixed(0) }} KB</p>
-                            </div>
-                            <font-awesome-icon :icon="['fas', 'download']" class="text-[12px] shrink-0 opacity-70" />
-                          </button>
+                        </div>
+                        <div class="mt-1 flex items-center justify-end gap-1 text-[10px]" :class="item.fromMe ? 'text-white/70' : 'text-text-muted'">
+                          <span>{{ formatBubbleTime(item.timestamp) }}</span>
+                          <i v-if="item.fromMe && !item.deletedForEveryone" class="text-[12px] leading-none"
+                             :class="[item.status === 'read' && 'fa-solid fa-check-double text-sky-300', item.status === 'delivered' && 'fa-solid fa-check-double text-white/70', item.status === 'sent' && 'fa-solid fa-check text-white/70', item.status === 'pending' && 'fa-regular fa-clock text-white/70']"></i>
                         </div>
                       </div>
-                      <div class="mt-1 flex items-center justify-end gap-1 text-[10px]" :class="msg.fromMe ? 'text-white/70' : 'text-text-muted'">
-                        <span>{{ formatBubbleTime(msg.timestamp) }}</span>
-                        <i v-if="msg.fromMe && !msg.deletedForEveryone" class="text-[12px] leading-none"
-                           :class="[msg.status === 'read' && 'fa-solid fa-check-double text-sky-300', msg.status === 'delivered' && 'fa-solid fa-check-double text-white/70', msg.status === 'sent' && 'fa-solid fa-check text-white/70', msg.status === 'pending' && 'fa-regular fa-clock text-white/70']"></i>
-                      </div>
                     </div>
-                  </div>
+                  </template>
                   <div v-if="!activeThread.messages.length" class="flex h-full items-center justify-center text-sm text-text-muted">No messages yet</div>
                 </div>
 

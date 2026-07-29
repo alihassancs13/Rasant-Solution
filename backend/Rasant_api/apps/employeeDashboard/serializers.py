@@ -48,8 +48,6 @@ class EmployeeStatusUpdateSerializer(serializers.ModelSerializer):
 
 
 class FlexibleEmploymentStatusField(serializers.Field):
-    """Accept EmploymentStatus id, code, or name from the client."""
-
     def to_representation(self, value):
         if value is None:
             return None
@@ -127,10 +125,13 @@ class EmployeeSerializer(serializers.ModelSerializer):
         return value
 
     def validate_name(self, value):
+        import re
         if not value:
             raise serializers.ValidationError("Name is required.")
         if len(value) > 32:
             raise serializers.ValidationError("Name must not exceed 32 characters.")
+        if not re.match(r'^[A-Za-z\s]+$', value):
+            raise serializers.ValidationError("Name must contain only alphabets, no numbers or special characters.")
         return value
 
     def validate_phone_number(self, value):
@@ -160,17 +161,25 @@ class EmployeeSerializer(serializers.ModelSerializer):
         return int(str_value)
 
     def validate_designation(self, value):
+        import re
         if not value:
             raise serializers.ValidationError("Designation is required.")
         if len(value) > 32:
             raise serializers.ValidationError("Designation must not exceed 32 characters.")
+        if not re.match(r'^[A-Za-z\s]+$', value):
+            raise serializers.ValidationError(
+                "Designation must contain only alphabets, no numbers or special characters.")
         return value
 
     def validate_department(self, value):
+        import re
         if not value:
             raise serializers.ValidationError("Department is required.")
         if len(value) > 32:
             raise serializers.ValidationError("Department must not exceed 32 characters.")
+        if not re.match(r'^[A-Za-z\s]+$', value):
+            raise serializers.ValidationError(
+                "Department must contain only alphabets, no numbers or special characters.")
         return value
 
     def validate_cnic(self, value):
@@ -206,13 +215,23 @@ class EmployeeSerializer(serializers.ModelSerializer):
         return value
 
     def validate_emergency_name(self, value):
-        if value and len(value) > 32:
-            raise serializers.ValidationError("Emergency contact name must not exceed 32 characters.")
+        import re
+        if value:
+            if len(value) > 32:
+                raise serializers.ValidationError("Emergency contact name must not exceed 32 characters.")
+            if not re.match(r'^[A-Za-z\s]+$', value):
+                raise serializers.ValidationError(
+                    "Emergency contact name must contain only alphabets, no numbers or special characters.")
         return value
 
     def validate_emergency_relation(self, value):
-        if value and len(value) > 32:
-            raise serializers.ValidationError("Emergency relation must not exceed 32 characters.")
+        import re
+        if value:
+            if len(value) > 32:
+                raise serializers.ValidationError("Emergency relation must not exceed 32 characters.")
+            if not re.match(r'^[A-Za-z\s]+$', value):
+                raise serializers.ValidationError(
+                    "Emergency relation must contain only alphabets, no numbers or special characters.")
         return value
 
     def validate_emergency_phone(self, value):
@@ -240,19 +259,36 @@ class EmployeeSerializer(serializers.ModelSerializer):
         return value
 
     def validate_bank_name(self, value):
-        if value and len(value) > 32:
-            raise serializers.ValidationError("Bank name must not exceed 32 characters.")
+        import re
+        if value:
+            if len(value) > 32:
+                raise serializers.ValidationError("Bank name must not exceed 32 characters.")
+            if not re.match(r'^[A-Za-z\s]+$', value):
+                raise serializers.ValidationError(
+                    "Bank name must contain only alphabets, no numbers or special characters.")
         return value
 
     def validate_branch_name(self, value):
-        if value and len(value) > 32:
-            raise serializers.ValidationError("Branch name must not exceed 32 characters.")
+        import re
+        if value:
+            if len(value) > 32:
+                raise serializers.ValidationError("Branch name must not exceed 32 characters.")
+            if not re.match(r'^[A-Za-z\s]+$', value):
+                raise serializers.ValidationError(
+                    "Branch name must contain only alphabets, no numbers or special characters.")
         return value
 
     def validate_account_number(self, value):
-        if value and len(value) > 24:
-            raise serializers.ValidationError("Account/IBAN number must not exceed 24 characters.")
+        import re
+        if value:
+            if len(value) > 24:
+                raise serializers.ValidationError("Account/IBAN number must not exceed 24 characters.")
+            if not re.match(r'^[A-Za-z0-9\-]+$', value):
+                raise serializers.ValidationError(
+                    "Account/IBAN number must contain only letters, numbers, and hyphens.")
         return value
+
+
 
     def validate(self, attrs):
         for key in ('cnic', 'emergency_cnic', 'gender'):
@@ -278,8 +314,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
                     {'present_address': 'Present address must not exceed 400 characters.'})
 
             # Permanent address is required
-            if not attrs.get('permanent_address'):
-                raise serializers.ValidationError({'permanent_address': 'Permanent address is required.'})
+
             if attrs.get('permanent_address') and len(attrs.get('permanent_address')) > 400:
                 raise serializers.ValidationError(
                     {'permanent_address': 'Permanent address must not exceed 400 characters.'})
@@ -318,9 +353,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
 
 
 class EmployeeListSerializer(serializers.ModelSerializer):
-    """
-    Used ONLY for GET /employees/ – excludes all file fields.
-    """
+
     raise_count = serializers.SerializerMethodField()
     net_salary = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()
@@ -377,10 +410,6 @@ class EmployeeCreateUpdateSerializer(serializers.ModelSerializer):
 
 
 class UpdateEmployeeSerializer(serializers.ModelSerializer):
-    """
-    Used ONLY for updating employee text fields.
-    File fields are excluded – they cannot be updated via this endpoint.
-    """
     password = serializers.CharField(
         write_only=True,
         required=False,
@@ -431,6 +460,165 @@ class UpdateEmployeeSerializer(serializers.ModelSerializer):
             "account_number": {"required": False, "allow_blank": True, "allow_null": True},
         }
 
+    def validate_email(self, value):
+        import re
+        email_regex = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        if not re.match(email_regex, value):
+            raise serializers.ValidationError("Please enter a valid email address.")
+        if len(value) > 50:
+            raise serializers.ValidationError("Email must not exceed 50 characters.")
+
+        from django.contrib.auth import get_user_model
+        UserModel = get_user_model()
+
+        qs = Employee.objects.filter(email__iexact=value)
+        if self.instance:
+            qs = qs.exclude(pk=self.instance.pk)
+        if qs.exists():
+            raise serializers.ValidationError("Employee with this email already exists.")
+
+        user_qs = UserModel.objects.filter(email__iexact=value)
+        if self.instance and getattr(self.instance, 'user_id', None):
+            user_qs = user_qs.exclude(pk=self.instance.user_id)
+        if user_qs.exists():
+            raise serializers.ValidationError("A user account with this email already exists.")
+        return value
+
+    def validate_name(self, value):
+        import re
+
+        if len(value) > 32:
+            raise serializers.ValidationError("Name must not exceed 32 characters.")
+        if not re.match(r'^[A-Za-z\s]+$', value):
+            raise serializers.ValidationError("Name must contain only alphabets, no numbers or special characters.")
+        return value
+
+    def validate_phone_number(self, value):
+        import re
+        value = (value or '').strip()
+
+        if not re.match(r'^\d+$', value):
+            raise serializers.ValidationError("Phone number must contain only numbers.")
+        if len(value) > 15:
+            raise serializers.ValidationError("Phone number must not exceed 15 digits.")
+        return value
+
+    def validate_department(self, value):
+        import re
+
+        if len(value) > 32:
+            raise serializers.ValidationError("Department must not exceed 32 characters.")
+        if not re.match(r'^[A-Za-z\s]+$', value):
+            raise serializers.ValidationError(
+                "Department must contain only alphabets, no numbers or special characters.")
+        return value
+
+    def validate_designation(self, value):
+        import re
+
+        if len(value) > 32:
+            raise serializers.ValidationError("Designation must not exceed 32 characters.")
+        if not re.match(r'^[A-Za-z\s]+$', value):
+            raise serializers.ValidationError(
+                "Designation must contain only alphabets, no numbers or special characters.")
+        return value
+
+    def validate_salary(self, value):
+        import re
+
+        str_value = str(value)
+        if '.' in str_value:
+            str_value = str_value.rstrip('0').rstrip('.')
+        if not re.match(r'^\d+$', str_value):
+            raise serializers.ValidationError("Salary must contain only numbers.")
+        if len(str_value) > 10:
+            raise serializers.ValidationError("Salary must not exceed 10 digits.")
+        return int(str_value)
+
+    def validate_present_address(self, value):
+        if value and len(value) > 250:
+            raise serializers.ValidationError("Present address must not exceed 250 characters.")
+        return value
+
+    def validate_permanent_address(self, value):
+        if value and len(value) > 250:
+            raise serializers.ValidationError("Permanent address must not exceed 250 characters.")
+        return value
+
+    def validate_emergency_name(self, value):
+        import re
+        if value:
+            if len(value) > 32:
+                raise serializers.ValidationError("Emergency contact name must not exceed 32 characters.")
+            if not re.match(r'^[A-Za-z\s]+$', value):
+                raise serializers.ValidationError(
+                    "Emergency contact name must contain only alphabets, no numbers or special characters.")
+        return value
+
+    def validate_emergency_relation(self, value):
+        import re
+        if value:
+            if len(value) > 32:
+                raise serializers.ValidationError("Emergency relation must not exceed 32 characters.")
+            if not re.match(r'^[A-Za-z\s]+$', value):
+                raise serializers.ValidationError(
+                    "Emergency relation must contain only alphabets, no numbers or special characters.")
+        return value
+
+    def validate_emergency_cnic(self, value):
+        if not value:
+            return None
+        import re
+        if not re.match(r'^\d+$', str(value)):
+            raise serializers.ValidationError("Emergency CNIC must contain only numbers.")
+        if len(str(value)) != 13:
+            raise serializers.ValidationError("Emergency CNIC must be exactly 13 digits.")
+        return value
+
+    def validate_emergency_phone(self, value):
+        if value:
+            import re
+            if not re.match(r'^\d+$', str(value)):
+                raise serializers.ValidationError("Emergency phone number must contain only numbers.")
+            if len(str(value)) > 15:
+                raise serializers.ValidationError("Emergency phone number must not exceed 15 digits.")
+        return value
+
+    def validate_emergency_address(self, value):
+        if value and len(value) > 250:
+            raise serializers.ValidationError("Emergency contact address must not exceed 250 characters.")
+        return value
+
+    def validate_bank_name(self, value):
+        import re
+        if value:
+            if len(value) > 32:
+                raise serializers.ValidationError("Bank name must not exceed 32 characters.")
+            if not re.match(r'^[A-Za-z\s]+$', value):
+                raise serializers.ValidationError(
+                    "Bank name must contain only alphabets, no numbers or special characters.")
+        return value
+
+    def validate_branch_name(self, value):
+        import re
+        if value:
+            if len(value) > 32:
+                raise serializers.ValidationError("Branch name must not exceed 32 characters.")
+            if not re.match(r'^[A-Za-z\s]+$', value):
+                raise serializers.ValidationError(
+                    "Branch name must contain only alphabets, no numbers or special characters.")
+        return value
+
+    def validate_account_number(self, value):
+        import re
+        if value:
+            if len(value) > 24:
+                raise serializers.ValidationError("Account/IBAN number must not exceed 24 characters.")
+            if not re.match(r'^[A-Za-z0-9\-]+$', value):
+                raise serializers.ValidationError(
+                    "Account/IBAN number must contain only letters, numbers, and hyphens.")
+        return value
+
     def validate_cnic(self, value):
         if not value:
             return None
@@ -448,7 +636,6 @@ class UpdateEmployeeSerializer(serializers.ModelSerializer):
         return value
 
     def validate_password(self, value):
-        # Keep raw password; hashing/sync is handled in the view
         if value in ("", None):
             return None
         return value
@@ -457,7 +644,6 @@ class UpdateEmployeeSerializer(serializers.ModelSerializer):
         for key in ("cnic", "emergency_cnic", "gender"):
             if key in attrs and attrs[key] == "":
                 attrs[key] = None
-        # Keep existing values when blank — joined_date is NOT NULL in DB
         for key in ("salary", "tax", "insurance_amount", "joined_date"):
             if key in attrs and attrs[key] in ("", None):
                 attrs.pop(key)

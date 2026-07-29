@@ -730,6 +730,7 @@ export function useEmployeeDashboard() {
 
         if (password && confirmPassword && password !== confirmPassword) {
             passwordError.value = 'Passwords do not match.';
+            showToast('Passwords do not match.', 'error');
             return;
         }
 
