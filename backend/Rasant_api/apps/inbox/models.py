@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
+import mimetypes
 
 class Conversation(models.Model):
 
@@ -229,11 +230,22 @@ class MessageAttachment(models.Model):
         return f'Attachment #{self.pk} ({self.file_name}) on Msg #{self.message_id}'
 
     @staticmethod
-    def detect_media_type(content_type):
+    def detect_media_type(content_type, file_name=None):
+        content_type = content_type or ''
         if content_type.startswith('image/'):
             return 'image'
         if content_type.startswith('video/'):
             return 'video'
         if content_type.startswith('audio/'):
             return 'audio'
+        if file_name:
+            guessed_type, _ = mimetypes.guess_type(file_name)
+            if guessed_type:
+                if guessed_type.startswith('image/'):
+                    return 'image'
+                if guessed_type.startswith('video/'):
+                    return 'video'
+                if guessed_type.startswith('audio/'):
+                    return 'audio'
+
         return 'document'

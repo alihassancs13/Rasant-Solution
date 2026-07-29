@@ -207,10 +207,9 @@ def send_message(request):
             file_data=f.read(),
             file_name=f.name,
             content_type=content_type,
-            media_type=MessageAttachment.detect_media_type(content_type),
+            media_type=MessageAttachment.detect_media_type(content_type, file_name=f.name),
             file_size=f.size,
         )
-
     other_members = ConversationMember.objects.filter(
         conversation=conv, left_at__isnull=True
     ).exclude(user=sender).select_related('user')

@@ -391,7 +391,9 @@ export function useInboxPage() {
     }
 
     function autoloadImageAttachments(attachments) {
-        (attachments || []).filter((a) => a.media_type === 'image').forEach((a) => loadAttachmentUrl(a));
+        (attachments || [])
+            .filter((a) => a.media_type === 'image' || a.media_type === 'video')
+            .forEach((a) => loadAttachmentUrl(a));
     }
 
     async function attachmentAction(attachment) {

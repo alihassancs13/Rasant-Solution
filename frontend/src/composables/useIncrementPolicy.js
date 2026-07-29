@@ -2,10 +2,12 @@ import { reactive, ref, computed, watch } from 'vue'
 import { usePolicyStore } from '@/stores/policyStore.js'
 import { useToast } from './useToast.js'
 import { useValidation } from './useValidation.js'
+import { useEmployeeStore } from '@/stores/employeeStore.js'
 
 export function useIncrementPolicy(employees) {
     const policyStore = usePolicyStore()
     const { showToast } = useToast()
+    const employeeStore = useEmployeeStore()
     const policyPage = ref(1)
     const policiesPerPage = ref(4)
     const { getUsernameError, getAmountError, LENGTH_LIMITS, blockNonDigitKeydown, blockNonDigitPaste } = useValidation()
@@ -482,7 +484,9 @@ export function useIncrementPolicy(employees) {
             const result = await policyStore.saveEmployeeMonthlyBonus(emp.id, bonusDraft.value, emp.deduction_month)
             if (result.success) {
                 showToast('Monthly bonus saved.', 'success')
+                await fetchEmployeeDetail(emp.id)
                 bonusDraft.value = Number(policyStore.employeeDetail?.bonus_amount || 0)
+                await employeeStore.fetchEmployees()
             } else {
                 showToast(result.error || 'Failed to save bonus', 'error')
             }
