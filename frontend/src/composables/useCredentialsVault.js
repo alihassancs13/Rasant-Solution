@@ -161,8 +161,13 @@ export default function useCredentialsVault() {
         const nameError = getCredentialLabelError(form.value.name)
         if (nameError) errors.name = nameError
 
-        const linkError = getLinkError(form.value.link)
-        if (linkError) errors.link = linkError
+        const linkValue = form.value.link?.trim() || ''
+        if (linkValue.length > 500) {
+            errors.link = 'URL must not exceed 500 characters.'
+        } else {
+            const linkError = getLinkError(form.value.link)
+            if (linkError) errors.link = linkError
+        }
 
         const usernameError = getUsernameError(form.value.username)
         if (usernameError) errors.username = usernameError
@@ -604,7 +609,12 @@ export default function useCredentialsVault() {
 
     // Live validation: login link
     watch(() => form.value.link, (val) => {
-        fieldErrors.value.link = getLinkError(val) || ''
+        const trimmed = val?.trim() || ''
+        if (trimmed.length > 500) {
+            fieldErrors.value.link = 'URL must not exceed 500 characters.'
+        } else {
+            fieldErrors.value.link = getLinkError(val) || ''
+        }
     })
 
     // Live validation: email

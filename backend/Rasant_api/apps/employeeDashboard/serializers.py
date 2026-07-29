@@ -666,9 +666,12 @@ class IncrementPolicySerializer(serializers.ModelSerializer):
         if value is None:
             raise serializers.ValidationError("Amount is required.")
         import re
-        if not re.match(r'^\d+$', str(value)):
+        str_value = str(value)
+        if '.' in str_value:
+            str_value = str_value.rstrip('0').rstrip('.')
+        if not re.match(r'^\d+$', str_value):
             raise serializers.ValidationError("Amount must contain only digits.")
-        if len(str(value)) > 10:
+        if len(str_value) > 10:
             raise serializers.ValidationError("Amount must not exceed 10 digits.")
         return value
 

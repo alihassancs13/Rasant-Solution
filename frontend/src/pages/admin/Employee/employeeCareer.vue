@@ -105,12 +105,6 @@ const draftCount = computed(() => adminJobs.value.filter(j => getJobStatusName(j
 const newCvsCount = computed(() => cvSubmissions.value.filter(cv => !cv.application_status || Number(cv.application_status) === 1).length)
 const totalCvsCount = computed(() => cvSubmissions.value.length)
 
-// ── Jobs table pagination/search ──
-// NOTE: This same pagination/search state is intentionally reused by BOTH:
-//   1. The "Site openings" table
-//   2. The "CV applications" -> "Select a job" grid (STEP 1)
-// Since only one tab is rendered at a time (v-if on activeTab), sharing this
-// state is safe and avoids duplicating pagination logic.
 const jobsPageSize = ref(5)
 const jobsPageSizeOptions = [5, 10, 20, 50]
 const jobsCurrentPage = ref(1)
@@ -170,6 +164,7 @@ const handleEditJob = (job) => {
     requirements: job.requirements,
     status: Number(job.status),
   })
+  touchAll()
   showJobModal.value = true
 }
 
@@ -859,10 +854,15 @@ watch(() => selectedApplicant.value?.id, (id) => {
                 <p v-if="fieldErrorVisible('department')" class="text-xs text-danger mt-1">{{ formErrors.department }}</p>
               </div>
 
-              <div class="w-full min-w-0">
-                <label class="block text-[11px] font-semibold text-text-muted tracking-wide uppercase mb-1.5">Location</label>
-                <input v-model="formData.location" type="text" placeholder="e.g. Lahore, Pakistan"
-                       :class="fieldClass('location')" @blur="touchField('location')" />
+              <div class="dash-field">
+                <label>Location</label>
+                <input
+                    v-model="formData.location"
+                    type="text"
+                    placeholder="e.g. Rawalpindi, Block 5"
+                    @blur="touchField('location')"
+                    :class="fieldClass('location')"
+                />
                 <p v-if="fieldErrorVisible('location')" class="text-xs text-danger mt-1">{{ formErrors.location }}</p>
               </div>
 
@@ -875,8 +875,6 @@ watch(() => selectedApplicant.value?.id, (id) => {
                     placeholder="e.g. 80000"
                     :class="fieldClass('salary_range')"
                     @blur="touchField('salary_range')"
-                    @keydown="blockNonDigitKeydown($event, { allowDecimal: true, maxDigits: LENGTH_LIMITS.amount.maxDigits })"
-                    @paste="blockNonDigitPaste($event, { allowDecimal: true, maxDigits: LENGTH_LIMITS.amount.maxDigits })"
                 />
                 <p v-if="fieldErrorVisible('salary_range')" class="text-xs text-danger mt-1">{{ formErrors.salary_range }}</p>
               </div>

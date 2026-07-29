@@ -384,11 +384,9 @@
               type="text"
               v-model="createFormData.name"
               placeholder="e.g. Sarah Ali"
-              maxlength="32"
+              
               :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200', (createTouched.name && createErrors.name) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
-              @keydown="nameHandlers.keydown"
-              @paste="nameHandlers.paste"
-              @input="nameHandlers.input"
+              @input="markCreateTouched('name')"
               @blur="markCreateTouched('name')"
           />
           <span v-if="createTouched.name && createErrors.name" class="text-xs text-rose-500 mt-1 block">
@@ -424,11 +422,9 @@
               inputmode="numeric"
               v-model="createFormData.phone_number"
               placeholder="e.g. 03XXXXXXXXX"
-              maxlength="15"
+              
               :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200', (createTouched.phone_number && createErrors.phone_number) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
-              @keydown="phoneHandlers.keydown"
-              @paste="phoneHandlers.paste"
-              @input="phoneHandlers.input"
+              @input="markCreateTouched('phone_number')"
               @blur="markCreateTouched('phone_number')"
           />
           <span v-if="createTouched.phone_number && createErrors.phone_number" class="text-xs text-rose-500 mt-1 block">
@@ -446,11 +442,9 @@
               type="text"
               v-model="createFormData.position"
               placeholder="e.g. Software Engineer"
-              maxlength="32"
+              
               :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200', (createTouched.position && createErrors.position) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
-              @keydown="designationHandlers.keydown"
-              @paste="designationHandlers.paste"
-              @input="designationHandlers.input"
+              @input="markCreateTouched('position')"
               @blur="markCreateTouched('position')"
           />
           <span v-if="createTouched.position && createErrors.position" class="text-xs text-rose-500 mt-1 block">
@@ -473,9 +467,7 @@
               placeholder="e.g. 85000"
               maxlength="10"
               :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200', (createTouched.salary && createErrors.salary) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
-              @keydown="salaryHandlers.keydown"
-              @paste="salaryHandlers.paste"
-              @input="salaryHandlers.input"
+              @input="markCreateTouched('salary')"
               @blur="markCreateTouched('salary')"
           />
           <span v-if="createTouched.salary && createErrors.salary" class="text-xs text-rose-500 mt-1 block">
@@ -492,11 +484,9 @@
               type="text"
               v-model="createFormData.department"
               placeholder="e.g. Engineering"
-              maxlength="32"
+              
               :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200', (createTouched.department && createErrors.department) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
-              @keydown="departmentHandlers.keydown"
-              @paste="departmentHandlers.paste"
-              @input="departmentHandlers.input"
+              @input="markCreateTouched('department')"
               @blur="markCreateTouched('department')"
           />
           <span v-if="createTouched.department && createErrors.department" class="text-xs text-rose-500 mt-1 block">
@@ -514,9 +504,7 @@
               placeholder="e.g. 23000"
               maxlength="10"
               :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200', (createTouched.insurance_amount && createErrors.insurance_amount) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
-              @keydown="insuranceHandlers.keydown"
-              @paste="insuranceHandlers.paste"
-              @input="insuranceHandlers.input"
+              @input="markCreateTouched('insurance_amount')"
               @blur="markCreateTouched('insurance_amount')"
           />
           <span v-if="createTouched.insurance_amount && createErrors.insurance_amount" class="text-xs text-rose-500 mt-1 block">
@@ -535,9 +523,7 @@
                 placeholder="e.g. 5"
                 maxlength="5"
                 :class="['w-full px-4 py-2.5 pr-8 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200', (createTouched.tax && createErrors.tax) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
-                @keydown="taxHandlers.keydown"
-                @paste="taxHandlers.paste"
-                @input="taxHandlers.input"
+                @input="markCreateTouched('tax')"
                 @blur="markCreateTouched('tax')"
             />
             <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
@@ -549,7 +535,6 @@
       </form>
     </CreateModal>
 
-    <!-- Edit Modal -->
     <!-- Edit Modal -->
     <EmployeeBaseModal
         :is-open="isEditModalOpen"
@@ -584,11 +569,9 @@
                   <input
                       type="text"
                       v-model="editFormData.name"
-                      maxlength="32"
+                      
                       :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.name && editErrors.name) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
-                      @keydown="editNameHandlers.keydown"
-                      @paste="editNameHandlers.paste"
-                      @input="editNameHandlers.input"
+                      @input="markEditTouched('name')"
                       @blur="markEditTouched('name')"
                   />
                   <span v-if="editTouched.name && editErrors.name" class="text-xs text-rose-500 mt-1 block">
@@ -616,11 +599,9 @@
                       type="text"
                       inputmode="numeric"
                       v-model="editFormData.phone_number"
-                      maxlength="15"
+                      
                       :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.phone_number && editErrors.phone_number) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
-                      @keydown="editPhoneHandlers.keydown"
-                      @paste="editPhoneHandlers.paste"
-                      @input="editPhoneHandlers.input"
+                      @input="markEditTouched('phone_number')"
                       @blur="markEditTouched('phone_number')"
                   />
                   <span v-if="editTouched.phone_number && editErrors.phone_number" class="text-xs text-rose-500 mt-1 block">
@@ -633,11 +614,9 @@
                   <input
                       type="text"
                       v-model="editFormData.department"
-                      maxlength="32"
+                      
                       :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.department && editErrors.department) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
-                      @keydown="editDepartmentHandlers.keydown"
-                      @paste="editDepartmentHandlers.paste"
-                      @input="editDepartmentHandlers.input"
+                      @input="markEditTouched('department')"
                       @blur="markEditTouched('department')"
                   />
                   <span v-if="editTouched.department && editErrors.department" class="text-xs text-rose-500 mt-1 block">
@@ -650,11 +629,9 @@
                   <input
                       type="text"
                       v-model="editFormData.designation"
-                      maxlength="32"
+                      
                       :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.designation && editErrors.designation) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
-                      @keydown="editDesignationHandlers.keydown"
-                      @paste="editDesignationHandlers.paste"
-                      @input="editDesignationHandlers.input"
+                      @input="markEditTouched('designation')"
                       @blur="markEditTouched('designation')"
                   />
                   <span v-if="editTouched.designation && editErrors.designation" class="text-xs text-rose-500 mt-1 block">
@@ -670,9 +647,7 @@
                       v-model="editFormData.salary"
                       maxlength="10"
                       :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.salary && editErrors.salary) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
-                      @keydown="editSalaryHandlers.keydown"
-                      @paste="editSalaryHandlers.paste"
-                      @input="editSalaryHandlers.input"
+                      @input="markEditTouched('salary')"
                       @blur="markEditTouched('salary')"
                   />
                   <span v-if="editTouched.salary && editErrors.salary" class="text-xs text-rose-500 mt-1 block">
@@ -703,9 +678,7 @@
                       placeholder="e.g. 5000"
                       maxlength="10"
                       :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.insurance_amount && editErrors.insurance_amount) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
-                      @keydown="editInsuranceHandlers.keydown"
-                      @paste="editInsuranceHandlers.paste"
-                      @input="editInsuranceHandlers.input"
+                      @input="markEditTouched('insurance_amount')"
                       @blur="markEditTouched('insurance_amount')"
                   />
                   <span v-if="editTouched.insurance_amount && editErrors.insurance_amount" class="text-xs text-rose-500 mt-1 block">
@@ -723,9 +696,7 @@
                         placeholder="e.g. 10"
                         maxlength="5"
                         :class="['w-full px-4 py-2.5 pr-10 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.tax && editErrors.tax) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
-                        @keydown="editTaxHandlers.keydown"
-                        @paste="editTaxHandlers.paste"
-                        @input="editTaxHandlers.input"
+                        @input="markEditTouched('tax')"
                         @blur="markEditTouched('tax')"
                     />
                     <span class="absolute inset-y-0 right-4 flex items-center text-gray-500 font-medium">%</span>
@@ -839,7 +810,7 @@
                         type="text"
                         v-model="editFormData.cnic"
                         placeholder="00000-0000000-0"
-                        maxlength="15"
+                        
                         :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.cnic && editErrors.cnic) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
                         @input="markEditTouched('cnic')"
                         @blur="markEditTouched('cnic')"
@@ -902,7 +873,7 @@
                         type="text"
                         v-model="editFormData.emergency_name"
                         placeholder="—"
-                        maxlength="32"
+                        
                         :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.emergency_name && editErrors.emergency_name) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
                         @input="markEditTouched('emergency_name')"
                         @blur="markEditTouched('emergency_name')"
@@ -917,7 +888,7 @@
                         type="text"
                         v-model="editFormData.emergency_relation"
                         placeholder="—"
-                        maxlength="32"
+                        
                         :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.emergency_relation && editErrors.emergency_relation) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
                         @input="markEditTouched('emergency_relation')"
                         @blur="markEditTouched('emergency_relation')"
@@ -932,7 +903,7 @@
                         type="text"
                         v-model="editFormData.emergency_cnic"
                         placeholder="00000-0000000-0"
-                        maxlength="15"
+                        
                         :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.emergency_cnic && editErrors.emergency_cnic) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
                         @input="markEditTouched('emergency_cnic')"
                         @blur="markEditTouched('emergency_cnic')"
@@ -948,11 +919,9 @@
                         inputmode="numeric"
                         v-model="editFormData.emergency_phone"
                         placeholder="03XXXXXXXXX"
-                        maxlength="15"
+                        
                         :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.emergency_phone && editErrors.emergency_phone) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
-                        @keydown="(e) => blockNonDigitKeydown(e, { allowDecimal: false, maxDigits: 15, currentValue: editFormData.emergency_phone })"
-                        @paste="(e) => blockNonDigitPaste(e, { allowDecimal: false, maxDigits: 15 })"
-                        @input="(event) => { const digitsOnly = event.target.value.replace(/\D/g, '').slice(0, 15); event.target.value = digitsOnly; editFormData.emergency_phone = digitsOnly; markEditTouched('emergency_phone'); }"
+                        @input="markEditTouched('emergency_phone')"
                         @blur="markEditTouched('emergency_phone')"
                     />
                     <span v-if="editTouched.emergency_phone && editErrors.emergency_phone" class="text-xs text-rose-500 mt-1 block">
@@ -984,7 +953,7 @@
                         type="text"
                         v-model="editFormData.bank_name"
                         placeholder="—"
-                        maxlength="32"
+                        
                         :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.bank_name && editErrors.bank_name) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
                         @input="markEditTouched('bank_name')"
                         @blur="markEditTouched('bank_name')"
@@ -999,7 +968,7 @@
                         type="text"
                         v-model="editFormData.branch_name"
                         placeholder="—"
-                        maxlength="32"
+                        
                         :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.branch_name && editErrors.branch_name) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
                         @input="markEditTouched('branch_name')"
                         @blur="markEditTouched('branch_name')"
@@ -1265,7 +1234,7 @@ const {
   viewEmployee,
   isEditModalOpen,
   isUpdating,
-  selectedEmployee,          // ADD
+  selectedEmployee,
   isCreateModalOpen,
   isCreating,
   showMoreEdit,
@@ -1308,26 +1277,11 @@ const {
   createTouched,
   createErrors,
   markCreateTouched,
-  isCreateFormValid,         // ADD
-  nameHandlers,
-  designationHandlers,
-  departmentHandlers,
-  salaryHandlers,
-  insuranceHandlers,
-  taxHandlers,
-  phoneHandlers,
-  editTouched,                // ADD
-  editErrors,                 // ADD
-  markEditTouched,            // ADD
-  isEditFormValid,            // ADD
-  editNameHandlers,           // ADD
-  editDesignationHandlers,    // ADD
-  editDepartmentHandlers,     // ADD
-  editSalaryHandlers,         // ADD
-  editInsuranceHandlers,      // ADD
-  editTaxHandlers,            // ADD
-  editPhoneHandlers,          // ADD
-  emergencyPhoneHandlers,     // ADD — see below
+  isCreateFormValid,
+  editTouched,
+  editErrors,
+  markEditTouched,
+  isEditFormValid,
 } = useEmployeeDashboard();
 
 // Lifecycle

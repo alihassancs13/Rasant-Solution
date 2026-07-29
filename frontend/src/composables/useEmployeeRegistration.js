@@ -339,7 +339,9 @@ export function useEmployeeRegistration(isDirectAccess) {
         if (typeof window !== 'undefined') window.scrollTo({ top: 0, behavior: 'auto' });
     };
 
-    const submitForm = async (onSuccess, skipValidation = false) => {
+    const submitForm = async (onSuccess, source = 'user_onboarding', skipValidation = false) => {
+        if (isSubmitted.value) return { success: false };
+
         if (!skipValidation) {
             let allValid = true;
             for (let step = 1; step <= totalSteps; step++) {
@@ -354,34 +356,21 @@ export function useEmployeeRegistration(isDirectAccess) {
                 showToast(GENERIC_VALIDATION_MESSAGE, 'error');
                 return { success: false };
             }
-    // --- submission using store ---
-    const submitForm = async (onSuccess, source = 'user_onboarding') => {
-        if (isSubmitted.value) return;
 
-        const formElement = document.getElementById('employeeForm');
-        if (!formElement.checkValidity()) {
-            formElement.reportValidity();
-            return;
             if (!allValid) {
                 showToast(GENERIC_VALIDATION_MESSAGE, 'error');
                 return { success: false };
             }
         }
 
-        if (isSubmitted.value) return { success: false };
         isSubmitted.value = true;
 
         const payload = new FormData();
-
-        // ADD THIS - source field
         payload.append('source', source);
 
         const cleanCnic = (value) => (value || '').replace(/\D/g, '');
-
-        const cleanedCnic = cleanCnic(formData.value.cnic);
         const cleanedEmergencyCnic = cleanCnic(formData.value.emergency_cnic);
 
-        // Prepare cleaned data
         const cleanedData = {
             name: (formData.value.name || '').trim(),
             present_address: (formData.value.present_address || '').trim(),
@@ -406,7 +395,6 @@ export function useEmployeeRegistration(isDirectAccess) {
         };
 
         const cleanedCnic = cleanCnic(formData.value.cnic);
-        const cleanedEmergencyCnic = cleanCnic(formData.value.emergency_cnic);
         if (cleanedCnic) cleanedData.cnic = cleanedCnic;
         if (cleanedEmergencyCnic) cleanedData.emergency_cnic = cleanedEmergencyCnic;
 
@@ -431,52 +419,26 @@ export function useEmployeeRegistration(isDirectAccess) {
                     ? ' (create-password email could not be sent — check Email settings)'
                     : ' Create-password link emailed to the employee.';
                 showToast(`Employee added successfully.${emailNote}`, 'success', 5000);
-                isSubmitted.value = true;
+                isSubmitted.value = false;
+                resetForm();
                 onSuccess?.(result.data);
                 return { success: true, data: result.data };
             }
 
             let errorMsg = 'Submission failed';
-            if (result.error) {
-                errorMsg += ': ' + result.error;
-            } else if (result.errors) {
-                errorMsg += ': ' + (typeof result.errors === 'object'
-                    ? Object.entries(result.errors).map(([field, msgs]) => `${field}: ${Array.isArray(msgs) ? msgs.join(', ') : msgs}`).join(' | ')
-                    : result.errors);
+            if (result.errors && typeof result.errors === 'object') {
+                const parts = Object.entries(result.errors).map(([field, msgs]) => {
+                    const text = Array.isArray(msgs) ? msgs.join(', ') : String(msgs);
+                    return `${field}: ${text}`;
+                });
+                if (parts.length) errorMsg = parts.join(' | ');
+            } else if (result.error) {
+                errorMsg = result.error;
             }
-            showToast(errorMsg, 'error', 7000);
+            showToast(errorMsg, 'error', 6000);
             console.error('Submission error:', result.error);
             isSubmitted.value = false;
             return { success: false, error: errorMsg };
-        } catch (error) {
-            console.error('Unexpected error:', error);
-            showToast('An unexpected error occurred. Please try again.', 'error', 5000);
-            isSubmitted.value = false;
-            return { success: false, error: error.message };
-        }
-                const emailNote = result.data?.email_sent === false
-                    ? ' (create-password email could not be sent — check Email settings)'
-                    : ' Create-password link emailed to the employee.';
-                showToast(`Employee added successfully.${emailNote}`, 'success', 5000);
-                isSubmitted.value = false;
-                resetForm();
-                if (onSuccess) onSuccess(result.data);
-                return { success: true, data: result.data };
-            } else {
-                let errorMsg = 'Submission failed';
-                if (result.errors && typeof result.errors === 'object') {
-                    const parts = Object.entries(result.errors).map(([field, msgs]) => {
-                        const text = Array.isArray(msgs) ? msgs.join(', ') : String(msgs);
-                        return `${field}: ${text}`;
-                    });
-                    if (parts.length) errorMsg = parts.join(' | ');
-                } else if (result.error) {
-                    errorMsg = result.error;
-                }
-                showToast(errorMsg, 'error', 6000);
-                isSubmitted.value = false;
-                return { success: false, error: errorMsg };
-            }
         } catch (error) {
             console.error('Unexpected error:', error);
             showToast('An unexpected error occurred. Please try again.', 'error', 5000);

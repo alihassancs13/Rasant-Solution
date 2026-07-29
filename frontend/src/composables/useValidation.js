@@ -21,7 +21,7 @@ const LENGTH_LIMITS = {
 
 const ALLOWED_SCAN_EXTENSIONS = ['pdf', 'png', 'jpg', 'jpeg'];
 const ALLOWED_SCAN_MIME_TYPES = ['application/pdf', 'image/png', 'image/jpeg'];
-
+const ALPHANUMERIC_REGEX = /^[A-Za-z0-9\s,.\-/]+$/;
 // NEW — letters + spaces only (used for Name, Designation, Department, etc.)
 const ALPHA_ONLY_REGEX = /^[A-Za-z\s]+$/;
 
@@ -30,6 +30,13 @@ export function useValidation() {
 
     const getLengthError = (value, fieldName, max) =>
         (value?.trim() || '').length > max ? `${fieldName} must not exceed ${max} characters.` : null;
+    const getLocationError = (value, max = 50, fieldName = 'Location') => {
+        const trimmed = (value || '').trim();
+        if (!trimmed) return `${fieldName} is required.`;
+        if (trimmed.length > max) return `${fieldName} must not exceed ${max} characters.`;
+        if (!ALPHANUMERIC_REGEX.test(trimmed)) return `${fieldName} must contain only letters, numbers, and basic punctuation.`;
+        return null;
+    };
 
     const requiredLengthError = (value, fieldName, max) => {
         const trimmed = (value || '').trim();
@@ -77,8 +84,8 @@ export function useValidation() {
 
     const isValidEmail = (email) => !getEmailError(email) && !!(email || '').trim();
 
-    const getCredentialLabelError = (value, max = LENGTH_LIMITS.credentialLabel.max) =>
-        requiredLengthError(value, 'Credential label', max);
+    const getCredentialLabelError = (value, max = LENGTH_LIMITS.credentialLabel.max, fieldName = 'Credential label') =>
+        requiredLengthError(value, fieldName, max);
 
     // UPDATED — now also rejects numbers/special characters (letters + spaces only)
     const getUsernameError = (value, max = LENGTH_LIMITS.username.max, fieldName = 'Username') => {
@@ -134,9 +141,9 @@ export function useValidation() {
     const getAmountError = (value, maxDigits = LENGTH_LIMITS.amount.maxDigits, fieldName = 'Amount') => {
         const trimmed = String(value ?? '').trim();
         if (!trimmed) return `${fieldName} is required.`;
-        if (!/^\d+(\.\d{1,2})?$/.test(trimmed)) return `${fieldName} must contain numbers only.`;
+        if (!/^\d+$/.test(trimmed)) return `${fieldName} must contain digits only.`;
+        if (trimmed.length > maxDigits) return `${fieldName} must not exceed ${maxDigits} digits.`;
         if (Number(trimmed) <= 0) return `${fieldName} must be greater than 0.`;
-        if (trimmed.replace('.', '').length > maxDigits) return `${fieldName} must not exceed ${maxDigits} digits in total.`;
         return null;
     };
 
@@ -238,5 +245,7 @@ export function useValidation() {
         blockNonDigitPaste,
         blockNonAlphaKeydown,   // NEW
         blockNonAlphaPaste,     // NEW
+        getLocationError,
+        requiredLengthError,
     };
 }

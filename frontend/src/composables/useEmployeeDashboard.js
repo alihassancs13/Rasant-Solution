@@ -15,10 +15,6 @@ export function useEmployeeDashboard() {
         getNumericRangeError,
         getAddressLengthError,
         getAccountNumberError,
-        blockNonDigitKeydown,
-        blockNonDigitPaste,
-        blockNonAlphaKeydown,
-        blockNonAlphaPaste,
     } = useValidation();
 
     const tempStatusId = ref(null);
@@ -90,7 +86,7 @@ export function useEmployeeDashboard() {
     });
 
     const CREATE_REQUIRED_FIELDS = ['name', 'email', 'phone_number', 'salary', 'department', 'position', 'insurance_amount', 'tax'];
-    
+
     const isCreateFormValid = computed(() => {
         for (const field of CREATE_REQUIRED_FIELDS) {
             if (!createFormData[field] || !String(createFormData[field]).trim()) {
@@ -151,58 +147,7 @@ export function useEmployeeDashboard() {
         validateCreateField(field);
     };
 
-    // Create form handlers
-    const makeAlphaHandlers = (field) => ({
-        keydown: blockNonAlphaKeydown,
-        paste: blockNonAlphaPaste,
-        input: (event) => {
-            const cleaned = event.target.value.replace(/[^A-Za-z\s]/g, '');
-            event.target.value = cleaned;
-            createFormData[field] = cleaned;
-            markCreateTouched(field);
-        },
-    });
-    const nameHandlers = makeAlphaHandlers('name');
-    const designationHandlers = makeAlphaHandlers('position');
-    const departmentHandlers = makeAlphaHandlers('department');
-
-    const makeAmountHandlers = (field, maxDigits = 8, allowDecimal = true) => ({
-        keydown: (e) => blockNonDigitKeydown(e, { allowDecimal, maxDigits, currentValue: createFormData[field] }),
-        paste: (e) => blockNonDigitPaste(e, { allowDecimal, maxDigits }),
-        input: (event) => {
-            let value = allowDecimal
-                ? event.target.value.replace(/[^0-9.]/g, '')
-                : event.target.value.replace(/[^0-9]/g, '');
-            if (allowDecimal) {
-                const parts = value.split('.');
-                if (parts.length > 2) value = parts[0] + '.' + parts.slice(1).join('');
-                if (parts[0] && parts[0].length > maxDigits) {
-                    value = parts[0].slice(0, maxDigits) + (parts[1] !== undefined ? '.' + parts[1] : '');
-                }
-            } else if (value.length > maxDigits) {
-                value = value.slice(0, maxDigits);
-            }
-            event.target.value = value;
-            createFormData[field] = value;
-            markCreateTouched(field);
-        },
-    });
-    const salaryHandlers = makeAmountHandlers('salary', 8, false);       // decimal off
-    const insuranceHandlers = makeAmountHandlers('insurance_amount', 8, false); // decimal off
-    const taxHandlers = makeAmountHandlers('tax', 3, true);              // decimal rehne do
-
-    const phoneHandlers = {
-        keydown: (e) => blockNonDigitKeydown(e, { allowDecimal: false, maxDigits: 15, currentValue: createFormData.phone_number }),
-        paste: (e) => blockNonDigitPaste(e, { allowDecimal: false, maxDigits: 15 }),
-        input: (event) => {
-            const digitsOnly = event.target.value.replace(/\D/g, '').slice(0, 15);
-            event.target.value = digitsOnly;
-            createFormData.phone_number = digitsOnly;
-            markCreateTouched('phone_number');
-        },
-    };
-
-    // Create form watches
+    // Create form watches (live validation only — no character stripping/restriction)
     watch(() => createFormData.name, () => { createTouched.name = true; validateCreateField('name'); });
     watch(() => createFormData.email, () => { createTouched.email = true; validateCreateField('email'); });
     watch(() => createFormData.phone_number, () => { createTouched.phone_number = true; validateCreateField('phone_number'); });
@@ -243,7 +188,6 @@ export function useEmployeeDashboard() {
         insurance_amount: '',
     });
 
-    // Edit form validation state
     const editTouched = reactive({
         name: false,
         email: false,
@@ -292,18 +236,14 @@ export function useEmployeeDashboard() {
         insurance_amount: null,
     });
 
-    // Edit form required fields
     const EDIT_REQUIRED_FIELDS = ['name', 'email', 'phone_number', 'department', 'designation', 'salary', 'joined_date'];
 
-    // COMPUTED: Check if edit form is valid
     const isEditFormValid = computed(() => {
-        // Check if any required field is empty
         for (const field of EDIT_REQUIRED_FIELDS) {
             if (!editFormData[field] || !String(editFormData[field]).trim()) {
                 return false;
             }
         }
-        // Check if any field has an error
         for (const field of Object.keys(editErrors)) {
             if (editErrors[field]) {
                 return false;
@@ -311,6 +251,14 @@ export function useEmployeeDashboard() {
         }
         return true;
     });
+
+    // CNIC validation helper (CNIC restriction rehne di hai — sirf format check)
+    const isValidCnic = (cnic) => !!cnic && /^\d{13}$/.test(cnic.replace(/[-\s]/g, ''));
+
+    const getCnicError = (cnic) => {
+        if (!cnic) return null;
+        return /^\d{13}$/.test(cnic.replace(/[-\s]/g, '')) ? null : 'CNIC must be exactly 13 digits (e.g., 12345-1234567-8)';
+    };
 
     const validateEditField = (field) => {
         const value = editFormData[field];
@@ -347,7 +295,7 @@ export function useEmployeeDashboard() {
                 error = value ? (getCnicError(value) || null) : null;
                 break;
             case 'gender':
-                error = null; // Gender can be empty, no validation needed
+                error = null;
                 break;
             case 'present_address':
                 error = value ? getAddressLengthError(value, 250, 'Present address') : null;
@@ -397,79 +345,7 @@ export function useEmployeeDashboard() {
         validateEditField(field);
     };
 
-    // CNIC validation helper
-    const isValidCnic = (cnic) => !!cnic && /^\d{13}$/.test(cnic.replace(/[-\s]/g, ''));
-
-    const getCnicError = (cnic) => {
-        if (!cnic) return null;
-        return /^\d{13}$/.test(cnic.replace(/[-\s]/g, '')) ? null : 'CNIC must be exactly 13 digits (e.g., 12345-1234567-8)';
-    };
-
-    // Edit form input handlers
-    const editAlphaHandlers = (field) => ({
-        keydown: blockNonAlphaKeydown,
-        paste: blockNonAlphaPaste,
-        input: (event) => {
-            const cleaned = event.target.value.replace(/[^A-Za-z\s]/g, '');
-            event.target.value = cleaned;
-            editFormData[field] = cleaned;
-            markEditTouched(field);
-        },
-    });
-
-    const editNameHandlers = editAlphaHandlers('name');
-    const editDesignationHandlers = editAlphaHandlers('designation');
-    const editDepartmentHandlers = editAlphaHandlers('department');
-
-    const editAmountHandlers = (field, maxDigits = 8, allowDecimal = true) => ({
-        keydown: (e) => blockNonDigitKeydown(e, { allowDecimal, maxDigits, currentValue: editFormData[field] }),
-        paste: (e) => blockNonDigitPaste(e, { allowDecimal, maxDigits }),
-        input: (event) => {
-            let value = allowDecimal
-                ? event.target.value.replace(/[^0-9.]/g, '')
-                : event.target.value.replace(/[^0-9]/g, '');
-            if (allowDecimal) {
-                const parts = value.split('.');
-                if (parts.length > 2) value = parts[0] + '.' + parts.slice(1).join('');
-                if (parts[0] && parts[0].length > maxDigits) {
-                    value = parts[0].slice(0, maxDigits) + (parts[1] !== undefined ? '.' + parts[1] : '');
-                }
-            } else if (value.length > maxDigits) {
-                value = value.slice(0, maxDigits);
-            }
-            event.target.value = value;
-            editFormData[field] = value;
-            markEditTouched(field);
-        },
-    });
-
-    const editSalaryHandlers = editAmountHandlers('salary', 8, false);
-    const editInsuranceHandlers = editAmountHandlers('insurance_amount', 8, false);
-    const editTaxHandlers = editAmountHandlers('tax', 3, true);
-
-
-    const editPhoneHandlers = {
-        keydown: (e) => blockNonDigitKeydown(e, { allowDecimal: false, maxDigits: 15, currentValue: editFormData.phone_number }),
-        paste: (e) => blockNonDigitPaste(e, { allowDecimal: false, maxDigits: 15 }),
-        input: (event) => {
-            const digitsOnly = event.target.value.replace(/\D/g, '').slice(0, 15);
-            event.target.value = digitsOnly;
-            editFormData.phone_number = digitsOnly;
-            markEditTouched('phone_number');
-        },
-    };
-    const emergencyPhoneHandlers = {
-        keydown: (e) => blockNonDigitKeydown(e, { allowDecimal: false, maxDigits: 15, currentValue: editFormData.emergency_phone }),
-        paste: (e) => blockNonDigitPaste(e, { allowDecimal: false, maxDigits: 15 }),
-        input: (event) => {
-            const digitsOnly = event.target.value.replace(/\D/g, '').slice(0, 15);
-            event.target.value = digitsOnly;
-            editFormData.emergency_phone = digitsOnly;
-            markEditTouched('emergency_phone');
-        },
-    };
-
-    // Edit form watches for live validation
+    // Edit form watches for live validation (no restriction, no stripping)
     watch(() => editFormData.name, () => { editTouched.name = true; validateEditField('name'); });
     watch(() => editFormData.email, () => { editTouched.email = true; validateEditField('email'); });
     watch(() => editFormData.phone_number, () => { editTouched.phone_number = true; validateEditField('phone_number'); });
@@ -493,11 +369,7 @@ export function useEmployeeDashboard() {
     watch(() => editFormData.insurance_amount, () => { editTouched.insurance_amount = true; validateEditField('insurance_amount'); });
 
     // ==================== REST OF THE CODE ====================
-    // (Pagination, stats, loadEmployees, updateEmployee, etc. remain the same)
 
-    // ... existing pagination code ...
-
-    // Computed for pagination
     const pageNumbers = computed(() => {
         const total = totalPages.value;
         const current = currentPage.value;
@@ -712,9 +584,7 @@ export function useEmployeeDashboard() {
         try {
             const formDataPayload = new FormData();
 
-            // ADD THIS LINE:
             formDataPayload.append('source', 'admin_quick');
-
             formDataPayload.append('name', createFormData.name.trim());
             formDataPayload.append('email', createFormData.email.trim());
             formDataPayload.append('phone_number', createFormData.phone_number.trim());
@@ -773,7 +643,6 @@ export function useEmployeeDashboard() {
         showStrongMessage.value = false;
         if (strongMessageTimeout) clearTimeout(strongMessageTimeout);
 
-        // Reset validation state
         Object.keys(editTouched).forEach((k) => { editTouched[k] = false; });
         Object.keys(editErrors).forEach((k) => { editErrors[k] = null; });
 
@@ -786,7 +655,7 @@ export function useEmployeeDashboard() {
             status: employee.status || employee.employment_status || 'Permanent',
             is_active: employee.is_active === true || employee.is_active === 'true' || employee.account_status === 'Active',
             work_from_home: employee.work_from_home === true || employee.work_from_home === 'true',
-            salary: employee.salary ? String(Math.trunc(Number(employee.salary))) : '',              // CHANGED
+            salary: employee.salary ? String(Math.trunc(Number(employee.salary))) : '',
             joined_date: employee.joined_date || '',
             employee_number: employee.employee_number || '',
             cnic: employee.cnic || '',
@@ -804,7 +673,7 @@ export function useEmployeeDashboard() {
             password: '',
             confirmPassword: '',
             tax: employee.tax || '',
-            insurance_amount: employee.insurance_amount ? String(Math.trunc(Number(employee.insurance_amount))) : '',  // CHANGED
+            insurance_amount: employee.insurance_amount ? String(Math.trunc(Number(employee.insurance_amount))) : '',
         });
 
         EDIT_REQUIRED_FIELDS.forEach(field => {
@@ -824,13 +693,11 @@ export function useEmployeeDashboard() {
     };
 
     const handleUpdateEmployee = async () => {
-        // Mark all fields as touched to show errors
         Object.keys(editTouched).forEach((field) => {
             editTouched[field] = true;
             validateEditField(field);
         });
 
-        // Check if form is valid
         let isValid = true;
         for (const field of Object.keys(editErrors)) {
             if (editErrors[field]) {
@@ -1186,32 +1053,16 @@ export function useEmployeeDashboard() {
         initialize,
         cleanup,
         tempStatusId,
-        // Create Employee modal validation
         createTouched,
         createErrors,
         markCreateTouched,
         validateCreateField,
         isCreateFormValid,
-        nameHandlers,
-        designationHandlers,
-        departmentHandlers,
-        salaryHandlers,
-        insuranceHandlers,
-        taxHandlers,
-        phoneHandlers,
-        // Edit Employee modal validation
         editTouched,
         editErrors,
         markEditTouched,
         validateEditField,
         isEditFormValid,
-        editNameHandlers,
-        editDesignationHandlers,
-        editDepartmentHandlers,
-        editSalaryHandlers,
-        editInsuranceHandlers,
-        editTaxHandlers,
-        editPhoneHandlers,
         isValidCnic,
         getCnicError,
     };

@@ -842,13 +842,6 @@ export default {
         isDirectAccess.value = true;
       }
     };
-
-    // All step 1-4 field/file validation lives in the composable (single source
-    // of truth — see composables/useValidation.js + composables/useEmployeeRegistration.js).
-    // NOTE: native HTML "required" is now bound to `isDirectAccess` throughout the
-    // template above — required only applies on the public onboarding link, not
-    // inside the admin modal. All JS-level (length/format/file-type) validation
-    // below is unchanged and still runs for BOTH modes.
     const registration = useEmployeeRegistration(isDirectAccess);
 
     const {

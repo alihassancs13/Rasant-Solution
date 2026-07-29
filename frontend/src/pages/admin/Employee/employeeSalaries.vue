@@ -38,11 +38,13 @@ const payrollErrors = ref({
   overtime_rate_per_hour: '',
   late_count_threshold: '',
   office_radius_meters: '',
+  default_timetable: '',
 })
 
 const {
   getGraceMinutesError, getAllowedPaidLimitError, getUnpaidAbsentsError,
   getOvertimeRateError, getFreeLatesError, getOfficeRadiusError,
+  getCredentialLabelError,
   blockNonDigitKeydown, blockNonDigitPaste,
 } = useValidation()
 
@@ -109,6 +111,9 @@ function validatePayrollField(key) {
     case 'allowed_leaves_per_month':
       payrollErrors.value.allowed_leaves_per_month = getAllowedPaidLimitError(val) || ''
       break
+    case 'default_timetable':
+      payrollErrors.value.default_timetable = getCredentialLabelError(val, 50, 'Default shift') || ''
+      break
     case 'allowed_absents_per_month':
       payrollErrors.value.allowed_absents_per_month = getUnpaidAbsentsError(val) || ''
       break
@@ -126,11 +131,9 @@ function validatePayrollField(key) {
   }
 }
 
-// Single source of truth for which fields get validated before a save — was
-// duplicated 3x (openSaveSettingsModal + two identical confirmSavePayrollSettings).
 const PAYROLL_VALIDATION_FIELDS = [
   'grace_minutes', 'allowed_leaves_per_month', 'allowed_absents_per_month',
-  'overtime_rate_per_hour', 'late_count_threshold', 'office_radius_meters',
+  'overtime_rate_per_hour', 'office_radius_meters', 'default_timetable',
 ]
 const validateAllPayrollFields = () => PAYROLL_VALIDATION_FIELDS.forEach(validatePayrollField)
 
@@ -782,8 +785,8 @@ watch(() => route.query.highlightEmployee, (newVal) => {
             <div class="dash-field">
               <label>Grace Minutes</label>
               <input v-model.number="payrollSettings.grace_minutes" type="number" min="0" max="480"
-                     @keydown="blockNonDigitKeydown($event, { maxDigits: 3, currentValue: payrollSettings.grace_minutes })"
-                     @paste="blockNonDigitPaste($event, { maxDigits: 3 })"
+                     @keydown="blockNonDigitKeydown($event, { currentValue: payrollSettings.grace_minutes })"
+                     @paste="blockNonDigitPaste($event, {})"
                      @input="validatePayrollField('grace_minutes')"
                      class="w-full mt-1 px-3.5 py-2.5 rounded-md border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
                      :class="payrollErrors.grace_minutes ? 'border-danger' : 'border-border'" />
@@ -794,8 +797,8 @@ watch(() => route.query.highlightEmployee, (newVal) => {
             <div class="dash-field">
               <label>Allowed Paid Leaves / Month</label>
               <input v-model.number="payrollSettings.allowed_leaves_per_month" type="number" min="0" max="31"
-                     @keydown="blockNonDigitKeydown($event, { maxDigits: 2, currentValue: payrollSettings.allowed_leaves_per_month })"
-                     @paste="blockNonDigitPaste($event, { maxDigits: 2 })"
+                     @keydown="blockNonDigitKeydown($event, { currentValue: payrollSettings.allowed_leaves_per_month })"
+                     @paste="blockNonDigitPaste($event, {})"
                      @input="validatePayrollField('allowed_leaves_per_month')"
                      class="w-full mt-1 px-3.5 py-2.5 rounded-md border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
                      :class="payrollErrors.allowed_leaves_per_month ? 'border-danger' : 'border-border'" />
@@ -805,10 +808,9 @@ watch(() => route.query.highlightEmployee, (newVal) => {
 
             <div class="dash-field">
               <label>Allowed Unpaid-Free Absents / Month</label>
-              <!-- NAYA -->
               <input v-model.number="payrollSettings.allowed_absents_per_month" type="number" min="0" max="31"
-                     @keydown="blockNonDigitKeydown($event, { maxDigits: 2, currentValue: payrollSettings.allowed_absents_per_month })"
-                     @paste="blockNonDigitPaste($event, { maxDigits: 2 })"
+                     @keydown="blockNonDigitKeydown($event, { currentValue: payrollSettings.allowed_absents_per_month })"
+                     @paste="blockNonDigitPaste($event, {})"
                      @input="validatePayrollField('allowed_absents_per_month')"
 
                      class="w-full mt-1 px-3.5 py-2.5 rounded-md border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
@@ -821,8 +823,8 @@ watch(() => route.query.highlightEmployee, (newVal) => {
               <label>Overtime Rate / Hour</label>
               <!-- NAYA -->
               <input v-model.number="payrollSettings.overtime_rate_per_hour" type="number" step="0.01" min="0" max="1000"
-                     @keydown="blockNonDigitKeydown($event, { allowDecimal: true, maxDigits: 4, currentValue: payrollSettings.overtime_rate_per_hour })"
-                     @paste="blockNonDigitPaste($event, { allowDecimal: true, maxDigits: 4 })"
+                     @keydown="blockNonDigitKeydown($event, { allowDecimal: true, currentValue: payrollSettings.overtime_rate_per_hour })"
+                     @paste="blockNonDigitPaste($event, { allowDecimal: true })"
                      @input="validatePayrollField('overtime_rate_per_hour')"
                      class="w-full mt-1 px-3.5 py-2.5 rounded-md border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
                      :class="payrollErrors.overtime_rate_per_hour ? 'border-danger' : 'border-border'" />
@@ -833,16 +835,19 @@ watch(() => route.query.highlightEmployee, (newVal) => {
               <label>Default Shift (self check-in)</label>
               <input v-model="payrollSettings.default_timetable" type="text"
                      placeholder="10 - 7"
-                     class="w-full mt-1 px-3.5 py-2.5 rounded-md border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" />
-              <p class="text-xs text-text-muted mt-1">Used when employees punch in from Overview (e.g. 10 - 7).</p>
+                     @input="validatePayrollField('default_timetable')"
+                     class="w-full mt-1 px-3.5 py-2.5 rounded-md border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+                     :class="payrollErrors.default_timetable ? 'border-danger' : 'border-border'" />
+              <p v-if="payrollErrors.default_timetable" class="text-xs text-danger mt-1">{{ payrollErrors.default_timetable }}</p>
+              <p v-else class="text-xs text-text-muted mt-1">Used when employees punch in from Overview (e.g. 10 - 7).</p>
             </div>
 
             <div class="dash-field">
               <label>Office Radius (meters)</label>
               <!-- NAYA -->
               <input v-model.number="payrollSettings.office_radius_meters" type="number" min="10" max="5000"
-                     @keydown="blockNonDigitKeydown($event, { maxDigits: 4, currentValue: payrollSettings.office_radius_meters })"
-                     @paste="blockNonDigitPaste($event, { maxDigits: 4 })"
+                     @keydown="blockNonDigitKeydown($event, { currentValue: payrollSettings.office_radius_meters })"
+                     @paste="blockNonDigitPaste($event, {})"
                      @input="validatePayrollField('office_radius_meters')"
                      class="w-full mt-1 px-3.5 py-2.5 rounded-md border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
                      :class="payrollErrors.office_radius_meters ? 'border-danger' : 'border-border'" />

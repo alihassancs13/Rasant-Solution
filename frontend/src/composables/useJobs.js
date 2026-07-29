@@ -7,10 +7,8 @@ import { useValidation } from './useValidation.js'
 export function useJobs() {
     const jobStore = useJobStore()
     const { showToast } = useToast()
-    const { getUsernameError, getAmountError } = useValidation()
-
+    const { getUsernameError, getAmountError, getLocationError, requiredLengthError } = useValidation()
     const getStatusId = (name) => jobStore.jobStatus.find(s => s.name?.toLowerCase() === name.toLowerCase())?.id ?? null
-
     const formData = reactive({
         job_title: '', job_type: null, department: '', location: '',
         salary_range: null, description: '', requirements: '', status: null, id: null,
@@ -37,16 +35,14 @@ export function useJobs() {
     const touchField = (key) => { touched[key] = true }
     const touchAll = () => { Object.keys(formData).forEach((key) => { touched[key] = true }) }
 
-    // Single source of truth — live watch (borders + button) aur submit-time
-    // validateForm() dono isi se chalte hain, koi duplicate rule nahi.
     const collectErrors = () => ({
         job_title: getUsernameError(formData.job_title, undefined, 'Job title'),
         job_type: formData.job_type ? null : 'Job type is required.',
         department: getUsernameError(formData.department, undefined, 'Department'),
-        location: getUsernameError(formData.location, undefined, 'Location'),
+        location: getLocationError(formData.location, 50, 'Location'),
         salary_range: getAmountError(formData.salary_range, undefined, 'Salary range'),
-        description: formData.description.trim() ? null : 'Description is required.',
-        requirements: formData.requirements.trim() ? null : 'Requirements are required.',
+        description: requiredLengthError(formData.description, 'Description', 2000),
+        requirements: requiredLengthError(formData.requirements, 'Requirements', 2000),
     })
 
     watch(formData, () => {

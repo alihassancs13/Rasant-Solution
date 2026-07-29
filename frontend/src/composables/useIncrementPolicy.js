@@ -93,7 +93,7 @@ export function useIncrementPolicy(employees) {
             id: policy.id,
             policy_name: policy.policy_name,
             increment_type: policy.increment_type,
-            amount: policy.amount,
+            amount: policy.amount != null ? String(Math.trunc(Number(policy.amount))) : '',
             cycle_timing: policy.cycle_timing,
             application_mode: policy.application_mode,
             description: policy.description || '',
@@ -460,13 +460,11 @@ export function useIncrementPolicy(employees) {
         bonusDraft.value = 0
     }
 
-    // Numeric guards for the Amount field — thin wrappers around the shared
-    // useValidation guards (previously ~25 lines duplicated here).
     const blockNonNumericAmount = (e) =>
-        blockNonDigitKeydown(e, { allowDecimal: true, maxDigits: LENGTH_LIMITS.amount.maxDigits, currentValue: formData.amount })
+        blockNonDigitKeydown(e, { currentValue: formData.amount })
 
     const blockNonNumericPaste = (e) =>
-        blockNonDigitPaste(e, { allowDecimal: true, maxDigits: LENGTH_LIMITS.amount.maxDigits })
+        blockNonDigitPaste(e, {})
 
     watch(() => formData.policy_name, (val) => {
         formErrors.policy_name = getUsernameError(val) || ''
@@ -517,6 +515,6 @@ export function useIncrementPolicy(employees) {
         isEmployeeDueToday, employeeDetail, isEmployeeDetailLoading,
         showEmployeeDetailModal, fetchEmployeeDetail,
         openEmployeeDetailModal, closeEmployeeDetailModal,
-        bonusDraft, isSavingBonus, saveMonthlyBonus, blockNonNumericAmount, blockNonNumericPaste,
+        bonusDraft, isSavingBonus, saveMonthlyBonus, blockNonNumericAmount, blockNonNumericPaste,getAmountError
     }
 }
