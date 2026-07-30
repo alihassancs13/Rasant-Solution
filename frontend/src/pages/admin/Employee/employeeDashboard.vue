@@ -1036,7 +1036,7 @@
     <EmployeeBaseModal
         :is-open="isViewModalOpen"
         mode="view"
-        title="Edit Employee"
+        title="View Employee"
         :subtitle="viewEmployee?.employee_number || 'RS-0726-04'"
         size="lg"
         @close="closeViewModal"

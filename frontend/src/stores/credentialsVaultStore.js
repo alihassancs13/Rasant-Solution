@@ -1,6 +1,26 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { BASE_URL, API_ENDPOINTS } from '@/services/baseUrl.js'
+import axios from 'axios'
+
+// Create axios client like other stores
+const getAuthToken = () => {
+    const token = localStorage.getItem('access_token') ||
+        localStorage.getItem('accessToken') ||
+        localStorage.getItem('token')
+    return token
+}
+
+const apiClient = axios.create({
+    baseURL: BASE_URL,
+    headers: { 'Content-Type': 'application/json' },
+})
+
+apiClient.interceptors.request.use((config) => {
+    const token = getAuthToken()
+    if (token) config.headers.Authorization = `Bearer ${token}`
+    return config
+})
 
 export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
     const credentials = ref([])
@@ -19,12 +39,7 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
         if (!credentials.value) return 0
         return credentials.value.filter(c => c.needsRotation).length
     })
-    const getAuthToken = () => {
-        const token = localStorage.getItem('access_token') ||
-            localStorage.getItem('accessToken') ||
-            localStorage.getItem('token')
-        return token
-    }
+
     // Actions
     const fetchCredentials = async () => {
         loading.value = true
@@ -36,31 +51,11 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
                 throw new Error('No authentication token found. Please login again.')
             }
 
-            const url = `${BASE_URL}${API_ENDPOINTS.CREDENTIALS.GET_ALL}`
-            console.log('Fetching credentials from:', url)
+            const response = await apiClient.get(API_ENDPOINTS.CREDENTIALS.GET_ALL)
+            console.log('Fetching credentials from:', response.config.url)
+            console.log('API Response:', response.data)
 
-            const response = await fetch(url, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                }
-            })
-
-            if (response.status === 401) {
-                localStorage.removeItem('access_token')
-                localStorage.removeItem('accessToken')
-                localStorage.removeItem('token')
-                window.location.href = '/login'
-                throw new Error('Session expired. Please login again.')
-            }
-
-            if (!response.ok) {
-                throw new Error(`Failed to fetch credentials: ${response.status} ${response.statusText}`)
-            }
-
-            const data = await response.json()
-            console.log('API Response:', data)
+            const data = response.data
 
             let credentialsData = []
             if (data.data && Array.isArray(data.data)) {
@@ -93,9 +88,17 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
             return { success: true, data: credentials.value }
 
         } catch (err) {
-            error.value = err.message
+            if (err.response && err.response.status === 401) {
+                localStorage.removeItem('access_token')
+                localStorage.removeItem('accessToken')
+                localStorage.removeItem('token')
+                window.location.href = '/login'
+                error.value = 'Session expired. Please login again.'
+                return { success: false, error: 'Session expired. Please login again.' }
+            }
+            error.value = err.response?.data?.message || err.response?.data?.error || err.message || 'Failed to fetch credentials'
             console.error('Error fetching credentials:', err)
-            return { success: false, error: err.message }
+            return { success: false, error: error.value }
         } finally {
             loading.value = false
         }
@@ -110,19 +113,11 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
                 throw new Error('No authentication token found. Please login again.')
             }
 
-            const cleanedBaseUrl = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL
-            const url = `${cleanedBaseUrl}${API_ENDPOINTS.CREDENTIALS.REMOVE_SHARE}`
-
-            const response = await fetch(url, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
+            const response = await apiClient.delete(API_ENDPOINTS.CREDENTIALS.REMOVE_SHARE, {
+                data: {
                     credential_id: credentialId,
                     employee_id: employeeId
-                })
+                }
             })
 
             if (response.status === 401) {
@@ -133,79 +128,72 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
                 throw new Error('Session expired. Please login again.')
             }
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}))
-                throw new Error(
-                    errorData.error || errorData.message || `Failed to remove share: ${response.status}`
-                )
-            }
-
-            const data = await response.json()
-            return { success: true, data }
+            return { success: true, data: response.data }
 
         } catch (err) {
-            error.value = err.message
+            if (err.response && err.response.status === 401) {
+                localStorage.removeItem('access_token')
+                localStorage.removeItem('accessToken')
+                localStorage.removeItem('token')
+                window.location.href = '/login'
+                error.value = 'Session expired. Please login again.'
+                return { success: false, error: 'Session expired. Please login again.' }
+            }
+            error.value = err.response?.data?.error || err.response?.data?.message || err.message || 'Failed to remove share'
             console.error('Error removing credential share:', err)
-            return { success: false, error: err.message }
+            return { success: false, error: error.value }
         } finally {
             loading.value = false
         }
     }
+
     // Fetch employee credentials
     const fetchEmployeeCredentials = async (employeeId) => {
         loading.value = true
         error.value = null
         try {
-            const cleanedBaseUrl = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL;
-            const endpoint = API_ENDPOINTS.CREDENTIALS.GET_EMPLOYEE_CREDENTIALS(employeeId);
-            const fullUrl = `${cleanedBaseUrl}${endpoint}`;
-
-            console.log('Fetching employee credentials from:', fullUrl);
-
-            const token = getAuthToken();
-            const headers = { 'Content-Type': 'application/json' };
-            if (token) headers['Authorization'] = `Bearer ${token}`;
-
-            const response = await fetch(fullUrl, { method: 'GET', headers });
-
-            if (response.status === 401) {
-                localStorage.removeItem('access_token')
-                localStorage.removeItem('accessToken')
-                localStorage.removeItem('token')
-                window.location.href = '/login'
-                throw new Error('Session expired. Please login again.')
+            const token = getAuthToken()
+            if (!token) {
+                throw new Error('No authentication token found. Please login again.')
             }
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.message || `HTTP Error: ${response.status}`);
-            }
+            const endpoint = API_ENDPOINTS.CREDENTIALS.GET_EMPLOYEE_CREDENTIALS(employeeId)
+            const response = await apiClient.get(endpoint)
 
-            const data = await response.json();
-            console.log(' Employee credentials response:', data);
+            console.log('Employee credentials response:', response.data)
+
+            const data = response.data
 
             if (data.status === 'success' && data.credentials) {
                 credentials.value = data.credentials.map(cred => ({
                     ...cred,
                     showPassword: false,
-                }));
-                totalCount.value = credentials.value.length;
-                console.log(' Credentials loaded:', credentials.value.length);
+                }))
+                totalCount.value = credentials.value.length
+                console.log('Credentials loaded:', credentials.value.length)
             } else {
-                credentials.value = [];
-                totalCount.value = 0;
-                throw new Error(data.message || 'Failed to fetch credentials');
+                credentials.value = []
+                totalCount.value = 0
+                throw new Error(data.message || 'Failed to fetch credentials')
             }
 
-            return { success: true, data: credentials.value };
-        } catch (error) {
-            error.value = error.message || 'Failed to fetch employee credentials';
-            credentials.value = [];
-            totalCount.value = 0;
-            console.error(' Error fetching employee credentials:', error);
-            return { success: false, error: error.value };
+            return { success: true, data: credentials.value }
+        } catch (err) {
+            if (err.response && err.response.status === 401) {
+                localStorage.removeItem('access_token')
+                localStorage.removeItem('accessToken')
+                localStorage.removeItem('token')
+                window.location.href = '/login'
+                error.value = 'Session expired. Please login again.'
+                return { success: false, error: 'Session expired. Please login again.' }
+            }
+            error.value = err.response?.data?.message || err.response?.data?.error || err.message || 'Failed to fetch employee credentials'
+            credentials.value = []
+            totalCount.value = 0
+            console.error('Error fetching employee credentials:', err)
+            return { success: false, error: error.value }
         } finally {
-            loading.value = false;
+            loading.value = false
         }
     }
 
@@ -218,16 +206,8 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
             if (!token) {
                 throw new Error('No authentication token found. Please login again.')
             }
-            const url = `${BASE_URL}${API_ENDPOINTS.CREDENTIALS.CREATE}`
 
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(credentialData)
-            })
+            const response = await apiClient.post(API_ENDPOINTS.CREDENTIALS.CREATE, credentialData)
 
             if (response.status === 401) {
                 localStorage.removeItem('access_token')
@@ -237,30 +217,7 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
                 throw new Error('Session expired. Please login again.')
             }
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}))
-
-                // Check for field-specific validation errors
-                let errorMessage = errorData.message || `Failed to create credential: ${response.status}`
-
-                // Handle Django serializer validation errors
-                if (errorData.errors) {
-                    const fieldErrors = []
-                    if (errorData.errors.username) {
-                        fieldErrors.push(errorData.errors.username.join(' '))
-                    }
-                    if (errorData.errors.email) {
-                        fieldErrors.push(errorData.errors.email.join(' '))
-                    }
-                    if (fieldErrors.length > 0) {
-                        errorMessage = fieldErrors.join(' ')
-                    }
-                }
-
-                throw new Error(errorMessage)
-            }
-
-            const data = await response.json()
+            const data = response.data
 
             let newCred = {}
             if (data.data) {
@@ -290,9 +247,33 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
             return { success: true, data: addedCred }
 
         } catch (err) {
-            error.value = err.message
+            if (err.response && err.response.status === 401) {
+                localStorage.removeItem('access_token')
+                localStorage.removeItem('accessToken')
+                localStorage.removeItem('token')
+                window.location.href = '/login'
+                error.value = 'Session expired. Please login again.'
+                return { success: false, error: 'Session expired. Please login again.' }
+            }
+
+            // Handle validation errors
+            let errorMessage = err.response?.data?.message || err.message || 'Failed to create credential'
+            if (err.response?.data?.errors) {
+                const fieldErrors = []
+                if (err.response.data.errors.username) {
+                    fieldErrors.push(err.response.data.errors.username.join(' '))
+                }
+                if (err.response.data.errors.email) {
+                    fieldErrors.push(err.response.data.errors.email.join(' '))
+                }
+                if (fieldErrors.length > 0) {
+                    errorMessage = fieldErrors.join(' ')
+                }
+            }
+
+            error.value = errorMessage
             console.error('Error creating credential:', err)
-            return { success: false, error: err.message }
+            return { success: false, error: errorMessage }
         } finally {
             loading.value = false
         }
@@ -307,17 +288,10 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
                 throw new Error('No authentication token found. Please login again.')
             }
 
-            const cleanedBaseUrl = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL
-            const url = `${cleanedBaseUrl}${API_ENDPOINTS.CREDENTIALS.UPDATE(credentialId)}`
-
-            const response = await fetch(url, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify(credentialData),
-            })
+            const response = await apiClient.put(
+                API_ENDPOINTS.CREDENTIALS.UPDATE(credentialId),
+                credentialData
+            )
 
             if (response.status === 401) {
                 localStorage.removeItem('access_token')
@@ -327,21 +301,7 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
                 throw new Error('Session expired. Please login again.')
             }
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}))
-                let errorMessage = errorData.error || errorData.message || `Failed to update credential: ${response.status}`
-                if (errorData.errors) {
-                    const fieldErrors = []
-                    Object.values(errorData.errors).forEach((msgs) => {
-                        if (Array.isArray(msgs)) fieldErrors.push(msgs.join(' '))
-                        else if (msgs) fieldErrors.push(String(msgs))
-                    })
-                    if (fieldErrors.length) errorMessage = fieldErrors.join(' ')
-                }
-                throw new Error(errorMessage)
-            }
-
-            const data = await response.json()
+            const data = response.data
             const updated = data.data || data
             const idx = credentials.value.findIndex((c) => c.id === credentialId)
             if (idx > -1) {
@@ -362,9 +322,28 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
 
             return { success: true, data: credentials.value[idx] || updated }
         } catch (err) {
-            error.value = err.message
+            if (err.response && err.response.status === 401) {
+                localStorage.removeItem('access_token')
+                localStorage.removeItem('accessToken')
+                localStorage.removeItem('token')
+                window.location.href = '/login'
+                error.value = 'Session expired. Please login again.'
+                return { success: false, error: 'Session expired. Please login again.' }
+            }
+
+            let errorMessage = err.response?.data?.error || err.response?.data?.message || err.message || 'Failed to update credential'
+            if (err.response?.data?.errors) {
+                const fieldErrors = []
+                Object.values(err.response.data.errors).forEach((msgs) => {
+                    if (Array.isArray(msgs)) fieldErrors.push(msgs.join(' '))
+                    else if (msgs) fieldErrors.push(String(msgs))
+                })
+                if (fieldErrors.length) errorMessage = fieldErrors.join(' ')
+            }
+
+            error.value = errorMessage
             console.error('Error updating credential:', err)
-            return { success: false, error: err.message }
+            return { success: false, error: errorMessage }
         } finally {
             loading.value = false
         }
@@ -379,16 +358,9 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
                 throw new Error('No authentication token found. Please login again.')
             }
 
-            const cleanedBaseUrl = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL
-            const url = `${cleanedBaseUrl}${API_ENDPOINTS.CREDENTIALS.DELETE(credentialId)}`
-
-            const response = await fetch(url, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-            })
+            const response = await apiClient.delete(
+                API_ENDPOINTS.CREDENTIALS.DELETE(credentialId)
+            )
 
             if (response.status === 401) {
                 localStorage.removeItem('access_token')
@@ -398,18 +370,21 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
                 throw new Error('Session expired. Please login again.')
             }
 
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}))
-                throw new Error(errorData.error || errorData.message || `Failed to delete credential: ${response.status}`)
-            }
-
             credentials.value = credentials.value.filter((c) => c.id !== credentialId)
             totalCount.value = Math.max(0, totalCount.value - 1)
             return { success: true }
         } catch (err) {
-            error.value = err.message
+            if (err.response && err.response.status === 401) {
+                localStorage.removeItem('access_token')
+                localStorage.removeItem('accessToken')
+                localStorage.removeItem('token')
+                window.location.href = '/login'
+                error.value = 'Session expired. Please login again.'
+                return { success: false, error: 'Session expired. Please login again.' }
+            }
+            error.value = err.response?.data?.error || err.response?.data?.message || err.message || 'Failed to delete credential'
             console.error('Error deleting credential:', err)
-            return { success: false, error: err.message }
+            return { success: false, error: error.value }
         } finally {
             loading.value = false
         }
@@ -425,18 +400,9 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
                 throw new Error('No authentication token found. Please login again.')
             }
 
-            const url = `${BASE_URL}${API_ENDPOINTS.CREDENTIALS.SHARE}`
-
-            const response = await fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify({
-                    credential_id: credentialId,
-                    employee_id: employeeIds
-                })
+            const response = await apiClient.post(API_ENDPOINTS.CREDENTIALS.SHARE, {
+                credential_id: credentialId,
+                employee_id: employeeIds
             })
 
             if (response.status === 401) {
@@ -447,22 +413,25 @@ export const useCredentialsVaultStore = defineStore('credentialsVault', () => {
                 throw new Error('Session expired. Please login again.')
             }
 
-            const data = await response.json()
-
-            if (!response.ok) {
-                throw new Error(data.error || `Failed to share credential: ${response.status}`)
-            }
-
-            return { success: true, data }
+            return { success: true, data: response.data }
 
         } catch (err) {
-            error.value = err.message
+            if (err.response && err.response.status === 401) {
+                localStorage.removeItem('access_token')
+                localStorage.removeItem('accessToken')
+                localStorage.removeItem('token')
+                window.location.href = '/login'
+                error.value = 'Session expired. Please login again.'
+                return { success: false, error: 'Session expired. Please login again.' }
+            }
+            error.value = err.response?.data?.error || err.response?.data?.message || err.message || 'Failed to share credential'
             console.error('Error sharing credential:', err)
-            return { success: false, error: err.message }
+            return { success: false, error: error.value }
         } finally {
             loading.value = false
         }
     }
+
     const togglePassword = (credentialId) => {
         const cred = credentials.value.find(c => c.id === credentialId);
         if (cred) {

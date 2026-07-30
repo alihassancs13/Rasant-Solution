@@ -77,11 +77,6 @@ export const useSidebarStore = defineStore('sidebar', {
             this.isLoading = false;
         },
 
-        /**
-         * @param {{ force?: boolean }} [opts]
-         * Skips network when cache is fresh unless force=true.
-         * Does not show loading spinner when modules are already on screen.
-         */
         async fetchModules(opts = {}) {
             const force = Boolean(opts.force);
 
