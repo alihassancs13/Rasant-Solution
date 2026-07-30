@@ -28,12 +28,16 @@ def apply_holiday_attendance(holiday_date: date) -> int:
     """
     Mark every active employee's attendance for holiday_date as holiday (paid).
     Does not wipe punches if the employee already clocked in that day.
+    Also resyncs each affected employee's payroll slip for that month so
+    present/absent/late/deduction figures stay accurate.
     """
     settings_obj = PayrollSettings.get_settings()
     timetable = settings_obj.default_timetable or "10 - 7"
-    employees = Employee.objects.filter(is_active=True)
+    employees = list(Employee.objects.filter(is_active=True))
     marked = 0
-    for emp in employees.iterator():
+    touched_employees = []
+
+    for emp in employees:
         record, created = Attendance.objects.get_or_create(
             employee=emp,
             date=holiday_date,
@@ -50,6 +54,7 @@ def apply_holiday_attendance(holiday_date: date) -> int:
         )
         if created:
             marked += 1
+            touched_employees.append(emp)
             continue
         # Already punched — keep their work day; otherwise force holiday
         if record.clock_in:
@@ -72,6 +77,14 @@ def apply_holiday_attendance(holiday_date: date) -> int:
             ]
         )
         marked += 1
+        touched_employees.append(emp)
+
+    # Resync payroll for every employee whose attendance we actually changed.
+    from .views import sync_payroll_for_month
+
+    for emp in touched_employees:
+        sync_payroll_for_month(emp, holiday_date)
+
     return marked
 
 

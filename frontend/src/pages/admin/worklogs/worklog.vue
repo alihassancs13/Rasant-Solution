@@ -473,7 +473,9 @@
                 class="w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition-all duration-200"
                 :class="touched.summary && fieldErrors.summary ? 'border-red-500' : 'border-gray-200'"
             />
-            <p v-if="touched.summary && fieldErrors.summary" class="text-red-500 text-xs mt-1">{{ fieldErrors.summary }}</p>
+            <p v-if="(touched.summary || !isFormValid) && fieldErrors.summary" class="text-red-500 text-xs mt-1">
+              {{ fieldErrors.summary }}
+            </p>
             <input type="hidden" v-model="worklogForm.issue_key" />
           </div>
 

@@ -398,7 +398,13 @@ class EmployeeListSerializer(serializers.ModelSerializer):
         return SalaryIncrementHistory.objects.filter(employee=obj).count()
 
     def get_net_salary(self, obj):
-        latest_deduction = obj.deduction_history.first()
+        from datetime import date
+
+        current_month = date.today().replace(day=1)
+        latest_deduction = obj.deduction_history.filter(deduction_month=current_month).first()
+        if latest_deduction is None:
+
+            latest_deduction = obj.deduction_history.first()
         return latest_deduction.net_salary if latest_deduction else None
 
 

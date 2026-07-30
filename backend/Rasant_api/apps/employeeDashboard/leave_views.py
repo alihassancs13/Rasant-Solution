@@ -321,6 +321,21 @@ def decide_leave_request(request, pk):
             is_half_day=bool(row.is_half_day),
         )
 
+        # Keep the payroll slip in sync with the attendance we just marked.
+        # Leave can span one or two calendar months — resync every distinct
+        # month touched (start month and end month cover the full range).
+        from .views import sync_payroll_for_month
+
+        affected_months = set()
+        cursor = row.start_date.replace(day=1)
+        end_month = row.end_date.replace(day=1)
+        while cursor <= end_month:
+            affected_months.add(cursor)
+            cursor = (cursor + timedelta(days=32)).replace(day=1)
+
+        for month in affected_months:
+            sync_payroll_for_month(row.employee, month)
+
     emp_user = row.employee.user
     decision_label = "approved" if approved else "rejected"
     try:

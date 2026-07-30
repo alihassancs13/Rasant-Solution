@@ -1030,6 +1030,8 @@ def get_employee_detail(request, pk):
             deduction_month=month,
         )
     except Exception as calc_err:
+        import traceback
+        traceback.print_exc()
         print(f"Monthly payroll calc failed for employee {pk}: {calc_err}")
         latest_deduction = employee.deduction_history.filter(deduction_month=month).first()
         if not latest_deduction:
@@ -1242,6 +1244,30 @@ def calculate_and_save_deduction(
     )
     return record
 
+
+def sync_payroll_for_month(employee, any_date_in_month, bonus_amount=None):
+    """
+    Thin wrapper around calculate_and_save_deduction — use this from any place
+    that mutates Attendance (status edit, bulk upload, leave approval, holiday
+    marking) so the SalaryDeductionHistory row for that month stays in sync
+    with the actual attendance data. Never lets a payroll-calc error break the
+    caller's main request (attendance save should still succeed).
+    """
+    if not any_date_in_month:
+        return None
+    month = any_date_in_month.replace(day=1)
+    try:
+        return calculate_and_save_deduction(
+            employee=employee,
+            tax_percent=employee.tax,
+            insurance_amount=employee.insurance_amount,
+            deduction_month=month,
+            bonus_amount=bonus_amount,
+        )
+    except Exception as e:
+        print(f"Payroll sync failed for employee {employee.id}, month {month}: {e}")
+        return None
+
 def renew_insurance_cycle(employee):
     if not employee.joined_date:
         return None
@@ -1305,12 +1331,14 @@ def attendance_bulk_upload(request):
         )
     saved_records = []
     failed_records = []
+    affected = set()
     for index, single_row in enumerate(all_rows):
         row_checker = AttendanceBulkRowSerializer(data=single_row)
         if row_checker.is_valid():
             try:
                 with transaction.atomic():
                     saved_attendance = row_checker.save()
+                    affected.add((saved_attendance.employee_id, saved_attendance.date.replace(day=1)))
                 saved_records.append({
                     'row_number': index + 1,
                     'employee_name': saved_attendance.employee.name,
@@ -1329,6 +1357,14 @@ def attendance_bulk_upload(request):
                 'emp_no': single_row.get('emp_no'),
                 'reason': row_checker.errors,
             })
+
+    for emp_id, month in affected:
+        try:
+            emp = Employee.objects.get(pk=emp_id)
+            sync_payroll_for_month(emp, month)
+        except Employee.DoesNotExist:
+            pass
+
     return Response({
         'total_rows': len(all_rows),
         'successfully_saved': len(saved_records),
@@ -1412,6 +1448,7 @@ def attendance_record_update(request, id):
     serializer = AttendanceHistorySerializer(attendance, data=request.data, partial=True)
     if serializer.is_valid():
         serializer.save()
+        sync_payroll_for_month(attendance.employee, attendance.date)
         return Response({
             'message': 'Attendance record updated successfully.',
             'record': {
@@ -1608,6 +1645,7 @@ def my_attendance_check_in(request):
     )
     _recalculate_attendance_metrics(record, settings_obj)
     record.save()
+    sync_payroll_for_month(employee, record.date)
 
     from .geo import location_presence_label
 
@@ -1671,6 +1709,7 @@ def my_attendance_check_out(request):
     )
     _recalculate_attendance_metrics(record, settings_obj)
     record.save()
+    sync_payroll_for_month(employee, record.date)
 
     from .geo import location_presence_label
 

@@ -4,7 +4,7 @@
     <ToastContainer />
 
     <div class="flex-1 flex flex-col overflow-hidden">
-      <div class="p-3 pl-1 sm:p-4 md:pl-4">
+      <div class="p-3 sm:p-4">
         <AppHeader
             :userName="displayName"
             :role="roleLabel"

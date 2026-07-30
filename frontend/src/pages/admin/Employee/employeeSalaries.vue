@@ -680,20 +680,18 @@ watch(() => route.query.highlightEmployee, (newVal) => {
             <p class="text-sm text-text-muted mt-1">Active compensation policies will appear here.</p>
           </div>
 
-          <div v-else>
-            <div class="relative px-8 sm:px-10">
-              <!-- Left Arrow -->
-              <button
-                  v-if="totalPolicyPages > 1"
-                  @click="prevPolicyPage"
-                  :disabled="policyPage === 1"
-                  class="absolute left-0 sm:-left-2 top-1/2 -translate-y-1/2 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white border border-border shadow-md hover:shadow-lg hover:border-primary/40 disabled:opacity-40 disabled:cursor-not-allowed transition"
-              >
-                <font-awesome-icon :icon="['fas', 'chevron-left']" class="w-4 h-4 text-text-secondary" />
-              </button>
+            <div v-else>
+              <div class="relative" :class="totalPolicyPages > 1 ? 'px-3 sm:px-10' : ''">
+                <button
+                    v-if="totalPolicyPages > 1"
+                    @click="prevPolicyPage"
+                    :disabled="policyPage === 1"
+                    class="absolute left-0 sm:-left-2 top-1/2 -translate-y-1/2 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white border border-border shadow-md hover:shadow-lg hover:border-primary/40 disabled:opacity-40 disabled:cursor-not-allowed transition"
+                >
+                  <font-awesome-icon :icon="['fas', 'chevron-left']" class="w-4 h-4 text-text-secondary" />
+                </button>
 
-              <!-- Grid with 4 columns -->
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 <div
                     v-for="policy in paginatedPolicies"
                     :key="policy.id"
@@ -728,7 +726,7 @@ watch(() => route.query.highlightEmployee, (newVal) => {
                   <div class="flex items-center gap-2 px-4 sm:px-5 pb-4 sm:pb-5">
                     <button
                         @click="editPolicy(policy)"
-                        class="flex-1 flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold rounded-xl transition-all duration-300 cursor-pointer btn-gradient-border hover:-translate-y-0.5 hover:shadow-md"
+                        class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-semibold rounded-xl transition-all duration-300 cursor-pointer btn-gradient-border hover:-translate-y-0.5 hover:shadow-md"
                     >
                       <font-awesome-icon :icon="['fas', 'pen']" class="w-3 h-3" />
                       Edit

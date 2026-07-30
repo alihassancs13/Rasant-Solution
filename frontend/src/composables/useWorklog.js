@@ -73,13 +73,9 @@ export function useWorklog() {
 
   const validateField = (field, value) => {
     const trimmed = (value || '').trim();
-
-    // Required validation for summary field
     if (!trimmed && field === 'summary') {
       return 'Task / title is required.';
     }
-
-    // Required validation for other fields
     if (!trimmed && (field === 'issue_key' || field === 'start_date' || field === 'start_time' ||
         field === 'end_date' || field === 'end_time')) {
       const labels = {
@@ -93,18 +89,14 @@ export function useWorklog() {
       };
       return `${labels[field] || field} is required.`;
     }
-
-    // Max length validation for summary field
     if (field === 'summary' && trimmed.length > MAX_LENGTH) {
       return `Must not exceed ${MAX_LENGTH} characters.`;
     }
-
-    // Max length validation for issue_key
     if (field === 'issue_key' && trimmed.length > MAX_LENGTH) {
       return `Must not exceed ${MAX_LENGTH} characters.`;
     }
 
-    return null;
+    return  '';
   };
 
   const runValidation = (fields, form, errors, touchedObj) => {
@@ -112,7 +104,16 @@ export function useWorklog() {
     Object.keys(touchedObj).forEach(k => touchedObj[k] = true);
   };
 
-  const validateAllFields = () => runValidation(ADD_FIELDS, worklogForm, fieldErrors, touched);
+  const validateAllFields = () => {
+    ADD_FIELDS.forEach(field => touched[field] = true);
+    runValidation(ADD_FIELDS, worklogForm, fieldErrors, touched);
+
+    if (worklogForm.source === 'manual') {
+      fieldErrors.issue_key = '';
+    } else {
+      fieldErrors.summary = '';
+    }
+  };
   const validateEditAllFields = () => runValidation(EDIT_FIELDS, editWorklogForm, editFieldErrors, editTouched);
 
   const isFormValid = computed(() => !Object.values(fieldErrors).some(error => error !== ''));
@@ -320,6 +321,7 @@ export function useWorklog() {
 
     const selectIssue = (issue) => {
       formTarget.issue_key = issue.issue_key
+      formTarget.summary = issue.summary || ''
       searchQuery.value = `${issue.issue_key} - ${issue.summary}`
       isDropdownOpen.value = false
       isSelected.value = true
@@ -436,6 +438,7 @@ export function useWorklog() {
     validateAllFields();
 
     if (!isFormValid.value) {
+      const firstError = Object.entries(fieldErrors).find(([_, v]) => v)?.[1];
       showToast('Please fix all validation errors before saving.', 'error');
       return;
     }

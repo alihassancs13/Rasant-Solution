@@ -102,13 +102,13 @@ def compute_monthly_attendance_payroll(employee, deduction_month: date, settings
     if apply:
         allowed_leaves = Decimal(str(settings_obj.allowed_leaves_per_month or 0))
         allowed_absents = int(settings_obj.allowed_absents_per_month or 0)
-        free_lates = int(settings_obj.late_count_threshold or 0)
 
         unpaid_leave_days = max(Decimal("0"), leave_days - allowed_leaves)
         unpaid_absent_days = max(0, absent_days - allowed_absents)
         paid_leave_days = leave_days - unpaid_leave_days
-        penalty_lates = max(0, late_count - free_lates)
-        # Each late beyond free threshold costs half a day
+
+        penalty_lates = late_count
+
         late_penalty_days = Decimal(penalty_lates) * Decimal("0.5")
         late_penalty_amount = late_penalty_days * per_day
         off_days_amount = (unpaid_leave_days + Decimal(unpaid_absent_days)) * per_day
