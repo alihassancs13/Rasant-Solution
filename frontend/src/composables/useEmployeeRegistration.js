@@ -76,7 +76,8 @@ export function useEmployeeRegistration(isDirectAccess) {
 
     // --- Validation State ---
     const touched = ref({
-        name: false, email: false, phone_number: false, department: false,
+        first_name: false,
+        last_name: false,  email: false, phone_number: false, department: false,
         designation: false, salary: false, present_address: false, gender: false,
         joined_date: false, status: false, emergency_name: false, emergency_relation: false,
         emergency_cnic: false, emergency_phone: false, emergency_address: false,
@@ -84,7 +85,8 @@ export function useEmployeeRegistration(isDirectAccess) {
     });
 
     const errors = ref({
-        name: null, email: null, phone_number: null, department: null,
+        first_name: null,
+        last_name: null, email: null, phone_number: null, department: null,
         designation: null, salary: null, present_address: null, gender: null,
         joined_date: null, status: null, emergency_name: null, emergency_relation: null,
         emergency_cnic: null, emergency_phone: null, emergency_address: null,
@@ -98,7 +100,7 @@ export function useEmployeeRegistration(isDirectAccess) {
 
     const validationError = ref('');
 
-    const ADMIN_REQUIRED_FIELDS = ['name', 'email', 'phone_number','gender','department','designation','salary','joined_date','status'];
+    const ADMIN_REQUIRED_FIELDS = ['first_name', 'last_name', 'email', 'phone_number','gender','department','designation','salary','joined_date','status'];
     const isFieldRequired = (field) => isPublic() || ADMIN_REQUIRED_FIELDS.includes(field);
 
     const emergencyCnicError = computed(() => {
@@ -138,7 +140,8 @@ export function useEmployeeRegistration(isDirectAccess) {
 
         let error = null;
         switch (field) {
-            case 'name': error = getUsernameError(value, 32, 'Name'); break;
+            case 'first_name': error = getUsernameError(value, 32, 'First Name'); break;
+            case 'last_name': error = getUsernameError(value, 32, 'Last Name'); break;
             case 'email': error = (!value || !value.trim()) ? 'Email is required.' : getEmailError(value); break;
             case 'phone_number': error = getPhoneError(value); break;
             case 'department': error = getUsernameError(value, 32, 'Department'); break;
@@ -186,10 +189,10 @@ export function useEmployeeRegistration(isDirectAccess) {
             return stepNumber === 1 ? [...ADMIN_REQUIRED_FIELDS] : [];
         }
         switch (stepNumber) {
-            case 1: return ['name', 'email', 'phone_number', 'department', 'designation', 'salary', 'present_address', 'gender', 'joined_date', 'status'];
+            case 1: return ['first_name', 'last_name','email', 'phone_number', 'department', 'designation', 'salary', 'present_address', 'gender', 'joined_date', 'status'];
             case 2: return ['emergency_name', 'emergency_relation', 'emergency_cnic', 'emergency_phone', 'emergency_address'];
             case 4: return ['bank_name', 'branch_name', 'account_number'];
-            default: return []; // step 3 = files, validated separately
+            default: return [];
         }
     };
 
@@ -373,7 +376,8 @@ export function useEmployeeRegistration(isDirectAccess) {
         const cleanedEmergencyCnic = cleanCnic(formData.value.emergency_cnic);
 
         const cleanedData = {
-            name: (formData.value.name || '').trim(),
+            first_name: (formData.value.first_name || '').trim(),
+            last_name: (formData.value.last_name || '').trim(),
             present_address: (formData.value.present_address || '').trim(),
             permanent_address: (formData.value.permanent_address || '').trim(),
             phone_number: (formData.value.phone_number || '').trim(),
@@ -399,7 +403,7 @@ export function useEmployeeRegistration(isDirectAccess) {
         if (cleanedCnic) cleanedData.cnic = cleanedCnic;
         if (cleanedEmergencyCnic) cleanedData.emergency_cnic = cleanedEmergencyCnic;
 
-        if (!cleanedData.name || !cleanedData.email || !cleanedData.phone_number) {
+        if (!cleanedData.first_name || !cleanedData.last_name || !cleanedData.email || !cleanedData.phone_number) {
             showToast('Name, email, and phone number are required.', 'error');
             isSubmitted.value = false;
             return { success: false };
@@ -466,7 +470,8 @@ export function useEmployeeRegistration(isDirectAccess) {
 
     const resetForm = () => {
         formData.value = {
-            name: '', cnic: '', present_address: '', permanent_address: '',
+            first_name: '',
+            last_name: '', cnic: '', present_address: '', permanent_address: '',
             phone_number: '', gender: '', email: '', department: '', designation: '',
             salary: '', joined_date: '', status: 'Intern', work_from_home: false,
             emergency_name: '', emergency_relation: '', emergency_cnic: '',

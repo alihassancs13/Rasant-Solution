@@ -3,7 +3,6 @@ import { computed, reactive, ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useEmployeeStore } from '@/stores/employeeStore.js';
 import { useToast } from '@/composables/useToast.js';
 import { useValidation } from '@/composables/useValidation.js';
-
 export function useEmployeeDashboard() {
     const employeeStore = useEmployeeStore();
     const { showToast } = useToast();
@@ -16,7 +15,6 @@ export function useEmployeeDashboard() {
         getAddressLengthError,
         getAccountNumberError,
     } = useValidation();
-
     const tempStatusId = ref(null);
     const allEmployees = computed(() => employeeStore.employees);
     const isLoading = computed(() => employeeStore.isLoading);
@@ -51,10 +49,11 @@ export function useEmployeeDashboard() {
     const isChangingStatus = ref(false);
     const statusChangeError = ref('');
     const employmentStatuses = computed(() => employeeStore.employmentStatuses || []);
-
+    const showOnlyActive = ref(false);
     // ==================== CREATE FORM ====================
     const createFormData = reactive({
-        name: '',
+        first_name: '',
+        last_name: '',
         email: '',
         phone_number: '',
         position: '',
@@ -65,7 +64,8 @@ export function useEmployeeDashboard() {
     });
 
     const createTouched = reactive({
-        name: false,
+        first_name: false,
+        last_name: false,
         email: false,
         phone_number: false,
         position: false,
@@ -75,7 +75,8 @@ export function useEmployeeDashboard() {
         tax: false,
     });
     const createErrors = reactive({
-        name: null,
+        first_name: null,
+        last_name: null,
         email: null,
         phone_number: null,
         position: null,
@@ -85,7 +86,7 @@ export function useEmployeeDashboard() {
         tax: null,
     });
 
-    const CREATE_REQUIRED_FIELDS = ['name', 'email', 'phone_number', 'salary', 'department', 'position', 'insurance_amount', 'tax'];
+    const CREATE_REQUIRED_FIELDS = ['first_name', 'last_name','email', 'phone_number', 'salary', 'department', 'position', 'insurance_amount', 'tax'];
 
     const isCreateFormValid = computed(() => {
         for (const field of CREATE_REQUIRED_FIELDS) {
@@ -111,8 +112,11 @@ export function useEmployeeDashboard() {
 
         let error = null;
         switch (field) {
-            case 'name':
-                error = getUsernameError(value, 32, 'Full Name');
+            case 'first_name':
+                error = getUsernameError(value, 32, 'First Name');
+                break;
+            case 'last_name':
+                error = getUsernameError(value, 32, 'Last Name');
                 break;
             case 'email':
                 error = (!value || !value.trim()) ? 'Email is required.' : getEmailError(value);
@@ -148,7 +152,8 @@ export function useEmployeeDashboard() {
     };
 
     // Create form watches (live validation only — no character stripping/restriction)
-    watch(() => createFormData.name, () => { createTouched.name = true; validateCreateField('name'); });
+    watch(() => createFormData.first_name, () => { createTouched.first_name = true; validateCreateField('first_name'); });
+    watch(() => createFormData.last_name, () => { createTouched.last_name = true; validateCreateField('last_name'); });
     watch(() => createFormData.email, () => { createTouched.email = true; validateCreateField('email'); });
     watch(() => createFormData.phone_number, () => { createTouched.phone_number = true; validateCreateField('phone_number'); });
     watch(() => createFormData.position, () => { createTouched.position = true; validateCreateField('position'); });
@@ -187,7 +192,6 @@ export function useEmployeeDashboard() {
         tax: '',
         insurance_amount: '',
     });
-
     const editTouched = reactive({
         name: false,
         email: false,
@@ -211,7 +215,6 @@ export function useEmployeeDashboard() {
         tax: false,
         insurance_amount: false,
     });
-
     const editErrors = reactive({
         name: null,
         email: null,
@@ -235,9 +238,7 @@ export function useEmployeeDashboard() {
         tax: null,
         insurance_amount: null,
     });
-
     const EDIT_REQUIRED_FIELDS = ['name', 'email', 'phone_number', 'department', 'designation', 'salary', 'joined_date'];
-
     const isEditFormValid = computed(() => {
         for (const field of EDIT_REQUIRED_FIELDS) {
             if (!editFormData[field] || !String(editFormData[field]).trim()) {
@@ -251,8 +252,6 @@ export function useEmployeeDashboard() {
         }
         return true;
     });
-
-    // CNIC validation helper (CNIC restriction rehne di hai — sirf format check)
     const isValidCnic = (cnic) => !!cnic && /^\d{13}$/.test(cnic.replace(/[-\s]/g, ''));
 
     const getCnicError = (cnic) => {
@@ -397,15 +396,22 @@ export function useEmployeeDashboard() {
     });
 
     const filteredEmployees = computed(() => {
-        if (!searchQuery.value.trim()) {
-            return allEmployees.value;
+        let employees = allEmployees.value;
+
+        // Filter by search query
+        if (searchQuery.value.trim()) {
+            const query = searchQuery.value.toLowerCase().trim();
+            employees = employees.filter(emp =>
+                emp.name?.toLowerCase().includes(query) ||
+                emp.employee_number?.toLowerCase().includes(query) ||
+                emp.email?.toLowerCase().includes(query)
+            );
         }
-        const query = searchQuery.value.toLowerCase().trim();
-        return allEmployees.value.filter(emp =>
-            emp.name?.toLowerCase().includes(query) ||
-            emp.employee_number?.toLowerCase().includes(query) ||
-            emp.email?.toLowerCase().includes(query)
-        );
+        if (showOnlyActive.value) {
+            employees = employees.filter(emp => emp.is_active === true);
+        }
+
+        return employees;
     });
 
     const sortedEmployees = computed(() => {
@@ -542,7 +548,8 @@ export function useEmployeeDashboard() {
 
     const openCreateModal = () => {
         Object.assign(createFormData, {
-            name: '', email: '', phone_number: '', position: '',
+            first_name: '',
+            last_name: '', email: '', phone_number: '', position: '',
             salary: '', department: '', insurance_amount: '', tax: ''
         });
         Object.keys(createTouched).forEach((k) => { createTouched[k] = false; });
@@ -585,7 +592,8 @@ export function useEmployeeDashboard() {
             const formDataPayload = new FormData();
 
             formDataPayload.append('source', 'admin_quick');
-            formDataPayload.append('name', createFormData.name.trim());
+            formDataPayload.append('first_name', createFormData.first_name.trim());
+            formDataPayload.append('last_name', createFormData.last_name.trim());
             formDataPayload.append('email', createFormData.email.trim());
             formDataPayload.append('phone_number', createFormData.phone_number.trim());
             formDataPayload.append('designation', (createFormData.position || '').trim() || 'Employee');
@@ -619,11 +627,13 @@ export function useEmployeeDashboard() {
             } else {
                 let errorMsg = result.error || 'Failed to create employee';
                 if (result.errors) {
-                    const errorDetails = Object.entries(result.errors)
-                        .map(([field, msgs]) => `${field}: ${Array.isArray(msgs) ? msgs.join(', ') : msgs}`)
-                        .join(' | ');
-                    errorMsg += `: ${errorDetails}`;
+                    const firstField = Object.keys(result.errors)[0];
+                    if (firstField) {
+                        const firstError = result.errors[firstField];
+                        errorMsg = Array.isArray(firstError) ? firstError[0] : String(firstError);
+                    }
                 }
+
                 showToast(errorMsg, 'error', 6000);
             }
         } catch (error) {
@@ -633,7 +643,6 @@ export function useEmployeeDashboard() {
             isCreating.value = false;
         }
     };
-
     const openEditModal = (employee) => {
         selectedEmployee.value = employee;
         passwordError.value = '';
@@ -762,10 +771,25 @@ export function useEmployeeDashboard() {
             });
 
             nullableTextFields.forEach((key) => {
-                const value = editFormData[key];
-                payload[key] = (value === undefined || value === null || value === '')
-                    ? null
-                    : (typeof value === 'string' ? value.trim() : value);
+                let value = editFormData[key];
+                if (value === undefined || value === null || value === '') {
+                    payload[key] = null;
+                } else {
+                    if (key === 'gender') {
+                        const genderStr = String(value).trim();
+                        const genderMap = {
+                            'male': 'Male',
+                            'female': 'Female',
+                            'other': 'Other',
+                            'M': 'Male',
+                            'F': 'Female',
+                            'O': 'Other',
+                        };
+                        payload[key] = genderMap[genderStr.toLowerCase()] || genderStr;
+                    } else {
+                        payload[key] = typeof value === 'string' ? value.trim() : value;
+                    }
+                }
             });
 
             if (editFormData.joined_date) {
@@ -1066,5 +1090,6 @@ export function useEmployeeDashboard() {
         isEditFormValid,
         isValidCnic,
         getCnicError,
+        showOnlyActive,
     };
 }

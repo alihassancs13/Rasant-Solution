@@ -49,9 +49,9 @@
             <div class="flex flex-col sm:flex-row sm:items-center gap-3 w-full md:w-auto">
               <div class="w-full sm:w-64">
                 <div class="relative w-full">
-                  <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-text-muted">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-text-muted">
                     <font-awesome-icon :icon="['fas', 'magnifying-glass']" />
-                  </span>
+                </span>
                   <input
                       v-model="searchQuery"
                       type="text"
@@ -73,6 +73,19 @@
                   <option value="50">50</option>
                 </select>
                 <span class="text-sm text-text-muted whitespace-nowrap">per page</span>
+              </div>
+
+              <!-- NEW: Active only checkbox -->
+              <div class="flex items-center gap-2 ml-0 sm:ml-2">
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input
+                      type="checkbox"
+                      v-model="showOnlyActive"
+                      class="sr-only peer"
+                  />
+                  <div class="w-9 h-5 bg-border rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-border after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-teal-500"></div>
+                </label>
+                <span class="text-sm text-text-muted whitespace-nowrap">Active only</span>
               </div>
             </div>
 
@@ -100,9 +113,8 @@
                   class="flex items-center cursor-pointer gap-1 px-2 py-2 btn-primary-gradient text-buttonTextColor font-medium rounded-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg whitespace-nowrap"
               >
                 <font-awesome-icon :icon="['fas', 'plus']" />
-                Create employee
+                Create
               </button>
-
             </div>
           </div>
 
@@ -375,23 +387,40 @@
         @save="handleCreateEmployee"
     >
       <form @submit.prevent="handleCreateEmployee" class="grid grid-cols-1 md:grid-cols-2 gap-5 text-left text-gray-700">
-        <!-- Full Name -->
+        <!-- First Name -->
         <div class="flex flex-col gap-1.5">
           <label class="text-xs font-bold uppercase tracking-wider text-gray-400">
-            Full Name <span class="text-red-500">*</span>
+            First Name <span class="text-red-500">*</span>
           </label>
           <input
               type="text"
-              v-model="createFormData.name"
-              placeholder="e.g. Sarah Ali"
-              
-              :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200', (createTouched.name && createErrors.name) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
-              @input="markCreateTouched('name')"
-              @blur="markCreateTouched('name')"
+              v-model="createFormData.first_name"
+              placeholder="e.g. Sarah"
+              :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200', (createTouched.first_name && createErrors.first_name) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
+              @input="markCreateTouched('first_name')"
+              @blur="markCreateTouched('first_name')"
           />
-          <span v-if="createTouched.name && createErrors.name" class="text-xs text-rose-500 mt-1 block">
-            <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ createErrors.name }}
-          </span>
+          <span v-if="createTouched.first_name && createErrors.first_name" class="text-xs text-rose-500 mt-1 block">
+        <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ createErrors.first_name }}
+      </span>
+        </div>
+
+        <!-- Last Name -->
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold uppercase tracking-wider text-gray-400">
+            Last Name <span class="text-red-500">*</span>
+          </label>
+          <input
+              type="text"
+              v-model="createFormData.last_name"
+              placeholder="e.g. Ali"
+              :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200', (createTouched.last_name && createErrors.last_name) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
+              @input="markCreateTouched('last_name')"
+              @blur="markCreateTouched('last_name')"
+          />
+          <span v-if="createTouched.last_name && createErrors.last_name" class="text-xs text-rose-500 mt-1 block">
+        <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ createErrors.last_name }}
+      </span>
         </div>
 
         <!-- Email -->
@@ -408,8 +437,8 @@
               @blur="markCreateTouched('email')"
           />
           <span v-if="createTouched.email && createErrors.email" class="text-xs text-rose-500 mt-1 block">
-            <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ createErrors.email }}
-          </span>
+        <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ createErrors.email }}
+      </span>
         </div>
 
         <!-- Phone Number -->
@@ -422,14 +451,13 @@
               inputmode="numeric"
               v-model="createFormData.phone_number"
               placeholder="e.g. 03XXXXXXXXX"
-              
               :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200', (createTouched.phone_number && createErrors.phone_number) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
               @input="markCreateTouched('phone_number')"
               @blur="markCreateTouched('phone_number')"
           />
           <span v-if="createTouched.phone_number && createErrors.phone_number" class="text-xs text-rose-500 mt-1 block">
-            <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ createErrors.phone_number }}
-          </span>
+        <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ createErrors.phone_number }}
+      </span>
         </div>
 
         <!-- Designation -->
@@ -442,14 +470,13 @@
               type="text"
               v-model="createFormData.position"
               placeholder="e.g. Software Engineer"
-              
               :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200', (createTouched.position && createErrors.position) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
               @input="markCreateTouched('position')"
               @blur="markCreateTouched('position')"
           />
           <span v-if="createTouched.position && createErrors.position" class="text-xs text-rose-500 mt-1 block">
-            <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ createErrors.position }}
-          </span>
+        <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ createErrors.position }}
+      </span>
         </div>
 
         <!-- Monthly Salary -->
@@ -471,8 +498,8 @@
               @blur="markCreateTouched('salary')"
           />
           <span v-if="createTouched.salary && createErrors.salary" class="text-xs text-rose-500 mt-1 block">
-            <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ createErrors.salary }}
-          </span>
+        <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ createErrors.salary }}
+      </span>
         </div>
 
         <!-- Department -->
@@ -484,14 +511,13 @@
               type="text"
               v-model="createFormData.department"
               placeholder="e.g. Engineering"
-              
               :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200', (createTouched.department && createErrors.department) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
               @input="markCreateTouched('department')"
               @blur="markCreateTouched('department')"
           />
           <span v-if="createTouched.department && createErrors.department" class="text-xs text-rose-500 mt-1 block">
-            <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ createErrors.department }}
-          </span>
+        <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ createErrors.department }}
+      </span>
         </div>
 
         <!-- Insurance Amount -->
@@ -508,8 +534,8 @@
               @blur="markCreateTouched('insurance_amount')"
           />
           <span v-if="createTouched.insurance_amount && createErrors.insurance_amount" class="text-xs text-rose-500 mt-1 block">
-            <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ createErrors.insurance_amount }}
-          </span>
+        <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ createErrors.insurance_amount }}
+      </span>
         </div>
 
         <!-- Tax -->
@@ -529,8 +555,8 @@
             <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
           </div>
           <span v-if="createTouched.tax && createErrors.tax" class="text-xs text-rose-500 mt-1 block">
-            <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ createErrors.tax }}
-          </span>
+        <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ createErrors.tax }}
+      </span>
         </div>
       </form>
     </CreateModal>
@@ -1282,6 +1308,7 @@ const {
   editErrors,
   markEditTouched,
   isEditFormValid,
+  showOnlyActive
 } = useEmployeeDashboard();
 
 // Lifecycle

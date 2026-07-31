@@ -723,7 +723,6 @@ def password_reset_confirm(request):
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def password_setup_validate(request, token):
-    """Validate a create-password invite link."""
     from .models import PasswordActionToken
     from .password_tokens import get_valid_token
 

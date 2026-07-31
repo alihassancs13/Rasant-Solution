@@ -93,25 +93,48 @@
                 </div>
 
                 <!-- Row 1: Name + CNIC -->
+                <!-- Row 1: First Name + Last Name -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Name <span class="text-rose-500">*</span></label>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">First Name <span class="text-rose-500">*</span></label>
                     <input
                         type="text"
-                        v-model="formData.name"
+                        v-model="formData.first_name"
                         :required="isDirectAccess"
                         :class="[
-                        'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
-                        (touched.name && errors.name) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
-                      ]"
-                        placeholder="Full Name"
-                        @input="markTouched('name')"
-                        @blur="markTouched('name')"
+        'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
+        (touched.first_name && errors.first_name) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
+      ]"
+                        placeholder="e.g. Sarah"
+                        @input="markTouched('first_name')"
+                        @blur="markTouched('first_name')"
                     >
-                    <span v-if="touched.name && errors.name" class="text-xs text-rose-500 mt-1 block">
-                      <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ errors.name }}
-                    </span>
+                    <span v-if="touched.first_name && errors.first_name" class="text-xs text-rose-500 mt-1 block">
+      <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ errors.first_name }}
+    </span>
                   </div>
+                  <div>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Last Name <span class="text-rose-500">*</span></label>
+                    <input
+                        type="text"
+                        v-model="formData.last_name"
+                        :required="isDirectAccess"
+                        :class="[
+        'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
+        (touched.last_name && errors.last_name) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
+      ]"
+                        placeholder="e.g. Ali"
+                        @input="markTouched('last_name')"
+                        @blur="markTouched('last_name')"
+                    >
+                    <span v-if="touched.last_name && errors.last_name" class="text-xs text-rose-500 mt-1 block">
+      <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ errors.last_name }}
+    </span>
+                  </div>
+                </div>
+
+                <!-- Row 1b: CNIC (moved to next row) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">CNIC <span class="text-rose-500">*</span></label>
                     <input
@@ -119,22 +142,24 @@
                         v-model="formData.cnic"
                         :required="isDirectAccess"
                         :class="[
-                        'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
-                        (cnicError || validationError) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
-                      ]"
+        'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
+        (cnicError || validationError) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
+      ]"
                         placeholder="00000-0000000-0"
                         @input="formatCnic"
                         @focus="validationError = ''"
                         maxlength="15"
                     >
                     <span v-if="cnicError" class="text-xs text-rose-500 mt-1 block">
-                      <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ cnicError }}
-                    </span>
+      <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ cnicError }}
+    </span>
                     <span v-else-if="validationError" class="text-xs text-rose-500 mt-1 block">
-                      <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ validationError }}
-                    </span>
+      <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ validationError }}
+    </span>
                     <span v-else class="text-[10px] text-slate-400 mt-1 block">National identity card number (13 digits)</span>
                   </div>
+                  <!-- You can add another field here if needed, or leave empty -->
+                  <div></div>
                 </div>
 
                 <!-- CNIC Scan -->

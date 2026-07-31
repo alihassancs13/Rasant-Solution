@@ -84,7 +84,8 @@ def add_employee(request):
         "university_degree",
         "other_course",
     )
-    # Build a plain dict — never QueryDict.copy() with uploads (cannot pickle temp files).
+
+    # Build a plain dict
     data = {}
     for key in request.data.keys():
         if key in file_fields:
@@ -93,6 +94,7 @@ def add_employee(request):
         if hasattr(value, "read"):
             continue
         data[key] = value
+
     source = request.data.get('source', 'admin_quick')
     data['source'] = source
 
@@ -107,7 +109,28 @@ def add_employee(request):
         if isinstance(raw_active, str):
             data["is_active"] = raw_active.strip().lower() in ("1", "true", "yes", "on")
 
-    serializer = EmployeeSerializer(data=data,context={'source': source})
+    # NEW: Get first_name and last_name from request (dashboard sends these)
+    first_name = data.get('first_name', '').strip()
+    last_name = data.get('last_name', '').strip()
+
+    # NEW: Combine them into name for Employee model (database only has 'name' column)
+    if first_name:
+        full_name = f"{first_name} {last_name}".strip()
+        data['name'] = full_name
+    elif 'name' in data and data['name']:
+        # Fallback: if name is provided directly, use it
+        full_name = data['name'].strip()
+        parts = full_name.split(' ', 1)
+        first_name = parts[0]
+        last_name = parts[1] if len(parts) > 1 else ''
+    else:
+        # Last resort: use email
+        full_name = data.get('email', '').split('@')[0]
+        data['name'] = full_name
+        first_name = full_name
+        last_name = ''
+
+    serializer = EmployeeSerializer(data=data, context={'source': source})
     if not serializer.is_valid():
         return Response(
             {"error": "Validation failed.", "errors": serializer.errors},
@@ -119,7 +142,12 @@ def add_employee(request):
     ensure_employee_modules()
 
     email = validated["email"]
-    name = (validated.get("name") or "").strip() or email.split("@")[0]
+    name = validated.get("name", "")
+
+    # Use first_name and last_name for User creation
+    user_first_name = first_name or email.split('@')[0]
+    user_last_name = last_name or ''
+
     base_username = re.sub(r"[^a-zA-Z0-9.@+-]", "", email.split("@")[0])[:40] or "employee"
     username = base_username
     suffix = 1
@@ -128,8 +156,8 @@ def add_employee(request):
         suffix += 1
 
     name_parts = name.split(" ", 1)
-    first_name = name_parts[0] if name_parts else ""
-    last_name = name_parts[1] if len(name_parts) > 1 else ""
+    first_name_from_name = name_parts[0] if name_parts else ""
+    last_name_from_name = name_parts[1] if len(name_parts) > 1 else ""
 
     file_payload = {}
     for field_name in file_fields:
@@ -156,15 +184,14 @@ def add_employee(request):
             user_account = User(
                 username=username,
                 email=email,
-                first_name=first_name,
-                last_name=last_name,
+                first_name=user_first_name[:30],
+                last_name=user_last_name[:30] if user_last_name else '',
                 is_staff=False,
                 is_active=True,
                 role=employee_role,
             )
             user_account.set_unusable_password()
             user_account.save()
-
             employee = Employee(**validated)
             employee.name = name
             employee.current_salary = employee.salary
@@ -314,6 +341,25 @@ def update_employee(request, pk):
     data.pop("employee_number", None)
     data.pop("full_name", None)
 
+    # Handle first_name and last_name from dashboard
+    first_name = data.get('first_name', '').strip() if 'first_name' in data else None
+    last_name = data.get('last_name', '').strip() if 'last_name' in data else None
+
+    # If first_name or last_name provided, combine them into name (for Employee model)
+    if first_name is not None:
+        data['name'] = f"{first_name} {last_name or ''}".strip()
+    elif last_name is not None:
+        # If only last_name is provided, combine with existing first name
+        if employee.user:
+            existing_first = employee.user.first_name or ''
+            data['name'] = f"{existing_first} {last_name}".strip()
+        else:
+            # Fallback: split existing name
+            existing_name = employee.name or ''
+            parts = existing_name.split(' ', 1)
+            existing_first = parts[0] if parts else ''
+            data['name'] = f"{existing_first} {last_name}".strip()
+
     new_password = data.pop("password", None)
     if new_password == "":
         new_password = None
@@ -334,22 +380,53 @@ def update_employee(request, pk):
     updated_employee.current_salary = updated_employee.salary
     updated_employee.save(update_fields=["current_salary"])
 
-    # Sync is_active, name, email, and date_joined to User table
+    # Sync with User model (User has first_name and last_name columns)
     if updated_employee.user:
         user_updated = False
+
         # Sync is_active
         if updated_employee.user.is_active != updated_employee.is_active:
             updated_employee.user.is_active = updated_employee.is_active
             user_updated = True
+
         # Sync email
         if updated_employee.user.email != updated_employee.email:
             updated_employee.user.email = updated_employee.email
             user_updated = True
-        # Sync username from employee name
-        if updated_employee.name and updated_employee.user.username != updated_employee.name:
-            updated_employee.user.username = updated_employee.name
-            user_updated = True
-        # Sync date_joined from joined_date
+
+        # UPDATED: Sync first_name and last_name to User model
+        # This handles BOTH: edit modal (sends 'name') AND create modal (sends 'first_name', 'last_name')
+        if 'name' in data and data.get('name'):
+            # When edit modal updates the name field
+            full_name = updated_employee.name or ''
+            name_parts = full_name.split(' ', 1)
+            user_first = name_parts[0] if name_parts else ''
+            user_last = name_parts[1] if len(name_parts) > 1 else ''
+
+            if updated_employee.user.first_name != user_first:
+                updated_employee.user.first_name = user_first
+                user_updated = True
+            if updated_employee.user.last_name != user_last:
+                updated_employee.user.last_name = user_last
+                user_updated = True
+        elif first_name is not None or last_name is not None:
+            # When create modal sends first_name and last_name separately
+            full_name = updated_employee.name or ''
+            name_parts = full_name.split(' ', 1)
+            user_first = name_parts[0] if name_parts else ''
+            user_last = name_parts[1] if len(name_parts) > 1 else ''
+
+            if updated_employee.user.first_name != user_first:
+                updated_employee.user.first_name = user_first
+                user_updated = True
+            if updated_employee.user.last_name != user_last:
+                updated_employee.user.last_name = user_last
+                user_updated = True
+
+        # Do NOT sync username - keep it separate
+        # Username is used for login and should not be changed automatically
+
+        # Sync date_joined
         if updated_employee.joined_date and updated_employee.user.date_joined != updated_employee.joined_date:
             updated_employee.user.date_joined = updated_employee.joined_date
             user_updated = True
