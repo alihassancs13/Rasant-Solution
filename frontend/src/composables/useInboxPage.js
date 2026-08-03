@@ -611,12 +611,24 @@ export function useInboxPage() {
         if (existing) {
             selectThread(existing.id);
         } else {
-            const convData = await inboxStore.createDirectConversation(contact.id);
-            const conv = convData.conversation || convData;
-            const thread = convToThread(conv, currentUserId.value);
-            if (!threads.value.find((t) => t.id === thread.id)) threads.value.unshift(thread);
-            inboxStore.upsertConversation(conv);
-            selectThread(thread.id);
+            try {
+                const convData = await inboxStore.createDirectConversation(contact.id);
+                const conv = convData.conversation || convData;
+                const thread = convToThread(conv, currentUserId.value);
+                // Check if thread already exists before adding (to avoid duplicates)
+                if (!threads.value.find((t) => t.id === thread.id)) {
+                    threads.value.unshift(thread);
+                }
+                inboxStore.upsertConversation(conv);
+                await selectThread(thread.id);
+            } catch (error) {
+                console.error('Failed to create direct conversation:', error);
+                // If error occurs, try to find existing thread again
+                const existingThread = threads.value.find((t) => t.contactId === contact.id);
+                if (existingThread) {
+                    selectThread(existingThread.id);
+                }
+            }
         }
         closeContactsPanel();
     }

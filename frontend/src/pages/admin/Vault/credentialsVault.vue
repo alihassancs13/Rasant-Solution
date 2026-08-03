@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-screen overflow-hidden bg-gray-50">
+  <div class="flex h-screen bg-gray-50">
     <ToastContainer />
     <!-- Sidebar (Desktop) -->
     <div class="flex-shrink-0 hidden md:block">
@@ -39,7 +39,7 @@
         />
       </div>
       <!-- Scrollable Content -->
-      <div class="flex-1 pt-1 px-4 pb-4 sm:px-6 lg:px-8 overflow-hidden">
+      <div class="flex-1 pt-1 px-4 pb-4 sm:px-6 lg:px-8 overflow-y-auto">
         <div class="w-full h-full">
           <!-- Loading State -->
           <div v-if="loading" class="py-2">
@@ -66,7 +66,7 @@
           <!-- Content -->
           <template v-else>
             <!-- Main Panel -->
-            <div class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden flex flex-col h-full">
+            <div class="bg-white rounded-xl shadow-lg border border-gray-200 flex flex-col">
               <!-- Toolbar -->
               <div class="flex-shrink-0 p-3 sm:p-4 border-b border-gray-200">
                 <div class="flex flex-col sm:flex-row flex-wrap items-start sm:items-center justify-between gap-3 sm:gap-4">
@@ -89,10 +89,10 @@
                           v-model="pageSize"
                           class="px-2 sm:px-3 py-1 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none text-sm"
                       >
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="20">20</option>
-                        <option value="50">50</option>
+                        <option value="8">8</option>
+                        <option value="16">16</option>
+                        <option value="32">32</option>
+                        <option value="64">64</option>
                       </select>
                       <span class="text-sm text-gray-600 hidden sm:inline">per page</span>
                     </div>
@@ -110,7 +110,7 @@
               </div>
 
               <!-- Card Grid View -->
-              <div class="overflow-y-auto flex-1 p-4">
+              <div class="flex-1 p-4">
                 <!-- No Data -->
                 <div v-if="paginatedCredentials && paginatedCredentials.length === 0" class="text-center py-12">
                   <i class="fas fa-lock text-4xl text-gray-300 mb-3"></i>

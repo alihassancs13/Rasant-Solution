@@ -198,12 +198,16 @@
                   <td class="p-4 whitespace-nowrap text-text-secondary">{{ emp.joined_date }}</td>
                   <td class="p-4 whitespace-nowrap">
                     <router-link
-                        :to="{ path: '/admin/inbox', query: { chatWith: emp.id, chatName: emp.name } }"
+                        v-if="emp.user"
+                        :to="{ path: '/admin/inbox', query: { chatWith: emp.user, chatName: emp.name } }"
                         class="flex items-center cursor-pointer gap-1.5 px-3 py-1.5 bg-teal-500 text-white rounded-lg text-xs font-bold shadow-sm hover:bg-teal-600 transition-colors w-fit"
                     >
                       <font-awesome-icon :icon="['far', 'comment']" />
                       DM
                     </router-link>
+                    <span v-else class="text-xs text-text-muted italic px-3 py-1.5" title="Employee hasn't completed onboarding yet">
+                    No account
+                  </span>
                   </td>
                   <td class="p-4 whitespace-nowrap text-center">
                     <div class="flex items-center justify-center gap-2">
@@ -293,12 +297,14 @@
 
                 <div class="flex items-center justify-between gap-2">
                   <router-link
-                      :to="{ path: '/admin/inbox', query: { chatWith: emp.id, chatName: emp.name } }"
+                      v-if="emp.user"
+                      :to="{ path: '/admin/inbox', query: { chatWith: emp.user, chatName: emp.name } }"
                       class="flex items-center gap-1.5 px-3 py-1.5 bg-teal-500 text-white rounded-lg text-xs font-bold shadow-sm hover:bg-teal-600 transition-colors"
                   >
                     <font-awesome-icon :icon="['far', 'comment']" />
                     DM
                   </router-link>
+                  <span v-else class="text-xs text-text-muted italic">No account</span>
                   <div class="flex items-center gap-2">
                     <button @click="openEditModal(emp)" class="w-8 h-8 flex items-center justify-center rounded-lg bg-white border border-border text-text-secondary" title="Edit">
                       <font-awesome-icon :icon="['fas', 'pen']" class="w-3 h-3" />

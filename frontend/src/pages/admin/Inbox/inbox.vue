@@ -72,6 +72,7 @@ const findThreadByUserId = (userId, userName) => {
 }
 
 // Main function to handle opening chat from DM click
+
 const handleChatWithQuery = async () => {
   if (isProcessing.value) {
     console.log('Already processing, skipping...')
@@ -81,15 +82,9 @@ const handleChatWithQuery = async () => {
   const chatWithId = route.query.chatWith
   const chatName = route.query.chatName
 
-  console.log('handleChatWithQuery called with:', chatWithId, chatName)
-
-  if (!chatWithId) {
-    console.log('No chatWithId in query')
-    return
-  }
+  if (!chatWithId) return
 
   if (!loginStore.user?.id) {
-    console.log('Waiting for user to login...')
     await new Promise(resolve => {
       const unwatch = watch(() => loginStore.user, (user) => {
         if (user?.id) {
@@ -101,10 +96,8 @@ const handleChatWithQuery = async () => {
   }
 
   const contactId = Number(chatWithId)
-  console.log('Looking for contact ID:', contactId)
 
   if (lastProcessedChatId.value === contactId && activeThreadId.value) {
-    console.log('Already on this chat, focusing input')
     await nextTick()
     const messageInput = document.querySelector('input[placeholder="Message..."]')
     if (messageInput) messageInput.focus()
@@ -114,40 +107,27 @@ const handleChatWithQuery = async () => {
   isProcessing.value = true
 
   try {
-    // Load conversations if not loaded
     if (!threads.value.length) {
-      console.log('Loading conversations...')
       await loadConversations()
       await nextTick()
     }
 
-    // Find existing thread using the helper function with name matching
-    let existingThread = findThreadByUserId(contactId, chatName)
-    console.log('Existing thread found:', existingThread ? `Yes (${existingThread.id})` : 'No')
+    const existingThread = findThreadByUserId(contactId, chatName)
 
     if (existingThread) {
-      console.log('Selecting existing thread:', existingThread.id)
       lastProcessedChatId.value = contactId
       await selectThread(existingThread.id)
       mobileChatOpen.value = true
-      await nextTick()
-      const messageInput = document.querySelector('input[placeholder="Message..."]')
-      if (messageInput) messageInput.focus()
-      console.log('Active thread ID after select:', activeThreadId.value)
-      console.log('Mobile chat open:', mobileChatOpen.value)
-      return
+    } else {
+      // startChatWithContact handles create + select + upsert internally
+      await startChatWithContact({ id: contactId, name: chatName })
+      lastProcessedChatId.value = contactId
     }
 
-    // If no existing thread found, DO NOT create a new user/chat
-    // Just show the empty state with a message
-    console.log('No existing thread found for user:', chatName)
-
-    // Clear any previous selection and show the empty state
-    activeThreadId.value = null
-    mobileChatOpen.value = false
-
-    // Show a toast or notification that no chat exists
-    // You can add a toast here if you have one
+    mobileChatOpen.value = true
+    await nextTick()
+    const messageInput = document.querySelector('input[placeholder="Message..."]')
+    if (messageInput) messageInput.focus()
 
   } catch (error) {
     console.error('Error in handleChatWithQuery:', error)

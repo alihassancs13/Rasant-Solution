@@ -15,7 +15,7 @@ export default function useCredentialsVault() {
     const currentFilter = ref('all')
     const searchQuery = ref('')
     const currentPage = ref(1)
-    const pageSize = ref(5)
+    const pageSize = ref(8)
     const showModal = ref(false)
     const showShareModal = ref(false)
     const showUnshareModal = ref(false)
@@ -28,7 +28,8 @@ export default function useCredentialsVault() {
     const selectedCredential = ref(null)
     const shareSearchQuery = ref('')
     const shareCurrentPage = ref(1)
-    const sharePageSize = ref(5)
+    const sharePageSize = ref(8)
+
     const selectedEmployees = ref([])
 
     const form = ref({
@@ -87,19 +88,21 @@ export default function useCredentialsVault() {
     })
 
     const totalPages = computed(() => {
-        return Math.ceil(filteredCredentials.value.length / pageSize.value) || 1
+        return Math.ceil(filteredCredentials.value.length / Number(pageSize.value)) || 1
     })
 
     const startIndex = computed(() => {
-        return (currentPage.value - 1) * pageSize.value
+        return (currentPage.value - 1) * Number(pageSize.value)
     })
 
     const endIndex = computed(() => {
-        return startIndex.value + pageSize.value
+        return startIndex.value + Number(pageSize.value)
     })
 
     const paginatedCredentials = computed(() => {
-        return filteredCredentials.value.slice(startIndex.value, endIndex.value)
+        const start = (currentPage.value - 1) * Number(pageSize.value)
+        const end = start + Number(pageSize.value)
+        return filteredCredentials.value.slice(start, end)
     })
 
     const shareFilteredEmployees = computed(() => {
@@ -732,5 +735,6 @@ export default function useCredentialsVault() {
         confirmRemoveShare,
         closeUnshareModal,
         submitUnshare,
+
     }
 }
