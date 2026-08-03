@@ -148,12 +148,16 @@ def add_employee(request):
     user_first_name = first_name or email.split('@')[0]
     user_last_name = last_name or ''
 
-    base_username = re.sub(r"[^a-zA-Z0-9.@+-]", "", email.split("@")[0])[:40] or "employee"
-    username = base_username
-    suffix = 1
-    while User.objects.filter(username=username).exists():
-        username = f"{base_username}{suffix}"
-        suffix += 1
+    # NEW: Get username from frontend (REQUIRED)
+    username = data.get('username', '').strip()
+    if not username:
+        return Response(
+            {"error": "Username is required.", "field": "username"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # Clean the username (remove special characters)
+    username = re.sub(r"[^a-zA-Z0-9.@+-]", "", username)[:150] or "employee"
 
     name_parts = name.split(" ", 1)
     first_name_from_name = name_parts[0] if name_parts else ""
@@ -264,7 +268,6 @@ def add_employee(request):
         },
         status=status.HTTP_201_CREATED,
     )
-
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])

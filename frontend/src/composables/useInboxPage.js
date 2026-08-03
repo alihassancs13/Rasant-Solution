@@ -59,24 +59,33 @@ const apiLastMessagePreview = (lastMsg) => {
 
 
 const convToThread = (conv, uid) => {
-    const other = conv.members?.find(m => m.user.id !== uid);
+    // If uid is null or undefined, use a fallback
+    const userId = uid || 0;
+    // Safely find other member - handle case where m.user might be null
+    const other = conv.members?.find(m => m.user && m.user.id !== userId);
     const last = conv.last_message;
     return {
-        id: conv.id, type: conv.type, contactId: other?.user?.id ?? null,
+        id: conv.id,
+        type: conv.type,
+        contactId: other?.user?.id ?? null,
         avatarUserId: conv.type === 'direct' ? other?.user?.id ?? null : null,
         name: conv.display_name || conv.name || 'Unknown',
         initials: getInitials(conv.display_name || conv.name),
         avatar: null,
         hasAvatar: conv.type === 'group' ? (conv.has_avatar || false) : (other?.user?.has_avatar || false),
-        online: false, unread: conv.unread_count || 0,
+        online: false,
+        unread: conv.unread_count || 0,
         lastMessageAt: last?.created_at ? new Date(last.created_at) : new Date(conv.created_at),
         lastMessage: last ? apiLastMessagePreview(last) : '',
-        messages: [], messagesLoaded: false, members: conv.members || [],
+        messages: [],
+        messagesLoaded: false,
+        members: conv.members || [],
     };
 };
 
 const msgToUi = (msg, uid) => {
-    const fromMe = msg.sender.id === uid;
+    // Handle case where sender might be null
+    const fromMe = msg.sender && msg.sender.id === uid;
     const receipts = fromMe ? mapReceipts(msg.receipts) : [];
     return {
         id: msg.id, fromMe,
@@ -273,7 +282,10 @@ export function useInboxPage() {
         isLoading.value = true;
         try {
             const data = await inboxStore.fetchConversations();
-            threads.value = data.map(c => convToThread(c, currentUserId.value));
+            const userId = currentUserId.value;
+            // If userId is null or undefined, use a fallback
+            const effectiveUserId = userId || 0;
+            threads.value = data.map(c => convToThread(c, effectiveUserId));
             restorePending();
             await Promise.all(
                 threads.value
@@ -284,6 +296,8 @@ export function useInboxPage() {
                             : await inboxStore.fetchUserAvatarBlob(t.avatarUserId);
                     })
             );
+        } catch (error) {
+            console.error('Error loading conversations:', error);
         } finally {
             isLoading.value = false;
         }
@@ -976,7 +990,7 @@ export function useInboxPage() {
         requestLeaveGroup,    myAvatarInput, uploadingMyAvatar, myAvatar, triggerMyAvatarUpload, handleMyAvatarChange,
         selectedFiles, attachFileInput, triggerFileAttach, handleFilesSelected,
         removeSelectedFile, clearSelectedFiles, attachmentAction, loadAttachmentUrl,
-        lightboxImage, closeImageLightbox, downloadLightboxImage,
+        lightboxImage, closeImageLightbox, downloadLightboxImage,loadConversations
 
     };
 }

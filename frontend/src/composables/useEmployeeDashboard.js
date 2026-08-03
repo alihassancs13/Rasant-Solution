@@ -54,6 +54,7 @@ export function useEmployeeDashboard() {
     const createFormData = reactive({
         first_name: '',
         last_name: '',
+        username: '',
         email: '',
         phone_number: '',
         position: '',
@@ -66,6 +67,7 @@ export function useEmployeeDashboard() {
     const createTouched = reactive({
         first_name: false,
         last_name: false,
+        username: false,
         email: false,
         phone_number: false,
         position: false,
@@ -77,6 +79,7 @@ export function useEmployeeDashboard() {
     const createErrors = reactive({
         first_name: null,
         last_name: null,
+        username: null,
         email: null,
         phone_number: null,
         position: null,
@@ -86,7 +89,7 @@ export function useEmployeeDashboard() {
         tax: null,
     });
 
-    const CREATE_REQUIRED_FIELDS = ['first_name', 'last_name','email', 'phone_number', 'salary', 'department', 'position', 'insurance_amount', 'tax'];
+    const CREATE_REQUIRED_FIELDS = ['first_name', 'last_name','username','email', 'phone_number', 'salary', 'department', 'position', 'insurance_amount', 'tax'];
 
     const isCreateFormValid = computed(() => {
         for (const field of CREATE_REQUIRED_FIELDS) {
@@ -117,6 +120,9 @@ export function useEmployeeDashboard() {
                 break;
             case 'last_name':
                 error = getUsernameError(value, 32, 'Last Name');
+                break;
+            case 'username':
+                error = getUsernameError(value, 32, 'Username');
                 break;
             case 'email':
                 error = (!value || !value.trim()) ? 'Email is required.' : getEmailError(value);
@@ -154,6 +160,7 @@ export function useEmployeeDashboard() {
     // Create form watches (live validation only — no character stripping/restriction)
     watch(() => createFormData.first_name, () => { createTouched.first_name = true; validateCreateField('first_name'); });
     watch(() => createFormData.last_name, () => { createTouched.last_name = true; validateCreateField('last_name'); });
+    watch(() => createFormData.username, () => { createTouched.username = true; validateCreateField('username'); });
     watch(() => createFormData.email, () => { createTouched.email = true; validateCreateField('email'); });
     watch(() => createFormData.phone_number, () => { createTouched.phone_number = true; validateCreateField('phone_number'); });
     watch(() => createFormData.position, () => { createTouched.position = true; validateCreateField('position'); });
@@ -549,7 +556,7 @@ export function useEmployeeDashboard() {
     const openCreateModal = () => {
         Object.assign(createFormData, {
             first_name: '',
-            last_name: '', email: '', phone_number: '', position: '',
+            last_name: '',username: '', email: '', phone_number: '', position: '',
             salary: '', department: '', insurance_amount: '', tax: ''
         });
         Object.keys(createTouched).forEach((k) => { createTouched[k] = false; });
@@ -559,6 +566,20 @@ export function useEmployeeDashboard() {
 
     const closeCreateModal = () => {
         isCreateModalOpen.value = false;
+        Object.assign(createFormData, {
+            first_name: '',
+            last_name: '',
+            username: '',
+            email: '',
+            phone_number: '',
+            position: '',
+            salary: '',
+            department: '',
+            insurance_amount: '',
+            tax: ''
+        });
+        Object.keys(createTouched).forEach((k) => { createTouched[k] = false; });
+        Object.keys(createErrors).forEach((k) => { createErrors[k] = null; });
     };
 
     const handleCreateEmployee = async () => {
@@ -594,6 +615,7 @@ export function useEmployeeDashboard() {
             formDataPayload.append('source', 'admin_quick');
             formDataPayload.append('first_name', createFormData.first_name.trim());
             formDataPayload.append('last_name', createFormData.last_name.trim());
+            formDataPayload.append('username', createFormData.username.trim());
             formDataPayload.append('email', createFormData.email.trim());
             formDataPayload.append('phone_number', createFormData.phone_number.trim());
             formDataPayload.append('designation', (createFormData.position || '').trim() || 'Employee');
@@ -997,6 +1019,9 @@ export function useEmployeeDashboard() {
             }
         }
     });
+    watch(pageSize, () => {
+        currentPage.value = 1;
+    });
 
     const initialize = () => {
         employeeStore.fetchEmploymentStatuses();
@@ -1091,5 +1116,6 @@ export function useEmployeeDashboard() {
         isValidCnic,
         getCnicError,
         showOnlyActive,
+      
     };
 }

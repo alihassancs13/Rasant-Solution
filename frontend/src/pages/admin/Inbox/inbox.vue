@@ -3,6 +3,12 @@ import AppHeader from '../../../components/header.vue'
 import AdminSidebar from '@/components/adminSidebar.vue'
 import AppSkeleton from '@/components/AppSkeleton.vue'
 import { useInboxPage } from '@/composables/useInboxPage.js'
+import { useRoute } from 'vue-router'
+import { onMounted, watch, nextTick, ref } from 'vue'
+import { useLoginStore } from '@/stores/loginStore.js'
+
+const route = useRoute()
+const loginStore = useLoginStore()
 
 const {
   isLoading, threads, contacts, activeThreadId, searchQuery, messageText, mobileChatOpen, messagesContainer,
@@ -27,10 +33,162 @@ const {
   myAvatar, uploadingMyAvatar, myAvatarInput, triggerMyAvatarUpload, handleMyAvatarChange,
   selectedFiles, attachFileInput, triggerFileAttach, handleFilesSelected,
   removeSelectedFile, clearSelectedFiles, attachmentAction, loadAttachmentUrl,lightboxImage, closeImageLightbox, downloadLightboxImage,
-
+  loadConversations,
 } = useInboxPage()
-</script>
 
+// Track last processed chat
+const lastProcessedChatId = ref(null)
+const isProcessing = ref(false)
+
+// Helper function to find thread by user ID - checks contactId, members, and also by name matching
+const findThreadByUserId = (userId, userName) => {
+  // First try by contactId
+  let thread = threads.value.find(t => t.contactId === userId)
+  if (thread) return thread
+
+  // Then try by checking members
+  for (const t of threads.value) {
+    if (t.type === 'direct' && t.members) {
+      const member = t.members.find(m => m.user && m.user.id === userId)
+      if (member) return t
+    }
+  }
+
+  // If still not found and we have a name, try to match by name (case insensitive)
+  if (userName) {
+    const nameLower = userName.toLowerCase().trim()
+    for (const t of threads.value) {
+      if (t.type === 'direct' && t.name) {
+        const threadNameLower = t.name.toLowerCase().trim()
+        // Check if the thread name contains the user name or vice versa
+        if (threadNameLower.includes(nameLower) || nameLower.includes(threadNameLower)) {
+          return t
+        }
+      }
+    }
+  }
+
+  return null
+}
+
+// Main function to handle opening chat from DM click
+const handleChatWithQuery = async () => {
+  if (isProcessing.value) {
+    console.log('Already processing, skipping...')
+    return
+  }
+
+  const chatWithId = route.query.chatWith
+  const chatName = route.query.chatName
+
+  console.log('handleChatWithQuery called with:', chatWithId, chatName)
+
+  if (!chatWithId) {
+    console.log('No chatWithId in query')
+    return
+  }
+
+  if (!loginStore.user?.id) {
+    console.log('Waiting for user to login...')
+    await new Promise(resolve => {
+      const unwatch = watch(() => loginStore.user, (user) => {
+        if (user?.id) {
+          unwatch()
+          resolve()
+        }
+      }, { immediate: true })
+    })
+  }
+
+  const contactId = Number(chatWithId)
+  console.log('Looking for contact ID:', contactId)
+
+  if (lastProcessedChatId.value === contactId && activeThreadId.value) {
+    console.log('Already on this chat, focusing input')
+    await nextTick()
+    const messageInput = document.querySelector('input[placeholder="Message..."]')
+    if (messageInput) messageInput.focus()
+    return
+  }
+
+  isProcessing.value = true
+
+  try {
+    // Load conversations if not loaded
+    if (!threads.value.length) {
+      console.log('Loading conversations...')
+      await loadConversations()
+      await nextTick()
+    }
+
+    // Find existing thread using the helper function with name matching
+    let existingThread = findThreadByUserId(contactId, chatName)
+    console.log('Existing thread found:', existingThread ? `Yes (${existingThread.id})` : 'No')
+
+    if (existingThread) {
+      console.log('Selecting existing thread:', existingThread.id)
+      lastProcessedChatId.value = contactId
+      await selectThread(existingThread.id)
+      mobileChatOpen.value = true
+      await nextTick()
+      const messageInput = document.querySelector('input[placeholder="Message..."]')
+      if (messageInput) messageInput.focus()
+      console.log('Active thread ID after select:', activeThreadId.value)
+      console.log('Mobile chat open:', mobileChatOpen.value)
+      return
+    }
+
+    // If no existing thread found, DO NOT create a new user/chat
+    // Just show the empty state with a message
+    console.log('No existing thread found for user:', chatName)
+
+    // Clear any previous selection and show the empty state
+    activeThreadId.value = null
+    mobileChatOpen.value = false
+
+    // Show a toast or notification that no chat exists
+    // You can add a toast here if you have one
+
+  } catch (error) {
+    console.error('Error in handleChatWithQuery:', error)
+  } finally {
+    isProcessing.value = false
+  }
+}
+
+// Run on mount
+onMounted(async () => {
+  console.log('Inbox mounted')
+  await nextTick()
+  setTimeout(async () => {
+    await handleChatWithQuery()
+  }, 600)
+})
+
+// Watch for query changes
+watch(() => route.query.chatWith, async (newVal, oldVal) => {
+  console.log('chatWith query changed:', newVal, oldVal)
+  if (newVal && newVal !== oldVal) {
+    lastProcessedChatId.value = null
+    isProcessing.value = false
+    await nextTick()
+    setTimeout(async () => {
+      await handleChatWithQuery()
+    }, 600)
+  }
+})
+
+// Also watch full path
+watch(() => route.fullPath, async (newVal, oldVal) => {
+  if (newVal !== oldVal && route.query.chatWith) {
+    console.log('Full path changed with chatWith')
+    await nextTick()
+    setTimeout(async () => {
+      await handleChatWithQuery()
+    }, 600)
+  }
+})
+</script>
 <template>
   <div class="flex h-screen bg-surface">
     <AdminSidebar />

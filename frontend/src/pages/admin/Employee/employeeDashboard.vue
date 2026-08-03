@@ -198,8 +198,9 @@
                   <td class="p-4 whitespace-nowrap text-text-secondary">{{ emp.joined_date }}</td>
                   <td class="p-4 whitespace-nowrap">
                     <router-link
-                        to="/admin/inbox"
-                        class="flex items-center cursor-pointer gap-1.5 px-3 py-1.5 bg-teal-500 text-white rounded-lg text-xs font-bold shadow-sm hover:bg-teal-600 transition-colors w-fit"                    >
+                        :to="{ path: '/admin/inbox', query: { chatWith: emp.id, chatName: emp.name } }"
+                        class="flex items-center cursor-pointer gap-1.5 px-3 py-1.5 bg-teal-500 text-white rounded-lg text-xs font-bold shadow-sm hover:bg-teal-600 transition-colors w-fit"
+                    >
                       <font-awesome-icon :icon="['far', 'comment']" />
                       DM
                     </router-link>
@@ -292,7 +293,7 @@
 
                 <div class="flex items-center justify-between gap-2">
                   <router-link
-                      to="/admin/inbox"
+                      :to="{ path: '/admin/inbox', query: { chatWith: emp.id, chatName: emp.name } }"
                       class="flex items-center gap-1.5 px-3 py-1.5 bg-teal-500 text-white rounded-lg text-xs font-bold shadow-sm hover:bg-teal-600 transition-colors"
                   >
                     <font-awesome-icon :icon="['far', 'comment']" />
@@ -388,6 +389,7 @@
     >
       <form @submit.prevent="handleCreateEmployee" class="grid grid-cols-1 md:grid-cols-2 gap-5 text-left text-gray-700">
         <!-- First Name -->
+        <!-- First Name -->
         <div class="flex flex-col gap-1.5">
           <label class="text-xs font-bold uppercase tracking-wider text-gray-400">
             First Name <span class="text-red-500">*</span>
@@ -402,7 +404,7 @@
           />
           <span v-if="createTouched.first_name && createErrors.first_name" class="text-xs text-rose-500 mt-1 block">
         <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ createErrors.first_name }}
-      </span>
+    </span>
         </div>
 
         <!-- Last Name -->
@@ -420,7 +422,25 @@
           />
           <span v-if="createTouched.last_name && createErrors.last_name" class="text-xs text-rose-500 mt-1 block">
         <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ createErrors.last_name }}
-      </span>
+    </span>
+        </div>
+
+        <!-- Username - NEW FIELD -->
+        <div class="flex flex-col gap-1.5">
+          <label class="text-xs font-bold uppercase tracking-wider text-gray-400">
+            Username <span class="text-red-500">*</span>
+          </label>
+          <input
+              type="text"
+              v-model="createFormData.username"
+              placeholder="e.g. sarah_ali"
+              :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all duration-200', (createTouched.username && createErrors.username) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
+              @input="markCreateTouched('username')"
+              @blur="markCreateTouched('username')"
+          />
+          <span v-if="createTouched.username && createErrors.username" class="text-xs text-rose-500 mt-1 block">
+        <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ createErrors.username }}
+    </span>
         </div>
 
         <!-- Email -->
@@ -438,7 +458,7 @@
           />
           <span v-if="createTouched.email && createErrors.email" class="text-xs text-rose-500 mt-1 block">
         <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ createErrors.email }}
-      </span>
+    </span>
         </div>
 
         <!-- Phone Number -->
