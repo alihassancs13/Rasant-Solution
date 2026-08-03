@@ -5,6 +5,8 @@ from . import holiday_views
 
 urlpatterns = [
     path('add_employee/', views.add_employee, name='add-employee'),
+    path('onboarding/<str:token>/', views.onboarding_validate, name='onboarding-validate'),          
+    path('onboarding/<str:token>/submit/', views.onboarding_submit, name='onboarding-submit'),
     path('get_employees/', views.list_employees, name='list-employees'),
     path('update_employee/<int:pk>/', views.update_employee, name='update-employee'),
     path('send_invitation/', views.send_invitation_email, name='send-invitation'),

@@ -19,7 +19,7 @@ OTP_TTL_MINUTES = 15
 RESET_SESSION_TTL_MINUTES = 30
 SETUP_TTL_HOURS = 72
 MAX_OTP_ATTEMPTS = 5
-
+ONBOARDING_TTL_HOURS = 24
 
 def _hash_code(code: str) -> str:
     return hashlib.sha256(code.strip().encode("utf-8")).hexdigest()
@@ -115,6 +115,12 @@ def create_setup_token(user) -> PasswordActionToken:
 
 def get_valid_token(token: str, purpose: str) -> tuple[PasswordActionToken | None, str | None]:
     row = PasswordActionToken.objects.select_related("user").filter(token=token, purpose=purpose).first()
+    print("token:", row.token)
+    print("created_at:", row.created_at)
+    print("expires_at:", row.expires_at)
+    print("now:", timezone.now())
+    print("is_expired:", row.is_expired)
+    print("used_at:", row.used_at)
     if not row:
         return None, "Invalid or unknown link."
     if row.is_used:
@@ -165,3 +171,12 @@ def validate_new_password(password: str, confirm: str) -> list[str]:
     if password != confirm:
         errors.append("Passwords do not match.")
     return errors
+
+def create_onboarding_token(user) -> PasswordActionToken:
+    invalidate_tokens(user, PasswordActionToken.PURPOSE_ONBOARDING)
+    return PasswordActionToken.objects.create(
+        user=user,
+        purpose=PasswordActionToken.PURPOSE_ONBOARDING,
+        token=generate_token(),
+        expires_at=timezone.now() + timedelta(hours=ONBOARDING_TTL_HOURS),
+    )

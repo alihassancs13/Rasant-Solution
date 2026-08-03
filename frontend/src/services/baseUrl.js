@@ -27,6 +27,8 @@ export const API_ENDPOINTS = {
     JOB_TYPES: '/api/employeeDashboard/job-types/',
     UPDATE_EMPLOYEE: '/api/employeeDashboard/update_employee/',
     ADD_EMPLOYEE: '/api/employeeDashboard/add_employee/',
+    ONBOARDING_VALIDATE: (token) => `/api/employeeDashboard/onboarding/${token}/`,      
+    ONBOARDING_SUBMIT: (token) => `/api/employeeDashboard/onboarding/${token}/submit/`,
     JOB_STATUS: '/api/employeeDashboard/job-status/',
     INCREMENT_POLICIES: '/api/employeeDashboard/salaries/policies/',
     INCREMENT_LOOKUPS:  '/api/employeeDashboard/salaries/lookups/',
@@ -91,6 +93,7 @@ export const API_ENDPOINTS = {
 
     INBOX_LIST_CONVERSATIONS: '/api/inbox/conversations/',
     INBOX_CREATE_DIRECT: '/api/inbox/conversations/direct/',
+    INBOX_MARK_OFFLINE: '/api/inbox/mark-offline/',
     INBOX_LIST_USERS: '/api/inbox/users/',
     INBOX_CREATE_GROUP: '/api/inbox/conversations/group/',
     INBOX_SEND_MESSAGE: '/api/inbox/messages/send/',

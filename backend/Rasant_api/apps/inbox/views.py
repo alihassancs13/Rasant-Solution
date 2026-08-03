@@ -139,6 +139,13 @@ def _deleted_for_me_ids(conv, user):
         ).values_list('message_id', flat=True)
     )
 
+@api_view(['POST'])
+@authentication_classes([JWTAuthentication])
+@permission_classes([IsAuthenticated])
+def mark_offline(request):
+    _mark_user_offline(request.user.id)
+    cache.delete(f'inbox_sse_generation_{request.user.id}')
+    return Response({'status': True})
 
 @api_view(['POST'])
 @authentication_classes([JWTAuthentication])
@@ -199,6 +206,7 @@ def send_message(request):
         )
 
     msg = Message.objects.create(conversation=conv, sender=sender, content=content)
+    print(f"[SSE-DEBUG] MESSAGE CREATED id={msg.id} at {time.time()}")
 
     for f in files:
         content_type = f.content_type or 'application/octet-stream'
@@ -439,7 +447,7 @@ def clear_chat(request, conversation_id):
     return Response({'status': True, 'message': message}, status=status.HTTP_200_OK)
 
 def _mark_user_online(user_id):
-    cache.set(f'inbox_sse_active_{user_id}', True, timeout=60)
+    cache.set(f'inbox_sse_active_{user_id}', True, timeout=20)
 
 
 def _mark_user_offline(user_id):
@@ -484,7 +492,7 @@ def inbox_sse_stream(request):
     except Exception:
         return HttpResponseForbidden('Invalid token')
     request.user = user
-
+    print(f"[SSE-DEBUG] stream started for user {user.id} at {time.time()}")
     generation = f"{time.time()}-{id(request)}"
     cache.set(f'inbox_sse_generation_{user.id}', generation, timeout=3600)
 
@@ -494,7 +502,7 @@ def inbox_sse_stream(request):
         user=user, is_delivered=False
     ).update(is_delivered=True, delivered_at=timezone.now())
 
-    AVATAR_CHECK_EVERY_N = 5  # avatar/member hash checks har 5 seconds mein 1 dafa
+    AVATAR_CHECK_EVERY_N = 5
 
     def event_stream():
         last_message_ids = {}
@@ -579,18 +587,13 @@ def inbox_sse_stream(request):
                 for membership in member_qs:
                     conv = membership.conversation
                     last_id = last_message_ids.get(conv.id, 0)
-
-                    # ---------------- FAST PATH ----------------
-                    # Naye messages, deletions, aur delivery/read ticks —
-                    # ye sabse zaroori/real-time cheezein hain, isliye
-                    # inhe avatar/member hashing se PEHLE process karo
-                    # taake ticks bina kisi extra overhead ke turant nikal jayein.
                     new_msgs = Message.objects.filter(
                         conversation=conv,
                         id__gt=last_id
                     ).select_related('sender').prefetch_related('attachments').order_by('id')
 
                     for msg in new_msgs:
+                        print(f"[SSE-DEBUG] MESSAGE DETECTED id={msg.id} for_user={user.id} at {time.time()}")
                         last_message_ids[conv.id] = msg.id
                         if msg.deleted_for_everyone:
                             sent_deletion_updates.add(msg.id)

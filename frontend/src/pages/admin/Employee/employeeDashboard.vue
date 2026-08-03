@@ -314,8 +314,7 @@
 
           <div v-else class="p-16 text-center text-text-muted">
             <font-awesome-icon :icon="['fas', 'folder-open']" class="text-5xl mb-4 text-slate-300" />
-            <h3 class="text-base font-semibold text-slate-700 mb-1">No matching employee data found</h3>
-            <p class="text-xs text-slate-400">Try modifying your query variables parameters filters.</p>
+            <h3 class="text-base font-semibold text-slate-700 mb-1">No employee data found</h3>
           </div>
 
           <div v-if="totalPages > 1" class="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 bg-surface border-t border-border gap-3">
@@ -615,7 +614,7 @@
                   <input
                       type="text"
                       v-model="editFormData.name"
-                      
+
                       :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.name && editErrors.name) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
                       @input="markEditTouched('name')"
                       @blur="markEditTouched('name')"
@@ -645,7 +644,7 @@
                       type="text"
                       inputmode="numeric"
                       v-model="editFormData.phone_number"
-                      
+
                       :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.phone_number && editErrors.phone_number) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
                       @input="markEditTouched('phone_number')"
                       @blur="markEditTouched('phone_number')"
@@ -660,7 +659,7 @@
                   <input
                       type="text"
                       v-model="editFormData.department"
-                      
+
                       :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.department && editErrors.department) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
                       @input="markEditTouched('department')"
                       @blur="markEditTouched('department')"
@@ -675,7 +674,7 @@
                   <input
                       type="text"
                       v-model="editFormData.designation"
-                      
+
                       :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.designation && editErrors.designation) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
                       @input="markEditTouched('designation')"
                       @blur="markEditTouched('designation')"
@@ -856,7 +855,7 @@
                         type="text"
                         v-model="editFormData.cnic"
                         placeholder="00000-0000000-0"
-                        
+
                         :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.cnic && editErrors.cnic) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
                         @input="markEditTouched('cnic')"
                         @blur="markEditTouched('cnic')"
@@ -919,7 +918,7 @@
                         type="text"
                         v-model="editFormData.emergency_name"
                         placeholder="—"
-                        
+
                         :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.emergency_name && editErrors.emergency_name) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
                         @input="markEditTouched('emergency_name')"
                         @blur="markEditTouched('emergency_name')"
@@ -934,7 +933,7 @@
                         type="text"
                         v-model="editFormData.emergency_relation"
                         placeholder="—"
-                        
+
                         :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.emergency_relation && editErrors.emergency_relation) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
                         @input="markEditTouched('emergency_relation')"
                         @blur="markEditTouched('emergency_relation')"
@@ -949,7 +948,7 @@
                         type="text"
                         v-model="editFormData.emergency_cnic"
                         placeholder="00000-0000000-0"
-                        
+
                         :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.emergency_cnic && editErrors.emergency_cnic) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
                         @input="markEditTouched('emergency_cnic')"
                         @blur="markEditTouched('emergency_cnic')"
@@ -965,7 +964,7 @@
                         inputmode="numeric"
                         v-model="editFormData.emergency_phone"
                         placeholder="03XXXXXXXXX"
-                        
+
                         :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.emergency_phone && editErrors.emergency_phone) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
                         @input="markEditTouched('emergency_phone')"
                         @blur="markEditTouched('emergency_phone')"
@@ -999,7 +998,7 @@
                         type="text"
                         v-model="editFormData.bank_name"
                         placeholder="—"
-                        
+
                         :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.bank_name && editErrors.bank_name) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
                         @input="markEditTouched('bank_name')"
                         @blur="markEditTouched('bank_name')"
@@ -1014,7 +1013,7 @@
                         type="text"
                         v-model="editFormData.branch_name"
                         placeholder="—"
-                        
+
                         :class="['w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-[#2F6FC4] transition', (editTouched.branch_name && editErrors.branch_name) ? 'border-rose-500 bg-rose-50' : 'border-gray-200']"
                         @input="markEditTouched('branch_name')"
                         @blur="markEditTouched('branch_name')"

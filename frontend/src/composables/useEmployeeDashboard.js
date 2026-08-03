@@ -917,7 +917,20 @@ export function useEmployeeDashboard() {
                 statusChangeEmployee.value.status_id = selectedNewStatus.value.id;
                 statusChangeEmployee.value.status = selectedNewStatus.value.name;
 
-                showToast(`Status changed to ${selectedNewStatus.value.name} successfully`, 'success');
+                const emailKind = result.data?.email_kind;
+                const emailSent = result.data?.email_sent;
+                let emailNote = '';
+                if (emailKind === 'password_setup') {
+                    emailNote = emailSent === false
+                        ? ' Password-setup email could not be sent — check Email settings.'
+                        : ' Password-setup email sent to the employee.';
+                } else if (emailKind === 'status_changed') {
+                    emailNote = emailSent === false
+                        ? ' Employee could not be notified by email — check Email settings.'
+                        : ' Employee notified by email.';
+                }
+
+                showToast(`Status changed to ${selectedNewStatus.value.name} successfully.${emailNote}`, 'success', 5000);
                 showStatusConfirmModal.value = false;
                 statusChangeEmployee.value = null;
                 selectedNewStatus.value = null;

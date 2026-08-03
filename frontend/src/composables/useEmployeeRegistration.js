@@ -3,6 +3,7 @@ import { ref, computed } from 'vue';
 import { useEmployeeStore } from '../stores/employeeStore.js';
 import { useToast } from '@/composables/useToast.js';
 import { useValidation } from '@/composables/useValidation.js';
+import { onboardingAPI } from '@/services/onboardingAPI.js';
 export function useEmployeeRegistration(isDirectAccess) {
     const store = useEmployeeStore();
     const { showToast } = useToast();
@@ -40,6 +41,15 @@ export function useEmployeeRegistration(isDirectAccess) {
     const isSubmitted = ref(false);
     const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024; // 10MB
     const ALLOWED_FILE_EXTENSIONS = ['.pdf', '.png', '.jpg', '.jpeg'];
+    const LOCKED_FIELDS = ['first_name', 'last_name', 'email', 'phone_number', 'designation', 'department', 'salary'];
+    const onboardingToken = ref(null);
+    const isValidatingToken = ref(false);
+    const tokenValid = ref(true);
+    const tokenError = ref('');
+    const alreadySubmitted = ref(false);
+    const lockedFields = ref({});
+
+    const isFieldLocked = (field) => !!lockedFields.value[field];
 
     const FILE_FIELD_LABELS = {
         cnic_scan: 'CNIC scan copy',
@@ -62,7 +72,7 @@ export function useEmployeeRegistration(isDirectAccess) {
     const formData = ref({
         name: '', cnic: '', present_address: '', permanent_address: '',
         phone_number: '', gender: '', email: '', department: '', designation: '',
-        salary: '', joined_date: '', status: 'Intern', work_from_home: false,
+        salary: '', joined_date: '', work_from_home: false,
         emergency_name: '', emergency_relation: '', emergency_cnic: '',
         emergency_phone: '', emergency_address: '',
         bank_name: '', branch_name: '', account_number: ''
@@ -79,7 +89,7 @@ export function useEmployeeRegistration(isDirectAccess) {
         first_name: false,
         last_name: false,  email: false, phone_number: false, department: false,
         designation: false, salary: false, present_address: false, gender: false,
-        joined_date: false, status: false, emergency_name: false, emergency_relation: false,
+        joined_date: false, emergency_name: false, emergency_relation: false,
         emergency_cnic: false, emergency_phone: false, emergency_address: false,
         bank_name: false, branch_name: false, account_number: false
     });
@@ -88,7 +98,7 @@ export function useEmployeeRegistration(isDirectAccess) {
         first_name: null,
         last_name: null, email: null, phone_number: null, department: null,
         designation: null, salary: null, present_address: null, gender: null,
-        joined_date: null, status: null, emergency_name: null, emergency_relation: null,
+        joined_date: null, emergency_name: null, emergency_relation: null,
         emergency_cnic: null, emergency_phone: null, emergency_address: null,
         bank_name: null, branch_name: null, account_number: null
     });
@@ -100,7 +110,7 @@ export function useEmployeeRegistration(isDirectAccess) {
 
     const validationError = ref('');
 
-    const ADMIN_REQUIRED_FIELDS = ['first_name', 'last_name', 'email', 'phone_number','gender','department','designation','salary','joined_date','status'];
+    const ADMIN_REQUIRED_FIELDS = ['first_name', 'last_name', 'email', 'phone_number','gender','department','designation','salary','joined_date'];
     const isFieldRequired = (field) => isPublic() || ADMIN_REQUIRED_FIELDS.includes(field);
 
     const emergencyCnicError = computed(() => {
@@ -108,6 +118,39 @@ export function useEmployeeRegistration(isDirectAccess) {
         if (!value) return (isPublic() && touched.value.emergency_cnic) ? 'CNIC is required.' : '';
         return isValidCnic(value) ? '' : 'CNIC must be exactly 13 digits (e.g., 12345-1234567-8)';
     });
+
+    async function validateOnboardingToken(token) {
+        if (!token) return;
+        onboardingToken.value = token;
+        isValidatingToken.value = true;
+        try {
+            const { data } = await onboardingAPI.validate(token);
+            if (!data.valid) {
+                tokenValid.value = false;
+                alreadySubmitted.value = !!data.already_submitted;
+                tokenError.value = data.error || (alreadySubmitted.value
+                    ? 'This onboarding form has already been submitted.'
+                    : 'This onboarding link is invalid or expired.');
+                return;
+            }
+            tokenValid.value = true;
+            formData.value.first_name = data.first_name || '';
+            formData.value.last_name = data.last_name || '';
+            formData.value.email = data.email || '';
+            formData.value.phone_number = data.phone_number || '';
+            formData.value.designation = data.designation || '';
+            formData.value.department = data.department || '';
+            formData.value.salary = data.salary || '';
+
+            LOCKED_FIELDS.forEach((f) => { lockedFields.value[f] = true; });
+        } catch (err) {
+            tokenValid.value = false;
+            alreadySubmitted.value = !!err.response?.data?.already_submitted;
+            tokenError.value = err.response?.data?.error || 'This onboarding link is invalid or expired.';
+        } finally {
+            isValidatingToken.value = false;
+        }
+    }
 
     const currentProgressPercentage = computed(() => {
         if (isSubmitted.value) return '100%';
@@ -150,7 +193,6 @@ export function useEmployeeRegistration(isDirectAccess) {
             case 'present_address': error = getAddressLengthError(value, 250, 'Present address'); break;
             case 'gender': error = !value ? 'Gender is required.' : null; break;
             case 'joined_date': error = !value ? 'Joined date is required.' : null; break;
-            case 'status': error = !value ? 'Status is required.' : null; break;
             case 'emergency_name': error = getUsernameError(value, 32, 'Emergency contact name'); break;
             case 'emergency_relation': error = getUsernameError(value, 32, 'Relation'); break;
             case 'emergency_cnic': error = getCnicError(value); break;
@@ -189,7 +231,7 @@ export function useEmployeeRegistration(isDirectAccess) {
             return stepNumber === 1 ? [...ADMIN_REQUIRED_FIELDS] : [];
         }
         switch (stepNumber) {
-            case 1: return ['first_name', 'last_name','email', 'phone_number', 'department', 'designation', 'salary', 'present_address', 'gender', 'joined_date', 'status'];
+            case 1: return ['first_name', 'last_name','email', 'phone_number', 'department', 'designation', 'salary', 'present_address', 'gender', 'joined_date'];
             case 2: return ['emergency_name', 'emergency_relation', 'emergency_cnic', 'emergency_phone', 'emergency_address'];
             case 4: return ['bank_name', 'branch_name', 'account_number'];
             default: return [];
@@ -368,11 +410,49 @@ export function useEmployeeRegistration(isDirectAccess) {
         }
 
         isSubmitted.value = true;
-
         const payload = new FormData();
+        const cleanCnic = (value) => (value || '').replace(/\D/g, '');
+
+        if (onboardingToken.value && tokenValid.value) {
+            const editableData = {
+                cnic: cleanCnic(formData.value.cnic),
+                present_address: (formData.value.present_address || '').trim(),
+                permanent_address: (formData.value.permanent_address || '').trim(),
+                gender: formData.value.gender || '',
+                work_from_home: !!formData.value.work_from_home,
+                emergency_name: (formData.value.emergency_name || '').trim(),
+                emergency_relation: (formData.value.emergency_relation || '').trim(),
+                emergency_cnic: cleanCnic(formData.value.emergency_cnic),
+                emergency_phone: (formData.value.emergency_phone || '').trim(),
+                emergency_address: (formData.value.emergency_address || '').trim(),
+                bank_name: (formData.value.bank_name || '').trim(),
+                branch_name: (formData.value.branch_name || '').trim(),
+                account_number: (formData.value.account_number || '').trim(),
+            };
+
+            Object.entries(editableData).forEach(([key, val]) => {
+                if (val !== undefined && val !== null) payload.append(key, val);
+            });
+            Object.entries(uploadedFiles.value).forEach(([key, file]) => {
+                if (file) payload.append(key, file);
+            });
+
+            try {
+                const { data } = await onboardingAPI.submit(onboardingToken.value, payload);
+                showToast(data.message || 'Onboarding submitted successfully.', 'success', 5000);
+                onSuccess?.(data);
+                return { success: true, data };
+            } catch (err) {
+                const errData = err.response?.data;
+                showToast(errData?.error || 'Submission failed.', 'error', 6000);
+                isSubmitted.value = false;
+                return { success: false, error: errData?.error, errors: errData?.errors };
+            }
+        }
+
+        // ---- Existing bare /onboarding (no token) flow — unchanged ----
         payload.append('source', source);
 
-        const cleanCnic = (value) => (value || '').replace(/\D/g, '');
         const cleanedEmergencyCnic = cleanCnic(formData.value.emergency_cnic);
 
         const cleanedData = {
@@ -387,7 +467,7 @@ export function useEmployeeRegistration(isDirectAccess) {
             designation: (formData.value.designation || '').trim() || 'Employee',
             salary: parseFloat(formData.value.salary) || 0,
             joined_date: formData.value.joined_date || new Date().toISOString().split('T')[0],
-            status: formData.value.status || 'Intern',
+            status: 'Intern',
             is_active: true,
             work_from_home: !!formData.value.work_from_home,
             emergency_name: (formData.value.emergency_name || '').trim(),
@@ -432,7 +512,6 @@ export function useEmployeeRegistration(isDirectAccess) {
 
             let errorMsg = 'Submission failed';
             if (result.errors && typeof result.errors === 'object') {
-                // Map backend field errors onto the actual form fields so they highlight red
                 Object.entries(result.errors).forEach(([field, msgs]) => {
                     const message = Array.isArray(msgs) ? msgs[0] : String(msgs);
                     if (Object.prototype.hasOwnProperty.call(errors.value, field)) {
@@ -441,7 +520,6 @@ export function useEmployeeRegistration(isDirectAccess) {
                     }
                 });
 
-                // If the failing field is on an earlier step, jump back so the user sees it
                 const failingFields = Object.keys(result.errors);
                 for (let step = 1; step <= totalSteps; step++) {
                     if (getFieldsForStep(step).some(f => failingFields.includes(f))) {
@@ -473,7 +551,7 @@ export function useEmployeeRegistration(isDirectAccess) {
             first_name: '',
             last_name: '', cnic: '', present_address: '', permanent_address: '',
             phone_number: '', gender: '', email: '', department: '', designation: '',
-            salary: '', joined_date: '', status: 'Intern', work_from_home: false,
+            salary: '', joined_date: '', work_from_home: false,
             emergency_name: '', emergency_relation: '', emergency_cnic: '',
             emergency_phone: '', emergency_address: '',
             bank_name: '', branch_name: '', account_number: ''
@@ -516,7 +594,10 @@ export function useEmployeeRegistration(isDirectAccess) {
         getFileFieldLabel,
         nextStep, prevStep,
         submitForm, resetForm,
+        token: onboardingToken,
         isLoading: computed(() => store.isLoading),
-        MAX_FILE_SIZE_BYTES, ALLOWED_FILE_EXTENSIONS,
+        MAX_FILE_SIZE_BYTES, ALLOWED_FILE_EXTENSIONS, onboardingToken, isValidatingToken, tokenValid, tokenError,
+        isFieldLocked, validateOnboardingToken,
+        alreadySubmitted,
     };
 }

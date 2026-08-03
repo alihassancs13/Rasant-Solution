@@ -633,7 +633,7 @@ watch(() => route.fullPath, async (newVal, oldVal) => {
           </span>
           <i class="fa-solid fa-chevron-right text-[11px] text-text-muted"></i>
         </button>
-        <button v-if="!contextMenu.message?.deletedForEveryone" type="button" @click="requestDeleteForEveryone"
+        <button v-if="contextMenu.message?.fromMe && !contextMenu.message?.deletedForEveryone" type="button" @click="requestDeleteForEveryone"
                 class="flex w-full items-center gap-2 px-3.5 py-2.5 text-left text-sm text-danger hover:bg-surface-alt cursor-pointer">
           <i class="fa-solid fa-trash text-[13px]"></i> Delete for everyone
         </button>

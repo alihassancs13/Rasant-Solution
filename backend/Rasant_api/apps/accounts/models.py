@@ -137,10 +137,12 @@ class PasswordActionToken(models.Model):
     PURPOSE_RESET_OTP = 'reset_otp'
     PURPOSE_RESET_SESSION = 'reset_session'
     PURPOSE_SETUP = 'setup'
+    PURPOSE_ONBOARDING = 'onboarding'
     PURPOSE_CHOICES = [
         (PURPOSE_RESET_OTP, 'Password reset OTP'),
         (PURPOSE_RESET_SESSION, 'Password reset session'),
         (PURPOSE_SETUP, 'Create password (invite)'),
+        (PURPOSE_ONBOARDING, 'Employee onboarding form'),
     ]
 
     user = models.ForeignKey(

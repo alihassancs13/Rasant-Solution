@@ -21,22 +21,24 @@
         'border-b border-slate-100 bg-white',
         isDirectAccess ? 'px-6 md:px-8 py-6' : 'p-5 px-6 pr-16 shrink-0'
       ]">
-        <div class="mb-3">
+        <div :class="showTokenErrorScreen ? '' : 'mb-3'">
           <h1 :class="[
             'font-bold text-slate-800',
             isDirectAccess ? 'text-2xl' : 'text-xl'
           ]">Employee Onboarding Form</h1>
-          <p class="text-xs text-slate-400 mt-0.5">Complete the multi-step registration to register a new employee.</p>
+          <p v-if="!showTokenErrorScreen" class="text-xs text-slate-400 mt-0.5">Complete the multi-step registration to register a new employee.</p>
         </div>
 
         <!-- Progress tracker line -->
-        <div class="flex justify-between items-center mb-1.5">
-          <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Overall Progress</span>
-          <span class="text-sm font-bold text-blue-600">{{ currentProgressPercentage }}</span>
-        </div>
-        <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-          <div class="bg-blue-500 h-full transition-all duration-300" :style="{ width: currentProgressPercentage }"></div>
-        </div>
+        <template v-if="!showTokenErrorScreen">
+          <div class="flex justify-between items-center mb-1.5">
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Overall Progress</span>
+            <span class="text-sm font-bold text-blue-600">{{ currentProgressPercentage }}</span>
+          </div>
+          <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+            <div class="bg-blue-500 h-full transition-all duration-300" :style="{ width: currentProgressPercentage }"></div>
+          </div>
+        </template>
       </div>
 
       <!-- CONTENT BODY -->
@@ -46,7 +48,7 @@
         <div :class="isDirectAccess ? 'px-2 md:px-4 py-6 space-y-4' : ''">
 
           <!-- STEP WIZARD INDICATORS -->
-          <div class="px-6 pt-5 bg-slate-50/50 pb-4 border-b border-slate-100 rounded-t-xl">
+          <div v-if="!showTokenErrorScreen" class="px-6 pt-5 bg-slate-50/50 pb-4 border-b border-slate-100 rounded-t-xl">
             <div class="flex justify-between max-w-2xl mx-auto relative">
               <div v-for="step in steps" :key="step.id" class="flex flex-col items-center flex-1">
                 <div :class="[
@@ -69,14 +71,36 @@
           </div>
 
           <!-- IMPORTANT NOTICE BOX -->
-          <div class="mx-6 p-4 bg-amber-50 rounded-xl border border-amber-200/70 text-amber-800 text-xs space-y-1">
+          <div v-if="!showTokenErrorScreen" class="mx-6 p-4 bg-amber-50 rounded-xl border border-amber-200/70 text-amber-800 text-xs space-y-1">
             <p class="font-bold text-sm mb-1 text-amber-900">Important:</p>
             <p>1. Employee found to have made false or incorrect statement in the form is liable for expulsion.</p>
             <p>2. Relevant documents for the verification may please be attached with the application.</p>
           </div>
 
           <!-- FORM FIELDS -->
-          <div v-if="!isSubmitted">
+          <div v-if="isValidatingToken" class="px-6 py-16 text-center text-sm text-slate-400">
+            Validating your onboarding link…
+          </div>
+
+          <!-- Already submitted -->
+          <div v-else-if="isDirectAccess && token && !tokenValid && alreadySubmitted" class="px-6 py-20 text-center max-w-md mx-auto">
+            <div class="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-5">
+              <i class="fa-solid fa-circle-check text-3xl text-emerald-600"></i>
+            </div>
+            <h2 class="text-xl font-bold text-slate-800 mb-2">Form already submitted</h2>
+            <p class="text-sm text-slate-500 leading-relaxed">{{ tokenError }}</p>
+          </div>
+
+          <!-- Invalid/expired token -->
+          <div v-else-if="isDirectAccess && token && !tokenValid" class="px-6 py-20 text-center max-w-md mx-auto">
+            <div class="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-5">
+              <div class="w-11 h-11 bg-emerald-600 rounded-full flex items-center justify-center">
+                <i class="fa-solid fa-check text-white text-lg"></i>
+              </div>
+            </div>
+            <h2 class="text-xl font-bold text-slate-800 mb-2">Response has been already submitted</h2>
+          </div>
+          <div v-else-if="!isSubmitted">
             <form @submit.prevent id="employeeForm" enctype="multipart/form-data" class="px-6 pb-6">
 
               <!-- STEP 1: Personal Details -->
@@ -92,7 +116,6 @@
                   </div>
                 </div>
 
-                <!-- Row 1: Name + CNIC -->
                 <!-- Row 1: First Name + Last Name -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -101,10 +124,12 @@
                         type="text"
                         v-model="formData.first_name"
                         :required="isDirectAccess"
+                        :disabled="isFieldLocked('first_name')"
                         :class="[
-        'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
-        (touched.first_name && errors.first_name) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
-      ]"
+                          'w-full px-4 py-2.5 rounded-xl border text-sm',
+                          isFieldLocked('first_name') ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : 'focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500',
+                          (touched.first_name && errors.first_name) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
+                        ]"
                         placeholder="e.g. Sarah"
                         @input="markTouched('first_name')"
                         @blur="markTouched('first_name')"
@@ -119,10 +144,12 @@
                         type="text"
                         v-model="formData.last_name"
                         :required="isDirectAccess"
+                        :disabled="isFieldLocked('last_name')"
                         :class="[
-        'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
-        (touched.last_name && errors.last_name) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
-      ]"
+                          'w-full px-4 py-2.5 rounded-xl border text-sm',
+                          isFieldLocked('last_name') ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : 'focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500',
+                          (touched.last_name && errors.last_name) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
+                        ]"
                         placeholder="e.g. Ali"
                         @input="markTouched('last_name')"
                         @blur="markTouched('last_name')"
@@ -201,10 +228,12 @@
                         type="email"
                         v-model="formData.email"
                         :required="isDirectAccess"
+                        :disabled="isFieldLocked('email')"
                         :class="[
-                        'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
-                        (touched.email && errors.email) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
-                      ]"
+                          'w-full px-4 py-2.5 rounded-xl border text-sm',
+                          isFieldLocked('email') ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : 'focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500',
+                          (touched.email && errors.email) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
+                        ]"
                         placeholder="employee@company.com"
                         @input="markTouched('email')"
                         @blur="markTouched('email')"
@@ -220,10 +249,12 @@
                         inputmode="numeric"
                         v-model="formData.phone_number"
                         :required="isDirectAccess"
+                        :disabled="isFieldLocked('phone_number')"
                         :class="[
-                        'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
-                        (touched.phone_number && errors.phone_number) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
-                      ]"
+                          'w-full px-4 py-2.5 rounded-xl border text-sm',
+                          isFieldLocked('phone_number') ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : 'focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500',
+                          (touched.phone_number && errors.phone_number) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
+                        ]"
                         placeholder="03XXXXXXXXX"
                         @keydown="handlePhoneKeydown"
                         @paste="handlePhonePaste"
@@ -271,10 +302,12 @@
                         type="text"
                         v-model="formData.department"
                         :required="isDirectAccess"
+                        :disabled="isFieldLocked('department')"
                         :class="[
-                        'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
-                        (touched.department && errors.department) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
-                      ]"
+                          'w-full px-4 py-2.5 rounded-xl border text-sm',
+                          isFieldLocked('department') ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : 'focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500',
+                          (touched.department && errors.department) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
+                        ]"
                         placeholder="e.g. Engineering"
                         @input="markTouched('department')"
                         @blur="markTouched('department')"
@@ -293,10 +326,12 @@
                         type="text"
                         v-model="formData.designation"
                         :required="isDirectAccess"
+                        :disabled="isFieldLocked('designation')"
                         :class="[
-                        'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
-                        (touched.designation && errors.designation) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
-                      ]"
+                          'w-full px-4 py-2.5 rounded-xl border text-sm',
+                          isFieldLocked('designation') ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : 'focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500',
+                          (touched.designation && errors.designation) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
+                        ]"
                         placeholder="e.g. Software Engineer"
                         @input="markTouched('designation')"
                         @blur="markTouched('designation')"
@@ -312,10 +347,12 @@
                         inputmode="decimal"
                         v-model="formData.salary"
                         :required="isDirectAccess"
+                        :disabled="isFieldLocked('salary')"
                         :class="[
-                        'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
-                        (touched.salary && errors.salary) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
-                      ]"
+                          'w-full px-4 py-2.5 rounded-xl border text-sm',
+                          isFieldLocked('salary') ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : 'focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500',
+                          (touched.salary && errors.salary) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
+                        ]"
                         placeholder="0.00"
                         @keydown="handleSalaryKeydown"
                         @paste="handleSalaryPaste"
@@ -328,7 +365,7 @@
                   </div>
                 </div>
 
-                <!-- Row 5: Joined Date + Status -->
+                <!-- Row 5: Joined Date -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Joined Date <span class="text-rose-500">*</span></label>
@@ -345,29 +382,6 @@
                     >
                     <span v-if="touched.joined_date && errors.joined_date" class="text-xs text-rose-500 mt-1 block">
                       <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ errors.joined_date }}
-                    </span>
-                  </div>
-                  <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Status <span class="text-rose-500">*</span></label>
-                    <select
-                        v-model="formData.status"
-                        :required="isDirectAccess"
-                        :class="[
-                        'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm bg-white',
-                        (touched.status && errors.status) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
-                      ]"
-                        @change="markTouched('status')"
-                        @blur="markTouched('status')"
-                    >
-                      <option value="">Select Status</option>
-                      <option
-                          v-for="st in employmentStatuses"
-                          :key="st.id || st.code || st.name"
-                          :value="st.name"
-                      >{{ st.name }}</option>
-                    </select>
-                    <span v-if="touched.status && errors.status" class="text-xs text-rose-500 mt-1 block">
-                      <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ errors.status }}
                     </span>
                   </div>
                 </div>
@@ -387,7 +401,7 @@
                       v-model="formData.present_address"
                       :required="isDirectAccess"
                       rows="3"
-                      
+
                       :class="[
                       'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
                       (touched.present_address && errors.present_address) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
@@ -541,7 +555,7 @@
                       v-model="formData.emergency_address"
                       :required="isDirectAccess"
                       rows="3"
-                      
+
                       :class="[
                       'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
                       (touched.emergency_address && errors.emergency_address) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
@@ -807,7 +821,7 @@
       </div>
 
       <!-- FOOTER SECTION -->
-      <div v-if="!isSubmitted" :class="[
+      <div v-if="!isSubmitted && !showTokenErrorScreen" :class="[
         'border-t border-slate-100 flex justify-between items-center',
         isDirectAccess ? 'px-6 md:px-8 py-4 bg-white' : 'p-6 bg-slate-50/80 shrink-0'
       ]">
@@ -837,7 +851,6 @@ import { useEmployeeRegistration } from '@/composables/useEmployeeRegistration.j
 import { onMounted, ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import Navbar from '@/components/Navbar.vue';
-import { useEmployeeStore } from '@/stores/employeeStore.js';
 
 export default {
   components: { Navbar },
@@ -845,8 +858,6 @@ export default {
   setup(props, { emit }) {
     const router = useRouter();
     const isDirectAccess = ref(false);
-    const employeeStore = useEmployeeStore();
-    const employmentStatuses = computed(() => employeeStore.employmentStatuses || []);
 
     const getTokenFromURL = () => {
       const path = window.location.pathname;
@@ -854,8 +865,7 @@ export default {
       const lastSegment = segments[segments.length - 1];
       return lastSegment === 'onboarding' ? null : lastSegment;
     };
-
-    const token = getTokenFromURL();
+    const tokenFromURL = getTokenFromURL();
 
     const checkDirectAccess = () => {
       const path = window.location.pathname;
@@ -863,6 +873,7 @@ export default {
         isDirectAccess.value = true;
       }
     };
+
     const registration = useEmployeeRegistration(isDirectAccess);
 
     const {
@@ -896,12 +907,20 @@ export default {
       nextStep,
       prevStep,
       submitForm,
+      onboardingToken,
+      isFieldLocked,
+      validateOnboardingToken,
+      token,
+      isValidatingToken,
+      tokenValid,
+      tokenError,
+      alreadySubmitted,
     } = registration;
 
     const genderPillClass = computed(() => [
       'inline-flex items-center text-sm font-medium text-slate-700 bg-white px-4 py-2 rounded-xl cursor-pointer hover:bg-slate-50 border',
       (touched.value.gender && errors.value.gender) ? 'border-rose-500 bg-rose-50' : 'border-slate-200',
-    ])
+    ]);
 
     const cnicError = computed(() => {
       if (currentStep.value !== 1) return '';
@@ -911,9 +930,10 @@ export default {
       }
       return '';
     });
+    const showTokenErrorScreen = computed(() =>
+        isDirectAccess.value && !!token.value && !tokenValid.value
+    );
 
-    // Wrap the composable's formatCnic so the step-1 "Please enter CNIC number"
-    // banner clears as soon as the user starts typing again.
     const formatCnic = (event) => {
       registrationFormatCnic(event);
       validationError.value = '';
@@ -921,17 +941,15 @@ export default {
 
     onMounted(() => {
       checkDirectAccess();
-      employeeStore.fetchEmploymentStatuses();
 
-      if (token) {
-        console.log('Token from URL:', token);
+      if (tokenFromURL) {
+        console.log('Token from URL:', tokenFromURL);
+        validateOnboardingToken(tokenFromURL);
       }
     });
 
     const customNextStep = () => {
       if (currentStep.value === totalSteps) {
-        // CHANGE THIS LINE - pass the source
-        // Determine source based on context
         const source = isDirectAccess.value ? 'user_onboarding' : 'admin_onboarding';
 
         submitForm((data) => {
@@ -941,7 +959,7 @@ export default {
               emit('close');
             }, 2500);
           }
-        }, source); // Pass source here
+        }, source);
       } else {
         nextStep();
       }
@@ -975,7 +993,6 @@ export default {
       formatEmergencyCnic,
       emergencyCnicError,
       validationError,
-      employmentStatuses,
       touched,
       errors,
       fileErrors,
@@ -990,7 +1007,14 @@ export default {
       handleSalaryKeydown,
       handleSalaryPaste,
       handleSalaryInput,
+      token,
+      isValidatingToken,
+      tokenValid,
+      tokenError,
+      isFieldLocked,
+      alreadySubmitted,
+      showTokenErrorScreen,
     };
-  }
+  },
 };
 </script>

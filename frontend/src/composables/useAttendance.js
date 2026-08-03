@@ -352,6 +352,7 @@ export function useAttendance() {
         const { data } = result
         showToast(
             `${data.successfully_saved} of ${data.total_rows} rows saved.` +
+            (data.skipped_weekend ? ` ${data.skipped_weekend} weekend rows skipped.` : '') +
             (data.failed ? ` ${data.failed} failed.` : ''),
             data.failed ? 'warning' : 'success',
         )

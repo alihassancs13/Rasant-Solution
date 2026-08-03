@@ -1,5 +1,5 @@
 // composables/useEmployeeCareer.js
-import { computed, onMounted, useTemplateRef, watch, ref } from 'vue'
+import { computed, onMounted, onUnmounted, useTemplateRef, watch, ref } from 'vue'
 import { useContactStore } from '@/stores/contactStore.js'
 import { useCvStore } from '@/stores/cvStore.js'
 import { useToast } from './useToast.js'
@@ -15,6 +15,14 @@ export function useEmployeeCareer() {
     const searchInput = useTemplateRef('searchInput')
     const showDeleteConfirm = ref(false)
     const pendingDeleteId = ref(null)
+
+    // Polling handle for CV submissions. A CV submitted from the public careers
+    // page comes from an entirely different browser/session than the admin
+    // panel, so there's no shared reactive state to piggyback on — we simply
+    // re-fetch on an interval while this composable (i.e. the admin Careers
+    // page) is mounted, and stop when it isn't.
+    let cvPollInterval = null
+    const CV_POLL_INTERVAL_MS = 8000
 
     async function fetchMessages() {
         const result = await contactStore.fetchMessages()
@@ -118,11 +126,15 @@ export function useEmployeeCareer() {
     const cvError = computed(() => cvStore.error)
     const cvSearchQuery = ref('')
 
-    async function fetchCVSubmissions() {
+    // `silent` skips the error toast — used by the background poll so a
+    // transient network hiccup every 8s doesn't spam the admin with toasts.
+    // Manual/explicit calls (initial load, refresh button) keep the toast.
+    async function fetchCVSubmissions(silent = false) {
         const result = await cvStore.fetchCVs()
-        if (!result.success) {
+        if (!result.success && !silent) {
             showToast(result.error, 'error')
         }
+        return result
     }
 
     async function deleteCV(id) {
@@ -227,6 +239,21 @@ export function useEmployeeCareer() {
         fetchCVSubmissions()
 
         searchInput.value?.focus()
+
+        // Background poll: keeps the admin's CV list in sync with CVs submitted
+        // from the public careers page (a different browser/session), without
+        // requiring a manual page refresh. Silent so it doesn't toast on every
+        // tick — only the initial load / manual actions surface errors.
+        cvPollInterval = setInterval(() => {
+            fetchCVSubmissions(true)
+        }, CV_POLL_INTERVAL_MS)
+    })
+
+    onUnmounted(() => {
+        if (cvPollInterval) {
+            clearInterval(cvPollInterval)
+            cvPollInterval = null
+        }
     })
 
     return {

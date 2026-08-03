@@ -122,7 +122,11 @@ def send_branded_email(
         return False
 
 
-def send_employee_welcome(employee, setup_url: str, ttl_hours: int = 72):
+def send_employee_welcome(
+    employee, setup_url: str, ttl_hours: int = 72,
+    onboarding_url: str | None = None, onboarding_ttl_hours: int = 24,
+):
+    frontend = getattr(settings, 'FRONTEND_URL', 'http://localhost:5173').rstrip('/')
     return send_branded_email(
         subject='Welcome to Rasant Solutions — Create your password',
         template_name='emails/employee_welcome.html',
@@ -132,7 +136,9 @@ def send_employee_welcome(employee, setup_url: str, ttl_hours: int = 72):
             'employee_number': employee.employee_number,
             'setup_url': setup_url,
             'ttl_hours': ttl_hours,
-            'login_url': f"{getattr(settings, 'FRONTEND_URL', 'http://localhost:5173')}/login",
+            'onboarding_url': onboarding_url or f"{frontend}/onboarding/{employee.employee_number}",
+            'onboarding_ttl_hours': onboarding_ttl_hours,
+            'login_url': f"{frontend}/login",
             'department': employee.department,
             'designation': employee.designation,
         },
@@ -312,4 +318,38 @@ def send_candidate_reply_email(to_email: str, subject: str, body: str, recipient
         },
         to=to_email,
         fail_silently=False,
+    )
+
+def send_employee_onboarding_invite(employee, onboarding_url: str, onboarding_ttl_hours: int = 24):
+    """Sent at employee creation — only the onboarding form link, NO password link."""
+    return send_branded_email(
+        subject='Complete your onboarding — Rasant Solutions',
+        template_name='emails/onboarding_invite.html',
+        context={
+            'employee_name': employee.name,
+            'employee_number': employee.employee_number,
+            'onboarding_link': onboarding_url,
+            'onboarding_ttl_hours': onboarding_ttl_hours,
+            'department': employee.department,
+            'designation': employee.designation,
+        },
+        to=employee.email,
+    )
+
+def send_employee_password_setup(employee, setup_url: str, ttl_hours: int = 72):
+    """Sent when admin moves employee OUT of Draft — the password creation link."""
+    return send_branded_email(
+        subject='Welcome to Rasant Solutions — Create your password',
+        template_name='emails/employee_welcome.html',  # existing template, reused
+        context={
+            'employee_name': employee.name,
+            'employee_email': employee.email,
+            'employee_number': employee.employee_number,
+            'setup_url': setup_url,
+            'ttl_hours': ttl_hours,
+            'login_url': f"{getattr(settings, 'FRONTEND_URL', 'http://localhost:5173').rstrip('/')}/login",
+            'department': employee.department,
+            'designation': employee.designation,
+        },
+        to=employee.email,
     )

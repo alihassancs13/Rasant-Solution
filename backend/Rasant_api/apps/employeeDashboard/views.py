@@ -1,4 +1,3 @@
-
 import datetime
 import calendar
 from rest_framework.decorators import permission_classes
@@ -25,7 +24,8 @@ from django.utils import timezone
 import re
 from django.contrib.auth.hashers import make_password
 from accounts.email_service import (
-    send_employee_welcome,
+    send_employee_onboarding_invite,
+    send_employee_password_setup,
     send_onboarding_complete,
     send_employee_status_changed,
     send_job_published,
@@ -51,7 +51,10 @@ from .serializers import (
     IncrementPolicySerializer, EmployeePolicyAssignmentSerializer, EmployeeAttendanceSerializer, AttendanceBulkRowSerializer,
     AttendanceHistorySerializer, PayrollSettingsSerializer
 )
-
+LOCKED_ONBOARDING_FIELDS = (
+    'first_name', 'last_name', 'name',
+    'email', 'phone_number', 'designation', 'salary', 'department',
+)
 
 # ---------- Helper function for employee number generation ----------
 def generate_employee_number():
@@ -72,7 +75,6 @@ def generate_employee_number():
 @parser_classes([MultiPartParser, FormParser, JSONParser])
 @permission_classes([IsAuthenticated])
 def add_employee(request):
-    """Create employee + linked User (employee role) and ensure sidebar modules."""
     from accounts.employee_access import ensure_employee_modules, ensure_user_is_employee
 
     MAX_FILE_SIZE = 10 * 1024 * 1024  # 10 MB
@@ -222,8 +224,8 @@ def add_employee(request):
 
             ensure_user_is_employee(user_account)
 
-            from accounts.password_tokens import create_setup_token, SETUP_TTL_HOURS
-            setup_token = create_setup_token(user_account)
+            from accounts.password_tokens import create_onboarding_token, ONBOARDING_TTL_HOURS
+            onboarding_token = create_onboarding_token(user_account)
 
     except IntegrityError as exc:
         return Response(
@@ -248,18 +250,20 @@ def add_employee(request):
         print(f"Deduction calculation failed after employee create: {ded_err}")
 
     frontend = getattr(django_settings, "FRONTEND_URL", "http://localhost:5173").rstrip("/")
-    setup_url = f"{frontend}/create-password/{setup_token.token}"
+    onboarding_url = f"{frontend}/onboarding/{onboarding_token.token}"
     email_sent = False
     try:
-        from accounts.password_tokens import SETUP_TTL_HOURS
-        email_sent = bool(send_employee_welcome(employee, setup_url, ttl_hours=SETUP_TTL_HOURS))
+        email_sent = bool(send_employee_onboarding_invite(
+            employee, onboarding_url,
+            onboarding_ttl_hours=ONBOARDING_TTL_HOURS,
+        ))
     except Exception as mail_err:
-        print(f"Welcome email failed after employee create: {mail_err}")
+        print(f"Onboarding invite email failed after employee create: {mail_err}")
 
     return Response(
         {
             "success": True,
-            "message": "Employee added successfully. A create-password link was emailed.",
+            "message": "Employee added successfully. An onboarding form link was emailed.",
             "employee_number": employee.employee_number,
             "name": employee.name,
             "email_sent": email_sent,
@@ -539,6 +543,131 @@ def update_employee(request, pk):
         },
         status=status.HTTP_200_OK,
     )
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def onboarding_validate(request, token):
+    """Validate an onboarding invite link and return the locked/prefilled fields."""
+    from accounts.models import PasswordActionToken
+    from accounts.password_tokens import get_valid_token
+
+    row, err = get_valid_token(token, PasswordActionToken.PURPOSE_ONBOARDING)
+    if err:
+        return Response({'valid': False, 'error': err}, status=status.HTTP_400_BAD_REQUEST)
+
+    employee = Employee.objects.filter(user=row.user).first()
+    if not employee:
+        return Response(
+            {'valid': False, 'error': 'No employee profile is linked to this invite.'},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    name_parts = (employee.name or '').strip().split(' ', 1)
+    return Response({
+        'valid': True,
+        'employee_number': employee.employee_number,
+        'first_name': name_parts[0] if name_parts else '',
+        'last_name': name_parts[1] if len(name_parts) > 1 else '',
+        'email': employee.email,
+        'phone_number': employee.phone_number,
+        'designation': employee.designation,
+        'department': employee.department,
+        'salary': str(employee.salary),
+        'expires_at': row.expires_at,
+    }, status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@parser_classes([MultiPartParser, FormParser, JSONParser])
+@permission_classes([AllowAny])
+def onboarding_submit(request, token):
+    from accounts.models import PasswordActionToken
+    from accounts.password_tokens import get_valid_token, mark_token_used
+
+    row, err = get_valid_token(token, PasswordActionToken.PURPOSE_ONBOARDING)
+    if err:
+        return Response({'error': err}, status=status.HTTP_400_BAD_REQUEST)
+
+    employee = Employee.objects.filter(user=row.user).first()
+    if not employee:
+        return Response(
+            {'error': 'No employee profile is linked to this invite.'},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+
+    MAX_FILE_SIZE = 10 * 1024 * 1024
+    file_fields = (
+        "cnic_scan", "emergency_cnic_scan", "matric_certificate",
+        "fsc_certificate", "university_degree", "other_course",
+    )
+
+    data = {}
+    for key in request.data.keys():
+        if key in file_fields or key in LOCKED_ONBOARDING_FIELDS:
+            continue  # locked — always ignored, regardless of what was sent
+        value = request.data.get(key)
+        if hasattr(value, "read"):
+            continue
+        data[key] = value
+
+    for blank_key in ("cnic", "emergency_cnic", "gender"):
+        if blank_key in data and data.get(blank_key) in ("", None):
+            data[blank_key] = None
+
+    # These stay admin-controlled; onboarding never touches them.
+    for key in ("salary", "tax", "insurance_amount", "joined_date", "status", "password"):
+        data.pop(key, None)
+
+    serializer = UpdateEmployeeSerializer(
+        employee, data=data, partial=True, context={"request": request},
+    )
+    if not serializer.is_valid():
+        return Response(
+            {"error": "Validation failed.", "errors": serializer.errors},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    file_payload = {}
+    for field_name in file_fields:
+        uploaded_file = request.FILES.get(field_name)
+        if uploaded_file:
+            if uploaded_file.size > MAX_FILE_SIZE:
+                return Response(
+                    {"error": f"The file '{field_name}' exceeds the {MAX_FILE_SIZE // (1024 * 1024)} MB size limit."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+            file_payload[field_name] = {
+                "data": uploaded_file.read(),
+                "name": uploaded_file.name,
+                "mimetype": uploaded_file.content_type,
+            }
+
+    with transaction.atomic():
+        updated_employee = serializer.save()
+        if file_payload:
+            for field_name, meta in file_payload.items():
+                setattr(updated_employee, f"{field_name}_data", meta["data"])
+                setattr(updated_employee, f"{field_name}_name", meta["name"])
+                setattr(updated_employee, f"{field_name}_mimetype", meta["mimetype"])
+            updated_employee.save()
+
+        draft_status = EmploymentStatus.objects.filter(code="draft").first()
+        if draft_status and updated_employee.status_id != draft_status.id:
+            updated_employee.status = draft_status
+            updated_employee.save(update_fields=["status"])
+
+        mark_token_used(row)
+
+    try:
+        send_onboarding_complete(updated_employee)
+    except Exception as mail_err:
+        print(f"Onboarding complete email failed: {mail_err}")
+
+    return Response({
+        "success": True,
+        "message": "Onboarding form submitted successfully.",
+        "employee_number": updated_employee.employee_number,
+    }, status=status.HTTP_200_OK)
 
 @api_view(["GET", "POST", "DELETE", "PUT"])
 @parser_classes([MultiPartParser, FormParser, JSONParser])
@@ -1409,33 +1538,53 @@ def attendance_bulk_upload(request):
             {'error': 'No rows found in the uploaded file.'},
             status=status.HTTP_400_BAD_REQUEST
         )
+
     saved_records = []
     failed_records = []
+    skipped_weekend_records = []
     affected = set()
+
     for index, single_row in enumerate(all_rows):
         row_checker = AttendanceBulkRowSerializer(data=single_row)
-        if row_checker.is_valid():
-            try:
-                with transaction.atomic():
-                    saved_attendance = row_checker.save()
-                    affected.add((saved_attendance.employee_id, saved_attendance.date.replace(day=1)))
-                saved_records.append({
-                    'row_number': index + 1,
-                    'employee_name': saved_attendance.employee.name,
-                    'date': str(saved_attendance.date),
-                    'status': saved_attendance.status,
-                })
-            except Exception as e:
-                failed_records.append({
-                    'row_number': index + 1,
-                    'emp_no': single_row.get('emp_no'),
-                    'reason': str(e),
-                })
-        else:
+        if not row_checker.is_valid():
             failed_records.append({
                 'row_number': index + 1,
                 'emp_no': single_row.get('emp_no'),
                 'reason': row_checker.errors,
+            })
+            continue
+
+        # ---- weekend filter: use the SAME date the serializer resolved ----
+        # (not the raw string) so parsing is always consistent with what
+        # actually gets saved. This avoids the earlier bug where manual
+        # strptime() on the raw string silently failed to match Excel's
+        # date format and let weekend rows slip through.
+        resolved_date = row_checker.validated_data.get('date')
+        if resolved_date and resolved_date.weekday() in (5, 6):  # 5=Sat, 6=Sun
+            skipped_weekend_records.append({
+                'row_number': index + 1,
+                'emp_no': single_row.get('emp_no'),
+                'date': str(resolved_date),
+                'day': resolved_date.strftime('%A'),
+            })
+            continue
+        # -----------------------------------------------------------------
+
+        try:
+            with transaction.atomic():
+                saved_attendance = row_checker.save()
+                affected.add((saved_attendance.employee_id, saved_attendance.date.replace(day=1)))
+            saved_records.append({
+                'row_number': index + 1,
+                'employee_name': saved_attendance.employee.name,
+                'date': str(saved_attendance.date),
+                'status': saved_attendance.status,
+            })
+        except Exception as e:
+            failed_records.append({
+                'row_number': index + 1,
+                'emp_no': single_row.get('emp_no'),
+                'reason': str(e),
             })
 
     for emp_id, month in affected:
@@ -1449,8 +1598,10 @@ def attendance_bulk_upload(request):
         'total_rows': len(all_rows),
         'successfully_saved': len(saved_records),
         'failed': len(failed_records),
+        'skipped_weekend': len(skipped_weekend_records),
         'saved_records': saved_records,
         'failed_records': failed_records,
+        'skipped_weekend_records': skipped_weekend_records,
     }, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
@@ -2099,18 +2250,45 @@ def update_employee_status(request, employee_id):
     except Employee.DoesNotExist:
         return Response({'error': 'Employee not found'}, status=status.HTTP_404_NOT_FOUND)
 
+    old_status = employee.status
     serializer = EmployeeStatusUpdateSerializer(employee, data=request.data, partial=True)
 
     if serializer.is_valid():
-        if serializer.validated_data.get('status') and \
-                serializer.validated_data['status'].code == 'resign' and \
+        new_status = serializer.validated_data.get('status')
+
+        if new_status and new_status.code == 'draft' and old_status is not None and old_status.code != 'draft':
+            return Response(
+                {'status': 'Draft is set automatically and cannot be selected once an employee has left it.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        if new_status and new_status.code == 'resign' and \
                 not serializer.validated_data.get('feedback'):
             return Response(
                 {'feedback': 'Feedback is required for resignation'},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        serializer.save()
+        updated_employee = serializer.save()
+
+        if new_status and new_status.id != getattr(old_status, 'id', None):
+            was_draft = old_status is not None and old_status.code == 'draft'
+            try:
+                if was_draft and new_status.code != 'draft':
+                    from accounts.password_tokens import create_setup_token, SETUP_TTL_HOURS
+                    frontend = getattr(django_settings, "FRONTEND_URL", "http://localhost:5173").rstrip("/")
+                    setup_token = create_setup_token(updated_employee.user)
+                    setup_url = f"{frontend}/create-password/{setup_token.token}"
+                    send_employee_password_setup(updated_employee, setup_url, ttl_hours=SETUP_TTL_HOURS)
+                else:
+                    send_employee_status_changed(
+                        updated_employee,
+                        old_status.name if old_status else '',
+                        new_status.name,
+                    )
+            except Exception as mail_err:
+                print(f"Status-change email failed: {mail_err}")
+
         return Response(serializer.data)
 
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

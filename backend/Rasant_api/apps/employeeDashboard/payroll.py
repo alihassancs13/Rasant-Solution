@@ -49,7 +49,7 @@ def resolve_employment_status(value):
 def default_employment_status():
     from .models import EmploymentStatus
 
-    obj = EmploymentStatus.objects.filter(code="intern").first()
+    obj = EmploymentStatus.objects.filter(code="draft").first()
     if obj:
         return obj
     return EmploymentStatus.objects.order_by("sort_order", "id").first()

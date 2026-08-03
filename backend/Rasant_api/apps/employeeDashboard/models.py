@@ -58,12 +58,12 @@ class Employee(models.Model):
         default=False,
         help_text="If true, attendance outside the office radius is labeled Work from home.",
     )
-    salary = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    tax = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    insurance_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    salary = models.IntegerField(default=0)
+    tax = models.IntegerField(  default=0)
+    insurance_amount = models.IntegerField( default=0)
     is_increment_pending = models.BooleanField(default=False)
     increment_applied_on = models.DateField(null=True, blank=True)
-    current_salary = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    current_salary = models.IntegerField(null=True, blank=True)
     joined_date = models.DateField(default=date.today)
     status = models.ForeignKey(
         EmploymentStatus,

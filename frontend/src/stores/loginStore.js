@@ -3,6 +3,7 @@ import { defineStore } from 'pinia';
 import { authAPI } from '../services/loginApi.js';
 import { usePolicyStore } from '@/stores/policyStore';
 import { useSidebarStore } from '@/stores/sidebarStore.js';
+import {useInboxStore} from "@/stores/inboxStore.js";
 
 export const useLoginStore = defineStore('login', {
     state: () => ({
@@ -50,10 +51,11 @@ export const useLoginStore = defineStore('login', {
             this.isAuthenticated = false;
             this.error = null;
             this.errorType = null;
-            localStorage.removeItem('accessToken');  //  changed
+            localStorage.removeItem('accessToken');
             localStorage.removeItem('refreshToken');
             localStorage.removeItem('user');
             useSidebarStore().clearModules();
+            useInboxStore().disconnectSSE();
         },
         async login(credentials) {
             this.isLoading = true;
@@ -139,6 +141,11 @@ export const useLoginStore = defineStore('login', {
             } catch (error) {
                 console.error('Logout error:', error);
             } finally {
+                try {
+                    await useInboxStore().markOffline();
+                } catch (offlineErr) {
+                    console.error('Failed to mark offline on logout:', offlineErr);
+                }
                 this.clearTokens();
             }
         },
@@ -216,7 +223,7 @@ export const useLoginStore = defineStore('login', {
         strategies: [
             {
                 key: 'loginStore',
-                storage: localStorage,   //  changed from sessionStorage
+                storage: localStorage,
                 paths: ['accessToken', 'refreshToken', 'user', 'isAuthenticated'],
             },
         ],

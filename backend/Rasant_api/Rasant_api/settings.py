@@ -165,8 +165,7 @@ EMAIL_USE_SSL = True
 EMAIL_HOST_USER = 'danialali@rasantsol.com'
 EMAIL_HOST_PASSWORD = ''
 DEFAULT_FROM_EMAIL = 'Rasant Solutions <danialali@rasantsol.com>'
-FRONTEND_URL = 'https://rasantsol.com'
-
+FRONTEND_URL = 'http://localhost:5173'
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 

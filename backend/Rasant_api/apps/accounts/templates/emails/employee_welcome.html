@@ -30,4 +30,22 @@
     If the button does not work, copy and paste this link into your browser:<br />
     <a href="{{ setup_url }}" style="color:#4A90E2;word-break:break-all;">{{ setup_url }}</a>
   </p>
+
+  {% if onboarding_url %}
+  <hr style="border:none;border-top:1px solid #E2E8F0;margin:26px 0;" />
+
+  <p style="margin:0 0 18px;font-size:15px;line-height:1.6;color:#475569;">
+    Once you've signed in, please complete your onboarding form so we have your full employment details on file.
+    {% if onboarding_ttl_hours %}This link expires in <strong>{{ onboarding_ttl_hours }} hours</strong>.{% endif %}
+  </p>
+
+  <a href="{{ onboarding_url }}" style="display:inline-block;background:#1E3A5F;color:#ffffff;text-decoration:none;font-weight:700;font-size:14px;padding:12px 22px;border-radius:10px;">
+    Complete onboarding form
+  </a>
+
+  <p style="margin:18px 0 0;font-size:12px;line-height:1.6;color:#94A3B8;">
+    If the button does not work, copy and paste this link into your browser:<br />
+    <a href="{{ onboarding_url }}" style="color:#4A90E2;word-break:break-all;">{{ onboarding_url }}</a>
+  </p>
+  {% endif %}
 {% endblock %}
