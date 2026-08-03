@@ -329,24 +329,34 @@
           </div>
 
           <!-- Password + Confirm Password in one row -->
+          <!-- Password + Confirm Password in one row -->
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">
                 Password
                 <span v-if="isEditing" class="text-gray-400 text-xs font-normal">(leave blank to keep current)</span>
               </label>
-              <input
-                  v-model="form.password"
-                  type="text"
-                  :placeholder="isEditing ? 'Leave blank to keep current' : 'Enter password'"
-                  :class="[
-                      'w-full px-4 py-2 border rounded-lg bg-white outline-none transition-all duration-200 placeholder:text-gray-400',
-                      fieldErrors.password
-                          ? 'border-error ring-2 ring-error/20 focus:border-error focus:ring-error/30'
-                          : 'border-borderDefault focus:border-primary-500 focus:ring-4 focus:ring-primary-500/12 focus:shadow-[0_0_0_4px_rgba(74,144,226,0.08),0_2px_8px_rgba(74,144,226,0.12)]'
-                  ]"
-                  :required="!isEditing"
-              />
+              <div class="relative">
+                <input
+                    v-model="form.password"
+                    :type="showPassword ? 'text' : 'password'"
+                    :placeholder="isEditing ? 'Leave blank to keep current' : 'Enter password'"
+                    :class="[
+              'w-full px-4 py-2 border rounded-lg bg-white outline-none transition-all duration-200 placeholder:text-gray-400 pr-10',
+              fieldErrors.password
+                  ? 'border-error ring-2 ring-error/20 focus:border-error focus:ring-error/30'
+                  : 'border-borderDefault focus:border-primary-500 focus:ring-4 focus:ring-primary-500/12 focus:shadow-[0_0_0_4px_rgba(74,144,226,0.08),0_2px_8px_rgba(74,144,226,0.12)]'
+          ]"
+                    :required="!isEditing"
+                />
+                <button
+                    type="button"
+                    @click="showPassword = !showPassword"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <i :class="showPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                </button>
+              </div>
               <p v-if="fieldErrors.password" class="text-xs mt-1 text-red-500">{{ fieldErrors.password }}</p>
               <p
                   v-else-if="passwordStrength && passwordStrength !== 'strong'"
@@ -358,19 +368,27 @@
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Confirm password</label>
-              <input
-                  v-model="form.confirmPassword"
-                  :type="showPassword ? 'text' : 'password'"
-                  :placeholder="isEditing ? 'Confirm new password' : 'Re-enter password'"
-                  :class="[
-                      'w-full px-4 py-2 border rounded-lg bg-white outline-none transition-all duration-200 placeholder:text-gray-400',
-                      fieldErrors.confirmPassword
-                          ? 'border-error ring-2 ring-error/20 focus:border-error focus:ring-error/30'
-                          : 'border-borderDefault focus:border-primary-500 focus:ring-4 focus:ring-primary-500/12 focus:shadow-[0_0_0_4px_rgba(74,144,226,0.08),0_2px_8px_rgba(74,144,226,0.12)]'
-                  ]"
-                  :required="!isEditing || !!form.password"
-              />
-
+              <div class="relative">
+                <input
+                    v-model="form.confirmPassword"
+                    :type="showConfirmPassword ? 'text' : 'password'"
+                    :placeholder="isEditing ? 'Confirm new password' : 'Re-enter password'"
+                    :class="[
+              'w-full px-4 py-2 border rounded-lg bg-white outline-none transition-all duration-200 placeholder:text-gray-400 pr-10',
+              fieldErrors.confirmPassword
+                  ? 'border-error ring-2 ring-error/20 focus:border-error focus:ring-error/30'
+                  : 'border-borderDefault focus:border-primary-500 focus:ring-4 focus:ring-primary-500/12 focus:shadow-[0_0_0_4px_rgba(74,144,226,0.08),0_2px_8px_rgba(74,144,226,0.12)]'
+          ]"
+                    :required="!isEditing || !!form.password"
+                />
+                <button
+                    type="button"
+                    @click="showConfirmPassword = !showConfirmPassword"
+                    class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <i :class="showConfirmPassword ? 'fas fa-eye-slash' : 'fas fa-eye'"></i>
+                </button>
+              </div>
               <p v-if="fieldErrors.confirmPassword" class="text-xs mt-1 text-red-500">{{ fieldErrors.confirmPassword }}</p>
               <p v-else-if="passwordMismatch" class="text-xs mt-1 text-red-500">
                 Passwords do not match
@@ -599,9 +617,13 @@ export default {
   },
   setup() {
     const isSidebarOpen = ref(false)
+    const showPassword = ref(false)
+    const showConfirmPassword = ref(false)
     return {
       ...useCredentialsVault(),
-      isSidebarOpen
+      isSidebarOpen,
+      showPassword,
+      showConfirmPassword
     }
   }
 }

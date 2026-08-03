@@ -552,9 +552,9 @@
               @input="markCreateTouched('insurance_amount')"
               @blur="markCreateTouched('insurance_amount')"
           />
-          <span v-if="createTouched.insurance_amount && createErrors.insurance_amount" class="text-xs text-rose-500 mt-1 block">
-        <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ createErrors.insurance_amount }}
-      </span>
+              <span v-if="createTouched.insurance_amount && createErrors.insurance_amount" class="text-xs text-rose-500 mt-1 block">
+            <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ createErrors.insurance_amount }}
+          </span>
         </div>
 
         <!-- Tax -->
@@ -574,9 +574,9 @@
             <span class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">%</span>
           </div>
           <span v-if="createTouched.tax && createErrors.tax" class="text-xs text-rose-500 mt-1 block">
-        <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ createErrors.tax }}
-      </span>
-        </div>
+              <i class="fa-solid fa-circle-exclamation mr-1"></i>{{ createErrors.tax }}
+            </span>
+              </div>
       </form>
     </CreateModal>
 

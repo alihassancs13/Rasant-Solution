@@ -89,7 +89,7 @@ export function useEmployeeDashboard() {
         tax: null,
     });
 
-    const CREATE_REQUIRED_FIELDS = ['first_name', 'last_name','username','email', 'phone_number', 'salary', 'department', 'position', 'insurance_amount', 'tax'];
+    const CREATE_REQUIRED_FIELDS = ['first_name', 'last_name','username','email', 'phone_number', 'salary', 'department', 'position',];
 
     const isCreateFormValid = computed(() => {
         for (const field of CREATE_REQUIRED_FIELDS) {
@@ -637,9 +637,9 @@ export function useEmployeeDashboard() {
 
             if (result.success) {
                 const emailNote = result.data?.email_sent === false
-                    ? ' Create-password email could not be sent — check Email settings.'
-                    : ' A create-password link was emailed to the employee.';
-                showToast(`Employee created successfully.${emailNote}`, 'success', 5000);
+                    ? ' Onboarding form link cannot be sent — check Email settings.'
+                    : ' Onboarding link sent to employee ';
+                showToast(`${emailNote}`, 'success', 5000);
                 closeCreateModal();
                 try {
                     await loadEmployees();
@@ -648,6 +648,12 @@ export function useEmployeeDashboard() {
                 }
             } else {
                 let errorMsg = result.error || 'Failed to create employee';
+
+                // Check for duplicate username error
+                if (result.error && typeof result.error === 'string' && result.error.includes('Duplicate entry') && result.error.includes('username')) {
+                    errorMsg = 'Username already exists. Please choose a different username.';
+                }
+
                 if (result.errors) {
                     const firstField = Object.keys(result.errors)[0];
                     if (firstField) {
@@ -660,7 +666,14 @@ export function useEmployeeDashboard() {
             }
         } catch (error) {
             console.error('Failed to create employee:', error);
-            showToast(error?.message || 'Failed to create employee. Please try again.', 'error');
+            let errorMsg = error?.message || 'Failed to create employee. Please try again.';
+
+            // Check for duplicate username error in catch block
+            if (errorMsg && typeof errorMsg === 'string' && errorMsg.includes('Duplicate entry') && errorMsg.includes('username')) {
+                errorMsg = 'Username already exists. Please choose a different username.';
+            }
+
+            showToast(errorMsg, 'error', 6000);
         } finally {
             isCreating.value = false;
         }
@@ -970,7 +983,7 @@ export function useEmployeeDashboard() {
     };
 
     const copyOnboardingLink = async () => {
-        const link = `${window.location.origin}/onboarding/new`;
+        const link = `${window.location.origin}/onboarding`;
         try {
             await navigator.clipboard.writeText(link);
             showToast('Onboarding link copied to clipboard!', 'success');

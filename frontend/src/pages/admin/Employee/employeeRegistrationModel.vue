@@ -163,35 +163,35 @@
                 <!-- Row 1b: CNIC (moved to next row) -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">CNIC <span class="text-rose-500">*</span></label>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">CNIC <span v-if="isDirectAccess" class="text-rose-500">*</span></label>
                     <input
                         type="text"
                         v-model="formData.cnic"
                         :required="isDirectAccess"
                         :class="[
-        'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
-        (cnicError || validationError) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
-      ]"
+                          'w-full px-4 py-2.5 rounded-xl border focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm',
+                          (cnicError || validationError) ? 'border-rose-500 bg-rose-50' : 'border-slate-200'
+                        ]"
                         placeholder="00000-0000000-0"
                         @input="formatCnic"
                         @focus="validationError = ''"
                         maxlength="15"
-                    >
-                    <span v-if="cnicError" class="text-xs text-rose-500 mt-1 block">
-      <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ cnicError }}
-    </span>
-                    <span v-else-if="validationError" class="text-xs text-rose-500 mt-1 block">
-      <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ validationError }}
-    </span>
-                    <span v-else class="text-[10px] text-slate-400 mt-1 block">National identity card number (13 digits)</span>
-                  </div>
+                                      >
+                                      <span v-if="cnicError" class="text-xs text-rose-500 mt-1 block">
+                        <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ cnicError }}
+                      </span>
+                                      <span v-else-if="validationError" class="text-xs text-rose-500 mt-1 block">
+                        <i class="fa-solid fa-circle-exclamation mr-1"></i> {{ validationError }}
+                      </span>
+                                      <span v-else class="text-[10px] text-slate-400 mt-1 block">National identity card number (13 digits)</span>
+                                    </div>
                   <!-- You can add another field here if needed, or leave empty -->
                   <div></div>
                 </div>
 
                 <!-- CNIC Scan -->
                 <div>
-                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">CNIC Scan copy <span class="text-rose-500" v-if="!fileNames.cnic_scan">*</span></label>
+                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">CNIC Scan copy <span v-if="isDirectAccess" class="text-rose-500">*</span></label>
 
                   <div v-if="fileNames.cnic_scan" class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between">
                     <div class="flex items-center gap-3">
@@ -396,7 +396,7 @@
 
                 <!-- Present Address -->
                 <div>
-                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Present Address <span class="text-rose-500">*</span></label>
+                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Present Address <span v-if="isDirectAccess" class="text-rose-500">*</span></label>
                   <textarea
                       v-model="formData.present_address"
                       :required="isDirectAccess"
@@ -440,7 +440,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Name <span class="text-rose-500">*</span></label>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Name <span v-if="isDirectAccess" class="text-rose-500">*</span></label>
                     <input
                         type="text"
                         v-model="formData.emergency_name"
@@ -458,7 +458,7 @@
                     </span>
                   </div>
                   <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Relation <span class="text-rose-500">*</span></label>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Relation <span v-if="isDirectAccess" class="text-rose-500">*</span></label>
                     <input
                         type="text"
                         v-model="formData.emergency_relation"
@@ -478,7 +478,7 @@
                 </div>
 
                 <div>
-                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">CNIC <span class="text-rose-500">*</span></label>
+                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">CNIC <span v-if="isDirectAccess" class="text-rose-500">*</span></label>
                   <input
                       type="text"
                       v-model="formData.emergency_cnic"
@@ -498,7 +498,7 @@
                 </div>
 
                 <div>
-                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">CNIC scan copy <span class="text-rose-500" v-if="!fileNames.emergency_cnic_scan">*</span></label>
+                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">CNIC scan copy <span v-if="isDirectAccess" class="text-rose-500">*</span></label>
 
                   <div v-if="fileNames.emergency_cnic_scan" class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between">
                     <div class="flex items-center gap-3">
@@ -528,7 +528,7 @@
                 </div>
 
                 <div>
-                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Phone no <span class="text-rose-500">*</span></label>
+                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Phone no <span v-if="isDirectAccess" class="text-rose-500">*</span></label>
                   <input
                       type="text"
                       inputmode="numeric"
@@ -550,7 +550,7 @@
                 </div>
 
                 <div>
-                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Address <span class="text-rose-500">*</span></label>
+                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Address <span v-if="isDirectAccess" class="text-rose-500">*</span></label>
                   <textarea
                       v-model="formData.emergency_address"
                       :required="isDirectAccess"
@@ -588,7 +588,7 @@
 
                 <!-- Matric -->
                 <div>
-                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Matric certificate or marksheet <span class="text-rose-500" v-if="!fileNames.matric_certificate">*</span></label>
+                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Matric certificate or marksheet <span v-if="isDirectAccess" class="text-rose-500">*</span></label>
 
                   <div v-if="fileNames.matric_certificate" class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between">
                     <div class="flex items-center gap-3">
@@ -619,7 +619,7 @@
 
                 <!-- FSC -->
                 <div>
-                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">FSC / Intermediate certificate or marksheet <span class="text-rose-500" v-if="!fileNames.fsc_certificate">*</span></label>
+                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">FSC / Intermediate certificate or marksheet <span v-if="isDirectAccess" class="text-rose-500">*</span></label>
 
                   <div v-if="fileNames.fsc_certificate" class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between">
                     <div class="flex items-center gap-3">
@@ -650,7 +650,7 @@
 
                 <!-- University -->
                 <div>
-                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">University degree / graduation certificate <span class="text-rose-500" v-if="!fileNames.university_degree">*</span></label>
+                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">University degree / graduation certificate <span v-if="isDirectAccess" class="text-rose-500">*</span></label>
 
                   <div v-if="fileNames.university_degree" class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex items-center justify-between">
                     <div class="flex items-center gap-3">
@@ -726,7 +726,7 @@
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Bank Name <span class="text-rose-500">*</span></label>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Bank Name <span v-if="isDirectAccess" class="text-rose-500">*</span></label>
                     <input
                         type="text"
                         v-model="formData.bank_name"
@@ -744,7 +744,7 @@
                     </span>
                   </div>
                   <div>
-                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Branch Name</label>
+                    <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Branch Name <span v-if="isDirectAccess" class="text-rose-500">*</span></label>
                     <input
                         type="text"
                         v-model="formData.branch_name"
@@ -763,7 +763,7 @@
                 </div>
 
                 <div>
-                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Account no / IBAN Number <span class="text-rose-500">*</span></label>
+                  <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-2">Account no / IBAN Number <span v-if="isDirectAccess" class="text-rose-500">*</span></label>
                   <input
                       type="text"
                       v-model="formData.account_number"
