@@ -380,26 +380,22 @@ export function useEmployeeDashboard() {
         const total = totalPages.value;
         const current = currentPage.value;
         if (total <= 1) return [];
-        const pages = [];
-        const maxVisible = 5;
-        if (total <= maxVisible) {
-            for (let i = 1; i <= total; i++) pages.push(i);
-        } else {
-            const left = Math.max(1, current - 1);
-            const right = Math.min(total, current + 1);
-            if (left > 1) {
-                pages.push(1);
-                if (left > 2) pages.push('...');
-            }
-            for (let i = left; i <= right; i++) {
-                pages.push(i);
-            }
-            if (right < total) {
-                if (right < total - 1) pages.push('...');
-                pages.push(total);
-            }
+        if (total <= 3) {
+            return Array.from({ length: total }, (_, i) => i + 1);
         }
-        return pages;
+
+        const pages = new Set([1, total, current]);
+        if (current + 1 <= total) pages.add(current + 1);
+
+        const sorted = Array.from(pages).sort((a, b) => a - b);
+        const result = [];
+        let prev = null;
+        for (const p of sorted) {
+            if (prev !== null && p - prev > 1) result.push('...');
+            result.push(p);
+            prev = p;
+        }
+        return result;
     });
 
     const filteredEmployees = computed(() => {
@@ -441,8 +437,9 @@ export function useEmployeeDashboard() {
     const totalPages = computed(() => Math.ceil(totalFiltered.value / pageSize.value));
 
     const paginatedEmployees = computed(() => {
-        const start = (currentPage.value - 1) * pageSize.value;
-        const end = start + pageSize.value;
+        const size = Number(pageSize.value) || 5;
+        const start = (currentPage.value - 1) * size;
+        const end = start + size;
         return sortedEmployees.value.slice(start, end);
     });
 

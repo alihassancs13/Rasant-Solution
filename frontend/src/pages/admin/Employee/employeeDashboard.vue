@@ -64,7 +64,7 @@
               <div class="flex items-center gap-2">
                 <span class="text-sm text-text-muted whitespace-nowrap">Show</span>
                 <select
-                    v-model="pageSize"
+                    v-model.number="pageSize"
                     class="px-3 py-2 bg-surface border border-border rounded-xl text-sm focus:outline-none focus:border-primary transition-colors"
                 >
                   <option value="5">5</option>

@@ -4,28 +4,36 @@ import * as XLSX from 'xlsx'
 import { useAttendanceStore } from '../stores/attendanceStore.js'
 import { useToast } from '@/composables/useToast'
 function buildPageNumbers(current, total) {
-    if (total <= 5) {
+    if (total <= 3) {
         return Array.from({ length: total }, (_, i) => i + 1)
     }
 
-    let leftStart = current <= 2 ? 1 : current - 1
-    leftStart = Math.min(leftStart, total - 1)
-    const leftEnd = Math.min(leftStart + 1, total)
-    const left = leftStart === leftEnd ? [leftStart] : [leftStart, leftEnd]
+    const pages = new Set([1, total])
 
-    const rightStart = total - 1
-    const rightEnd = total
-    let right = rightStart === rightEnd ? [rightEnd] : [rightStart, rightEnd]
-    right = right.filter((p) => !left.includes(p))
-
-    if (right.length === 0) {
-        return [1, '...', ...left]
+    // current page ke aas-paas ke numbers bhi rakhein (agar start/end pe na ho)
+    if (current > 1 && current < total) {
+        pages.add(current)
     }
 
-    return [...left, '...', ...right]
+    // hamesha aakhri 2 pages dikhayein (jaisa aapke screenshot mein hai)
+    pages.add(total - 1)
+
+    const sorted = Array.from(pages)
+        .filter((p) => p >= 1 && p <= total)
+        .sort((a, b) => a - b)
+
+    const result = []
+    let prev = null
+    for (const p of sorted) {
+        if (prev !== null && p - prev > 1) {
+            result.push('...')
+        }
+        result.push(p)
+        prev = p
+    }
+    return result
 }
 
-// Reusable pagination state for a reactive source array.
 function usePagination(sourceRef, initialPageSize = 5) {
     const currentPage = ref(1)
     const pageSize = ref(initialPageSize)
@@ -187,7 +195,6 @@ export function useAttendance() {
     const { isLoading: isLoadingList, isLoadingHistory, isSubmitting: isUploading } = storeToRefs(store)
     const { showToast } = useToast()
 
-    // ---------- list ----------
     const searchQuery = ref('')
 
     const employees = computed(() => store.employees.map(mapEmployeeRow))

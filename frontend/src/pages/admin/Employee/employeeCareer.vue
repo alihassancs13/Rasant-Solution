@@ -128,11 +128,12 @@ const jobsPageNumbers = computed(() => {
   const total = jobsTotalPages.value
   const current = jobsCurrentPage.value
   if (total <= 7) return Array.from({ length: total }, (_, i) => i + 1)
-  const pages = [1]
+
+  const pages = [1, 2]
   if (current > 3) pages.push('...')
-  for (let p = Math.max(2, current - 1); p <= Math.min(total - 1, current + 1); p++) pages.push(p)
+  if (current > 2 && current < total - 1) pages.push(current)
   if (current < total - 2) pages.push('...')
-  pages.push(total)
+  pages.push(total - 1, total)
   return pages
 })
 
