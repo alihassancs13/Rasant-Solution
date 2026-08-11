@@ -1,0 +1,97 @@
+<svg viewBox="0 0 1000 720" xmlns="http://www.w3.org/2000/svg" font-family="'Segoe UI', Arial, sans-serif">
+    <defs>
+        <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="#64748b"/>
+        </marker>
+        <linearGradient id="frontendGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#4A90E2"/>
+            <stop offset="100%" stop-color="#2A5F9E"/>
+        </linearGradient>
+        <linearGradient id="backendGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#16a34a"/>
+            <stop offset="100%" stop-color="#0f766e"/>
+        </linearGradient>
+        <linearGradient id="dbGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#f59e0b"/>
+            <stop offset="100%" stop-color="#d97706"/>
+        </linearGradient>
+    </defs>
+
+    <rect width="1000" height="720" fill="#f8fafc"/>
+
+    <text x="500" y="40" text-anchor="middle" font-size="24" font-weight="700" fill="#1e293b">System Architecture</text>
+
+    <!-- Browser / Client layer -->
+    <rect x="60" y="70" width="880" height="60" rx="12" fill="#e2e8f0" stroke="#cbd5e1" stroke-width="1.5"/>
+    <text x="500" y="106" text-anchor="middle" font-size="15" font-weight="600" fill="#334155">Browser (Admin / Employee / Client)</text>
+
+    <!-- Arrow down -->
+    <line x1="500" y1="130" x2="500" y2="160" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+
+    <!-- Frontend block -->
+    <rect x="60" y="165" width="880" height="180" rx="14" fill="url(#frontendGrad)"/>
+    <text x="90" y="196" font-size="16" font-weight="700" fill="#ffffff">Vue 3 Frontend</text>
+
+    <rect x="90" y="212" width="240" height="110" rx="10" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.4)"/>
+    <text x="210" y="238" text-anchor="middle" font-size="13" font-weight="600" fill="#ffffff">Pages / Components</text>
+    <text x="210" y="260" text-anchor="middle" font-size="11" fill="#e2e8f0">AdminSidebar, BaseModal,</text>
+    <text x="210" y="276" text-anchor="middle" font-size="11" fill="#e2e8f0">StatCard, AppSkeleton,</text>
+    <text x="210" y="292" text-anchor="middle" font-size="11" fill="#e2e8f0">Toast, per-page views</text>
+
+    <rect x="350" y="212" width="240" height="110" rx="10" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.4)"/>
+    <text x="470" y="238" text-anchor="middle" font-size="13" font-weight="600" fill="#ffffff">Composables</text>
+    <text x="470" y="260" text-anchor="middle" font-size="11" fill="#e2e8f0">useAttendance, useJira,</text>
+    <text x="470" y="276" text-anchor="middle" font-size="11" fill="#e2e8f0">useEmployeeDashboard,</text>
+    <text x="470" y="292" text-anchor="middle" font-size="11" fill="#e2e8f0">useWorklog, useToast ...</text>
+
+    <rect x="610" y="212" width="300" height="110" rx="10" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.4)"/>
+    <text x="760" y="238" text-anchor="middle" font-size="13" font-weight="600" fill="#ffffff">Pinia Stores</text>
+    <text x="760" y="260" text-anchor="middle" font-size="11" fill="#e2e8f0">All API calls (axios) + auth</text>
+    <text x="760" y="276" text-anchor="middle" font-size="11" fill="#e2e8f0">token, employeeStore,</text>
+    <text x="760" y="292" text-anchor="middle" font-size="11" fill="#e2e8f0">jiraStore, policyStore ...</text>
+
+    <!-- Arrow down to backend -->
+    <line x1="500" y1="345" x2="500" y2="380" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="515" y="368" font-size="11" fill="#64748b">REST (JWT) + SSE</text>
+
+    <!-- Backend block -->
+    <rect x="60" y="385" width="880" height="150" rx="14" fill="url(#backendGrad)"/>
+    <text x="90" y="416" font-size="16" font-weight="700" fill="#ffffff">Django REST Framework API</text>
+
+    <rect x="90" y="432" width="270" height="85" rx="10" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.4)"/>
+    <text x="225" y="458" text-anchor="middle" font-size="12" font-weight="600" fill="#ffffff">Auth &amp; Roles</text>
+    <text x="225" y="476" text-anchor="middle" font-size="11" fill="#e2e8f0">Custom User + Role,</text>
+    <text x="225" y="492" text-anchor="middle" font-size="11" fill="#e2e8f0">JWT (admin/employee/client)</text>
+
+    <rect x="375" y="432" width="270" height="85" rx="10" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.4)"/>
+    <text x="510" y="458" text-anchor="middle" font-size="12" font-weight="600" fill="#ffffff">Domain Apps</text>
+    <text x="510" y="476" text-anchor="middle" font-size="11" fill="#e2e8f0">HR, Payroll, Attendance,</text>
+    <text x="510" y="492" text-anchor="middle" font-size="11" fill="#e2e8f0">Careers, Documents, Chat</text>
+
+    <rect x="660" y="432" width="250" height="85" rx="10" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.4)"/>
+    <text x="785" y="458" text-anchor="middle" font-size="12" font-weight="600" fill="#ffffff">EmailSettings (solo)</text>
+    <text x="785" y="476" text-anchor="middle" font-size="11" fill="#e2e8f0">SMTP-driven branded</text>
+    <text x="785" y="492" text-anchor="middle" font-size="11" fill="#e2e8f0">email service</text>
+
+    <!-- Arrow down to DB -->
+    <line x1="270" y1="535" x2="270" y2="570" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="285" y="558" font-size="11" fill="#64748b">PyMySQL</text>
+
+    <!-- DB block -->
+    <rect x="120" y="575" width="300" height="80" rx="12" fill="url(#dbGrad)"/>
+    <text x="270" y="610" text-anchor="middle" font-size="14" font-weight="700" fill="#ffffff">MySQL Database</text>
+    <text x="270" y="630" text-anchor="middle" font-size="11" fill="#fff7ed">Users, employees, attendance,</text>
+    <text x="270" y="645" text-anchor="middle" font-size="11" fill="#fff7ed">payroll, documents, messages ...</text>
+
+    <!-- External services, right side -->
+    <line x1="785" y1="535" x2="785" y2="570" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="800" y="558" font-size="11" fill="#64748b">HTTPS</text>
+
+    <rect x="620" y="575" width="330" height="80" rx="12" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+    <text x="785" y="600" text-anchor="middle" font-size="13" font-weight="700" fill="#334155">External Services</text>
+    <text x="785" y="620" text-anchor="middle" font-size="11" fill="#475569">Jira Cloud API · SMTP mail server</text>
+    <text x="785" y="636" text-anchor="middle" font-size="11" fill="#475569">Company SMTP/email relay</text>
+
+    <!-- Legend -->
+    <text x="500" y="695" text-anchor="middle" font-size="11" fill="#94a3b8">Frontend (Vue 3 + Pinia) → Backend (Django REST + JWT) → MySQL, with Jira &amp; SMTP as external integrations</text>
+</svg>
