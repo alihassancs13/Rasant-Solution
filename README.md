@@ -84,7 +84,7 @@ A full-stack company management platform combining HR, payroll, attendance, docu
 
 ## 🏗 Architecture
 
-![Architecture](docs/screenshots/architecture.png)
+![Architecture](frontend/src/assets/screenshots/architecture.svg)
 
 ### Frontend
 - **Vue 3** (`<script setup>` for templates, business logic extracted into **composables**)
