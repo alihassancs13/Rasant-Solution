@@ -140,4 +140,4 @@ Configure environment variables for the database connection, JWT secret, and (op
 
 
 
-Internal project — © All rights reserved.﻿# Rasant-Solution
+Internal project — © All rights reserved.﻿
