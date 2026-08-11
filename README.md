@@ -138,13 +138,6 @@ Configure environment variables for the database connection, JWT secret, and (op
 
 ---
 
-## 🗺 Roadmap / Known Issues
 
-- Mobile sidebar hamburger toggle currently fails to open the sidebar on some layouts — under review
-- Centralizing form-field length validation via `useValidation.js` (in progress)
-
----
-
-## 📄 License
 
 Internal project — © All rights reserved.﻿# Rasant-Solution
